@@ -1,6 +1,8 @@
 name: 验证上传文件夹
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "45 13 * * *"
 jobs:
   verify:
     runs-on: ubuntu-latest
