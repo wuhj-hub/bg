@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: check secrets
+      - name: upload + move to folder
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
@@ -23,13 +23,16 @@ jobs:
           IMA_FOLDER_ID: ${{ secrets.IMA_FOLDER_ID }}
         run: |
           python3 - <<'PY'
-          import os
+          import os, sys, time
+          sys.path.insert(0, ".")
+          import upload_ima as U
           KB = os.environ["IMA_KB_ID"]
           FOLDER = os.environ["IMA_FOLDER_ID"]
-          EXPECT_KB = "6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs="
-          EXPECT_FOLDER = "folder_7485264708529742"
-          print("KB_MATCH", KB == EXPECT_KB)
-          print("FOLDER_MATCH", FOLDER == EXPECT_FOLDER)
-          print("KB_LEN", len(KB))
-          print("FOLDER_LEN", len(FOLDER))
+          fn = "对照实验_moved_%s.md" % time.strftime("%H%M%S")
+          open("/tmp/m.md", "w").write("# 对照实验 move\n上传并 move 到子文件夹。\n")
+          mid, cred = U.create_media(KB, fn, os.path.getsize("/tmp/m.md"), 7, "text/markdown", "md")
+          U.cos_upload(cred, "/tmp/m.md", "text/markdown")
+          print("UPLOADED", mid, "NAME", fn)
+          r = U.move_to_folder(KB, mid, FOLDER)
+          print("MOVE_CODE", r.get("code"), "MOVE_MSG", r.get("msg"))
           PY
