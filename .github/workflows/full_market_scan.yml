@@ -48,3 +48,10 @@ jobs:
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: ${{ secrets.IMA_FOLDER_ID }}
         run: python3 upload_ima.py --file full_market_report.md --name "全市场双维扫描_$(date +%Y-%m-%d).md"
+
+      - name: 推送报告到微信
+        if: success()
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          PUSH_SERVICE: pushplus
+        run: python3 push_report.py
