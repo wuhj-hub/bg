@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: 列出完整结构
+      - name: search files
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
@@ -24,25 +24,23 @@ jobs:
           python3 - <<'PY'
           import os, json, urllib.request
           KB = os.environ["IMA_KB_ID"]
+          TARGET = "folder_7485264708529742"
           def call(body):
               cid = os.environ["IMA_OPENAPI_CLIENTID"]; key = os.environ["IMA_OPENAPI_APIKEY"]
               req = urllib.request.Request(
-                  "https://ima.qq.com/openapi/wiki/v1/get_knowledge_list",
+                  "https://ima.qq.com/openapi/wiki/v1/search_knowledge",
                   data=json.dumps(body).encode(),
                   headers={"ima-openapi-clientid": cid, "ima-openapi-apikey": key, "Content-Type": "application/json"},
                   method="POST")
               return json.loads(urllib.request.urlopen(req, timeout=20).read().decode())
-          r = call({"cursor": "", "limit": 50, "knowledge_base_id": KB})
-          print("KB", KB)
-          print("ROOT current_path:", json.dumps(r.get("data", {}).get("current_path", []), ensure_ascii=False))
-          folders = r.get("data", {}).get("knowledge_list", [])
-          print("ROOT folders:", len(folders))
-          for it in folders:
-              fid = it.get("media_id")
-              name = it.get("file_name")
-              rr = call({"cursor": "", "limit": 50, "knowledge_base_id": KB, "folder_id": fid})
-              files = rr.get("data", {}).get("knowledge_list", [])
-              print(f"FOLDER id={fid} name={name} code={rr.get('code')} files={len(files)}")
-              for f in files:
-                  print("   -", f.get("media_id"), f.get("file_name"))
+          for q in ["验证", "全市场双维扫描"]:
+              r = call({"query": q, "knowledge_base_id": KB})
+              info = r.get("data", {}).get("info_list", [])
+              print(f"QUERY {q} count={len(info)} code={r.get('code')}")
+              for it in info:
+                  pid = it.get("parent_folder_id")
+                  name = it.get("file_name") or it.get("name")
+                  mid = it.get("media_id")
+                  tag = "MATCH_DUAL" if pid == TARGET else "NOT_DUAL"
+                  print(f"  {tag} name={name} media={mid}")
           PY
