@@ -1,57 +1,50 @@
-name: probe_search
+name: 全市场双维扫描
 
 on:
+  schedule:
+    # 北京时间 15:30（UTC 7:30），交易日收盘后自动运行（留 30 分钟给当日 K 线/资金流数据归集）
+    - cron: "30 7 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
   contents: read
 
+concurrency:
+  group: full-market-scan
+  cancel-in-progress: false
+
 jobs:
-  probe:
+  scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # 全市场约 3000 只主板股，westock 调用较慢，给足超时（GitHub 免费额度约 2000 分钟/月，
+    # 若额度不足请改用 workflow_dispatch 手动触发，或在 Secrets 中调高 SCAN_WORKERS 缩短时长）
+    timeout-minutes: 355
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: search-knowledge
+
+      - name: 生成沪深主板清单
+        run: python3 gen_mainboard.py
+
+      - name: 全市场双维扫描
+        env:
+          SCAN_WORKERS: "8"
+        run: python3 full_market_dualdim.py all_mainboard.csv
+
+      - name: 上传报告到 ima 知识库
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: ${{ secrets.IMA_FOLDER_ID }}
-        run: |
-          python3 - <<'PY'
-          import os, sys, time, json, urllib.request
-          KB = os.environ["IMA_KB_ID"]
-          FOLDER = os.environ["IMA_FOLDER_ID"]
-          CID = os.environ["IMA_OPENAPI_CLIENTID"]
-          KEY = os.environ["IMA_OPENAPI_APIKEY"]
-          print("EXPECT_KB", KB)
-          print("EXPECT_FOLDER", FOLDER)
-          def search(q):
-              body = json.dumps({"query": q, "knowledge_base_id": KB}).encode()
-              req = urllib.request.Request(
-                  "https://ima.qq.com/openapi/wiki/v1/search_knowledge",
-                  data=body,
-                  headers={"ima-openapi-clientid": CID,
-                           "ima-openapi-apikey": KEY,
-                           "Content-Type": "application/json"},
-                  method="POST")
-              with urllib.request.urlopen(req, timeout=30) as r:
-                  return json.loads(r.read().decode())
-          for q in ["全市场双维扫描", "验证", "对照", "盘前", "复盘", "2026"]:
-              try:
-                  res = search(q)
-                  lst = res.get("info_list", []) or []
-                  print("Q=%s CODE=%s CNT=%d" % (q, res.get("code"), len(lst)))
-                  for it in lst:
-                      pid = it.get("parent_folder_id")
-                      print("  title=%s mid=%s type=%s parent=%s MATCH_FOLDER=%s" % (
-                          it.get("title"), it.get("media_id"), it.get("media_type"),
-                          pid, pid == FOLDER))
-              except Exception as e:
-                  print("Q=%s ERR %s" % (q, repr(e)[:160]))
-              time.sleep(3)
-          PY
+        run: python3 upload_ima.py --file full_market_report.md --name "全市场双维扫描_$(date +%Y-%m-%d).md"
