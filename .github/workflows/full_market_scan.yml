@@ -2,8 +2,8 @@ name: 全市场双维扫描
 
 on:
   schedule:
-    # 北京时间 16:30（UTC 8:30），交易日收盘后自动运行
-    - cron: "30 8 * * 1-5"
+    # 北京时间 15:30（UTC 7:30），交易日收盘后自动运行（留 30 分钟给当日 K 线/资金流数据归集）
+    - cron: "30 7 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
