@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: upload test to root + list
+      - name: check secrets
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
@@ -23,22 +23,13 @@ jobs:
           IMA_FOLDER_ID: ${{ secrets.IMA_FOLDER_ID }}
         run: |
           python3 - <<'PY'
-          import os, json, sys
-          sys.path.insert(0, ".")
-          import upload_ima as U
+          import os
           KB = os.environ["IMA_KB_ID"]
           FOLDER = os.environ["IMA_FOLDER_ID"]
-          open("/tmp/t.md", "w").write("# 对照实验\n上传到根目录不 move。\n")
-          mid, cred = U.create_media(KB, "对照实验_root.md", os.path.getsize("/tmp/t.md"), 7, "text/markdown", "md")
-          U.cos_upload(cred, "/tmp/t.md", "text/markdown")
-          print("UPLOADED_ROOT", mid)
-          def gl(fid=""):
-              body = {"cursor": "", "limit": 50, "knowledge_base_id": KB}
-              if fid:
-                  body["folder_id"] = fid
-              return U.send_ima("openapi/wiki/v1/get_knowledge_list", json.dumps(body))
-          r = gl()
-          print("ROOT_RAW", json.dumps(r.get("data", {}), ensure_ascii=False)[:1800])
-          rf = gl(FOLDER)
-          print("FOLDER_RAW", json.dumps(rf.get("data", {}), ensure_ascii=False)[:1800])
+          EXPECT_KB = "6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs="
+          EXPECT_FOLDER = "folder_7485264708529742"
+          print("KB_MATCH", KB == EXPECT_KB)
+          print("FOLDER_MATCH", FOLDER == EXPECT_FOLDER)
+          print("KB_LEN", len(KB))
+          print("FOLDER_LEN", len(FOLDER))
           PY
