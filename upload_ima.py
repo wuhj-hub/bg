@@ -41,16 +41,18 @@ def build_authorization(secret_id, secret_key, method, pathname, headers, start_
     header_keys = sorted(headers.keys())
     http_headers = "&".join([f"{k.lower()}={urllib.parse.quote(headers[k])}" for k in header_keys])
     http_string = f"{method.lower()}\n{pathname}\n\n{http_headers}\n"
+    # COS 签名：两步 HMAC（SignKey = HMAC(SecretKey, KeyTime)，再 HMAC(SignKey, StringToSign)）
+    sign_key = hmac_sha1(secret_key, key_time)
     string_to_sign = f"sha1\n{key_time}\n{sha1(http_string)}\n"
-    signature = hmac_sha1(secret_key, string_to_sign)
+    signature = hmac_sha1(sign_key, string_to_sign)
     header_list = ";".join([k.lower() for k in header_keys])
     return "&".join([
         "q-sign-algorithm=sha1",
         f"q-ak={secret_id}",
         f"q-sign-time={key_time}",
         f"q-key-time={key_time}",
-        "q-header-list=" + header_list,
-        "q-url-param-list=",
+        f"q-header-list=" + header_list,
+        f"q-url-param-list=",
         f"q-signature={signature}",
     ])
 
@@ -87,19 +89,19 @@ def create_media(kb_id, filename, size, media_type, content_type, file_ext):
 
 
 def cos_upload(cred, file_path, content_type):
-    secret_id = cred["secret-id"]
-    secret_key = cred["secret-key"]
+    secret_id = cred["secret_id"]
+    secret_key = cred["secret_key"]
     token = cred["token"]
-    bucket = cred["bucket"]
+    bucket = cred["bucket_name"]
     region = cred["region"]
-    cos_key = cred["cos-key"]
+    cos_key = cred["cos_key"]
     with open(file_path, "rb") as f:
         data = f.read()
     hostname = f"{bucket}.cos.{region}.myqcloud.com"
     pathname = f"/{cos_key}"
     sign_headers = {"content-length": str(len(data)), "host": hostname}
     auth = build_authorization(secret_id, secret_key, "PUT", pathname, sign_headers,
-                               str(int(time.time())), str(int(time.time()) + 3600))
+                               cred["start_time"], cred["expired_time"])
     headers = {
         "Content-Type": content_type,
         "Content-Length": str(len(data)),
