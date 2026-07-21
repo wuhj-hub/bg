@@ -15,6 +15,7 @@ gen_mainboard.py —— 生成沪深主板股票清单 all_mainboard.csv
 import json
 import time
 import csv
+import sys
 import urllib.parse
 import urllib.request
 
@@ -25,8 +26,8 @@ HEADERS = {
 }
 
 
-def fetch_page(fs, pn=1, ps=1000):
-    """分页拉取东方财富股票列表。fs: 市场过滤器。"""
+def fetch_once(fs, pn, ps=1000):
+    """单次拉取东方财富股票列表。fs: 市场过滤器。"""
     params = {
         "pn": pn, "pz": ps, "po": "1", "np": "1", "fltt": "2",
         "invt": "2", "fid": "f3", "fs": fs,
@@ -36,6 +37,19 @@ def fetch_page(fs, pn=1, ps=1000):
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.loads(r.read().decode("utf-8"))
+
+
+def fetch_page(fs, pn, retries=3):
+    """带重试的翻页拉取；全部重试失败返回 None。"""
+    last = None
+    for _ in range(retries):
+        try:
+            return fetch_once(fs, pn)
+        except Exception as e:
+            last = e
+            time.sleep(2)
+    print(f"[WARN] fetch {fs} pn={pn} failed after {retries} retries: {last}")
+    return None
 
 
 def is_mainboard(code: str, name: str) -> bool:
@@ -65,10 +79,9 @@ def main():
     for fs in fs_list:
         pn = 1
         while True:
-            try:
-                d = fetch_page(fs, pn)
-            except Exception as e:
-                print(f"[WARN] fetch {fs} pn={pn} failed: {e}")
+            d = fetch_page(fs, pn)
+            if d is None:
+                # 该市场拉取失败，跳过（不影响另一市场）
                 break
             arr = (d.get("data") or {}).get("diff") or []
             if not arr:
@@ -78,11 +91,9 @@ def main():
                 name = (it.get("f14") or "").strip()
                 if is_mainboard(code, name):
                     codes.append((code, name))
-            if len(arr) < 1000:
-                break
             pn += 1
             time.sleep(0.3)
-    # 去重（沪/深可能重叠，理论上不重叠）
+    # 去重（沪/深理论上不重叠，仍保险）
     seen = set()
     uniq = []
     for c in codes:
@@ -90,6 +101,10 @@ def main():
             continue
         seen.add(c[0])
         uniq.append(c)
+    if len(uniq) < 500:
+        # 拉取明显异常（如网络故障只拿到零星数据），避免空扫/误扫
+        print(f"[ERR] mainboard count too small ({len(uniq)}), abort to avoid empty scan")
+        sys.exit(1)
     with open("all_mainboard.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["code", "name"])
