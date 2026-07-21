@@ -15,31 +15,30 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: search files
+      - name: upload test to root + list
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: ${{ secrets.IMA_FOLDER_ID }}
         run: |
           python3 - <<'PY'
-          import os, json, urllib.request
+          import os, json, sys
+          sys.path.insert(0, ".")
+          import upload_ima as U
           KB = os.environ["IMA_KB_ID"]
-          def call(body):
-              cid = os.environ["IMA_OPENAPI_CLIENTID"]; key = os.environ["IMA_OPENAPI_APIKEY"]
-              req = urllib.request.Request(
-                  "https://ima.qq.com/openapi/wiki/v1/search_knowledge",
-                  data=json.dumps(body).encode(),
-                  headers={"ima-openapi-clientid": cid, "ima-openapi-apikey": key, "Content-Type": "application/json"},
-                  method="POST")
-              return json.loads(urllib.request.urlopen(req, timeout=20).read().decode())
-          for q in ["盘前", "复盘", "报告", "双维", "md", "2026"]:
-              r = call({"query": q, "knowledge_base_id": KB})
-              info = r.get("data", {}).get("info_list", [])
-              print(f"QUERY {q} count={len(info)} code={r.get('code')}")
-              for it in info[:5]:
-                  pid = it.get("parent_folder_id")
-                  name = it.get("file_name") or it.get("name")
-                  mid = it.get("media_id")
-                  mtype = it.get("media_type")
-                  print(f"  type={mtype} name={name} media={mid} pid={pid}")
+          FOLDER = os.environ["IMA_FOLDER_ID"]
+          open("/tmp/t.md", "w").write("# 对照实验\n上传到根目录不 move。\n")
+          mid, cred = U.create_media(KB, "对照实验_root.md", os.path.getsize("/tmp/t.md"), 7, "text/markdown", "md")
+          U.cos_upload(cred, "/tmp/t.md", "text/markdown")
+          print("UPLOADED_ROOT", mid)
+          def gl(fid=""):
+              body = {"cursor": "", "limit": 50, "knowledge_base_id": KB}
+              if fid:
+                  body["folder_id"] = fid
+              return U.send_ima("openapi/wiki/v1/get_knowledge_list", json.dumps(body))
+          r = gl()
+          print("ROOT_RAW", json.dumps(r.get("data", {}), ensure_ascii=False)[:1800])
+          rf = gl(FOLDER)
+          print("FOLDER_RAW", json.dumps(rf.get("data", {}), ensure_ascii=False)[:1800])
           PY
