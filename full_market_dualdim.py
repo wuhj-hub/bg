@@ -123,11 +123,23 @@ def classify(cjb30, precip):
     return vol, lv, m[(vol, lv)]
 
 
+def to_westock_code(code):
+    """gen_mainboard 输出纯数字代码，westock 需带市场前缀 sh/sz。"""
+    if code.lower().startswith(("sh", "sz")):
+        return code
+    if code.startswith("60"):
+        return "sh" + code
+    if code.startswith(("000", "001", "002", "003")):
+        return "sz" + code
+    return code
+
+
 def process(stock):
     code, name = stock
+    wcode = to_westock_code(code)
     try:
-        kr = parse_kline(run(["kline", code, "--period", "day", "--limit", "130"]))
-        ar = parse_asfund(run(["asfund", code]))
+        kr = parse_kline(run(["kline", wcode, "--period", "day", "--limit", "130"]))
+        ar = parse_asfund(run(["asfund", wcode]))
         if not kr or not ar:
             return None
         amounts = [r["amount"] for r in kr]
