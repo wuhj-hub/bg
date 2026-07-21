@@ -2,7 +2,6 @@ name: 全市场双维扫描
 
 on:
   schedule:
-    # 北京时间 15:30（UTC 7:30），交易日收盘后自动运行（留 30 分钟给当日 K 线/资金流数据归集）
     - cron: "30 7 * * 1-5"
   workflow_dispatch: {}
 
@@ -16,35 +15,44 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    # 全市场约 3000 只主板股，westock 调用较慢，给足超时（GitHub 免费额度约 2000 分钟/月，
-    # 若额度不足请改用 workflow_dispatch 手动触发，或在 Secrets 中调高 SCAN_WORKERS 缩短时长）
-    timeout-minutes: 355
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Node.js（westock npx 依赖）
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: 生成沪深主板清单
-        run: python3 gen_mainboard.py
+      - run: echo "# 验证文件 $(date)" > verify_tmp.md
 
-      - name: 全市场双维扫描
-        env:
-          SCAN_WORKERS: "8"
-        run: python3 full_market_dualdim.py all_mainboard.csv
-
-      - name: 上传报告到 ima 知识库
+      - name: 上传到 IMA_FOLDER_ID
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: ${{ secrets.IMA_FOLDER_ID }}
-        run: python3 upload_ima.py --file full_market_report.md --name "全市场双维扫描_$(date +%Y-%m-%d).md"
+        run: python3 upload_ima.py --file verify_tmp.md --name "验证_$(date +%s).md"
+
+      - name: 列出目标文件夹内容
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+        run: |
+          python3 - <<'PY'
+          import os, json, urllib.request
+          KB = os.environ["IMA_KB_ID"]
+          FID = "folder_7485264708529742"
+          cid = os.environ["IMA_OPENAPI_CLIENTID"]; key = os.environ["IMA_OPENAPI_APIKEY"]
+          req = urllib.request.Request(
+              "https://ima.qq.com/openapi/wiki/v1/get_knowledge_list",
+              data=json.dumps({"cursor": "", "limit": 50, "knowledge_base_id": KB, "folder_id": FID}).encode(),
+              headers={"ima-openapi-clientid": cid, "ima-openapi-apikey": key, "Content-Type": "application/json"},
+              method="POST")
+          r = json.loads(urllib.request.urlopen(req, timeout=20).read().decode())
+          print("FOLDER", FID, "code", r.get("code"))
+          for it in r.get("data", {}).get("knowledge_list", []):
+              print("  -", it.get("media_id"), it.get("file_name"))
+          PY
