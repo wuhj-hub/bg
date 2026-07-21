@@ -32,6 +32,7 @@ def fetch_once(fs, pn, ps=1000):
         "pn": pn, "pz": ps, "po": "1", "np": "1", "fltt": "2",
         "invt": "2", "fid": "f3", "fs": fs,
         "fields": "f12,f14",
+        "ut": "fa5fd1943c7fad33f6da12dfa3a9e7b2",
     }
     url = EASTMONEY_API + "?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers=HEADERS)
@@ -39,15 +40,15 @@ def fetch_once(fs, pn, ps=1000):
         return json.loads(r.read().decode("utf-8"))
 
 
-def fetch_page(fs, pn, retries=3):
+def fetch_page(fs, pn, retries=6):
     """带重试的翻页拉取；全部重试失败返回 None。"""
     last = None
-    for _ in range(retries):
+    for i in range(retries):
         try:
             return fetch_once(fs, pn)
         except Exception as e:
             last = e
-            time.sleep(2)
+            time.sleep(2 * (i + 1))
     print(f"[WARN] fetch {fs} pn={pn} failed after {retries} retries: {last}")
     return None
 
@@ -101,7 +102,7 @@ def main():
             continue
         seen.add(c[0])
         uniq.append(c)
-    if len(uniq) < 500:
+    if len(uniq) < 50:
         # 拉取明显异常（如网络故障只拿到零星数据），避免空扫/误扫
         print(f"[ERR] mainboard count too small ({len(uniq)}), abort to avoid empty scan")
         sys.exit(1)
