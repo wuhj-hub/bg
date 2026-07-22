@@ -45,6 +45,10 @@ jobs:
           SCAN_WORKERS: "8"
         run: python3 full_market_dualdim.py all_mainboard.csv
 
+      # ─── 第二步.5：动态生成鱼身股票池 ───
+      - name: 动态生成鱼身股票池（近20日日均成交额排名前300）
+        run: python3 quant_scripts/gen_fish_pool.py
+
       # ─── 第三步：三系统预运行 ───
       - name: 量化系统预运行（双弦+鱼身+猛兽）
         run: python3 quant_scripts/run_all_quant.py
