@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-full_market_dualdim.py —— 全市场沪深主板双维扫描
+full_market_dualdim.py —— 盘后量化扫描（原全市场双维扫描）
 
 读 all_mainboard.csv，对每只股票并发调用 westock-data-skillhub 计算：
   - 沉淀率 = MainNetFlow5D ÷ 近5日总成交额
   - CJB30 / B30V100 / VEAB（放量趋势，对齐盘前报告 §2.12）
 套用双维定性矩阵得到信号，输出：
-  - full_market_dualdim.csv  （全量结果）
-  - full_market_report.md     （分布统计 + 重点标的）
+  - panhou_lianghua.csv（全量结果）
+  - panhou_lianghua.md（分布统计 + 重点标的）
 
 运行环境：GitHub Actions runner（westock 需外网 + node）。
+注意：此脚本输出为复盘报告的原始数据源，不独立作为分析报告发布。
 """
+
 import subprocess
 import re
 import json
@@ -124,7 +126,6 @@ def classify(cjb30, precip):
 
 
 def to_westock_code(code):
-    """gen_mainboard 输出纯数字代码，westock 需带市场前缀 sh/sz。"""
     if code.lower().startswith(("sh", "sz")):
         return code
     if code.startswith("60"):
@@ -167,7 +168,7 @@ def process(stock):
 def gen_report(results, dist, today):
     ordered = sorted(results, key=lambda r: (SIGNAL_ORDER.get(r["sig"], 9), -r["precip"]))
     L = []
-    L.append(f"# 全市场双维扫描报告（{today} 收盘）\n")
+    L.append(f"# 盘后量化报告（{today} 收盘）\n")
     L.append("> 范围：沪深主板（剔除科创板/创业板/北交所/ST），约 3000 只逐只扫描")
     L.append("> 双维口径：沉淀率 = MainNetFlow5D ÷ 近5日总成交额；CJB30 = (今日成交额 − 近30日均量)/近30日均量×100（>50% 为放量）\n")
     L.append("## 一、双维定性分布\n")
@@ -188,7 +189,7 @@ def gen_report(results, dist, today):
     L.append("- 游资情绪：放量但低沉淀，情绪驱动，需结合技术确认")
     L.append("- 主力控盘：缩量高沉淀，筹码锁定，观察突破")
     L.append("- 数据由 GitHub Actions 自动扫描生成，回传 ima 知识库\n")
-    open("full_market_report.md", "w", encoding="utf-8").write("\n".join(L))
+    open("panhou_lianghua.md", "w", encoding="utf-8").write("\n".join(L))
 
 
 def main():
@@ -208,7 +209,7 @@ def main():
                 results.append(r)
             if done % 200 == 0:
                 print(f"[PROGRESS] {done}/{len(stocks)} ok={len(results)}")
-    with open("full_market_dualdim.csv", "w", newline="", encoding="utf-8") as f:
+    with open("panhou_lianghua.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["code", "name", "cjb30", "b30v100", "veab",
                                           "precip", "m5", "m10", "m20", "vol", "lv", "sig"])
         w.writeheader()
@@ -217,7 +218,7 @@ def main():
     dist = Counter(r["sig"] for r in results)
     print("[DIST]", dict(dist))
     gen_report(results, dist, time.strftime("%Y-%m-%d"))
-    print(f"[OK] scanned={len(results)} -> full_market_dualdim.csv + full_market_report.md")
+    print(f"[OK] scanned={len(results)} -> panhou_lianghua.csv + panhou_lianghua.md")
 
 
 if __name__ == "__main__":
