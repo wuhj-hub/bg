@@ -31,15 +31,26 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: 安装 Python 依赖（pandas+numpy for 猛兽）
+        run: |
+          pip install pandas numpy
+
+      # ─── 第一步：生成主板清单 ───
       - name: 生成沪深主板清单
         run: python3 gen_mainboard.py
 
-      - name: 全量量化扫描（复盘报告数据源）
+      # ─── 第二步：全量量化扫描 ───
+      - name: 全量量化扫描（盘后量化）
         env:
           SCAN_WORKERS: "8"
         run: python3 full_market_dualdim.py all_mainboard.csv
 
-      - name: 上传原始数据到复盘报告文件夹
+      # ─── 第三步：三系统预运行 ───
+      - name: 量化系统预运行（双弦+鱼身+猛兽）
+        run: python3 quant_scripts/run_all_quant.py
+
+      # ─── 第四步：上传所有结果 ───
+      - name: 上传盘后量化数据到复盘报告文件夹
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
@@ -47,6 +58,17 @@ jobs:
           IMA_FOLDER_ID: folder_7485234585035034
         run: python3 upload_ima.py --file panhou_lianghua.md --name "盘后量化_$(date +%Y-%m-%d).md"
 
+      - name: 上传量化预运行结果到复盘报告文件夹
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485234585035034
+        run: |
+          # 上传三系统汇总结果
+          python3 upload_ima.py --file outputs/quant_results_$(date +%Y-%m-%d).json --name "quant_results_$(date +%Y-%m-%d).json"
+
+      # ─── 第五步：推送通知 ───
       - name: 推送扫描完成通知到微信
         if: success()
         env:
