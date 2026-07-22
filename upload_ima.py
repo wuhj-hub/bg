@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-upload_ima.py —— 将 markdown 报告上传到 ima 知识库（可选移入文件夹）
+upload_ima.py —— 将 markdown 报告上传到 ima 知识库（修复版：增加 add_knowledge 步骤）
 
 环境变量：
   IMA_OPENAPI_CLIENTID / IMA_OPENAPI_APIKEY  (ima 开放 API 凭证，配到 GitHub Secrets)
   IMA_KB_ID      (目标知识库 ID，必填)
   IMA_FOLDER_ID  (可选，目标文件夹 ID；省略则传根目录)
 
-用法：python3 upload_ima.py --file full_market_report.md
+用法：python3 upload_ima.py --file full_market_report.md --name "全市场双维扫描_$(date +%Y-%m-%d).md"
+
+修复说明：
+  原版缺少 add_knowledge 步骤（create_media → cos_upload 后未将媒体关联到知识库），
+  导致文件虽上传到 COS 但不可见。修复后流程：
+  create_media → cos_upload → add_knowledge（含 folder_id）
 """
 import os
 import sys
@@ -41,7 +46,6 @@ def build_authorization(secret_id, secret_key, method, pathname, headers, start_
     header_keys = sorted(headers.keys())
     http_headers = "&".join([f"{k.lower()}={urllib.parse.quote(headers[k])}" for k in header_keys])
     http_string = f"{method.lower()}\n{pathname}\n\n{http_headers}\n"
-    # COS 签名：两步 HMAC（SignKey = HMAC(SecretKey, KeyTime)，再 HMAC(SignKey, StringToSign)）
     sign_key = hmac_sha1(secret_key, key_time)
     string_to_sign = f"sha1\n{key_time}\n{sha1(http_string)}\n"
     signature = hmac_sha1(sign_key, string_to_sign)
@@ -116,16 +120,19 @@ def cos_upload(cred, file_path, content_type):
     conn.close()
 
 
-def move_to_folder(kb_id, media_id, folder_id):
+def add_knowledge(kb_id, media_id, title, media_type, folder_id=None):
+    """将已上传到 COS 的媒体关联到知识库（关键步骤！）"""
     body = {
-        "src_knowledge_base_id": kb_id,
-        "dst_knowledge_base_id": kb_id,
-        "dst_folder_id": folder_id,
-        "infos": [{"media_id": media_id}],
+        "media_type": media_type,
+        "media_id": media_id,
+        "title": title,
+        "knowledge_base_id": kb_id,
     }
-    resp = send_ima("openapi/wiki/v1/move_knowledge", json.dumps(body))
+    if folder_id:
+        body["folder_id"] = folder_id
+    resp = send_ima("openapi/wiki/v1/add_knowledge", json.dumps(body))
     if resp.get("code", 0) != 0:
-        raise RuntimeError(f"move failed: {resp}")
+        raise RuntimeError(f"add_knowledge failed: {resp}")
     return resp
 
 
@@ -141,12 +148,24 @@ def main():
     fp = a.file
     filename = a.name or os.path.basename(fp)
     size = os.path.getsize(fp)
-    media_id, cred = create_media(kb_id, filename, size, 7, "text/markdown", "md")
-    cos_upload(cred, fp, "text/markdown")
-    print(f"[OK] uploaded media_id={media_id}")
-    if folder_id:
-        move_to_folder(kb_id, media_id, folder_id)
-        print(f"[OK] moved to folder {folder_id}")
+    media_type = 7  # Markdown
+    content_type = "text/markdown"
+    file_ext = "md"
+
+    # Step 1: 创建媒体条目，获取 COS 上传凭证
+    media_id, cred = create_media(kb_id, filename, size, media_type, content_type, file_ext)
+    print(f"[OK] create_media -> {media_id}")
+
+    # Step 2: 上传文件内容到 COS
+    cos_upload(cred, fp, content_type)
+    print(f"[OK] cos_upload done")
+
+    # Step 3: 将媒体关联到知识库（含目标文件夹）
+    folder_arg = folder_id if folder_id else None
+    add_knowledge(kb_id, media_id, filename, media_type, folder_id=folder_arg)
+    folder_info = f"folder={folder_id}" if folder_id else "root"
+    print(f"[OK] add_knowledge done ({folder_info})")
+    print(f"[OK] 报告已发布: {filename}")
 
 
 if __name__ == "__main__":
