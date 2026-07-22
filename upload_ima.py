@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-upload_ima.py —— 将 markdown 报告上传到 ima 知识库（修复版：增加 add_knowledge 步骤）
+upload_ima.py —— 将 markdown 报告上传到 ima 知识库
 
 环境变量：
   IMA_OPENAPI_CLIENTID / IMA_OPENAPI_APIKEY  (ima 开放 API 凭证，配到 GitHub Secrets)
   IMA_KB_ID      (目标知识库 ID，必填)
   IMA_FOLDER_ID  (可选，目标文件夹 ID；省略则传根目录)
 
-用法：python3 upload_ima.py --file full_market_report.md --name "全市场双维扫描_$(date +%Y-%m-%d).md"
+用法：python3 upload_ima.py --file panhou_lianghua.md --name "盘后量化_$(date +%Y-%m-%d).md"
 
-修复说明：
-  原版缺少 add_knowledge 步骤（create_media → cos_upload 后未将媒体关联到知识库），
-  导致文件虽上传到 COS 但不可见。修复后流程：
-  create_media → cos_upload → add_knowledge（含 folder_id）
+注意：此脚本由 GitHub Actions 调用，数据上传到「复盘报告」文件夹作为复盘报告的数据源。
+流程：create_media → cos_upload → add_knowledge（含 folder_id）
 """
+
 import os
 import sys
 import json
@@ -121,7 +120,7 @@ def cos_upload(cred, file_path, content_type):
 
 
 def add_knowledge(kb_id, media_id, title, media_type, folder_id=None):
-    """将已上传到 COS 的媒体关联到知识库（关键步骤！）"""
+    """将已上传到 COS 的媒体关联到知识库"""
     body = {
         "media_type": media_type,
         "media_id": media_id,
