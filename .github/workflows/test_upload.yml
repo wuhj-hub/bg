@@ -1,0 +1,27 @@
+name: 测试上传路线（样本验证）
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  test-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 生成样本文件
+        run: |
+          printf '# 样本上传测试 %s\n\n这是用于验证 IMA 开放 API 上传路线是否打通的样本文件。\n' "$(date +%Y-%m-%d_%H:%M:%S)" > sample_upload_test.md
+
+      - name: 上传样本到复盘报告文件夹
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485234585035034
+        run: python3 upload_ima.py --file sample_upload_test.md --name "样本上传测试_$(date +%Y%m%d_%H%M%S).md"
