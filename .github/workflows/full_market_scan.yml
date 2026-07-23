@@ -53,29 +53,38 @@ jobs:
       - name: 量化系统预运行（双弦+鱼身+猛兽）
         run: python3 quant_scripts/run_all_quant.py
 
-      # ─── 第四步：上传所有结果 ───
+      # ─── 第四步：上传所有结果（失败不阻断，记录状态供推送）───
       - name: 上传盘后量化数据到复盘报告文件夹
+        id: upload_main
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
-          IMA_FOLDER_ID: folder_7485234585035034
-        run: python3 upload_ima.py --file panhou_lianghua.md --name "盘后量化_$(date +%Y-%m-%d).md"
+          IMA_FOLDER_ID: folder_7485234585034
+        run: |
+          if python3 upload_ima.py --file panhou_lianghua.md --name "盘后量化_$(date +%Y-%m-%d).md"; then
+            echo "IMA_UPLOAD_OK=true" >> "$GITHUB_ENV"
+          else
+            echo "IMA_UPLOAD_OK=false" >> "$GITHUB_ENV"
+            echo "::warning::ima upload_main failed (OpenAPI 凭证可能过期/失效)"
+          fi
 
       - name: 上传量化预运行结果到复盘报告文件夹
+        id: upload_extra
+        continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
-          IMA_FOLDER_ID: folder_7485234585035034
+          IMA_FOLDER_ID: folder_7485234585034
         run: |
-          # 上传三系统汇总结果
           python3 upload_ima.py --file outputs/quant_results_$(date +%Y-%m-%d).json --name "quant_results_$(date +%Y-%m-%d).json"
 
-      # ─── 第五步：推送通知 ───
-      - name: 推送扫描完成通知到微信
-        if: success()
+      # ─── 第五步：推送结果到微信（PushPlus 独立备份通道，不依赖 ima 成功）───
+      - name: 推送扫描结果到微信（PushPlus 备份通道）
+        if: always()
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
           PUSH_SERVICE: pushplus
+          IMA_UPLOAD_OK: ${{ env.IMA_UPLOAD_OK }}
         run: python3 push_notify.py
