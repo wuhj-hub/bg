@@ -46,7 +46,7 @@ def check_env():
 # 工具
 # ============================================================
 
-def run_py(script, args="", cwd=None, timeout=600):
+def run_py(script, args="", cwd=None, timeout=1800):
     """运行 Python 脚本并返回 stdout"""
     if cwd is None:
         cwd = str(REPO_DIR)
