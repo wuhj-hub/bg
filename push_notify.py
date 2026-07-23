@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""推送全量扫描结果到微信（PushPlus）。
+"""推送全量扫描结果到微信（PushPlus 备份通道）。
 
-作为 ima 上传的**独立备份通道**：
-  - 不依赖 ima 上传成功（workflow 中以 if: always() 调用）
-  - 读取 panhou_lianghua.md 提取关键摘要推送
-  - 根据 IMA_UPLOAD_OK 环境变量区分 ima 是否已同步成功
-
-环境变量：
-  PUSH_TOKEN    : pushplus token（必填）
-  PUSH_SERVICE  : pushplus(默认)
-  IMA_UPLOAD_OK : true/false（ima 上传是否成功，缺省视为成功）
-  RESULT_FILE   : 结果 md 路径（默认 panhou_lianghua.md）
+不依赖 ima 上传成功（workflow if: always() 调用）。
+读取 panhou_lianghua.md 提取关键摘要推送。
+根据 IMA_UPLOAD_OK / IMA_CRED_EXPIRED 动态提示：
+  - 成功：已同步 ima
+  - 凭证失效(401)：升级告警，请去 ima 重新生成并回填 secret（自愈指引）
+  - 其他失败：结果备份
 """
 
 import os, json, time, urllib.request
@@ -20,6 +16,7 @@ TOKEN = os.environ.get("PUSH_TOKEN", "")
 SERVICE = os.environ.get("PUSH_SERVICE", "pushplus").lower()
 TODAY = time.strftime("%Y-%m-%d")
 IMA_OK = os.environ.get("IMA_UPLOAD_OK", "true").lower() in ("true", "1", "ok", "")
+CRED_EXPIRED = os.environ.get("IMA_CRED_EXPIRED", "false").lower() in ("true", "1", "yes")
 RESULT_FILE = os.environ.get("RESULT_FILE", "panhou_lianghua.md")
 
 
@@ -41,12 +38,24 @@ def extract_summary(path, max_chars=5000):
 
 
 def build_msg():
-    if IMA_OK:
+    if IMA_OK and not CRED_EXPIRED:
         head = f"# ✅ 全量扫描完成 · {TODAY}\n\n> 已同步至 ima「复盘报告」知识库。"
+    elif CRED_EXPIRED:
+        head = (
+            f"# ⚠️ 全量扫描完成 · {TODAY}\n\n"
+            f"> **ima OpenAPI 凭证已失效（上传持续 401 / skill auth failed）**，本次结果未能同步至 ima。\n\n"
+            f"> **【需要您处理 · 自愈步骤】**\n"
+            f"> 1. 打开 https://ima.qq.com/agent-interface 点「获取 API Key」重新生成一对 client_id / api_key\n"
+            f"> 2. 把新值分别更新到 GitHub 仓库 Secrets：\n"
+            f"> 　　· `IMA_OPENAPI_CLIENTID`\n> 　　· `IMA_OPENAPI_APIKEY`\n"
+            f"> 3. 回填后下一次扫描将自动用新凭证成功（无需改代码）。\n\n"
+            f"> 以下为本次结果备份："
+        )
     else:
-        head = (f"# ⚠️ 全量扫描完成 · {TODAY}\n\n"
-                f"> **ima 上传失败（OpenAPI 凭证可能已过期/失效）**，"
-                f"以下是结果备份，请查收。")
+        head = (
+            f"# ⚠️ 全量扫描完成 · {TODAY}\n\n"
+            f"> **ima 上传失败（非凭证失效，疑似网络/限流）**，以下是结果备份："
+        )
     summary = extract_summary(RESULT_FILE)
     return f"{head}\n\n## 📊 关键结果\n\n{summary}\n\n---\n🤖 由 full_market_scan 自动推送（PushPlus 备份通道）"
 
@@ -59,9 +68,15 @@ def _post(url, body):
 
 
 def push_pushplus(token):
+    if CRED_EXPIRED:
+        title = "⚠️ima凭证失效 请重置 " + TODAY
+    elif not IMA_OK:
+        title = "⚠️扫描完成(ima失败) " + TODAY
+    else:
+        title = "扫描完成 " + TODAY
     body = json.dumps({
         "token": token,
-        "title": ("⚠️扫描完成(ima失败) " if not IMA_OK else "扫描完成 ") + TODAY,
+        "title": title,
         "content": build_msg(),
         "template": "markdown",
     }).encode("utf-8")
