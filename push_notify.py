@@ -20,20 +20,38 @@ CRED_EXPIRED = os.environ.get("IMA_CRED_EXPIRED", "false").lower() in ("true", "
 RESULT_FILE = os.environ.get("RESULT_FILE", "panhou_lianghua.md")
 
 
-def extract_summary(path, max_chars=5000):
-    """读取结果 md，提取关键摘要（稳健截断，避免 PushPlus 超长）。"""
+def extract_summary(path, max_chars=15000):
+    """读取结果 md，提取重点标的完整表格 + 信号释义（保留 Markdown 表格结构）。"""
     try:
         with open(path, "r", encoding="utf-8", errors="replace") as f:
             text = f.read()
     except Exception as e:
         return f"（无法读取结果文件 {path}：{e}）"
-    lines = text.splitlines()
-    keywords = ("★", "重点", "买入", "关注", "信号", "精选", "共振",
-                "操作建议", "评分", ">>>", "候选", "预警")
-    picked = [ln for ln in lines if any(k in ln for k in keywords)]
-    body = "\n".join(picked[:60]) if picked else "\n".join(lines[:120])
+
+    import re
+
+    # 重点标的表格（从 ## 二、到 ## 三、之间，捕获完整的多段表格）
+    table_match = re.search(r'## 二、重点标的.*?(?=## 三、)', text, re.DOTALL)
+    sig_match = re.search(r'## 三、信号释义.*', text, re.DOTALL)
+
+    parts = []
+    if table_match:
+        parts.append(table_match.group(0).strip())
+    if sig_match:
+        parts.append(sig_match.group(0).strip())
+
+    if parts:
+        body = "\n\n".join(parts)
+    else:
+        # fallback: 关键词提取
+        lines = text.splitlines()
+        keywords = ("★", "重点", "买入", "关注", "信号", "精选", "共振",
+                    "操作建议", "评分", ">>>", "候选", "预警")
+        picked = [ln for ln in lines if any(k in ln for k in keywords)]
+        body = "\n".join(picked[:60]) if picked else "\n".join(lines[:120])
+
     if len(body) > max_chars:
-        body = body[:max_chars] + "\n\n…（结果过长已截断，完整版见 ima「复盘报告」）"
+        body = body[:max_chars] + "\n\n…（内容过长已截断，完整版见 ima「复盘报告」）"
     return body
 
 
