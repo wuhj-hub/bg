@@ -276,9 +276,9 @@ def score_stock(code: str, name: str, sector: str = "",
 # 4. 主运行流程
 # ============================================================
 def run_daily():
-    """每日全量扫描"""
+    """每日全量扫描（v2.3 全量主板并发版）"""
     today = date.today().isoformat()
-    print(f"双弦投资系统 v2.2 ima版")
+    print(f"双弦投资系统 v2.3 全量主板版")
     print(f"运行时间: {today} {datetime.now().strftime('%H:%M:%S')}")
     print("=" * 50)
 
@@ -299,36 +299,51 @@ def run_daily():
         if s['zdf'] < 0:
             print(f"    - {s['name']} ({s['zdf']:.2f}%)")
 
-    # Step 2: 核心3只标的评分
-    print("\n[Step 2] 核心标的评分...")
+    # Step 2: 全量主板评分（从 all_mainboard.csv 读取）
+    print("\n[Step 2] 全量主板扫描...")
+    import csv
+    all_stocks = []
+    csv_path = "all_mainboard.csv"
+    if os.path.exists(csv_path):
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                code = row.get("code", "").strip()
+                name = row.get("name", "").strip()
+                if code and name:
+                    pref = "sh" if code.startswith("6") else "sz"
+                    all_stocks.append((pref + code, name))
+        print(f"  读取全量主板: {len(all_stocks)}只")
+    else:
+        print(f"  [WARN] {csv_path} 不存在，跳过全量扫描")
+        all_stocks = []
+
+    # 并发评分
+    scored_all = []
+    if all_stocks:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        def _score_one(item):
+            return score_stock(item[0], item[1], "", 0, temp)
+        with ThreadPoolExecutor(max_workers=8) as exe:
+            futures = {exe.submit(_score_one, s): s for s in all_stocks}
+            done = 0
+            for fut in as_completed(futures):
+                done += 1
+                if done % 200 == 0:
+                    print(f"    评分进度: {done}/{len(all_stocks)}")
+                try:
+                    scored_all.append(fut.result())
+                except:
+                    pass
+        print(f"  全量评分完成: {len(scored_all)}只")
+
+    # Step 3: 核心3只 + 板块代表（独立评分，确保重点）
+    print("\n[Step 3] 核心标的评分...")
     core_stocks = [
         ("sh603669", "灵康药业", "医药生物"),
         ("sh600400", "红豆股份", "纺织服饰"),
         ("sz002520", "日发精机", "机械设备"),
     ]
-
-    scored = []
-    for code, name, sector in core_stocks:
-        # 找对应的板块涨跌幅
-        sector_zdf = 0
-        for s in sectors['all']:
-            if sector[:2] in s['name'] or s['name'] in sector:
-                sector_zdf = s['zdf']
-                break
-
-        r = score_stock(code, name, sector, sector_zdf, temp)
-        scored.append(r)
-        label = "S" if r["total_score"] >= 80 else "A" if r["total_score"] >= 65 else \
-                "B" if r["total_score"] >= 50 else "C"
-        resonance_label = ["逆势", "偏空", "中性", "偏多", "强共振"][r["resonance"] + 3]
-        print(f"  {code} {name}")
-        print(f"    评分: {r['total_score']}分({label}) | "
-              f"资金{r['fund_score']}+技术{r['tech_score']}+趋势{r['trend_score']}")
-        print(f"    价格: {r['price']} | 共振: {r['resonance']} ({resonance_label})")
-
-    # Step 3: 热门板块标的追加评分
-    print("\n[Step 3] 热门板块标的扫描...")
-    # 从板块排行中取流入为正的板块，选代表性主板标的
     hot_picks = [
         ("半导体", "sh603501", "豪威集团"),
         ("存储器", "sh603986", "兆易创新"),
@@ -336,88 +351,70 @@ def run_daily():
         ("石油石化", "sh601857", "中国石油"),
         ("元件", "sz002129", "TCL中环"),
     ]
-
-    for sname, code, cname in hot_picks:
+    scored_extra = []
+    for code, name, sector in core_stocks + [(s, c, n) for s,c,n in hot_picks]:
         sector_zdf = 0
         for s in sectors['all']:
-            if s['name'] == sname:
-                sector_zdf = s['zdf']
-                break
-        r = score_stock(code, cname, sname, sector_zdf, temp)
-        scored.append(r)
+            if any(k in s['name'] for k in sector[:2]):
+                sector_zdf = s['zdf']; break
+        r = score_stock(code, name, sector, sector_zdf, temp)
+        scored_extra.append(r)
+    # 合并（scored_all 为主，scored_extra 补充）
+    all_codes = set(r['code'] for r in scored_all)
+    for r in scored_extra:
+        if r['code'] not in all_codes:
+            scored_all.append(r)
+    print(f"  核心/板块评分完成，合并后总计: {len(scored_all)}只")
 
-    # Step 4: AND门控
+    # Step 4: AND门控过滤
     print("\n[Step 4] AND门控过滤...")
     gate_results = []
-    for r in scored:
-        gate2 = True  # 简化：板块条件
+    for r in scored_all:
+        gate2 = True
         gate3 = r["fund_score"] >= 10
-        passed = gate1 and gate2 and gate3
-        if passed and r["price"] > 0:
+        if gate1 and gate2 and gate3 and r["price"] > 0:
             gate_results.append(r)
             print(f"  ✅ {r['code']} {r['name']} 评分{r['total_score']} 共振{r['resonance']}")
-
     if not gate_results:
         print("  (无信号通过门控)")
 
-    # Step 5: 注入月度股池
+    # Step 5: 月度股池
     print("\n[Step 5] 注入月度股池...")
     from monthly_pool import add_daily_results, MonthlyPool
-
     resonance_list = []
-    # 过滤进入月度股池（共振≥中性0 + 价格≤10）
     for r in gate_results:
-        if r["resonance"] >= 0 and r["price"] <= 10 and r["price"] > 0:
+        if r["resonance"] >= 0 and 0 < r["price"] <= 10:
             resonance_list.append({
                 "code": r["code"], "name": r["name"], "price": r["price"],
                 "score": r["total_score"],
                 "resonance_label": f"{['逆势','偏空','中性','偏多','强共振'][r['resonance']+3]}",
-                "sector": "", "reason": f"双弦门控通过",
+                "sector": "", "reason": "双弦门控通过(全量主板)",
             })
-
-    # 低吸检测（简化为评分中等但技术分高的）
     dip_list = []
-    for r in scored:
-        if r not in gate_results and r["tech_score"] >= 20 and r["price"] <= 10:
+    for r in scored_all:
+        if r not in gate_results and r["tech_score"] >= 20 and 0 < r["price"] <= 10:
             dip_list.append({
                 "code": r["code"], "name": r["name"], "price": r["price"],
                 "score": r["total_score"], "sector": "",
-                "reason": "MACD底背离买点(简版检测)",
+                "reason": "技术面优质(简版检测)",
             })
+    result = add_daily_results(resonance_stocks=resonance_list, dip_stocks=dip_list)
+    print(f"  共振新增: {len(resonance_list)}只  低吸新增: {len(dip_list)}只  月度股池总计: {result['total_count']}只")
 
-    result = add_daily_results(
-        resonance_stocks=resonance_list,
-        dip_stocks=dip_list,
-    )
-
-    print(f"  共振新增: {len(resonance_list)}只")
-    print(f"  低吸新增: {len(dip_list)}只")
-    print(f"  当前月度股池总计: {result['total_count']}只")
-
-    # Step 6: 输出报告
+    # Step 6: 报告
     print("\n[Step 6] 月度股池报告:")
     pool = MonthlyPool()
     print(pool.format_report())
 
-    # 写入运行日志
-    log = {
-        "date": today,
-        "temperature": temp,
-        "level": level,
-        "gate1": gate1,
-        "signals": len(gate_results),
-        "pool_total": result["total_count"],
-    }
+    log = {"date": today, "temperature": temp, "level": level,
+           "gate1": gate1, "signals": len(gate_results),
+           "pool_total": result["total_count"], "scanned": len(scored_all)}
     log_file = POOLS_DIR / f"run_log_{today}.json"
     with open(log_file, "w", encoding="utf-8") as f:
         json.dump(log, f, ensure_ascii=False, indent=2)
-
-    print(f"\n✅ 运行完成！日志已保存: {log_file}")
+    print(f"\n✅ 运行完成！日志: {log_file}")
     return log
 
 
-# ============================================================
-# 命令行入口
-# ============================================================
 if __name__ == "__main__":
     run_daily()
