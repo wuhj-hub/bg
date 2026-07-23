@@ -311,46 +311,62 @@ def get_sector_ranking(top_n: int = 5) -> list[dict]:
 # ============================================================
 #      Step 2: 候选股获取
 # ============================================================
-def get_candidate_stocks(max_count: int = 25) -> list[dict]:
-    raw = cli("hot stock --limit 50")
-    rows = parse_table(raw)
+def get_candidate_stocks(max_count: int = 0) -> list[dict]:
+    """从 all_mainboard.csv 读取全量主板（替代 hot stock 精选）"""
     candidates = []
-    seen = set()
-    for r in rows:
-        code = get_val(r, "code", "代码")
-        name = get_val(r, "name", "名称")
-        zdf_str = get_val(r, "zdf", "涨跌幅")
-        price_str = get_val(r, "zxj", "最新价", "now_price")
-        stype = get_val(r, "stock_type", "类型")
-
-        if stype and stype != "GP-A":
-            continue
-        if not is_mainboard(code):
-            continue
-        if not is_not_st(name):
-            continue
-        if code in seen:
-            continue
-        seen.add(code)
-
-        try:
-            zdf = float(zdf_str.replace("%", "").replace("+", ""))
-        except:
-            zdf = 0
-        try:
-            price = float(price_str)
-        except:
-            price = 0
-
-        candidates.append({"code": code, "name": name, "price": price, "zdf": zdf})
-        if len(candidates) >= max_count:
-            break
+    csv_path = "all_mainboard.csv"
+    if os.path.exists(csv_path):
+        import csv
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                code = row.get("code", "").strip()
+                name = row.get("name", "").strip()
+                if not code or not name:
+                    continue
+                if not is_mainboard(code):
+                    continue
+                if not is_not_st(name):
+                    continue
+                pref = "sh" if code.startswith("6") else "sz"
+                candidates.append({"code": pref + code, "name": name, "zdf": 0, "price": 0})
+        print(f"[candidate] 全量主板: {len(candidates)} 只")
+    else:
+        # fallback: hot stock 精选
+        raw = cli("hot stock --limit 50")
+        rows = parse_table(raw)
+        seen = set()
+        for r in rows:
+            code = get_val(r, "code", "代码")
+            name = get_val(r, "name", "名称")
+            zdf_str = get_val(r, "zdf", "涨跌幅")
+            price_str = get_val(r, "zxj", "最新价", "now_price")
+            stype = get_val(r, "stock_type", "类型")
+            if stype and stype != "GP-A":
+                continue
+            if not is_mainboard(code):
+                continue
+            if not is_not_st(name):
+                continue
+            if code in seen:
+                continue
+            seen.add(code)
+            try:
+                zdf = float(zdf_str.replace("%", "").replace("+", ""))
+            except:
+                zdf = 0
+            try:
+                price = float(price_str) if price_str else 0
+            except:
+                price = 0
+            candidates.append({"code": code, "name": name, "zdf": zdf, "price": price})
+            if max_count > 0 and len(candidates) >= max_count:
+                break
+        print(f"[candidate] fallback hot stock: {len(candidates)} 只")
+    # max_count > 0 时截断
+    if max_count > 0 and len(candidates) > max_count:
+        candidates = candidates[:max_count]
     return candidates
-
-
-# ============================================================
-#      Step 3: OVS综合评分 (★★ 优化: 增加RSVA指标获取)
-# ============================================================
 def ovs_score_stock(code: str, name: str) -> dict:
     result = {"code": code, "name": name, "ovs_total": 0,
               "ovs_volume": 0, "ovs_momentum": 0, "ovs_trend": 0}
@@ -987,7 +1003,7 @@ def main():
     # ---- Step 2: 候选股获取 ----
     print("\n🎯 Step 2: 候选股筛选（热搜股·主板过滤）")
     print("-" * 40)
-    candidates = get_candidate_stocks(25)
+    candidates = get_candidate_stocks(0)
     print(f"  获取到 {len(candidates)} 只候选股")
     if not candidates:
         print("\n❌ 无候选股，终止扫描")
