@@ -189,13 +189,27 @@ def main():
     OUTPUTS_DIR.mkdir(exist_ok=True)
 
     # 运行三个系统
+    # 并行运行三个系统
+    from concurrent.futures import ThreadPoolExecutor, as_completed
     results = {
         "date": TODAY,
         "timestamp": NOW.strftime("%Y-%m-%d %H:%M:%S"),
-        "shuangxian": run_shuangxian(),
-        "fishbody": run_fishbody(),
-        "beast": run_beast(),
     }
+
+    with ThreadPoolExecutor(max_workers=3) as exe:
+        fut_map = {
+            exe.submit(run_shuangxian): "shuangxian",
+            exe.submit(run_fishbody): "fishbody",
+            exe.submit(run_beast): "beast",
+        }
+        for fut in as_completed(fut_map):
+            name = fut_map[fut]
+            try:
+                results[name] = fut.result()
+                print(f"[OK] {name} 已完成")
+            except Exception as e:
+                print(f"[FAIL] {name} 异常: {e}")
+                results[name] = {"error": str(e)}
 
     # 保存汇总结果
     summary_file = OUTPUTS_DIR / f"quant_results_{TODAY}.json"
