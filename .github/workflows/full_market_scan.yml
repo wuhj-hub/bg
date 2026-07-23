@@ -53,7 +53,7 @@ jobs:
       - name: 量化系统预运行（双弦+鱼身+猛兽）
         run: python3 quant_scripts/run_all_quant.py
 
-      # ─── 第四步：上传所有结果（失败不阻断，记录状态供推送）───
+      # ─── 第四步：上传所有结果（自动重试 + 失效识别 + 记录状态）───
       - name: 上传盘后量化数据到复盘报告文件夹
         id: upload_main
         env:
@@ -62,12 +62,24 @@ jobs:
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485234585034
         run: |
-          if python3 upload_ima.py --file panhou_lianghua.md --name "盘后量化_$(date +%Y-%m-%d).md"; then
-            echo "IMA_UPLOAD_OK=true" >> "$GITHUB_ENV"
-          else
-            echo "IMA_UPLOAD_OK=false" >> "$GITHUB_ENV"
-            echo "::warning::ima upload_main failed (OpenAPI 凭证可能过期/失效)"
-          fi
+          IMA_UPLOAD_OK=false
+          IMA_CRED_EXPIRED=false
+          for i in 1 2 3; do
+            if python3 upload_ima.py --file panhou_lianghua.md --name "盘后量化_$(date +%Y-%m-%d).md" 2>upload_err.log; then
+              IMA_UPLOAD_OK=true
+              break
+            fi
+            # 凭证失效(401)立即判定，不再无谓重试
+            if grep -Eq "401|skill auth failed|Unauthorized" upload_err.log; then
+              IMA_CRED_EXPIRED=true
+              echo "::error::ima credential expired (401) — 需重新生成并回填 GitHub secret"
+              break
+            fi
+            echo "upload attempt $i failed, retry after $((i*10))s"
+            sleep $((i*10))
+          done
+          echo "IMA_UPLOAD_OK=$IMA_UPLOAD_OK" >> "$GITHUB_ENV"
+          echo "IMA_CRED_EXPIRED=$IMA_CRED_EXPIRED" >> "$GITHUB_ENV"
 
       - name: 上传量化预运行结果到复盘报告文件夹
         id: upload_extra
@@ -78,7 +90,12 @@ jobs:
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485234585034
         run: |
-          python3 upload_ima.py --file outputs/quant_results_$(date +%Y-%m-%d).json --name "quant_results_$(date +%Y-%m-%d).json"
+          for i in 1 2 3; do
+            if python3 upload_ima.py --file outputs/quant_results_$(date +%Y-%m-%d).json --name "quant_results_$(date +%Y-%m-%d).json"; then
+              break
+            fi
+            sleep $((i*10))
+          done
 
       # ─── 第五步：推送结果到微信（PushPlus 独立备份通道，不依赖 ima 成功）───
       - name: 推送扫描结果到微信（PushPlus 备份通道）
@@ -87,4 +104,5 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
           PUSH_SERVICE: pushplus
           IMA_UPLOAD_OK: ${{ env.IMA_UPLOAD_OK }}
+          IMA_CRED_EXPIRED: ${{ env.IMA_CRED_EXPIRED }}
         run: python3 push_notify.py
