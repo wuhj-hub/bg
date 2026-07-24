@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-full_market_dualdim.py —— 全盘量化扫描（原全市场双维扫描）（原全市场双维扫描）
+full_market_dualdim.py —— 全盘量化扫描
 
 读 all_mainboard.csv，对每只股票并发调用 westock-data-skillhub 计算：
   - 沉淀率 = MainNetFlow5D ÷ 近5日总成交额
