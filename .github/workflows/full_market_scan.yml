@@ -54,13 +54,13 @@ jobs:
         run: python3 quant_scripts/run_all_quant.py
 
       # ─── 第四步：上传所有结果（自动重试 + 失效识别 + 记录状态）───
-      - name: 上传盘后量化数据到复盘报告文件夹
+      - name: 上传盘后量化数据到全盘量化文件夹
         id: upload_main
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
-          IMA_FOLDER_ID: folder_7485234585035034
+          IMA_FOLDER_ID: folder_7485264708529742
         run: |
           IMA_UPLOAD_OK=false
           IMA_CRED_EXPIRED=false
@@ -104,7 +104,7 @@ jobs:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
-          IMA_FOLDER_ID: folder_7485234585035034
+          IMA_FOLDER_ID: folder_7485264708529742
         run: |
           for i in 1 2 3; do
             if python3 upload_ima.py --file outputs/quant_results_$(date +%Y-%m-%d).json --name "quant_results_$(date +%Y-%m-%d).json"; then
