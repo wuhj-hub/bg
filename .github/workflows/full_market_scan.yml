@@ -60,7 +60,7 @@ jobs:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
-          IMA_FOLDER_ID: folder_7485234585034
+          IMA_FOLDER_ID: folder_7485234585035034
         run: |
           IMA_UPLOAD_OK=false
           IMA_CRED_EXPIRED=false
@@ -94,7 +94,7 @@ jobs:
             if python3 upload_ima.py --file panhou_lianghua.csv --name "全量扫描数据_$(date +%Y-%m-%d).csv"; then
               break
             fi
-            sleep \$((i*10))
+            sleep $((i*10))
           done
 
       - name: 上传量化预运行结果到复盘报告文件夹
@@ -104,7 +104,7 @@ jobs:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
-          IMA_FOLDER_ID: folder_7485234585034
+          IMA_FOLDER_ID: folder_7485234585035034
         run: |
           for i in 1 2 3; do
             if python3 upload_ima.py --file outputs/quant_results_$(date +%Y-%m-%d).json --name "quant_results_$(date +%Y-%m-%d).json"; then
