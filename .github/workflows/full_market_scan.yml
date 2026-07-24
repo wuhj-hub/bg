@@ -113,6 +113,14 @@ jobs:
           done
 
       # ─── 第五步：推送结果到微信（PushPlus 独立备份通道，不依赖 ima 成功）───
+      - name: 自动生成复盘报告并上传
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+        run: python3 quant_scripts/gen_review_report.py
+
       - name: 推送扫描结果到微信（PushPlus 备份通道）
         if: always()
         env:
