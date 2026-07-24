@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-full_market_dualdim.py —— 盘后量化扫描（原全市场双维扫描）
+full_market_dualdim.py —— 全盘量化扫描（原全市场双维扫描）（原全市场双维扫描）
 
 读 all_mainboard.csv，对每只股票并发调用 westock-data-skillhub 计算：
   - 沉淀率 = MainNetFlow5D ÷ 近5日总成交额
@@ -169,7 +169,7 @@ def process(stock):
 def gen_report(results, dist, today):
     ordered = sorted(results, key=lambda r: (SIGNAL_ORDER.get(r["sig"], 9), -r["precip"]))
     L = []
-    L.append(f"# 盘后量化报告（{today} 收盘）\n")
+    L.append(f"# 全盘量化报告（{today} 收盘）\n")
     L.append("> 范围：沪深主板（剔除科创板/创业板/北交所/ST），约 3000 只逐只扫描")
     L.append("> 双维口径：沉淀率 = MainNetFlow5D ÷ 近5日总成交额；CJB30 = (今日成交额 − 近30日均量)/近30日均量×100（>50% 为放量）\n")
     L.append("## 一、双维定性分布\n")
