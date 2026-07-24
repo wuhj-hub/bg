@@ -1,4 +1,4 @@
-name: 全量扫描（复盘报告数据源）
+name: 全盘量化扫描
 
 on:
   schedule:
@@ -54,7 +54,7 @@ jobs:
         run: python3 quant_scripts/run_all_quant.py
 
       # ─── 第四步：上传所有结果 ───
-      - name: 上传盘后量化数据到全盘量化文件夹
+      - name: 上传全盘量化报告到全盘量化文件夹
         id: upload_main
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
@@ -65,7 +65,7 @@ jobs:
           IMA_UPLOAD_OK=false
           IMA_CRED_EXPIRED=false
           for i in 1 2 3; do
-            if python3 upload_ima.py --file panhou_lianghua.md --name "盘后量化_$(date +%Y-%m-%d).md" 2>upload_err.log; then
+            if python3 upload_ima.py --file panhou_lianghua.md --name "全盘量化报告_$(date +%Y-%m-%d).md" 2>upload_err.log; then
               IMA_UPLOAD_OK=true
               break
             fi
@@ -90,7 +90,7 @@ jobs:
           IMA_FOLDER_ID: folder_7485264708529742
         run: |
           for i in 1 2 3; do
-            if python3 upload_ima.py --file panhou_lianghua.csv --name "全量扫描数据_$(date +%Y-%m-%d).csv"; then
+            if python3 upload_ima.py --file panhou_lianghua.csv --name "全盘量化数据_$(date +%Y-%m-%d).csv"; then
               break
             fi
             sleep $((i*10))
