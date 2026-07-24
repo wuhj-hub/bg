@@ -1,0 +1,42 @@
+name: 盘前市场报告
+
+on:
+  schedule:
+    # 北京时间 08:00（UTC 0:00），交易日盘前自动生成
+    - cron: "0 0 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  premarket:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 生成盘前市场报告
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+        run: python3 quant_scripts/gen_premarket_report.py
+
+      - name: 推送盘前报告到微信
+        if: always()
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          PUSH_SERVICE: pushplus
+        run: python3 push_notify.py
