@@ -63,7 +63,7 @@ def parse_kline(txt):
         if header and "---" not in parts[0]:
             try:
                 if re.match(r"\d{4}-\d{2}-\d{2}", parts[0]):
-                    rows.append({"date": parts[0], "amount": float(parts[header.index("amount")])})
+                    rows.append({"date": parts[0], "amount": float(parts[header.index("amount")]), "last": float(parts[header.index("last")])})
             except Exception:
                 pass
     return sorted(rows, key=lambda r: r["date"])
@@ -160,6 +160,7 @@ def process(stock):
             "cjb30": bt["cjb30"], "b30v100": bt["b30v100"], "veab": bt["veab"],
             "precip": round(precip, 2), "m5": round(m5), "m10": round(m10), "m20": round(m20),
             "vol": vol, "lv": lv, "sig": sig,
+            "price": kr[-1]["last"] if kr else 0,
         }
     except Exception as e:
         return {"code": code, "name": name, "error": str(e)}
@@ -184,8 +185,21 @@ def gen_report(results, dist, today):
     for r in top:
         L.append(f"| {r['code']} | {r['name']} | {r['cjb30']} | {r['precip']}% | {r['m5']/1e8:.2f} | {r['sig']} |")
     L.append("")
-    L.append("## 三、信号释义\n")
-    L.append("- 主力主导放量🔥(最强)：放量且高沉淀，主力建仓特征，优先关注")
+    L.append("## 三、主力信号专表（含低价标注 💰）\n")
+    L.append("")
+    main_force = [r for r in results if r["sig"] in ("主力主导放量🔥(最强)", "主力偏强放量", "主力控盘")]
+    main_force.sort(key=lambda r: -r["precip"])
+    L.append("| 代码 | 名称 | 价格(元) | 信号类型 | CJB30 | 沉淀率 | 5D主力净流(亿) | 低价池 |")
+    L.append("|---|---|:---:|---|---|---|---|")
+    for r in main_force:
+        lp = "💰" if r.get("price", 999) < 10 else ""
+        price_str = f"{r['price']:.2f}" if r.get("price", 0) else "N/A"
+        L.append(f"| {r['code']} | {r['name']} | {price_str} | {r['sig']} | {r['cjb30']} | {r['precip']}% | {r['m5']/1e8:.2f} | {lp} |")
+    L.append("")
+    L.append("> 💰 = 股价<10元，适合做低价股池跟踪\n")
+    L.append("")
+    L.append("## 四、信号释义\n")
+    L.append("- 主力主导放量🔥(最强)：放量且高沉淀，主力建仓特征，优先关注（四号是最强信号）")
     L.append("- 游资情绪：放量但低沉淀，情绪驱动，需结合技术确认")
     L.append("- 主力控盘：缩量高沉淀，筹码锁定，观察突破")
     L.append("- 数据由 GitHub Actions 自动扫描生成，回传 ima 知识库\n")
@@ -210,7 +224,7 @@ def main():
             if done % 200 == 0:
                 print(f"[PROGRESS] {done}/{len(stocks)} ok={len(results)}")
     with open("panhou_lianghua.csv", "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["code", "name", "cjb30", "b30v100", "veab",
+        w = csv.DictWriter(f, fieldnames=["code", "name", "price", "cjb30", "b30v100", "veab",
                                           "precip", "m5", "m10", "m20", "vol", "lv", "sig"])
         w.writeheader()
         for r in results:
