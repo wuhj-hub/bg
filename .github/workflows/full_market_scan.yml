@@ -81,6 +81,22 @@ jobs:
           echo "IMA_UPLOAD_OK=$IMA_UPLOAD_OK" >> "$GITHUB_ENV"
           echo "IMA_CRED_EXPIRED=$IMA_CRED_EXPIRED" >> "$GITHUB_ENV"
 
+      - name: 上传全量扫描CSV到全盘量化文件夹（供盘前报告引用）
+        id: upload_csv
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: \${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: \${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: \${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          for i in 1 2 3; do
+            if python3 upload_ima.py --file panhou_lianghua.csv --name "全量扫描数据_$(date +%Y-%m-%d).csv"; then
+              break
+            fi
+            sleep \$((i*10))
+          done
+
       - name: 上传量化预运行结果到复盘报告文件夹
         id: upload_extra
         continue-on-error: true
