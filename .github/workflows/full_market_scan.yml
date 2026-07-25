@@ -136,3 +136,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 update_changelog.py
+
+      # ─── 第七步：体系自检（健康评分 + 市场状态检测 + 自动修复）───
+      - name: 体系自检 — 健康评分 / 市场状态 / 异常检测
+        if: always()  # 即使上传失败也执行自检
+        continue-on-error: true
+        run: |
+          echo "🔍 体系自检开始..."
+          python3 self_check.py --csv panhou_lianghua.csv --mainboard all_mainboard.csv --fix
+          echo "✅ 自检完成，结果写入 health_status.json"
+
+      - name: 推送自检报告到微信
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          if [ -f health_status.json ]; then
+            SCORE=$(python3 -c "import json; print(json.load(open('health_status.json'))['health_score'])")
+            GRADE=$(python3 -c "import json; print(json.load(open('health_status.json'))['health_grade'])")
+            REGIME=$(python3 -c "import json; print(json.load(open('health_status.json'))['market_regime'])")
+            ISSUES=$(python3 -c "
+import json
+d=json.load(open('health_status.json'))
+all_i=[]
+for k,v in d.get('checks',{}).items():
+    if isinstance(v,dict): all_i.extend(v.get('issues',[]))
+print('; '.join(all_i[:3]) if all_i else '无')
+")
+            MSG="🏥 体系自检报告 - $(date +%Y-%m-%d)\n\n健康评分: ${SCORE}/100 (${GRADE})\n市场状态: ${REGIME}\n问题摘要: ${ISSUES}"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=🏥体系自检&content=${MSG}&template=txt" > /dev/null
+          fi
