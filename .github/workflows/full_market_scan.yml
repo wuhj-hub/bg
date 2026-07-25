@@ -7,7 +7,7 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: read
+  contents: write  # write for changelog auto-update
 
 concurrency:
   group: panhou-lianghua
@@ -129,3 +129,10 @@ jobs:
           IMA_UPLOAD_OK: ${{ env.IMA_UPLOAD_OK }}
           IMA_CRED_EXPIRED: ${{ env.IMA_CRED_EXPIRED }}
         run: python3 push_notify.py
+
+      # ─── 第六步：运行成功 → 自动更新CHANGELOG版本记录（仅在有新commit时触发）───
+      - name: 自动更新版本记录到CHANGELOG
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 update_changelog.py
