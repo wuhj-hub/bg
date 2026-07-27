@@ -13,7 +13,9 @@
 import os
 import json
 import subprocess
-from datetime import datetime, timedelta, json, time, urllib.request
+import time
+import urllib.request
+from datetime import datetime, timedelta
 
 TOKEN = os.environ.get("PUSH_TOKEN", "")
 SERVICE = os.environ.get("PUSH_SERVICE", "pushplus").lower()
