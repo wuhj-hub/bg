@@ -119,6 +119,7 @@ jobs:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485234585035034
         run: python3 quant_scripts/gen_review_report.py
 
       - name: 推送扫描结果到微信（完整版报告）
