@@ -59,6 +59,20 @@ def extract_summary(path, max_chars=15000):
 
 
 def build_msg():
+    """构建推送内容 — 优先使用完整报告，回退到摘要"""
+    # ★ 完整版模式：如果指定了 FULL_REPORT_FILE，推送完整报告内容
+    full_report = os.environ.get("FULL_REPORT_FILE", "")
+    if full_report and os.path.exists(full_report):
+        try:
+            with open(full_report, "r", encoding="utf-8", errors="replace") as f:
+                content = f.read()
+            if len(content) > 15000:
+                content = content[:15000] + "\n\n> ...（内容过长已截断，完整报告见IMA知识库）"
+            return content
+        except:
+            pass
+    
+    # 回退到摘要模式
     if IMA_OK and not CRED_EXPIRED:
         head = f"# ✅ 全量扫描完成 · {TODAY}\n\n> 已同步至 ima「复盘报告」知识库。"
     elif CRED_EXPIRED:

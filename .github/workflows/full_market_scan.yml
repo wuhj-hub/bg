@@ -121,24 +121,13 @@ jobs:
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
         run: python3 quant_scripts/gen_review_report.py
 
-      - name: 推送扫描结果到微信（PushPlus curl直推）
+      - name: 推送扫描结果到微信（完整版报告）
         if: always()
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
-        run: |
-          echo "🔍 测试 PushPlus token..."
-          HTTP_CODE=$(curl -s -o /tmp/pushplus_resp.json -w "%{http_code}" \
-            --connect-timeout 15 \
-            -X POST "https://www.pushplus.plus/send" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"token\": \"${PUSH_TOKEN}\",
-              \"title\": \"✅ 全盘量化扫描完成 $(date +%Y-%m-%d)\",
-              \"content\": \"全量扫描+三系统预运行+IMA上传已完成。\n📊 详情报查看IMA知识库「全盘量化」文件夹。\",
-              \"template\": \"txt\"
-            }")
-          echo "HTTP响应码: $HTTP_CODE"
-          cat /tmp/pushplus_resp.json
+          PUSH_SERVICE: pushplus
+          FULL_REPORT_FILE: /home/runner/work/bg/bg/panhou_lianghua.md
+        run: python3 push_notify.py
 
       # ─── 第六步：运行成功 → 自动更新CHANGELOG版本记录（仅在有新commit时触发）───
       - name: 自动更新版本记录到CHANGELOG
