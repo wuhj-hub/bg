@@ -14,6 +14,9 @@ import os
 import json
 import subprocess
 import time
+import smtplib
+import email.utils
+from email.mime.text import MIMEText
 import urllib.request
 from datetime import datetime, timedelta
 
@@ -25,6 +28,13 @@ RUN_TAG = f" bg#{RUN_NUM}" if RUN_NUM else ""
 IMA_OK = os.environ.get("IMA_UPLOAD_OK", "true").lower() in ("true", "1", "ok", "")
 CRED_EXPIRED = os.environ.get("IMA_CRED_EXPIRED", "false").lower() in ("true", "1", "yes")
 RESULT_FILE = os.environ.get("RESULT_FILE", "panhou_lianghua.md")
+# 邮件配置
+MAIL_ENABLED = os.environ.get("MAIL_ENABLED", "").lower() in ("true", "1", "yes")
+MAIL_SMTP = os.environ.get("MAIL_SMTP", "smtp.qq.com")
+MAIL_PORT = int(os.environ.get("MAIL_PORT", "465"))
+MAIL_USER = os.environ.get("MAIL_USER", "")
+MAIL_PASS = os.environ.get("MAIL_PASS", "")  # SMTP授权码
+MAIL_TO = os.environ.get("MAIL_TO", "")
 
 
 def extract_summary(path, max_chars=15000):
@@ -120,19 +130,52 @@ def push_pushplus(token):
     return _post("https://www.pushplus.plus/send", body)
 
 
-def main():
-    if not TOKEN:
-        print("PUSH_SKIP: PUSH_TOKEN not set")
-        return
+def push_email(title, content):
+    """SMTP邮件推送"""
+    if not MAIL_USER or not MAIL_PASS or not MAIL_TO:
+        print("MAIL_SKIP: 邮件未配置(需MAIL_USER/MAIL_PASS/MAIL_TO)")
+        return False
     try:
-        if SERVICE == "pushplus":
-            resp = push_pushplus(TOKEN)
-        else:
-            print("UNKNOWN_SERVICE", SERVICE)
-            return
-        print("PUSH_OK", resp[:300])
+        msg = MIMEText(content, "markdown" if content.strip().startswith("#") else "plain", "utf-8")
+        msg["Subject"] = title
+        msg["From"] = email.utils.formataddr(("全量扫描", MAIL_USER))
+        msg["To"] = MAIL_TO
+        msg["Date"] = email.utils.formatdate(localtime=True)
+        
+        server = smtplib.SMTP_SSL(MAIL_SMTP, MAIL_PORT, timeout=30)
+        server.login(MAIL_USER, MAIL_PASS)
+        server.sendmail(MAIL_USER, [MAIL_TO], msg.as_string())
+        server.quit()
+        print(f"MAIL_OK → {MAIL_TO}")
+        return True
     except Exception as e:
-        print("PUSH_ERR", repr(e)[:200])
+        print(f"MAIL_ERR: {e}")
+        return False
+
+
+def main():
+    results = []
+    
+    # PushPlus通道
+    if TOKEN:
+        try:
+            if SERVICE == "pushplus":
+                resp = push_pushplus(TOKEN)
+                results.append(("PushPlus", "OK" if resp else "FAIL"))
+        except Exception as e:
+            results.append(("PushPlus", f"ERR: {e}"))
+    
+    # 邮件通道
+    if MAIL_ENABLED:
+        content = build_msg()
+        title = f"全量扫描{RUN_TAG} {TODAY}"
+        ok = push_email(title, content)
+        results.append(("邮件", "OK" if ok else "FAIL"))
+    
+    if results:
+        print(f"推送结果: {' | '.join([f'{n}={s}' for n,s in results])}")
+    else:
+        print("无推送通道启用")
 
 
 if __name__ == "__main__":
