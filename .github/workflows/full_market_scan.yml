@@ -122,13 +122,19 @@ jobs:
           IMA_FOLDER_ID: folder_7485234585035034
         run: python3 quant_scripts/gen_review_report.py
 
-      - name: 推送扫描结果到微信（完整版报告）
+      - name: 推送扫描结果到微信+邮件（完整版报告）
         if: always()
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
           PUSH_SERVICE: pushplus
           FULL_REPORT_FILE: /home/runner/work/bg/bg/panhou_lianghua.md
           RUN_NUMBER: ${{ github.run_number }}
+          MAIL_ENABLED: ${{ secrets.MAIL_ENABLED }}
+          MAIL_SMTP: ${{ secrets.MAIL_SMTP }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
         run: python3 push_notify.py
 
       # ─── 第六步：运行成功 → 自动更新CHANGELOG版本记录（仅在有新commit时触发）───
