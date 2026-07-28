@@ -20,6 +20,8 @@ from datetime import datetime, timedelta
 TOKEN = os.environ.get("PUSH_TOKEN", "")
 SERVICE = os.environ.get("PUSH_SERVICE", "pushplus").lower()
 TODAY = time.strftime("%Y-%m-%d")
+RUN_NUM = os.environ.get("RUN_NUMBER", "")
+RUN_TAG = f" bg#{RUN_NUM}" if RUN_NUM else ""
 IMA_OK = os.environ.get("IMA_UPLOAD_OK", "true").lower() in ("true", "1", "ok", "")
 CRED_EXPIRED = os.environ.get("IMA_CRED_EXPIRED", "false").lower() in ("true", "1", "yes")
 RESULT_FILE = os.environ.get("RESULT_FILE", "panhou_lianghua.md")
@@ -62,7 +64,6 @@ def extract_summary(path, max_chars=15000):
 
 def build_msg():
     """构建推送内容 — 优先使用完整报告，回退到摘要"""
-    # ★ 完整版模式：如果指定了 FULL_REPORT_FILE，推送完整报告内容
     full_report = os.environ.get("FULL_REPORT_FILE", "")
     if full_report and os.path.exists(full_report):
         try:
@@ -74,12 +75,11 @@ def build_msg():
         except:
             pass
     
-    # 回退到摘要模式
     if IMA_OK and not CRED_EXPIRED:
-        head = f"# ✅ 全量扫描完成 · {TODAY}\n\n> 已同步至 ima「复盘报告」知识库。"
+        head = f"# ✅ 全量扫描完成{RUN_TAG} · {TODAY}\n\n> 已同步至 ima「复盘报告」知识库。"
     elif CRED_EXPIRED:
         head = (
-            f"# ⚠️ 全量扫描完成 · {TODAY}\n\n"
+            f"# ⚠️ 全量扫描完成{RUN_TAG} · {TODAY}\n\n"
             f"> **ima OpenAPI 凭证已失效（上传持续 401 / skill auth failed）**，本次结果未能同步至 ima。\n\n"
             f"> **【需要您处理 · 自愈步骤】**\n"
             f"> 1. 打开 https://ima.qq.com/agent-interface 点「获取 API Key」重新生成一对 client_id / api_key\n"
@@ -90,11 +90,11 @@ def build_msg():
         )
     else:
         head = (
-            f"# ⚠️ 全量扫描完成 · {TODAY}\n\n"
+            f"# ⚠️ 全量扫描完成{RUN_TAG} · {TODAY}\n\n"
             f"> **ima 上传失败（非凭证失效，疑似网络/限流）**，以下是结果备份："
         )
     summary = extract_summary(RESULT_FILE)
-    return f"{head}\n\n## 📊 关键结果\n\n{summary}\n\n---\n🤖 由 full_market_scan 自动推送（PushPlus 备份通道）"
+    return f"{head}\n\n## 📊 关键结果\n\n{summary}\n\n---\n🤖 由 full_market_scan{RUN_TAG} 自动推送（PushPlus 备份通道）"
 
 
 def _post(url, body):
@@ -106,11 +106,11 @@ def _post(url, body):
 
 def push_pushplus(token):
     if CRED_EXPIRED:
-        title = "⚠️ima凭证失效 请重置 " + TODAY
+        title = f"⚠️ima凭证失效{RUN_TAG} 请重置 {TODAY}"
     elif not IMA_OK:
-        title = "⚠️扫描完成(ima失败) " + TODAY
+        title = f"⚠️扫描完成{RUN_TAG}(ima失败) {TODAY}"
     else:
-        title = "扫描完成 " + TODAY
+        title = f"扫描完成{RUN_TAG} {TODAY}"
     body = json.dumps({
         "token": token,
         "title": title,

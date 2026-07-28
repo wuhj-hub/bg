@@ -128,6 +128,7 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
           PUSH_SERVICE: pushplus
           FULL_REPORT_FILE: /home/runner/work/bg/bg/panhou_lianghua.md
+          RUN_NUMBER: ${{ github.run_number }}
         run: python3 push_notify.py
 
       # ─── 第六步：运行成功 → 自动更新CHANGELOG版本记录（仅在有新commit时触发）───
