@@ -80,22 +80,6 @@ jobs:
           echo "IMA_UPLOAD_OK=$IMA_UPLOAD_OK" >> "$GITHUB_ENV"
           echo "IMA_CRED_EXPIRED=$IMA_CRED_EXPIRED" >> "$GITHUB_ENV"
 
-      - name: 上传量化预运行结果到复盘报告文件夹
-        id: upload_extra
-        continue-on-error: true
-        env:
-          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
-          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
-          IMA_FOLDER_ID: folder_7485234585035034
-        run: |
-          for i in 1 2 3; do
-            if python3 upload_ima.py --file outputs/quant_results_$(date +%Y-%m-%d).json --name "quant_results_$(date +%Y-%m-%d).json"; then
-              break
-            fi
-            sleep $((i*10))
-          done
-
       # ─── 第五步：推送结果到微信（PushPlus 独立备份通道，不依赖 ima 成功）───
       - name: 自动生成复盘报告并上传
         continue-on-error: true
