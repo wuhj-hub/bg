@@ -79,8 +79,8 @@ def build_msg():
         try:
             with open(full_report, "r", encoding="utf-8", errors="replace") as f:
                 content = f.read()
-            if len(content) > 15000:
-                content = content[:15000] + "\n\n> ...（内容过长已截断，完整报告见IMA知识库）"
+            if len(content) > 9000:
+                content = content[:9000] + "\n\n> ...（内容过长已截断，完整报告见IMA知识库）"
             return content
         except:
             pass
