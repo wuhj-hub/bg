@@ -221,16 +221,38 @@ def gen_report(today_str):
                 lines.append(f"| {sig} | {dist[sig]} | {meaning} |")
     
     # ════════════════════════════════════════
-    # 四、💰 主力信号低价股池
+    # 四、💰 主力信号专表
     # ════════════════════════════════════════
-    lines.append("\n## 四、💰 主力信号低价股池\n")
+    lines.append("\n## 四、💰 主力信号专表\n")
+    lines.append("> 来源：全量量化扫描 · 按信号强度排序\n")
     stocks = read_lianghua_csv()
+    ALL_STOCKS = stocks[:30]  # 全部信号前30只
     cheap = [s for s in stocks if s["price"] < 10]
+    if ALL_STOCKS:
+        lines.append("\n### 全部信号 TOP30\n")
+        lines.append("| # | 代码 | 名称 | 价格 | 信号 | 沉淀率 | 5D主力(亿) |")
+        lines.append("|---|------|------|:---:|:-----|:----:|:---------:|")
+        sig_emoji = {
+            "主力主导放量🔥(最强)": "🔥",
+            "主力偏强放量": "🟢",
+            "主力控盘": "🔵",
+            "主力惜售": "⚪",
+            "游资情绪": "🎯",
+            "情绪退潮": "🔻"
+        }
+        for i, s in enumerate(ALL_STOCKS, 1):
+            emoji = sig_emoji.get(s["sig"], " ")
+            sig_short = s["sig"][:15] + ".." if len(s["sig"]) > 15 else s["sig"]
+            lines.append(f"| {i} | {s['code']} | {s['name']} | {s['price']:.2f} | {emoji} {sig_short} | {s['precip']}% | {s['m5']:.2f} |")
+    
     if cheap:
-        lines.append("| 代码 | 名称 | 价格(元) | 信号 | 沉淀率 | 5D主力(亿) |")
-        lines.append("|---|---|:---:|:---|---:|:---:|")
-        for s in cheap:
-            lines.append(f"| {s['code']} | {s['name']} | {s['price']:.2f} | {s['sig'][:10]} | {s['precip']}% | {s['m5']:.2f} |")
+        lines.append("\n### 💰 低价精选（≤10元）\n")
+        lines.append("| # | 代码 | 名称 | 价格 | 信号 | 沉淀率 | 5D主力(亿) | 关注 |")
+        lines.append("|---|------|------|:---:|:-----|:----:|:---------:|:----:|")
+        for i, s in enumerate(cheap[:15], 1):
+            emoji = sig_emoji.get(s["sig"], " ")
+            focus = "⭐" if s["price"] < 5 else "👀"
+            lines.append(f"| {i} | {s['code']} | {s['name']} | {s['price']:.2f} | {emoji} {s['sig'][:12]} | {s['precip']}% | {s['m5']:.2f} | {focus} |")
     
     # ════════════════════════════════════════
     # 五、尾盘异动扫描（新增！）
