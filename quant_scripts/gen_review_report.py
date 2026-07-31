@@ -30,15 +30,26 @@ def read_local_file(path):
     return ""
 
 def parse_kline_table(txt):
+    """
+    解析westock kline表格，兼容两种格式:
+    1. 单股: | date | open | last | ... |  (第一列为日期)
+    2. batch: | symbol | date | open | last | ... |  (第二列为日期)
+    """
     rows, header = [], None
     for ln in txt.splitlines():
         s = ln.strip()
-        if not s.startswith("|"): continue
+        if not s.startswith("|"):
+            continue
         parts = [p.strip() for p in s.strip("|").split("|")]
         if "date" in parts:
-            header = parts; continue
-        if header and "---" not in parts[0] and re.match(r"\d{4}-\d{2}-\d{2}", parts[0]):
-            rows.append({header[i]: parts[i] for i in range(min(len(header), len(parts)))})
+            header = parts
+            continue
+        if header and "---" not in parts[0]:
+            # 找出日期所在列索引
+            date_idx = header.index("date") if "date" in header else 0
+            # 数据行第一列必须是日期或symbol
+            if len(parts) >= len(header) and re.match(r"^(\d{4}-\d{2}-\d{2}|[a-z]{2}\d{6})$", parts[0]):
+                rows.append({header[i]: parts[i] for i in range(min(len(header), len(parts)))})
     return rows
 
 def calc_change(rows):
@@ -170,6 +181,7 @@ def gen_report(today_str):
         lines.append("| 指数 | 昨收 | 今收 | 涨跌幅 |")
         lines.append("|---|---|---|---|")
         symbols = {"sh000001": "上证指数", "sz399001": "深证成指", "sz399006": "创业板指", "sh000688": "科创50"}
+        rendered = 0
         for code, name in symbols.items():
             rows = [r for r in idx_rows if r.get("symbol") == code]
             if len(rows) >= 2:
@@ -177,6 +189,22 @@ def gen_report(today_str):
                 chg = (float(r_today["last"]) - float(r_yest["last"])) / float(r_yest["last"]) * 100
                 emoji = "🟢" if chg > 0 else "🔴" if chg < 0 else "⚪"
                 lines.append(f"| {name} | {r_yest['last']} | {r_today['last']} | {emoji} **{chg:+.2f}%** |")
+                rendered += 1
+        if rendered == 0:
+            # batch查询失败，尝试逐只查询
+            for code, name in symbols.items():
+                one = run(["kline", code, "--period", "day", "--limit", "3"])
+                one_rows = parse_kline_table(one)
+                if len(one_rows) >= 2:
+                    r_today, r_yest = one_rows[-1], one_rows[-2]
+                    chg = (float(r_today["last"]) - float(r_yest["last"])) / float(r_yest["last"]) * 100
+                    emoji = "🟢" if chg > 0 else "🔴" if chg < 0 else "⚪"
+                    lines.append(f"| {name} | {r_yest['last']} | {r_today['last']} | {emoji} **{chg:+.2f}%** |")
+                    rendered += 1
+        if rendered == 0:
+            lines.append("> ⏳ 指数数据暂不可用（收盘后westock更新延迟），以下为盘后量化分析")
+    else:
+        lines.append("> ⏳ 指数数据暂不可用（收盘后westock更新延迟），以下为盘后量化分析")
     
     # ════════════════════════════════════════
     # 二、盘前预判验证（新增！闭环核心）
