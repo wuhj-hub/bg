@@ -63,6 +63,8 @@ def estimate_premarket_judgment(idx_rows):
     根据实际走势推断盘前报告可能的预判，生成验证对比
     """
     judgments = []
+    chg = 0      # 默认值：指数数据缺失时按震荡处理
+    close = 0
     if idx_rows:
         sh_rows = [r for r in idx_rows if r.get("symbol") == "sh000001"]
         if len(sh_rows) >= 2:
@@ -101,10 +103,15 @@ def estimate_premarket_judgment(idx_rows):
     except:
         top_sectors = []
     
+    # 指数数据缺失时的实际走势描述
+    if not judgments:
+        actual_desc = "⏳ 指数数据暂不可用"
+    else:
+        actual_desc = f"实际走势：{'下跌' if chg < 0 else '上涨' if chg > 1 else '震荡'}"
     judgments.append({
         "item": "操作基调",
         "pre": "⛔ 全系统防守（不开新仓，仓位0~30%）",
-        "actual": f"实际走势：{'下跌' if chg < 0 else '上涨' if chg > 1 else '震荡'}",
+        "actual": actual_desc,
         "result": "✅ 防守策略正确" if chg < 0 else "⏳ 防守偏保守" if chg > 0 else "✅ 中性无偏差"
     })
     
