@@ -39,10 +39,14 @@ jobs:
       - name: 生成沪深主板清单
         run: python3 gen_mainboard.py
 
+      # ─── 预热westock包（避免扫描时每只股票首次调用下载开销）───
+      - name: 预热westock数据包
+        run: npx -y westock-data-skillhub@1.0.3 hot board --limit 3
+
       # ─── 第二步：全量量化扫描 ───
       - name: 全量量化扫描（盘后量化）
         env:
-          SCAN_WORKERS: "8"
+          SCAN_WORKERS: "16"
         run: python3 full_market_dualdim.py all_mainboard.csv
 
       # ─── 第二步.5：动态生成鱼身股票池 ───
