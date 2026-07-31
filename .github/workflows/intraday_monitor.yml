@@ -1,0 +1,41 @@
+name: 盘中监控
+
+on:
+  schedule:
+    # 交易日 09:00~15:10 北京时间每30分钟 = UTC 01:00~07:10
+    # 使用 */30 1-7 覆盖，脚本内判断交易时段
+    - cron: '*/30 1-7 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  intraday-monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 运行盘中监控
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          PUSH_SERVICE: pushplus
+          MAIL_ENABLED: ${{ secrets.MAIL_ENABLED }}
+          MAIL_SMTP: ${{ secrets.MAIL_SMTP }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          python3 intraday_monitor.py
