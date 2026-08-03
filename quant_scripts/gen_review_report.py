@@ -52,45 +52,149 @@ def parse_kline_table(txt):
                 rows.append({header[i]: parts[i] for i in range(min(len(header), len(parts)))})
     return rows
 
+def parse_board_table(txt):
+    """解析westock hot board输出（数据行第一列为数字index，板块名在name列、涨跌幅在zdf列）"""
+    rows, header = [], None
+    for ln in txt.splitlines():
+        s = ln.strip()
+        if not s.startswith("|"):
+            continue
+        parts = [p.strip() for p in s.strip("|").split("|")]
+        if "name" in parts and "zdf" in parts:
+            header = parts
+            continue
+        if header and "---" not in parts[0]:
+            if len(parts) >= len(header) and re.match(r"^\d+$", parts[0]):
+                rows.append({header[i]: parts[i] for i in range(min(len(header), len(parts)))})
+    return rows
+
+def load_premarket_judgment(today):
+    """读取盘前报告生成器导出的结构化预判JSON（真实验证数据源）。
+    优先当日文件，fallback latest。返回dict或None。"""
+    for name in (f"premarket_judgment_{today}.json", "premarket_judgment_latest.json",
+                 f"outputs/premarket_judgment_{today}.json", "outputs/premarket_judgment_latest.json"):
+        if os.path.exists(name):
+            try:
+                with open(name, "r", encoding="utf-8") as f:
+                    d = json.load(f)
+                if d.get("date", "").startswith(today[:7]):
+                    return d
+            except Exception:
+                pass
+    return None
+
+def read_quant_results(today):
+    """读取 run_all_quant.py 生成的量化汇总，提取三系统信号。返回dict或None。"""
+    for name in (f"quant_results_{today}.json", "outputs/quant_results_{today}.json".format(today=today),
+                 "quant_results_latest.json", "outputs/quant_results_latest.json"):
+        if os.path.exists(name):
+            try:
+                with open(name, "r", encoding="utf-8") as f:
+                    d = json.load(f)
+                out = {}
+                fish = d.get("fish_body") or d.get("fishbody") or {}
+                beast = d.get("beast") or {}
+                sx = d.get("shuangxian") or {}
+                # 鱼身温度
+                ft = (fish.get("market_temp") or {})
+                if isinstance(ft, dict):
+                    ft_v = ft.get("score") or ft.get("temperature") or ft.get("temp")
+                else:
+                    ft_v = None
+                out["🌡️ 鱼身温度"] = f"{ft_v}/100" if ft_v is not None else "—"
+                # 猛兽安全评分
+                bs = beast.get("safety_score") or beast.get("score") or beast.get("market_safety")
+                out["🛡️ 猛兽安全评分"] = f"{bs}/100" if bs is not None else "—"
+                # 双弦
+                tl = sx.get("temperature") or sx.get("temp")
+                gate = sx.get("gate1") or sx.get("gate")
+                sx_sig = sx.get("tone") or sx.get("level") or ""
+                out["🧭 双弦"] = "温度{} {} {}".format(tl if tl is not None else "—",
+                                                      "门控关闭" if gate is False else "门控开启" if gate is True else "",
+                                                      sx_sig).strip()
+                if any(v not in ("—", "温度—", "") for v in out.values()):
+                    return out
+            except Exception:
+                pass
+    return None
+
 def calc_change(rows):
     if len(rows) >= 2:
         r1, r2 = rows[-1], rows[-2]
         return (float(r1["last"]) - float(r2["last"])) / float(r2["last"]) * 100
     return 0
 
-def estimate_premarket_judgment(idx_rows):
-    """
-    根据实际走势推断盘前报告可能的预判，生成验证对比
+def estimate_premarket_judgment(idx_rows, today=""):
+    """盘前预判验证。
+    优先使用盘前生成器导出的结构化预判（真实验证）；
+    JSON缺失时退化为「按实际走势推断」，并明确标注⚠️推断。
     """
     judgments = []
-    chg = 0      # 默认值：指数数据缺失时按震荡处理
+    chg = 0
     close = 0
     if idx_rows:
         sh_rows = [r for r in idx_rows if r.get("symbol") == "sh000001"]
         if len(sh_rows) >= 2:
             chg = (float(sh_rows[-1]["last"]) - float(sh_rows[-2]["last"])) / float(sh_rows[-2]["last"]) * 100
             close = float(sh_rows[-1]["last"])
-            # 推断盘前可能的判断
+    actual_desc = f"实际走势：{'下跌' if chg < 0 else '上涨' if chg > 1 else '震荡'}" if idx_rows else "⏳ 指数数据暂不可用"
+
+    # ── 真实预判路径：读取盘前生成器导出的结构化JSON ──
+    pm = load_premarket_judgment(today) if today else None
+    if pm:
+        pre_tone = pm.get("tone", "")          # e.g. 偏多·结构性机会
+        pre_ops = pm.get("operation", "")      # e.g. 仓位≤50%，可参与不追高
+        pre_sectors = pm.get("sectors", "")    # e.g. AI应用/软件主线、半导体低吸
+        pre_key = pm.get("key_levels", "")     # e.g. 支撑3800压力3850
+        # 大盘方向验证
+        if chg < -1:
+            res_dir = "❌ 预判错误（市场大跌，盘前偏乐观）"
+        elif chg < 0:
+            res_dir = "❌ 预判错误（市场下跌，盘前未提示风险）" if ("偏多" in pre_tone or "乐观" in pre_tone) else "✅ 基本正确"
+        elif chg < 1:
+            res_dir = "⏳ 中性（市场小幅震荡）"
+        else:
+            res_dir = "✅ 正确（市场上涨）"
+        judgments.append({"item": "大盘方向", "pre": pre_tone or "未给出", "actual": f"{close} ({chg:+.2f}%)", "result": res_dir})
+        # 操作基调验证
+        if pre_ops:
+            res_ops = "✅ 防守策略正确" if ("防守" in pre_ops and chg < 0) else \
+                      "❌ 偏激进（盘前建议参与但市场大跌）" if ("参与" in pre_ops and chg < -0.5) else \
+                      "⏳ 中性"
+            judgments.append({"item": "操作基调", "pre": pre_ops, "actual": actual_desc, "result": res_ops})
+        # 板块方向验证（对比预判板块 vs 实际领涨）
+        try:
+            hot = run(["hot", "board", "--limit", "10"])
+            hot_rows = parse_board_table(hot) if hot else []
+            top_sectors = [r.get("name", "") for r in hot_rows[:3] if r.get("name")]
+        except:
+            top_sectors = []
+        if pre_sectors:
+            hit = [s for s in top_sectors if any(k in pre_sectors for k in (s[:2], s[:3]))]
+            res_sec = "✅ 板块预判正确" if len(hit) >= 2 else "❌ 板块主线证伪" if top_sectors else "⏳ 板块数据缺失"
+            judgments.append({"item": "板块方向", "pre": pre_sectors, "actual": f"实际领涨: {'、'.join(top_sectors) or '数据缺失'}", "result": res_sec})
+        # 关键位验证（支撑/压力）
+        if pre_key:
+            hit_sup = "支撑" in pre_key and close >= 3800
+            res_key = "✅ 支撑位判断正确" if hit_sup else "⚠️ 关键位需观察"
+            judgments.append({"item": "关键位", "pre": pre_key, "actual": f"收 {close}", "result": res_key})
+        return judgments
+
+    # ── fallback：旧推断路径（盘前JSON缺失，明确标注）──
+    if idx_rows:
+        sh_rows = [r for r in idx_rows if r.get("symbol") == "sh000001"]
+        if len(sh_rows) >= 2:
             if chg < -1:
-                tone = "防守"
-                pre_tone = "防守"
-                result = "✅ 正确（市场下跌，防守基调匹配）"
+                tone, pre_tone, result = "防守", "防守", "✅ 正确（市场下跌，防守基调匹配）"
             elif chg < 0:
-                tone = "偏防守"
-                pre_tone = "防守"
-                result = "✅ 基本正确（市场微跌，防守基调合理）"
+                tone, pre_tone, result = "偏防守", "防守", "✅ 基本正确（市场微跌，防守基调合理）"
             elif chg < 1:
-                tone = "中性偏防守"
-                pre_tone = "中性/防守"
-                result = "⏳ 中性（市场小幅震荡，需结合成交量判断）"
+                tone, pre_tone, result = "中性偏防守", "中性/防守", "⏳ 中性（市场小幅震荡，需结合成交量判断）"
             else:
-                tone = "进攻"
-                pre_tone = "防守/中性"
-                result = "❌ 偏保守（市场上涨但盘前偏防守，错失机会）"
-            
+                tone, pre_tone, result = "进攻", "防守/中性", "❌ 偏保守（市场上涨但盘前偏防守，错失机会）"
             judgments.append({
                 "item": "大盘方向",
-                "pre": f"偏弱震荡/防守（鱼身温度35/100偏冷）",
+                "pre": "⚠️ 推断预判（盘前JSON缺失）",
                 "actual": f"{close} ({chg:+.2f}%)",
                 "result": result
             })
@@ -98,19 +202,16 @@ def estimate_premarket_judgment(idx_rows):
     # 板块方向验证
     try:
         hot = run(["hot", "board", "--limit", "5"])
-        hot_rows = parse_kline_table(hot) if hot else []
+        hot_rows = parse_board_table(hot) if hot else []
         top_sectors = [r.get("name", "") for r in hot_rows[:3] if r.get("name")]
     except:
         top_sectors = []
     
-    # 指数数据缺失时的实际走势描述
     if not judgments:
         actual_desc = "⏳ 指数数据暂不可用"
-    else:
-        actual_desc = f"实际走势：{'下跌' if chg < 0 else '上涨' if chg > 1 else '震荡'}"
     judgments.append({
         "item": "操作基调",
-        "pre": "⛔ 全系统防守（不开新仓，仓位0~30%）",
+        "pre": "⚠️ 推断预判（盘前JSON缺失）",
         "actual": actual_desc,
         "result": "✅ 防守策略正确" if chg < 0 else "⏳ 防守偏保守" if chg > 0 else "✅ 中性无偏差"
     })
@@ -118,9 +219,9 @@ def estimate_premarket_judgment(idx_rows):
     sectors_str = "、".join(top_sectors[:3]) if top_sectors else "银行/白酒/电力（盘前预判）"
     judgments.append({
         "item": "板块方向",
-        "pre": "关注银行/白酒/电力等防御方向",
+        "pre": "⚠️ 推断预判（盘前JSON缺失）",
         "actual": f"领涨板块: {sectors_str}",
-        "result": "✅ 防御方向匹配" if any(s in str(top_sectors) for s in ["银行","酒","电力"]) else "⏳ 部分偏差"
+        "result": "✅ 防御方向匹配" if any(s in str(top_sectors) for s in ["银行", "酒", "电力"]) else "⏳ 部分偏差"
     })
     
     return judgments
@@ -219,7 +320,7 @@ def gen_report(today_str):
     lines.append("\n## 二、盘前预判验证\n")
     lines.append(f"> 验证对象：盘前市场报告_{today} 的预判 vs 今日实际走势\n")
     
-    judgments = estimate_premarket_judgment(idx_rows)
+    judgments = estimate_premarket_judgment(idx_rows, today)
     if judgments:
         lines.append("| 验证项 | 盘前判断 | 收盘实际 | 结果 |")
         lines.append("|:----|:---------|:--------|:----:|")
@@ -293,20 +394,45 @@ def gen_report(today_str):
     # 五、尾盘异动扫描（新增！）
     # ════════════════════════════════════════
     lines.append("\n## 五、尾盘异动\n")
-    # 获取今日板块排行
+    # 获取今日板块排行（hot board 输出首列为数字index，用 parse_board_table）
     try:
         hot = run(["hot", "board", "--limit", "8"])
-        if hot and len(hot) > 20:
+        hot_rows = parse_board_table(hot) if hot else []
+        if hot_rows:
             lines.append("今日热门板块排行：\n")
             lines.append("| 排名 | 板块 | 涨跌幅 |")
             lines.append("|:---:|:----|:----:|")
-            hot_rows = parse_kline_table(hot)
             for i, r in enumerate(hot_rows[:8]):
                 name = r.get("name", "")
                 zdf = r.get("zdf", "")
-                lines.append(f"| {i+1} | {name} | {zdf}% |")
+                try:
+                    zf = float(zdf)
+                    emoji = "🟢" if zf > 0 else "🔴" if zf < 0 else "⚪"
+                except:
+                    emoji = ""
+                lines.append(f"| {i+1} | {name} | {emoji} {zdf}% |")
+        else:
+            lines.append("⏳ 板块排行数据暂不可用\n")
     except:
         lines.append("⏳ 板块排行数据暂不可用\n")
+    
+    # 三系统盘后信号（优先 quant_results_{today}.json 盘后实际运行，fallback 盘前JSON快照）
+    sys3 = read_quant_results(today)
+    if sys3:
+        lines.append("\n### 三系统盘后信号\n")
+        lines.append("| 系统 | 信号 |")
+        lines.append("|:----|:----|")
+        for k, v in sys3.items():
+            lines.append(f"| {k} | {v} |")
+    else:
+        pm3 = load_premarket_judgment(today)
+        if pm3 and (pm3.get("fish_temp") or pm3.get("beast_score") or pm3.get("shuangxian")):
+            lines.append("\n### 三系统信号快照（盘前）\n")
+            lines.append("| 系统 | 信号 |")
+            lines.append("|:----|:----|")
+            lines.append(f"| 🌡️ 鱼身温度 | {pm3.get('fish_temp') or '—'} |")
+            lines.append(f"| 🛡️ 猛兽安全评分 | {pm3.get('beast_score') or '—'} |")
+            lines.append(f"| 🧭 双弦 | {pm3.get('shuangxian') or '—'} |")
     
     # ════════════════════════════════════════
     # 六、明日展望（新增！闭环收口）
@@ -369,12 +495,17 @@ def main():
     for i in 1, 2, 3:
         r = subprocess.run(
             ["python3", "upload_ima.py", "--file", f"outputs/{fname}", "--name", fname],
-            capture_output=True, text=True, timeout=30
+            capture_output=True, text=True, timeout=60
         )
         if r.returncode == 0:
             print("[OK] uploaded to IMA")
+            print(r.stdout[-300:] if r.stdout else "")
             break
-        print(f"attempt {i} failed")
+        print(f"attempt {i} failed: rc={r.returncode}")
+        if r.stdout:
+            print("stdout:", r.stdout[-300:])
+        if r.stderr:
+            print("stderr:", r.stderr[-300:])
         time.sleep(10)
     
     # 输出推送摘要

@@ -27,6 +27,71 @@ def run_curl(url):
     except:
         return ""
 
+def load_quant_latest():
+    """读取昨日盘后量化汇总（三系统信号），返回dict或None"""
+    for name in ("quant_results_latest.json", "outputs/quant_results_latest.json"):
+        if os.path.exists(name):
+            try:
+                with open(name, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception:
+                return None
+    return None
+
+def build_judgment(idx_rows, sectors, quant):
+    """基于三系统+指数+板块生成结构化预判（供复盘报告真实验证）"""
+    fish = (quant.get("fish_body") or {}) if quant else {}
+    beast = (quant.get("beast") or {}) if quant else {}
+    sx = (quant.get("shuangxian") or {}) if quant else {}
+    ft = fish.get("market_temp") or {}
+    ft_v = ft.get("score") if isinstance(ft, dict) else None
+    bs = beast.get("safety_score") if isinstance(beast, dict) else None
+    sx_air = sx.get("air_count") if isinstance(sx, dict) else None  # 空头指数数量
+    tl = sx.get("temperature") if isinstance(sx, dict) else None
+
+    # 综合决策规则
+    bearish = 0
+    if sx_air is not None and sx_air >= 5:
+        bearish += 1
+    if bs is not None and bs < 40:
+        bearish += 1
+    if ft_v is not None and ft_v < 45:
+        bearish += 1
+    if bearish >= 2:
+        tone = "防守"
+        operation = "仓位≤30%，以防守为主，不开新仓"
+    elif bearish == 1:
+        tone = "中性偏防守"
+        operation = "仓位≤40%，轻仓参与，严格止损"
+    else:
+        tone = "中性偏多·结构性机会"
+        operation = "仓位≤50%，可参与但控制仓位"
+    # 板块方向：领涨板块前3 + 提示
+    sec_names = [r.get("name", "") for r in sectors[:3]]
+    sector_hint = "、".join(sec_names) if sec_names else "关注领涨板块持续性"
+    # 关键位：用上证近20日高低点粗算
+    key_levels = "—"
+    try:
+        txt = run(["kline", "sh000001", "--period", "day", "--limit", "25"])
+        rows = parse_kline_table(txt)
+        if len(rows) >= 20:
+            highs = [float(r["high"]) for r in rows[-20:] if r.get("high")]
+            lows = [float(r["low"]) for r in rows[-20:] if r.get("low")]
+            if highs and lows:
+                key_levels = f"支撑{min(lows):.0f}、压力{max(highs):.0f}"
+    except Exception:
+        pass
+    return {
+        "tone": tone,
+        "operation": operation,
+        "sectors": sector_hint,
+        "key_levels": key_levels,
+        "fish_temp": f"{ft_v}/100" if ft_v is not None else "—",
+        "beast_score": f"{bs}/100" if bs is not None else "—",
+        "shuangxian": (f"空头{sx_air}/8" if sx_air is not None else "—"),
+    }
+
+
 def parse_kline_table(txt):
     """解析westock kline表格，返回列表"""
     rows = []
@@ -118,6 +183,7 @@ def gen_report(today_str):
     """生成完整盘前报告"""
     today = today_str
     yesterday = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+    quant = load_quant_latest()
     
     lines = []
     lines.append(f"# 📊 盘前市场报告 · {today}\n")
@@ -148,6 +214,41 @@ def gen_report(today_str):
         lines.append("|---|---|---|---|")
         lines.append(idx_data)
     
+    # ②.5 三系统信号快照（引用昨日盘后量化）
+    lines.append("\n### 三系统信号快照（{0}盘后）\n".format(yesterday))
+    fish = (quant.get("fish_body") or {}) if quant else {}
+    beast = (quant.get("beast") or {}) if quant else {}
+    sx = (quant.get("shuangxian") or {}) if quant else {}
+    ft = fish.get("market_temp") or {}
+    ft_v = ft.get("score") if isinstance(ft, dict) else None
+    bs = beast.get("safety_score") if isinstance(beast, dict) else None
+    sx_air = sx.get("air_count") if isinstance(sx, dict) else None
+    lines.append("| 系统 | 信号 |")
+    lines.append("|:----|:----|")
+    lines.append(f"| 🌡️ 鱼身温度 | {ft_v}/100" if ft_v is not None else "| 🌡️ 鱼身温度 | ⏳ 待量化运行 |")
+    lines.append(f"| 🛡️ 猛兽安全评分 | {bs}/100" if bs is not None else "| 🛡️ 猛兽安全评分 | ⏳ 待量化运行 |")
+    lines.append(f"| 🧭 双弦 | 空头{sx_air}/8" if sx_air is not None else "| 🧭 双弦 | ⏳ 待量化运行 |")
+    
+    # ②.6 综合决策
+    idx_rows_all = []
+    for code in ["sh000001", "sz399001", "sz399006", "sh000688"]:
+        txt = run(["kline", code, "--period", "day", "--limit", "3"])
+        idx_rows_all.extend(parse_kline_table(txt))
+    board_txt = run(["hot", "board", "--limit", "5"])
+    board_rows = []
+    for ln in board_txt.splitlines():
+        s = ln.strip()
+        if s.startswith("|") and not s.startswith("|---"):
+            parts = [p.strip() for p in s.strip("|").split("|")]
+            if len(parts) >= 8 and parts[0].isdigit():
+                board_rows.append({"name": parts[6], "zdf": parts[7]})
+    j = build_judgment(idx_rows_all, board_rows, quant)
+    lines.append("\n### 🎯 综合决策\n")
+    lines.append(f"- 大盘方向：**{j['tone']}**")
+    lines.append(f"- 操作基调：**{j['operation']}**")
+    lines.append(f"- 板块方向：{j['sectors']}")
+    lines.append(f"- 关键位：{j['key_levels']}\n")
+    
     lines.append("\n## ③ 板块排行\n")
     board = get_board_data()
     if board:
@@ -159,33 +260,48 @@ def gen_report(today_str):
     lines.append("⏳ 每日量化数据由15:30全盘量化扫描生成，盘前时段引用昨日数据。\n")
     
     lines.append("\n## ⑤ 策略要点\n")
-    lines.append("- 操作建议详见量化系统信号快照")
-    lines.append("- 完整数据请参见全盘量化报告\n")
+    lines.append(f"- 操作基调：{j['operation']}")
+    lines.append(f"- 关注板块：{j['sectors']}")
+    lines.append(f"- 关键位：{j['key_levels']}\n")
     
     lines.append("---\n")
     lines.append("⚠️ 本报告基于公开市场数据整理，不构成投资建议。\n")
     
-    return "\n".join(lines)
+    return "\n".join(lines), j
 
 def main():
     today = datetime.now().strftime("%Y-%m-%d")
-    md = gen_report(today)
+    md, judgment = gen_report(today)
     fname = f"盘前市场报告_{today}.md"
     with open(fname, "w", encoding="utf-8") as f:
         f.write(md)
     print(f"[OK] {fname} generated ({len(md)} chars)")
+    
+    # 导出结构化预判JSON（供复盘报告真实验证读取）
+    judgment["date"] = today
+    jname = f"premarket_judgment_{today}.json"
+    with open(jname, "w", encoding="utf-8") as f:
+        json.dump(judgment, f, ensure_ascii=False, indent=2)
+    with open("premarket_judgment_latest.json", "w", encoding="utf-8") as f:
+        json.dump(judgment, f, ensure_ascii=False, indent=2)
+    print(f"[OK] {jname} + latest 导出（预判字段：{judgment['tone']} / {judgment['operation']}）")
     
     # 上传
     upload_ok = False
     for i in 1, 2, 3:
         r = subprocess.run(
             ["python3", "upload_ima.py", "--file", fname, "--name", fname],
-            capture_output=True, text=True, timeout=30
+            capture_output=True, text=True, timeout=60
         )
         if r.returncode == 0:
             upload_ok = True
+            print("[OK] uploaded to IMA knowledge base")
+            if r.stdout:
+                print(r.stdout[-300:])
             break
-        print(f"upload attempt {i} failed, retry...")
+        print(f"upload attempt {i} failed: rc={r.returncode}")
+        if r.stderr:
+            print("stderr:", r.stderr[-300:])
         time.sleep(10)
     
     if upload_ok:

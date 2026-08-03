@@ -57,6 +57,18 @@ jobs:
       - name: 量化系统预运行（双弦+鱼身+猛兽）
         run: python3 quant_scripts/run_all_quant.py
 
+      # ─── 第三步.5：提交量化汇总（供次日盘前报告引用三系统信号）───
+      - name: 提交量化汇总到仓库（供盘前报告引用）
+        run: |
+          cp outputs/quant_results_$(date +%Y-%m-%d).json quant_results_latest.json 2>/dev/null || cp outputs/quant_results_latest.json quant_results_latest.json 2>/dev/null || true
+          if [ -f quant_results_latest.json ]; then
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git add quant_results_latest.json
+            git commit -m "chore: update quant_results_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
+            git push origin main || echo "push failed (network), will retry next run"
+          fi
+
       # ─── 第四步：上传所有结果 ───
       - name: 上传全盘量化报告到全盘量化文件夹
         id: upload_main
