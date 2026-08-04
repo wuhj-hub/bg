@@ -388,6 +388,20 @@ def main():
         mm={'1':1,'2':2,'3':3}
         tm=mm.get(args.mode)
         if tm: all_sigs=[s for s in all_sigs if s.get('mode')==tm]
+    
+    # 月线框架确认（曾星智体系: MA6半年线/MA12年线 + 月线反转）——日线买点的月线闸门
+    try:
+        import sys as _sys
+        _sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__))))
+        from month_frame import check_month_trend
+        for s in all_sigs:
+            r = check_month_trend(s['code'])
+            s['month_trend'] = r.get('trend', '')
+            s['month_gate'] = r.get('gate', '')
+            s['month_reversal'] = r.get('reversal')
+    except Exception as _e:
+        print(f"  ⚠️ 月线确认模块不可用: {_e}")
+    
     all_sigs.sort(key=lambda x:x['final_score'],reverse=True)
     
     # 阶段3: 输出
@@ -413,6 +427,21 @@ def main():
                       f"(原始{s['raw_score']}+多维{s['multi_score']}+共振{res_sc})  "
                       f"现价: {s['price']:.2f}"
                       + (f"  {c('🔥黄金起爆',C.R)}" if s.get('tag') == '黄金起爆' else ""))
+                # 月线框架标注（曾星智体系）
+                mg = s.get('month_gate', '')
+                mr = s.get('month_reversal')
+                if mr:
+                    mtag = c(f"⚡月线反转({mr})", C.R)
+                elif mg == 'PASS':
+                    mtag = c("🟢月线多头", C.G)
+                elif mg == 'WARN':
+                    mtag = c("🟡月线纠缠", C.Y)
+                elif mg == 'BLOCK':
+                    mtag = c("🔴月线空头", C.R)
+                else:
+                    mtag = ""
+                if mtag:
+                    print(f"    {mtag}")
                 for r in s['reasons']:
                     print(f"    {r}")
                 print(f"    止损:{s['stop_loss']}  目标:{s['target']}")

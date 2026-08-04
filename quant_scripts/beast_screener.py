@@ -1633,10 +1633,52 @@ def main():
         print("\n❌ 无候选股，终止扫描")
         return
 
+    # ---- Step 2.6: 月线框架闸门（曾星智体系: MA6半年线+MA12年线+月线反转）----
+    try:
+        import sys, os
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        if script_dir not in sys.path:
+            sys.path.insert(0, script_dir)
+        from month_frame import check_month_trend
+        
+        month_enabled = os.environ.get("MONTH_GATE_ENABLED", "true").lower() == "true"
+        if month_enabled and candidates:
+            print("\n📅 Step 2.6: 月线框架闸门（曾星智: MA6半年线/MA12年线 + 月线反转）")
+            print("-" * 40)
+            n_pass = n_warn = n_block = n_rev = 0
+            for i, c in enumerate(candidates):
+                r = check_month_trend(c["code"])
+                c["month_trend"] = r.get("trend", "无数据")
+                c["month_gate"] = r.get("gate", "BLOCK")
+                c["month_reversal"] = r.get("reversal")
+                if r.get("reversal"):
+                    n_rev += 1
+                if c["month_gate"] == "PASS":
+                    n_pass += 1
+                elif c["month_gate"] == "WARN":
+                    n_warn += 1
+                else:
+                    n_block += 1
+                tag = "⚡反转" if r.get("reversal") else {"PASS": "🟢", "WARN": "🟡", "BLOCK": "🔴"}.get(c["month_gate"], "❔")
+                print(f"  {c['code']} {c['name']} 月线{c['month_trend']} {tag} {r.get('reversal') or ''}")
+            print(f"  📊 月线闸门: PASS {n_pass} / WARN {n_warn} / BLOCK {n_block}，反转信号 {n_rev} 只")
+            print("  💡 规则: 月线多头(PASS)或反转信号→日线买点可靠; 纠缠(WARN)→降级; 空头(BLOCK)→日线信号可靠性低")
+        else:
+            print("  ⏭️ 月线闸门跳过（未启用或候选为空）")
+    except Exception as e:
+        print(f"  ⚠️ 月线闸门异常: {e}（跳过该步骤）")
+
     # ---- Step 3: OVS评分 ----
     print("\n🔍 Step 3: OVS综合评分 (官方PV2/PV3/OV3公式)")
     print("-" * 40)
+    cand_map = {c["code"]: c for c in candidates}
     ovs_results = [ovs_score_stock(c["code"], c["name"], index_df) for c in candidates]
+    # 透传月线框架字段（Step 2.6标注在candidates上，ovs_results为新dict需回填）
+    for r in ovs_results:
+        cm = cand_map.get(r["code"], {})
+        r["month_trend"] = cm.get("month_trend", "")
+        r["month_gate"] = cm.get("month_gate", "")
+        r["month_reversal"] = cm.get("month_reversal", "")
     ovs_results.sort(key=lambda x: x["ovs_total"], reverse=True)
     setup_candidates = [r for r in ovs_results if r["ovs_total"] >= 40][:15]
     if not setup_candidates:
@@ -1654,6 +1696,10 @@ def main():
     for i, c in enumerate(setup_candidates):
         print(f"  ⏳ 计算中 ({i+1}/{len(setup_candidates)})...", end="\r")
         setup = setup_score_stock(c["code"], c["name"], index_df)
+        # 透传月线框架字段（Step 2.6）
+        setup["month_trend"] = c.get("month_trend", "")
+        setup["month_gate"] = c.get("month_gate", "")
+        setup["month_reversal"] = c.get("month_reversal", "")
         setup_results.append(setup)
 
         gap_tag = "⍟" if setup.get("gap_score_display", 0) >= 8 else ""
@@ -1704,8 +1750,8 @@ def main():
     print("🟢 二、领先股 — 强势突破信号 (Setup≥40 + 突破强 + RSVA高)")
     print("=" * 72)
     if leaders:
-        print(f"  {'代码':<11} {'名称':<7} {'总分':>4} {'突破':>4} {'RSVA':>5} {'孤狼':>6} {'近高点':>6}  模式  {'评级'}")
-        print("  " + "-" * 70)
+        print(f"  {'代码':<11} {'名称':<7} {'总分':>4} {'突破':>4} {'RSVA':>5} {'孤狼':>6} {'近高点':>6}  模式  {'月线'}  {'评级'}")
+        print("  " + "-" * 78)
         for s in leaders:
             d = s["details"]
             lead_tag = f"+{d.get('lead_over_index',0):.0f}%" if d.get('lead_over_index',0) else ""
@@ -1713,6 +1759,17 @@ def main():
             gap_mark = " [断层]" if s["gap_score_display"] >= 8 else ""
             gpoint_mark = " [G点]" if d.get("has_gpoint", False) else ""
             mode_tag = s.get("trade_mode", "")
+            m_tag = ""
+            if s.get("month_reversal"):
+                m_tag = "⚡反转"
+            elif s.get("month_gate") == "PASS":
+                m_tag = "🟢多头"
+            elif s.get("month_gate") == "WARN":
+                m_tag = "🟡纠缠"
+            elif s.get("month_gate") == "BLOCK":
+                m_tag = "🔴空头"
+            else:
+                m_tag = "—"
             print(f"  {s['code']:<11} {s['name']:<7} "
                   f"{s['setup_total']:>3}/{100:<2} "
                   f"{s['breakout_score']:>2}/{15:<2} "
@@ -1720,6 +1777,7 @@ def main():
                   f"{lead_tag:>6} "
                   f"{d.get('dist_from_high_pct',0):>4.1f}% "
                   f"{mode_tag:>4} "
+                  f"{m_tag:>6} "
                   f"{level}{gap_mark}{gpoint_mark}")
     else:
         print(f"  ⚠️ 当前无符合条件的领先股")
@@ -1738,8 +1796,8 @@ def main():
     print("=" * 72)
     if pullbacks:
         pullbacks.sort(key=lambda x: x["vcp_score"], reverse=True)
-        print(f"  {'代码':<11} {'名称':<7} {'VCP':>4} {'距高点':>6} {'量比':>6} {'总分':>4} {'伏击':>4} {'RS_D':>4} 备注")
-        print("  " + "-" * 65)
+        print(f"  {'代码':<11} {'名称':<7} {'VCP':>4} {'距高点':>6} {'量比':>6} {'总分':>4} {'伏击':>4} {'RS_D':>4} {'月线':>6} 备注")
+        print("  " + "-" * 72)
         for s in pullbacks:
             d = s["details"]
             notes = []
@@ -1755,6 +1813,17 @@ def main():
                 notes.append("📉RS_D背离")
             if d.get("has_gpoint", False):
                 notes.append("⚡G点")
+            m_tag = ""
+            if s.get("month_reversal"):
+                m_tag = "⚡反转"
+            elif s.get("month_gate") == "PASS":
+                m_tag = "🟢多头"
+            elif s.get("month_gate") == "WARN":
+                m_tag = "🟡纠缠"
+            elif s.get("month_gate") == "BLOCK":
+                m_tag = "🔴空头"
+            else:
+                m_tag = "—"
             print(f"  {s['code']:<11} {s['name']:<7} "
                   f"{s['vcp_score']:>2}/{20:<2} "
                   f"{d.get('dist_from_high_pct',0):>5.1f}% "
@@ -1762,6 +1831,7 @@ def main():
                   f"{s['setup_total']:>3}  "
                   f"{s['ambush_score']:>1}/{5:<2} "
                   f"{s['rsd_score']:>1}/{5:<2} "
+                  f"{m_tag:>6} "
                   f"{' '.join(notes)}")
     else:
         print(f"  ⚠️ 当前无符合条件的回调股")
@@ -1804,10 +1874,10 @@ def main():
     print("💡 Step 5: 操作建议")
     print("=" * 72)
 
-    gap_sigs = [s for s in setup_results if s["gap_score_display"] >= 8]
+    gap_sigs = [s for s in setup_results if s.get("gap_score_display", 0) >= 8]
     gpoint_sigs = [s for s in setup_results if s["details"].get("has_gpoint", False)]
-    ambush_sigs = [s for s in setup_results if s["ambush_score"] >= 3]
-    rsd_sigs = [s for s in setup_results if s["rsd_score"] >= 3]
+    ambush_sigs = [s for s in setup_results if s.get("ambush_score", 0) >= 3]
+    rsd_sigs = [s for s in setup_results if s.get("rsd_score", 0) >= 3]
 
     if leaders:
         print(f"\n  🟢 【领先股关注】突破信号清晰, 可跟踪枢轴点确认")
