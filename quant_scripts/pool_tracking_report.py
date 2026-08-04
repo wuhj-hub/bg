@@ -222,12 +222,37 @@ def append_signal_log(results, fin):
     except Exception as e:
         print(f"[log] 失败: {e}")
 
+def load_extend_signals(lianghua_path="panhou_lianghua.md"):
+    """从全盘量化报告提取主力信号标的（主力主导放量/偏强放量/控盘），返回 [(code,name)]"""
+    added = []
+    if not os.path.exists(lianghua_path):
+        if os.path.exists("outputs/" + lianghua_path):
+            lianghua_path = "outputs/" + lianghua_path
+        else:
+            return added
+    with open(lianghua_path, encoding="utf-8") as f:
+        text = f.read()
+    # 解析主力信号专表行: | 代码 | 名称 | 价格 | 信号 | ...
+    for ln in text.splitlines():
+        s = ln.strip()
+        if not s.startswith("|"):
+            continue
+        parts = [p.strip() for p in s.strip("|").split("|")]
+        if len(parts) >= 5 and re.match(r"^\d{6}$", parts[0]):
+            sig = parts[3]
+            if any(k in sig for k in ("主力主导放量", "主力偏强放量", "主力控盘")):
+                code = ("sh" if parts[0].startswith("6") else "sz") + parts[0]
+                added.append((code, f"{parts[1]}({sig[:4]})"))
+    return added
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pool", default="")
     ap.add_argument("--name", default="")
     ap.add_argument("--pool-file", default="stock_pool.txt", help="股票池配置文件路径")
     ap.add_argument("--push", action="store_true", help="推送PushPlus")
+    ap.add_argument("--auto-extend", action="store_true",
+                    help="自动并入全盘量化当日主力信号（panhou_lianghua.md）")
     a = ap.parse_args()
 
     DEFAULT_POOL = [
@@ -254,6 +279,14 @@ def main():
         else:
             pool = DEFAULT_POOL
             pool_src = "默认池"
+    # 自动并入当日主力信号（动态刷新）
+    if a.auto_extend:
+        extend = load_extend_signals()
+        if extend:
+            existing = {c for c, _ in pool}
+            new = [(c, n) for c, n in extend if c not in existing]
+            pool = pool + new
+            pool_src += f" + 当日主力信号{len(extend)}只(新增{len(new)})"
     print(f"跟踪标的: {len(pool)} 只（来源: {pool_src}）\n")
 
     results = []

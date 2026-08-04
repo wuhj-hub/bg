@@ -272,6 +272,70 @@ def read_lianghua_csv():
     stocks.sort(key=lambda s: s["price"])
     return stocks
 
+def read_pool_status(today):
+    """读取当日股池跟踪报告（pool_tracking_report.py 产出），提取三阶共振/一阶通过标的"""
+    for path in (f"outputs/股池标的跟踪报告_{today}.md", f"股池标的跟踪报告_{today}.md"):
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, encoding="utf-8") as f:
+                text = f.read()
+            stars, passes = [], []
+            in_star = in_pass = False
+            for ln in text.splitlines():
+                if "二、三阶共振" in ln:
+                    in_star, in_pass = True, False
+                    continue
+                if "三、信号明细" in ln or "三、二阶共振" in ln:
+                    in_star, in_pass = False, True
+                    continue
+                if "四、否决" in ln or "## 四" in ln:
+                    in_star = in_pass = False
+                    continue
+                s = ln.strip()
+                if s.startswith("|") and not s.startswith("|:") and "代码" not in s:
+                    if in_star and "三重共振" in s and "当前无" not in s:
+                        stars.append(s)
+                    elif in_pass and s.count("|") >= 6:
+                        passes.append(s)
+            return text, stars, passes
+        except Exception:
+            pass
+    return None, [], []
+
+def pool_status_section(today):
+    """生成复盘报告中的「股池三阶漏斗状态」章节"""
+    text, stars, passes = read_pool_status(today)
+    if not text:
+        return ""
+    L = []
+    A = L.append
+    A("\n### ③.5 股池三阶漏斗状态（当日）\n")
+    if stars:
+        A("**★ 三阶共振标的（可执行）**\n")
+        A("| 代码 | 名称 | 建议 |")
+        A("|:----|:----|:----|")
+        for s in stars:
+            parts = [p.strip() for p in s.strip("|").split("|")]
+            if len(parts) >= 4:
+                A(f"| {parts[0]} | {parts[1]} | {parts[-2] if len(parts) > 4 else '关注'} |")
+    A("**一阶通过 / 信号标的（观察）**\n")
+    A("| 代码 | 名称 | 月线状态 |")
+    A("|:----|:----|:----|")
+    n = 0
+    for s in passes:
+        parts = [p.strip() for p in s.strip("|").split("|")]
+        if len(parts) >= 4 and re.match(r"^(sh|sz)\d{6}$", parts[0]):
+            A(f"| {parts[0]} | {parts[1]} | {parts[2]} |")
+            n += 1
+        if n >= 15:
+            A(f"| ... | 其余{n if n < len(passes) else len(passes)}只见股池跟踪报告 | — |")
+            break
+    if not stars and not passes:
+        A("> 股池跟踪报告已生成（见全盘量化文件夹），当前无三阶共振/信号标的\n")
+    A("\n> 📌 三阶漏斗=月线反转(趋势)→武威G1(低吸)→v2.1质量否决(支撑≥5%+盈利)，详见股池标的跟踪报告\n")
+    return "\n".join(L)
+
 def gen_report(today_str):
     today = today_str
     yesterday = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
@@ -436,6 +500,9 @@ def gen_report(today_str):
             lines.append(f"| 🛡️ 猛兽安全评分 | {pm3.get('beast_score') or '—'} |")
             lines.append(f"| 🧭 双弦 | {pm3.get('shuangxian') or '—'} |")
     
+    # 五.5 股池三阶漏斗状态（当日，pool_tracking_report.py 产出）
+    lines.append(pool_status_section(today))
+
     # ════════════════════════════════════════
     # 六、明日展望（新增！闭环收口）
     # ════════════════════════════════════════
