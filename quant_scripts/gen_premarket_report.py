@@ -181,6 +181,46 @@ def get_index_monthly():
             results[name] = rows
     return results
 
+def calc_zengxingzhi():
+    """曾星智+双弦双体系市场定性：8大指数月线 → MA60/MA120/半年涨跌/振幅 → 定性表"""
+    codes = {"sh000001":"上证指数","sz399106":"深证综指","sh000016":"上证50","sh000300":"沪深300",
+             "sz399101":"中小综指","sh000688":"科创50","sz399006":"创业板指","sh000905":"中证500"}
+    data = {}
+    for code in codes:
+        txt = run(["kline", code, "--period", "month", "--limit", "10"])
+        for ln in txt.splitlines():
+            s = ln.strip()
+            if not s.startswith("|"):
+                continue
+            parts = [p.strip() for p in s.strip("|").split("|")]
+            if len(parts) >= 6 and re.match(r"^\d{4}-\d{2}-\d{2}$", parts[1]) and parts[0] == code:
+                try:
+                    data.setdefault(code, []).append((parts[1], float(parts[3]), float(parts[4]), float(parts[5])))
+                except:
+                    pass
+    lines = []
+    bear = bull = 0
+    for code, name in codes.items():
+        rows = sorted(data.get(code, []))
+        if len(rows) < 6:
+            continue
+        closes = [r[1] for r in rows]
+        ma60 = sum(closes[-3:]) / 3
+        ma120 = sum(closes[-6:]) / 6
+        cur = closes[-1]
+        half_chg = (cur / closes[-7] - 1) * 100 if len(closes) >= 7 else 0
+        zx = "看多" if (cur > ma120 and half_chg > 0) else "看空" if (cur < ma120 and half_chg < 0) else "震荡"
+        sx = "多头" if (closes[-1] > ma60 and cur > ma60) else "空头" if (closes[-1] < ma60 and cur < ma60) else "纠缠"
+        if sx == "空头": bear += 1
+        if sx == "多头": bull += 1
+        h5 = max(r[2] for r in rows[-5:]); l5 = min(r[3] for r in rows[-5:])
+        amp = (h5 - l5) / l5 * 100
+        amp_txt = "高波动" if amp > 30 else "中波动" if amp > 15 else "低波动"
+        zx_emoji = "🔴看空" if zx == "看空" else "🟡震荡" if zx == "震荡" else "🟢看多"
+        lines.append(f"| {name} | {ma60:.0f} | {ma120:.0f} | {cur:.2f} | {half_chg:+.1f}% | {zx_emoji} | {sx} | {amp:.0f}%{amp_txt} |")
+    qual = "🐻 熊市结构" if bear >= 6 else "🐂 牛市结构" if bull >= 6 else "🟡 震荡结构"
+    return "\n".join(lines), qual, bear, bull
+
 def gen_report(today_str):
     """生成完整盘前报告"""
     today = today_str
@@ -230,6 +270,17 @@ def gen_report(today_str):
     lines.append(f"| 🌡️ 鱼身温度 | {ft_v}/100" if ft_v is not None else "| 🌡️ 鱼身温度 | ⏳ 待量化运行 |")
     lines.append(f"| 🛡️ 猛兽安全评分 | {bs}/100" if bs is not None else "| 🛡️ 猛兽安全评分 | ⏳ 待量化运行 |")
     lines.append(f"| 🧭 双弦 | 空头{sx_air}/8" if sx_air is not None else "| 🧭 双弦 | ⏳ 待量化运行 |")
+    
+    # ②.5.1 曾星智+双弦双体系市场定性（8大指数月线）
+    zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
+    if zx_table:
+        lines.append("\n### 双弦+曾星智双体系市场定性\n")
+        lines.append(f"**双弦体系**（快弦MA20≈1月均/慢弦MA60≈3月均）：空头 {zx_bear}/8、多头 {zx_bull}/8 → {zx_qual}\n")
+        lines.append("**曾星智体系**（半年线MA120≈6月均+6个月涨跌）：按「价在MA120上+半年涨>0=看多；价在MA120下+半年跌<0=看空」逐指数判定\n")
+        lines.append("| 指数 | MA60(3月) | MA120(6月) | 最新 | 半年涨跌 | 曾星智 | 双弦 | 5月振幅 |")
+        lines.append("|:----|:----|:----|:----|:----|:----:|:----:|:----|")
+        lines.append(zx_table)
+        lines.append("")
     
     # ②.6 综合决策
     idx_rows_all = []
