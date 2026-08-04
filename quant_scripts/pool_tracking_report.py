@@ -13,6 +13,7 @@ pool_tracking_report.py —— 股池标的跟踪报告（三阶漏斗整合版 
 用法: python3 pool_tracking_report.py [--pool "sz000779,sz002596,..."] [--name 自定义标题]
 """
 import subprocess, sys, os, re, json, argparse
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
@@ -292,7 +293,9 @@ def main():
     A("⚠️ 本报告基于公开市场数据整理，不构成投资建议。三阶漏斗为量化历史规律总结，实战需结合大盘温度动态调整。")
 
     md = "\n".join(L)
-    out = "/sandbox/workspace/outputs/股池标的跟踪报告_2026-08-04.md"
+    today = datetime.now().strftime("%Y-%m-%d")
+    os.makedirs("outputs", exist_ok=True)
+    out = os.path.join("outputs", f"股池标的跟踪报告_{today}.md")
     with open(out, "w", encoding="utf-8") as f:
         f.write(md)
     print(f"[OK] {out} ({len(md)} chars)")
