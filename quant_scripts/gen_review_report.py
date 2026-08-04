@@ -50,6 +50,8 @@ def parse_kline_table(txt):
             # 数据行第一列必须是日期或symbol
             if len(parts) >= len(header) and re.match(r"^(\d{4}-\d{2}-\d{2}|[a-z]{2}\d{6})$", parts[0]):
                 rows.append({header[i]: parts[i] for i in range(min(len(header), len(parts)))})
+    # ⚠️ westock kline输出为降序(最新在前)，统一按date升序排序，保证 rows[-1]=最新
+    rows.sort(key=lambda r: r.get("date", ""))
     return rows
 
 def parse_board_table(txt):

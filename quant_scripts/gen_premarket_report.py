@@ -110,6 +110,8 @@ def parse_kline_table(txt):
                 if i < len(parts):
                     row[h] = parts[i]
             rows.append(row)
+    # ⚠️ westock kline输出为降序(最新在前)，统一按date升序排序，保证 rows[-1]=最新
+    rows.sort(key=lambda r: r.get("date", ""))
     return rows
 
 def get_index_data():
