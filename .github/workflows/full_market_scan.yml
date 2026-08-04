@@ -114,8 +114,9 @@ jobs:
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
-          python3 quant_scripts/pool_tracking_report.py
+          python3 quant_scripts/pool_tracking_report.py --push
           if [ -f "outputs/股池标的跟踪报告_$(date +%Y-%m-%d).md" ]; then
             python3 upload_ima.py --file "outputs/股池标的跟踪报告_$(date +%Y-%m-%d).md" --name "股池标的跟踪报告_$(date +%Y-%m-%d).md"
           fi

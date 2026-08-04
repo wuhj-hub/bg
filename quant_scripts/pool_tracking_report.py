@@ -164,10 +164,70 @@ def track_stock(code, name=""):
     return {"code": code, "name": name, "ok": True, "mf": mf, "g1": g1,
             "support": support, "shrink": shrink, "price": cur_price}
 
+def load_pool_file(path="stock_pool.txt"):
+    """读取股票池配置文件（兼容 '代码 # 名称' 或 'sh600000 名称' 或纯代码行）"""
+    pool = []
+    if not os.path.exists(path):
+        return pool
+    with open(path, encoding="utf-8") as f:
+        for ln in f:
+            s = ln.split("#")[0].strip()
+            if not s:
+                continue
+            parts = s.split()
+            code = parts[0].strip()
+            m = re.match(r"^(sh|sz)?(\d{6})$", code)
+            if not m:
+                continue
+            code = (m.group(1) or ("sh" if m.group(2).startswith("6") else "sz")) + m.group(2)
+            name = ln.split("#")[-1].strip() if "#" in ln else ""
+            pool.append((code, name))
+    return pool
+
+def push_pushplus(token, title, file_path):
+    """PushPlus推送报告摘要"""
+    import urllib.request, urllib.parse
+    try:
+        with open(file_path, encoding="utf-8") as f:
+            content = f.read()
+        # 截取报告前部关键内容（信号卡/总览）
+        content = content[:4000] + ("\n\n...（完整报告见 IMA 知识库全盘量化文件夹）" if len(content) > 4000 else "")
+        body = urllib.parse.urlencode({"token": token, "title": title, "content": content, "template": "markdown"}).encode()
+        req = urllib.request.Request("https://pushplus.plus/send", data=body)
+        with urllib.request.urlopen(req, timeout=30) as r:
+            resp = r.read().decode()
+        print(f"[pushplus] {resp[:100]}")
+    except Exception as e:
+        print(f"[pushplus] 失败: {e}")
+
+def append_signal_log(results, fin):
+    """信号日志CSV累积（供胜率跟踪）"""
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        os.makedirs("outputs", exist_ok=True)
+        log = "outputs/pool_signals_log.csv"
+        need_header = not os.path.exists(log)
+        with open(log, "a", encoding="utf-8") as f:
+            if need_header:
+                f.write("date,code,name,trend,gate,reversal,g1,support,finance,decision\n")
+            for r in results:
+                if not r["ok"]:
+                    continue
+                mf, g1 = r["mf"], r["g1"]
+                fst = fin.get(r["code"], "无数据")
+                support = f"{r['support']:.4f}" if r["support"] is not None else ""
+                f.write(f"{today},{r['code']},{r['name']},{mf['trend']},{mf['gate']},"
+                        f"{mf['reversal'] or ''},{g1},{support},{fst},{''}\n")
+        print(f"[log] 信号日志已累积 → {log}")
+    except Exception as e:
+        print(f"[log] 失败: {e}")
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pool", default="")
     ap.add_argument("--name", default="")
+    ap.add_argument("--pool-file", default="stock_pool.txt", help="股票池配置文件路径")
+    ap.add_argument("--push", action="store_true", help="推送PushPlus")
     a = ap.parse_args()
 
     DEFAULT_POOL = [
@@ -180,11 +240,21 @@ def main():
         ("sz000892", "欢瑞世纪(主力放量)"), ("sz000566", "海南海药(主力放量)"),
         ("sz002131", "利欧股份(主力放量)"),
     ]
+    # 股池优先级: --pool 参数 > 配置文件 > 默认池
     if a.pool:
         pool = [(c.strip(), "") for c in a.pool.split(",") if c.strip()]
+        pool_src = "命令行参数"
     else:
-        pool = DEFAULT_POOL
-    print(f"跟踪标的: {len(pool)} 只\n")
+        file_pool = load_pool_file(a.pool_file)
+        if not file_pool:
+            file_pool = load_pool_file("quant_scripts/" + a.pool_file)  # GitHub runner路径
+        if file_pool:
+            pool = file_pool
+            pool_src = f"配置文件({a.pool_file}, {len(pool)}只)"
+        else:
+            pool = DEFAULT_POOL
+            pool_src = "默认池"
+    print(f"跟踪标的: {len(pool)} 只（来源: {pool_src}）\n")
 
     results = []
     with ThreadPoolExecutor(max_workers=8) as ex:
@@ -202,35 +272,43 @@ def main():
     L = []
     A = L.append
     A(f"# 📊 {title} · 三阶漏斗整合版\n")
-    A("> 生成时间：2026-08-04 17:45 | 数据：月线K线+利润表（westock）")
+    A("> 生成时间：2026-08-04 18:11 | 数据：月线K线+利润表（westock）")
     A("> **三阶漏斗**：① 月线反转（曾星智MA6/MA12+陶博士）→ ② 武威G1（双阴/一阴缩量回调）→ ③ v2.1质量否决（支撑≥5%+盈利）")
-    A("> 📅 信号基准月：**2026-07**（月末完整月，与武威G1月末选股一致）\n")
+    A(f"> 📅 信号基准月：**2026-07**（月末完整月） | 股池来源：**{pool_src}**\n")
 
-    # 汇总表
+    # 汇总表（只显示有信号价值的：月线PASS或有G1信号；其余合并统计）
+    sig_results = [r for r in results if r["ok"] and
+                   (r["mf"]["gate"] == "PASS" or r["g1"] in ("双阴", "一阴"))]
+    warn_count = len([r for r in results if r["ok"] and r["mf"]["gate"] == "WARN"
+                      and r["g1"] not in ("双阴", "一阴")])
+    block_count = len([r for r in results if r["ok"] and r["mf"]["gate"] == "BLOCK"])
+    data_na = len([r for r in results if not r["ok"]])
     A("## 一、三阶漏斗总览\n")
-    A("| 代码 | 名称 | 现价 | ①月线 | 闸门 | 反转信号 | ②G1 | 支撑 | ③v2.1 | 决策 |")
+    A(f"| 代码 | 名称 | 现价 | ①月线 | 闸门 | 反转信号 | ②G1 | 支撑 | ③v2.1 | 决策 |")
     A("|:----|:----|:----:|:----:|:----:|:--------|:----:|:----:|:----:|:----:|")
-    for r in results:
-        if not r["ok"]:
-            A(f"| {r['code']} | {r['name']} | — | 数据不足 | — | — | — | — | — | ⚠️ |")
-            continue
+    for r in sig_results:
         mf, g1 = r["mf"], r["g1"]
         sup_txt = f"{r['support']*100:.0f}%" if r["support"] is not None else "—"
         fst = fin.get(r["code"], "无数据")
-        gate_txt = {"PASS": "🟢", "WARN": "🟡", "BLOCK": "🔴"}.get(mf["gate"], "❔")
+        gate_txt = {"PASS": "🟢", "WARN": "🟡"}.get(mf["gate"], "❔")
         rev_txt = mf["reversal"] or "—"
-        # 三阶漏斗判定
         if mf["gate"] == "PASS" and g1 in ("双阴", "一阴") and fst == "盈利" and (r["support"] or 0) >= 0.05:
             dec = "★ 三重共振"
         elif mf["gate"] == "PASS" and g1 in ("双阴", "一阴"):
             dec = "二阶共振"
         elif mf["gate"] == "PASS":
             dec = "一阶通过"
-        elif mf["gate"] == "WARN":
-            dec = "月线纠缠"
         else:
-            dec = "月线空头"
+            dec = "G1低吸信号"
         A(f"| {r['code']} | {r['name']} | {r['price']} | {mf['trend']} | {gate_txt} | {rev_txt} | {g1} | {sup_txt} | {fst} | **{dec}** |")
+    if warn_count:
+        A(f"| ... | **{warn_count} 只月线纠缠**（无G1信号） | — | 🟡 | — | — | — | — | — | 待确认 |")
+    if block_count:
+        A(f"| ... | **{block_count} 只月线空头** | — | 🔴 被月线闸门拦截 | — | — | — | — | — | 否决 |")
+    if data_na:
+        A(f"| ... | **{data_na} 只数据不足** | — | — | — | — | — | — | — | ⚠️ |")
+    if not sig_results and not warn_count and not block_count and not data_na:
+        A("| — | 无标的 | — | — | — | — | — | — | — | — |")
 
     # 三阶共振明细
     A("\n## 二、三阶共振标的（★ 可执行）\n")
@@ -250,8 +328,8 @@ def main():
     if n_star == 0:
         A("| — | 当前无三重共振标的 | — | — | — | — | — |")
 
-    # 二阶/一阶明细
-    A("\n## 三、二阶共振 / 一阶通过（观察）\n")
+    # 二阶/一阶明细（仅月线PASS或有G1信号）
+    A("\n## 三、信号明细（一阶通过 / 二阶共振）\n")
     A("| 代码 | 名称 | ①月线 | ②G1 | ③v2.1 | 状态 |")
     A("|:----|:----|:----:|:----:|:----:|:----|")
     for r in results:
@@ -262,10 +340,10 @@ def main():
         sup_ok = (r["support"] or 0) >= 0.05
         if mf["gate"] == "PASS" and g1 in ("双阴", "一阴") and fst == "盈利" and sup_ok:
             continue  # 已在上表
-        if mf["gate"] == "PASS":
-            A(f"| {r['code']} | {r['name']} | {mf['trend']}{'⚡'+mf['reversal'] if mf['reversal'] else ''} | {g1} | {fst}{'·支撑'+str(round((r['support'] or 0)*100))+'%' if r['support'] else ''} | 观察 |")
-        elif mf["gate"] == "WARN":
-            A(f"| {r['code']} | {r['name']} | {mf['trend']} | {g1} | {fst} | ⚠️月线纠缠待确认 |")
+        if mf["gate"] != "PASS" and g1 not in ("双阴", "一阴"):
+            continue  # 纠缠/空头无G1，已合并计数
+        sup_txt = f"支撑{round((r['support'] or 0)*100)}%" if r["support"] else ""
+        A(f"| {r['code']} | {r['name']} | {mf['trend']}{'⚡'+mf['reversal'] if mf['reversal'] else ''} | {g1} | {fst}·{sup_txt} | 观察 |")
 
     # 被否决明细（仅BLOCK或数据不足）
     A("\n## 四、否决 / 拦截标的（三阶漏斗未通过）\n")
@@ -299,7 +377,18 @@ def main():
     with open(out, "w", encoding="utf-8") as f:
         f.write(md)
     print(f"[OK] {out} ({len(md)} chars)")
-    print(md[:800])
+
+    # 信号日志累积（胜率跟踪数据源）
+    append_signal_log(results, fin)
+
+    # PushPlus推送
+    if a.push:
+        token = os.environ.get("PUSH_TOKEN", "")
+        if token:
+            push_pushplus(token, f"📊 {title} {today}", out)
+        else:
+            print("[push] 跳过（PUSH_TOKEN未设置）")
+    print(md[:600])
 
 if __name__ == "__main__":
     main()
