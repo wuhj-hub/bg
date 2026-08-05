@@ -284,7 +284,22 @@ def main():
     ap.add_argument("--push", action="store_true", help="推送PushPlus")
     ap.add_argument("--auto-extend", action="store_true",
                     help="自动并入全盘量化当日主力信号（panhou_lianghua.md）")
+    ap.add_argument("--holdings", default="", help="持仓代码列表(逗号分隔)，离场计分卡仅对持仓生效")
+    ap.add_argument("--holdings-file", default="holdings.txt", help="持仓文件(每行一个代码)")
     a = ap.parse_args()
+
+    # 持仓集合
+    holdings = set()
+    if a.holdings:
+        holdings = {c.strip() for c in a.holdings.split(",") if c.strip()}
+    elif os.path.exists(a.holdings_file):
+        with open(a.holdings_file, encoding="utf-8") as f:
+            for ln in f:
+                s = ln.split("#")[0].strip()
+                for c in s.replace("，", ",").split(","):
+                    c = c.strip()
+                    if c:
+                        holdings.add(c)
 
     DEFAULT_POOL = [
         ("sz000779", "甘咨询"), ("sz002596", "海南瑞泽"), ("sh600095", "湘财股份"),
@@ -443,14 +458,20 @@ def main():
 
     # 交易防护明细（ATR/离场计分）
     A("\n## 五、交易防护明细（ATR止损 / 离场计分卡）\n")
-    A("| 代码 | 名称 | ATR | ATR止损 | 盈亏比 | 离场分 | 离场状态 | 原因 |")
-    A("|:----|:----|:----:|:----:|:----:|:----:|:----:|:----|")
+    A(f"> 持仓 {len(holdings)} 只（--holdings）；离场计分仅对持仓有约束力，未持仓标的行为参考\n")
+    A("| 代码 | 名称 | 持仓 | ATR | ATR止损 | 盈亏比 | 离场分 | 离场状态 | 原因 |")
+    A("|:----|:----|:----:|:----:|:----:|:----:|:----:|:----:|:----|")
     for r in sig_results:
         g = r.get("guard")
         if not g or not g.get("ok"):
             continue
+        held = "✅" if r["code"] in holdings else "—"
         reasons = "、".join(g.get("exit_reasons", [])[:3]) or "—"
-        A(f"| {r['code']} | {r['name']} | {g.get('atr')} | {g.get('stop')} | {g.get('rr')} | {g['exit_score']} | {g['exit_action']} | {reasons} |")
+        if r["code"] not in holdings and g["exit_score"] <= -2:
+            status = "未持仓·参考"
+        else:
+            status = g["exit_action"]
+        A(f"| {r['code']} | {r['name']} | {held} | {g.get('atr')} | {g.get('stop')} | {g.get('rr')} | {g['exit_score']} | {status} | {reasons} |")
     A("\n> 💡 离场计分卡（八维启发）：月线破MA6(-2)/ATR止损破位(-2)/日线破MA20(-1)/MACD死叉(-1)；≤-2强制离场（仅对已持仓标的有约束力）")
 
     md = "\n".join(L)
