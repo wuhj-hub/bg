@@ -245,6 +245,49 @@ def load_extend_signals(lianghua_path="panhou_lianghua.md"):
                 added.append((code, f"{parts[1]}({sig[:4]})"))
     return added
 
+def load_double_pool():
+    """读取双弦体系月度股池（pools/pool_YYYY-MM.json），返回 [(code, name(标注))]"""
+    added = []
+    month = datetime.now().strftime("%Y-%m")
+    paths = [f"pools/pool_{month}.json", f"quant_scripts/pools/pool_{month}.json",
+             f"skills/双弦投资系统/pools/pool_{month}.json"]
+    for p in paths:
+        if os.path.exists(p):
+            try:
+                with open(p, encoding="utf-8") as f:
+                    d = json.load(f)
+                for e in d.get("entries", []):
+                    code = e.get("code", "")
+                    if re.match(r"^(sh|sz)\d{6}$", code):
+                        added.append((code, f"{e.get('name','')}(双弦:{e.get('signal_type','')})"))
+                if added:
+                    return added
+            except Exception:
+                pass
+    return added
+
+def load_beast_pool():
+    """读取猛兽体系月度股池（monthly_pool/YYYY-MM.md），返回 [(code, name(标注))]"""
+    added = []
+    month = datetime.now().strftime("%Y-%m")
+    paths = [f"monthly_pool/{month}.md", f"quant_scripts/monthly_pool/{month}.md",
+             f"skills/猛兽体系/scripts/monthly_pool/{month}.md"]
+    for p in paths:
+        if os.path.exists(p):
+            try:
+                with open(p, encoding="utf-8") as f:
+                    for ln in f:
+                        m = re.search(r"(sh|sz)(\d{6})", ln)
+                        if m:
+                            code = m.group(1) + m.group(2)
+                            nm = re.search(r"[|：:]\s*([\u4e00-\u9fa5A-Za-z]{2,8})", ln)
+                            added.append((code, f"{nm.group(1) if nm else ''}(猛兽)"))
+                if added:
+                    return added
+            except Exception:
+                pass
+    return added
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pool", default="")
@@ -253,6 +296,8 @@ def main():
     ap.add_argument("--push", action="store_true", help="推送PushPlus")
     ap.add_argument("--auto-extend", action="store_true",
                     help="自动并入全盘量化当日主力信号（panhou_lianghua.md）")
+    ap.add_argument("--no-integrate", action="store_true",
+                    help="不整合双弦/猛兽体系月度股池（默认整合）")
     a = ap.parse_args()
 
     DEFAULT_POOL = [
@@ -287,6 +332,20 @@ def main():
             new = [(c, n) for c, n in extend if c not in existing]
             pool = pool + new
             pool_src += f" + 当日主力信号{len(extend)}只(新增{len(new)})"
+    # 整合双弦/猛兽体系月度股池（默认开启）
+    if not a.no_integrate:
+        existing = {c for c, _ in pool}
+        dp = load_double_pool()
+        if dp:
+            nd = [(c, n) for c, n in dp if c not in existing]
+            pool = pool + nd
+            pool_src += f" + 双弦月度股池{len(nd)}只"
+            existing = {c for c, _ in pool}
+        bp = load_beast_pool()
+        if bp:
+            nb = [(c, n) for c, n in bp if c not in existing]
+            pool = pool + nb
+            pool_src += f" + 猛兽月度股池{len(nb)}只"
     print(f"跟踪标的: {len(pool)} 只（来源: {pool_src}）\n")
 
     results = []
