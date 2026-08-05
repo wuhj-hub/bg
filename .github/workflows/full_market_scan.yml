@@ -66,7 +66,15 @@ jobs:
             git config user.email "actions@github.com"
             git add quant_results_latest.json
             git commit -m "chore: update quant_results_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
-            git push origin main || echo "push failed (network), will retry next run"
+            for i in 1 2 3; do
+              git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true
+              if git push origin main 2>/dev/null; then
+                echo "[OK] quant_results_latest pushed (attempt $i)"
+                break
+              fi
+              echo "push attempt $i failed, retry after 15s"
+              sleep 15
+            done
           fi
 
       # ─── 第四步：上传所有结果 ───

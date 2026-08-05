@@ -293,8 +293,9 @@ def gen_report(today_str):
         s = ln.strip()
         if s.startswith("|") and not s.startswith("|---"):
             parts = [p.strip() for p in s.strip("|").split("|")]
-            if len(parts) >= 8 and parts[0].isdigit():
-                board_rows.append({"name": parts[6], "zdf": parts[7]})
+            # 列序: index|level|symbol|rank|rankdelta|date|stock_type|name|zdf|zxj
+            if len(parts) >= 9 and parts[0].isdigit():
+                board_rows.append({"name": parts[7], "zdf": parts[8]})
     j = build_judgment(idx_rows_all, board_rows, quant)
     lines.append("\n### 🎯 综合决策\n")
     lines.append(f"- 大盘方向：**{j['tone']}**")

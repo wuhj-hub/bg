@@ -86,7 +86,9 @@ def load_premarket_judgment(today):
     return None
 
 def read_quant_results(today):
-    """读取 run_all_quant.py 生成的量化汇总，提取三系统信号。返回dict或None。"""
+    """读取 run_all_quant.py 生成的量化汇总，提取三系统信号。返回dict或None。
+    结构: {date, timestamp, shuangxian:{stdout,pool_file,pool_data}, fishbody:{market_temp,...}, beast:{stdout,...}}
+    猛兽安全评分/双弦温度计在stdout文本中，正则提取。"""
     for name in (f"quant_results_{today}.json", "outputs/quant_results_{today}.json".format(today=today),
                  "quant_results_latest.json", "outputs/quant_results_latest.json"):
         if os.path.exists(name):
@@ -104,16 +106,26 @@ def read_quant_results(today):
                 else:
                     ft_v = None
                 out["🌡️ 鱼身温度"] = f"{ft_v}/100" if ft_v is not None else "—"
-                # 猛兽安全评分
-                bs = beast.get("safety_score") or beast.get("score") or beast.get("market_safety")
+                # 猛兽安全评分（stdout文本提取）
+                bs = beast.get("safety_score")
+                if bs is None:
+                    bstd = beast.get("stdout", "")
+                    m = re.search(r"安全评分:\s*([\d.]+)/100", bstd)
+                    bs = m.group(1) if m else None
                 out["🛡️ 猛兽安全评分"] = f"{bs}/100" if bs is not None else "—"
-                # 双弦
+                # 双弦温度/门控（stdout文本提取）
+                sstd = sx.get("stdout", "")
                 tl = sx.get("temperature") or sx.get("temp")
+                if tl is None:
+                    m = re.search(r"温度[:计]?\s*([\d.]+)", sstd)
+                    tl = m.group(1) if m else None
                 gate = sx.get("gate1") or sx.get("gate")
+                if gate is None:
+                    gate = "关闭" if "AND门.*关闭|门控关闭" in sstd or "关闭" in sstd else None
                 sx_sig = sx.get("tone") or sx.get("level") or ""
-                out["🧭 双弦"] = "温度{} {} {}".format(tl if tl is not None else "—",
-                                                      "门控关闭" if gate is False else "门控开启" if gate is True else "",
-                                                      sx_sig).strip()
+                out["🧭 双弦"] = "温度{} {}".format(tl if tl is not None else "—",
+                                                   "·门控关闭" if gate == "关闭" else "",
+                                                   sx_sig).strip()
                 if any(v not in ("—", "温度—", "") for v in out.values()):
                     return out
             except Exception:

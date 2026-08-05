@@ -38,9 +38,17 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add premarket_judgment_latest.json "盘前市场报告_$(date +%Y-%m-%d).md" 2>/dev/null
+          git add premarket_judgment_latest.json "premarket_judgment_$(date +%Y-%m-%d).json" "盘前市场报告_$(date +%Y-%m-%d).md" 2>/dev/null
           git commit -m "chore: update premarket judgment ($(date +%Y-%m-%d))" || echo "no changes to commit"
-          git push origin main || echo "push failed (network), will retry next run"
+          for i in 1 2 3; do
+            git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true
+            if git push origin main 2>/dev/null; then
+              echo "[OK] premarket judgment pushed (attempt $i)"
+              break
+            fi
+            echo "push attempt $i failed, retry after 15s"
+            sleep 15
+          done
 
       - name: 推送盘前报告到微信
         if: always()
