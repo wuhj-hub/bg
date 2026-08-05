@@ -144,6 +144,29 @@ def v21_decision(sig_type, support, finance):
         return "轻仓", "一阴仅轻仓(永不重仓)"
     return "观察", "未触发G1"
 
+def load_regime_from_quant():
+    """从quant_results_latest.json读取市场档位（猛兽评分/双弦温度）"""
+    try:
+        for p in ("quant_results_latest.json", "outputs/quant_results_latest.json"):
+            if os.path.exists(p):
+                with open(p, encoding="utf-8") as f:
+                    d = json.load(f)
+                beast = d.get("beast") or {}
+                sx = d.get("shuangxian") or {}
+                bstd = beast.get("stdout", "")
+                m = re.search(r"安全评分:\s*([\d.]+)/100", bstd)
+                bs = float(m.group(1)) if m else None
+                sstd = sx.get("stdout", "")
+                m2 = re.search(r"温度[:计]?\s*([\d.]+)", sstd)
+                temp = float(m2.group(1)) if m2 else None
+                gate = "关闭" in sstd and "开启" not in sstd
+                from trade_guard import market_regime
+                regime, hint = market_regime(bs, temp, not gate)
+                return regime, hint
+    except Exception:
+        pass
+    return "震荡", "标准档：信号正常，仓位上限50%"
+
 def track_stock(code, name=""):
     rows = []
     for _ in range(3):
@@ -161,8 +184,16 @@ def track_stock(code, name=""):
     if rows and re.match(r"^\d{4}-08", rows[-1]["date"]):
         rows_g1 = rows[:-1]
     g1, support, shrink = wuwei_g1(rows_g1)
+    # 交易防护（ATR止损/盈亏比/离场计分）
+    guard = None
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from trade_guard import check_stock
+        guard = check_stock(code)
+    except Exception:
+        pass
     return {"code": code, "name": name, "ok": True, "mf": mf, "g1": g1,
-            "support": support, "shrink": shrink, "price": cur_price}
+            "support": support, "shrink": shrink, "price": cur_price, "guard": guard}
 
 def load_pool_file(path="stock_pool.txt"):
     """读取股票池配置文件（兼容 '代码 # 名称' 或 'sh600000 名称' 或纯代码行）"""
@@ -245,49 +276,6 @@ def load_extend_signals(lianghua_path="panhou_lianghua.md"):
                 added.append((code, f"{parts[1]}({sig[:4]})"))
     return added
 
-def load_double_pool():
-    """读取双弦体系月度股池（pools/pool_YYYY-MM.json），返回 [(code, name(标注))]"""
-    added = []
-    month = datetime.now().strftime("%Y-%m")
-    paths = [f"pools/pool_{month}.json", f"quant_scripts/pools/pool_{month}.json",
-             f"skills/双弦投资系统/pools/pool_{month}.json"]
-    for p in paths:
-        if os.path.exists(p):
-            try:
-                with open(p, encoding="utf-8") as f:
-                    d = json.load(f)
-                for e in d.get("entries", []):
-                    code = e.get("code", "")
-                    if re.match(r"^(sh|sz)\d{6}$", code):
-                        added.append((code, f"{e.get('name','')}(双弦:{e.get('signal_type','')})"))
-                if added:
-                    return added
-            except Exception:
-                pass
-    return added
-
-def load_beast_pool():
-    """读取猛兽体系月度股池（monthly_pool/YYYY-MM.md），返回 [(code, name(标注))]"""
-    added = []
-    month = datetime.now().strftime("%Y-%m")
-    paths = [f"monthly_pool/{month}.md", f"quant_scripts/monthly_pool/{month}.md",
-             f"skills/猛兽体系/scripts/monthly_pool/{month}.md"]
-    for p in paths:
-        if os.path.exists(p):
-            try:
-                with open(p, encoding="utf-8") as f:
-                    for ln in f:
-                        m = re.search(r"(sh|sz)(\d{6})", ln)
-                        if m:
-                            code = m.group(1) + m.group(2)
-                            nm = re.search(r"[|：:]\s*([\u4e00-\u9fa5A-Za-z]{2,8})", ln)
-                            added.append((code, f"{nm.group(1) if nm else ''}(猛兽)"))
-                if added:
-                    return added
-            except Exception:
-                pass
-    return added
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pool", default="")
@@ -296,8 +284,6 @@ def main():
     ap.add_argument("--push", action="store_true", help="推送PushPlus")
     ap.add_argument("--auto-extend", action="store_true",
                     help="自动并入全盘量化当日主力信号（panhou_lianghua.md）")
-    ap.add_argument("--no-integrate", action="store_true",
-                    help="不整合双弦/猛兽体系月度股池（默认整合）")
     a = ap.parse_args()
 
     DEFAULT_POOL = [
@@ -332,20 +318,6 @@ def main():
             new = [(c, n) for c, n in extend if c not in existing]
             pool = pool + new
             pool_src += f" + 当日主力信号{len(extend)}只(新增{len(new)})"
-    # 整合双弦/猛兽体系月度股池（默认开启）
-    if not a.no_integrate:
-        existing = {c for c, _ in pool}
-        dp = load_double_pool()
-        if dp:
-            nd = [(c, n) for c, n in dp if c not in existing]
-            pool = pool + nd
-            pool_src += f" + 双弦月度股池{len(nd)}只"
-            existing = {c for c, _ in pool}
-        bp = load_beast_pool()
-        if bp:
-            nb = [(c, n) for c, n in bp if c not in existing]
-            pool = pool + nb
-            pool_src += f" + 猛兽月度股池{len(nb)}只"
     print(f"跟踪标的: {len(pool)} 只（来源: {pool_src}）\n")
 
     results = []
@@ -361,12 +333,14 @@ def main():
 
     # ═══ 生成报告 ═══
     title = a.name or "股池标的跟踪报告"
+    regime, regime_hint = load_regime_from_quant()
     L = []
     A = L.append
-    A(f"# 📊 {title} · 三阶漏斗整合版\n")
-    A("> 生成时间：2026-08-04 18:11 | 数据：月线K线+利润表（westock）")
+    A(f"# 📊 {title} · 三阶漏斗+交易防护整合版\n")
+    A("> 生成时间：2026-08-05 09:00 | 数据：月线/日线K线+利润表（westock）")
     A("> **三阶漏斗**：① 月线反转（曾星智MA6/MA12+陶博士）→ ② 武威G1（双阴/一阴缩量回调）→ ③ v2.1质量否决（支撑≥5%+盈利）")
-    A(f"> 📅 信号基准月：**2026-07**（月末完整月） | 股池来源：**{pool_src}**\n")
+    A("> **交易防护**：ATR动态止损 + 盈亏比门槛(≥2) + 离场计分卡（八维计分卡启发）")
+    A(f"> 📅 信号基准月：**2026-07**（月末完整月） | 股池来源：**{pool_src}** | 市场档位：**{regime}**（{regime_hint}）\n")
 
     # 汇总表（只显示有信号价值的：月线PASS或有G1信号；其余合并统计）
     sig_results = [r for r in results if r["ok"] and
@@ -376,23 +350,28 @@ def main():
     block_count = len([r for r in results if r["ok"] and r["mf"]["gate"] == "BLOCK"])
     data_na = len([r for r in results if not r["ok"]])
     A("## 一、三阶漏斗总览\n")
-    A(f"| 代码 | 名称 | 现价 | ①月线 | 闸门 | 反转信号 | ②G1 | 支撑 | ③v2.1 | 决策 |")
-    A("|:----|:----|:----:|:----:|:----:|:--------|:----:|:----:|:----:|:----:|")
+    A(f"| 代码 | 名称 | 现价 | ①月线 | 闸门 | 反转信号 | ②G1 | 支撑 | ③v2.1 | 盈亏比 | 止损 | 决策 |")
+    A("|:----|:----|:----:|:----:|:----:|:--------|:----:|:----:|:----:|:----:|:----:|:----:|")
     for r in sig_results:
         mf, g1 = r["mf"], r["g1"]
         sup_txt = f"{r['support']*100:.0f}%" if r["support"] is not None else "—"
         fst = fin.get(r["code"], "无数据")
         gate_txt = {"PASS": "🟢", "WARN": "🟡"}.get(mf["gate"], "❔")
         rev_txt = mf["reversal"] or "—"
+        # 交易防护
+        rr = r["guard"].get("rr") if r.get("guard") else None
+        rr_txt = f"{rr:.1f}✅" if rr and rr >= 2 else f"{rr:.1f}❌" if rr else "—"
+        stop_txt = str(r["guard"].get("stop")) if r.get("guard") and r["guard"].get("stop") else "—"
+        rr_ok = rr is not None and rr >= 2.0
         if mf["gate"] == "PASS" and g1 in ("双阴", "一阴") and fst == "盈利" and (r["support"] or 0) >= 0.05:
-            dec = "★ 三重共振"
+            dec = "★ 三重共振" if rr_ok else "★ 共振(盈亏比不足)"
         elif mf["gate"] == "PASS" and g1 in ("双阴", "一阴"):
             dec = "二阶共振"
         elif mf["gate"] == "PASS":
             dec = "一阶通过"
         else:
             dec = "G1低吸信号"
-        A(f"| {r['code']} | {r['name']} | {r['price']} | {mf['trend']} | {gate_txt} | {rev_txt} | {g1} | {sup_txt} | {fst} | **{dec}** |")
+        A(f"| {r['code']} | {r['name']} | {r['price']} | {mf['trend']} | {gate_txt} | {rev_txt} | {g1} | {sup_txt} | {fst} | {rr_txt} | {stop_txt} | **{dec}** |")
     if warn_count:
         A(f"| ... | **{warn_count} 只月线纠缠**（无G1信号） | — | 🟡 | — | — | — | — | — | 待确认 |")
     if block_count:
@@ -461,6 +440,18 @@ def main():
 
     A("\n---")
     A("⚠️ 本报告基于公开市场数据整理，不构成投资建议。三阶漏斗为量化历史规律总结，实战需结合大盘温度动态调整。")
+
+    # 交易防护明细（ATR/离场计分）
+    A("\n## 五、交易防护明细（ATR止损 / 离场计分卡）\n")
+    A("| 代码 | 名称 | ATR | ATR止损 | 盈亏比 | 离场分 | 离场状态 | 原因 |")
+    A("|:----|:----|:----:|:----:|:----:|:----:|:----:|:----|")
+    for r in sig_results:
+        g = r.get("guard")
+        if not g or not g.get("ok"):
+            continue
+        reasons = "、".join(g.get("exit_reasons", [])[:3]) or "—"
+        A(f"| {r['code']} | {r['name']} | {g.get('atr')} | {g.get('stop')} | {g.get('rr')} | {g['exit_score']} | {g['exit_action']} | {reasons} |")
+    A("\n> 💡 离场计分卡（八维启发）：月线破MA6(-2)/ATR止损破位(-2)/日线破MA20(-1)/MACD死叉(-1)；≤-2强制离场（仅对已持仓标的有约束力）")
 
     md = "\n".join(L)
     today = datetime.now().strftime("%Y-%m-%d")
