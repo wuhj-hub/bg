@@ -456,12 +456,28 @@ def main():
     A("\n---")
     A("⚠️ 本报告基于公开市场数据整理，不构成投资建议。三阶漏斗为量化历史规律总结，实战需结合大盘温度动态调整。")
 
-    # 交易防护明细（ATR/离场计分）
+    # 交易防护明细（ATR/离场计分）：持仓标的全显示 + 有信号标的
     A("\n## 五、交易防护明细（ATR止损 / 离场计分卡）\n")
     A(f"> 持仓 {len(holdings)} 只（--holdings）；离场计分仅对持仓有约束力，未持仓标的行为参考\n")
-    A("| 代码 | 名称 | 持仓 | ATR | ATR止损 | 盈亏比 | 离场分 | 离场状态 | 原因 |")
-    A("|:----|:----|:----:|:----:|:----:|:----:|:----:|:----:|:----|")
+    A("| 代码 | 名称 | 持仓 | 月线 | ATR | ATR止损 | 盈亏比 | 离场分 | 离场状态 | 原因 |")
+    A("|:----|:----|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----|")
+    shown = set()
+    # 持仓标的第一优先
+    for r in results:
+        if not r["ok"] or r["code"] not in holdings:
+            continue
+        shown.add(r["code"])
+        g = r.get("guard")
+        mf = r["mf"]
+        if g and g.get("ok"):
+            reasons = "、".join(g.get("exit_reasons", [])[:3]) or "—"
+            A(f"| {r['code']} | {r['name']} | ✅ | {mf['trend']} | {g.get('atr')} | {g.get('stop')} | {g.get('rr')} | {g['exit_score']} | {g['exit_action']} | {reasons} |")
+        else:
+            A(f"| {r['code']} | {r['name']} | ✅ | {mf['trend']} | 数据获取失败 | — | — | — | — | — |")
+    # 其余有信号标的（参考）
     for r in sig_results:
+        if r["code"] in shown:
+            continue
         g = r.get("guard")
         if not g or not g.get("ok"):
             continue
@@ -471,7 +487,7 @@ def main():
             status = "未持仓·参考"
         else:
             status = g["exit_action"]
-        A(f"| {r['code']} | {r['name']} | {held} | {g.get('atr')} | {g.get('stop')} | {g.get('rr')} | {g['exit_score']} | {status} | {reasons} |")
+        A(f"| {r['code']} | {r['name']} | {held} | {r['mf']['trend']} | {g.get('atr')} | {g.get('stop')} | {g.get('rr')} | {g['exit_score']} | {status} | {reasons} |")
     A("\n> 💡 离场计分卡（八维启发）：月线破MA6(-2)/ATR止损破位(-2)/日线破MA20(-1)/MACD死叉(-1)；≤-2强制离场（仅对已持仓标的有约束力）")
 
     md = "\n".join(L)
