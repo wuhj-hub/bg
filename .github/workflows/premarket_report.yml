@@ -32,7 +32,9 @@ jobs:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
-        run: python3 quant_scripts/gen_premarket_report.py
+        run: |
+          python3 quant_scripts/gen_premarket_report.py
+          python3 quant_scripts/report_selfcheck.py --premarket "premarket_judgment_$(date +%Y-%m-%d).json" --today "$(date +%Y-%m-%d)" --alert || echo "自检发现问题(已推送报警), 不阻断流程"
 
       - name: 提交盘前预判到仓库（供复盘报告真实验证）
         run: |

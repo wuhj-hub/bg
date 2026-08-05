@@ -128,7 +128,9 @@ jobs:
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485234585035034
-        run: python3 quant_scripts/gen_review_report.py
+        run: |
+          python3 quant_scripts/gen_review_report.py
+          python3 quant_scripts/report_selfcheck.py --review "outputs/复盘报告_$(date +%Y-%m-%d).md" --today "$(date +%Y-%m-%d)" --alert || echo "自检发现问题(已推送报警), 不阻断流程"
 
       # ─── 第五.6步：股池信号实盘胜率跟踪（每日累积，2-4周后可对比回测）───
       - name: 股池信号实盘胜率跟踪
