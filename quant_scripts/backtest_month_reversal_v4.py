@@ -234,15 +234,22 @@ def main():
             print(f"  {m}: 胜率{wr:.1f}% 平均{avg:+.1f}% (基准)")
         prev = {"m": m, "wr": wr, "avg": avg}
 
-    e_all = groups.get("E三阶共振", [])
-    if len(e_all) >= 10:
-        print("\n三阶共振(E组)按市场状态:")
+    # 牛熊分层（全部方法 × 市场状态）
+    print("\n牛熊分层（全部方法 × 市场状态，持有6个月）:")
+    print(f"| {'方法':<14} | {'牛市':<22} | {'震荡市':<22} | {'熊市':<22} |")
+    print("|" + "-" * 82 + "|")
+    for m in methods:
+        ss = groups.get(m, [])
+        cells = []
         for regime in ("牛", "震荡", "熊"):
-            ss = [s for s in e_all if s["regime"] == regime]
-            if len(ss) >= 10:
-                rets = [s["ret"] for s in ss]
+            sub = [s for s in ss if s["regime"] == regime]
+            if len(sub) >= 10:
+                rets = [s["ret"] for s in sub]
                 wins = len([r for r in rets if r > 0])
-                print(f"  {regime}市: 样本{len(ss)} 胜率{wins/len(ss)*100:.1f}% 平均{sum(rets)/len(rets):+.2f}%")
+                cells.append(f"{len(sub)}样本/胜率{wins/len(sub)*100:.0f}%/平均{sum(rets)/len(rets):+.1f}%")
+            else:
+                cells.append(f"样本不足({len(sub)})")
+        print(f"| {m:<14} | {cells[0]:<22} | {cells[1]:<22} | {cells[2]:<22} |")
 
     print("\n⚠️ 本回测为历史规律统计，非投资建议；盈亏比用8%近似止损；未计交易成本。")
 
