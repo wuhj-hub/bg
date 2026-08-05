@@ -215,14 +215,15 @@ def load_pool_file(path="stock_pool.txt"):
             pool.append((code, name))
     return pool
 
-def push_pushplus(token, title, file_path):
-    """PushPlus推送报告摘要"""
+def push_pushplus(token, title, file_path=None, content=None):
+    """PushPlus推送报告摘要或自定义内容"""
     import urllib.request, urllib.parse
     try:
-        with open(file_path, encoding="utf-8") as f:
-            content = f.read()
-        # 截取报告前部关键内容（信号卡/总览）
-        content = content[:4000] + ("\n\n...（完整报告见 IMA 知识库全盘量化文件夹）" if len(content) > 4000 else "")
+        if content is None:
+            with open(file_path, encoding="utf-8") as f:
+                content = f.read()
+            # 截取报告前部关键内容（信号卡/总览）
+            content = content[:4000] + ("\n\n...（完整报告见 IMA 知识库全盘量化文件夹）" if len(content) > 4000 else "")
         body = urllib.parse.urlencode({"token": token, "title": title, "content": content, "template": "markdown"}).encode()
         req = urllib.request.Request("https://pushplus.plus/send", data=body)
         with urllib.request.urlopen(req, timeout=30) as r:
@@ -333,6 +334,13 @@ def main():
             new = [(c, n) for c, n in extend if c not in existing]
             pool = pool + new
             pool_src += f" + 当日主力信号{len(extend)}只(新增{len(new)})"
+    # 持仓强制并入跟踪池（确保离场计分卡每日都有数据，即使持仓不在任何股池）
+    if holdings:
+        pool_codes = {c for c, _ in pool}
+        missing = [c for c in holdings if c not in pool_codes]
+        if missing:
+            pool = pool + [(c, f"持仓:{c}") for c in missing]
+            pool_src += f" + 持仓{len(missing)}只(强制跟踪)"
     print(f"跟踪标的: {len(pool)} 只（来源: {pool_src}）\n")
 
     results = []
@@ -352,7 +360,7 @@ def main():
     L = []
     A = L.append
     A(f"# 📊 {title} · 三阶漏斗+交易防护整合版\n")
-    A("> 生成时间：2026-08-05 09:00 | 数据：月线/日线K线+利润表（westock）")
+    A(f"> 生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')} | 数据：月线/日线K线+利润表（westock）")
     A("> **三阶漏斗**：① 月线反转（曾星智MA6/MA12+陶博士）→ ② 武威G1（双阴/一阴缩量回调）→ ③ v2.1质量否决（支撑≥5%+盈利）")
     A("> **交易防护**：ATR动态止损 + 盈亏比门槛(≥2) + 离场计分卡（八维计分卡启发）")
     A(f"> 📅 信号基准月：**2026-07**（月末完整月） | 股池来源：**{pool_src}** | 市场档位：**{regime}**（{regime_hint}）\n")
@@ -506,6 +514,25 @@ def main():
         token = os.environ.get("PUSH_TOKEN", "")
         if token:
             push_pushplus(token, f"📊 {title} {today}", out)
+            # 持仓离场预警：持仓标的离场分≤-2时单独推送（醒目提醒）
+            alerts = []
+            for r in results:
+                if not r["ok"] or r["code"] not in holdings:
+                    continue
+                g = r.get("guard")
+                if g and g.get("ok") and g.get("exit_score", 0) <= -2:
+                    alerts.append(r)
+            if alerts:
+                lines = [f"### 🔴 持仓离场预警 {today}", "",
+                         f"> 以下持仓触发离场计分卡（≤-2 强制离场），请及时处理：", ""]
+                for r in alerts:
+                    g = r["guard"]
+                    reasons = "、".join(g.get("exit_reasons", [])[:3]) or "—"
+                    lines.append(f"**{r['name']}（{r['code']}）**：离场分 **{g['exit_score']}** → {g['exit_action']}")
+                    lines.append(f"- 月线：{r['mf']['trend']} | ATR止损：{g.get('stop')} | 盈亏比：{g.get('rr')}")
+                    lines.append(f"- 原因：{reasons}")
+                    lines.append("")
+                push_pushplus(token, f"🔴 持仓离场预警 {today}", content="\n".join(lines))
         else:
             print("[push] 跳过（PUSH_TOKEN未设置）")
     print(md[:600])
