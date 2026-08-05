@@ -1,10 +1,17 @@
 name: 盘前市场报告
 
 on:
-  schedule:
-    # 北京时间 08:00（UTC 0:00），交易日盘前自动生成
-    - cron: "0 0 * * 1-5"
-  workflow_dispatch: {}
+  # ⚠️ 双轨制统一：schedule停用（2026-08-05），盘前报告统一由 ima 生成（质量最高）
+  # GitHub自动版JSON曾污染复盘验证链路（三系统空/板块取错列/关键位空）
+  # schedule:
+  #   # 北京时间 08:00（UTC 0:00），交易日盘前自动生成
+  #   - cron: "0 0 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      manual_note:
+        description: '手动触发说明'
+        required: false
+        default: 'ima统一生成盘前报告，本workflow仅保留手动兜底'
 
 permissions:
   contents: write  # write for premarket_judgment commit (复盘报告引用)
