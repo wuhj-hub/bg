@@ -1756,7 +1756,7 @@ def main():
             d = s["details"]
             lead_tag = f"+{d.get('lead_over_index',0):.0f}%" if d.get('lead_over_index',0) else ""
             level = "⭐⭐" if s["setup_total"] >= 55 else "⭐"
-            gap_mark = " [断层]" if s["gap_score_display"] >= 8 else ""
+            gap_mark = " [断层]" if s.get("gap_score_display", 0) >= 8 else ""
             gpoint_mark = " [G点]" if d.get("has_gpoint", False) else ""
             mode_tag = s.get("trade_mode", "")
             m_tag = ""
@@ -1857,7 +1857,7 @@ def main():
         elif s in pullbacks:
             cat = "回调"
 
-        gap_mark = "⍟" if s["gap_score_display"] >= 8 else ""
+        gap_mark = "⍟" if s.get("gap_score_display", 0) >= 8 else ""
         print(f"  {i:>2}  {s['code']:<11} {s['name']:<7} "
               f"{s['setup_total']:>3}/{100:<2} "
               f"{s['vcp_score']:>2}/{20:<2} "

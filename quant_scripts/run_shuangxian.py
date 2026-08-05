@@ -419,7 +419,7 @@ def run_daily():
         scored.append(r)
         label = "S" if r["total_score"] >= 80 else "A" if r["total_score"] >= 65 else \
                 "B" if r["total_score"] >= 50 else "C"
-        resonance_label = ["逆势", "偏空", "中性", "偏多", "强共振"][r["resonance"] + 3]
+        resonance_label = ["逆势", "偏空", "中性", "偏多", "强共振"][min(4, max(0, r["resonance"] + 3))]
         print(f"  {code} {name}")
         print(f"    评分: {r['total_score']}分({label}) | "
               f"资金{r['fund_score']}+技术{r['tech_score']}+趋势{r['trend_score']}")
@@ -519,7 +519,7 @@ def run_daily():
             resonance_list.append({
                 "code": r["code"], "name": r["name"], "price": r["price"],
                 "score": r["score"],
-                "resonance_label": f"{['逆势','偏空','中性','偏多','强共振'][min(3, max(-3, r.get('resonance',0)))+3] if 'resonance' in r else '中性'}",
+                "resonance_label": f"{['逆势','偏空','中性','偏多','强共振'][min(4, max(0, r.get('resonance',0)+3))] if 'resonance' in r else '中性'}",
                 "sector": "",
                 "reason": f"双弦门控通过 | {tags_display}" if tags_display else "双弦门控通过",
             })
