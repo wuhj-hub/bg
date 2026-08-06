@@ -164,6 +164,21 @@ jobs:
             python3 upload_ima.py --file "outputs/纸面组合跟踪报告_$(date +%Y-%m-%d).md" --name "纸面组合跟踪报告_$(date +%Y-%m-%d).md"
           fi
 
+      # ─── 第五.8步：反转数值周线漏斗扫描（沪深300，F/D层重仓信号）───
+      - name: 反转数值周线信号扫描（漏斗分层）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/reversal_funnel_screener.py --weeks 2 --push
+          if [ -f "outputs/反转数值周线信号_$(date +%Y-%m-%d).md" ]; then
+            python3 upload_ima.py --file "outputs/反转数值周线信号_$(date +%Y-%m-%d).md" --name "反转数值周线信号_$(date +%Y-%m-%d).md"
+          fi
+
       - name: 推送扫描结果到微信+邮件（完整版报告）
         if: always()
         env:
