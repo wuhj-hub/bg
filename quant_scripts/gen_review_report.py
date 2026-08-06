@@ -110,22 +110,28 @@ def read_quant_results(today):
                 bs = beast.get("safety_score")
                 if bs is None:
                     bstd = beast.get("stdout", "")
-                    m = re.search(r"安全评分:\s*([\d.]+)/100", bstd)
+                    m = re.search(r"安全评分:\s*(\d+(?:\.\d+)?)/100", bstd)
                     bs = m.group(1) if m else None
                 out["🛡️ 猛兽安全评分"] = f"{bs}/100" if bs is not None else "—"
-                # 双弦温度/门控（stdout文本提取）
+                # 双弦温度/门控（stdout文本提取 + pool_data兜底）
                 sstd = sx.get("stdout", "")
                 tl = sx.get("temperature") or sx.get("temp")
                 if tl is None:
-                    m = re.search(r"温度[:计]?\s*([\d.]+)", sstd)
+                    m = re.search(r"温度[:：]?\s*(\d+(?:\.\d+)?)", sstd)
                     tl = m.group(1) if m else None
+                if tl is None:
+                    pd = sx.get("pool_data") or {}
+                    tl = pd.get("temperature") or pd.get("temp") or pd.get("market_temp")
                 gate = sx.get("gate1") or sx.get("gate")
                 if gate is None:
-                    gate = "关闭" if "AND门.*关闭|门控关闭" in sstd or "关闭" in sstd else None
+                    gate = "关闭" if re.search(r"门控.*关闭|AND门.*关闭", sstd) else None
                 sx_sig = sx.get("tone") or sx.get("level") or ""
-                out["🧭 双弦"] = "温度{} {}".format(tl if tl is not None else "—",
-                                                   "·门控关闭" if gate == "关闭" else "",
-                                                   sx_sig).strip()
+                sx_txt = f"温度{tl}" if tl is not None else "温度—"
+                if gate == "关闭":
+                    sx_txt += "·门控关闭"
+                if sx_sig:
+                    sx_txt += f"·{sx_sig}"
+                out["🧭 双弦"] = sx_txt
                 if any(v not in ("—", "温度—", "") for v in out.values()):
                     return out
             except Exception:
@@ -338,7 +344,11 @@ def pool_status_section(today):
     for s in passes:
         parts = [p.strip() for p in s.strip("|").split("|")]
         if len(parts) >= 4 and re.match(r"^(sh|sz)\d{6}$", parts[0]):
-            A(f"| {parts[0]} | {parts[1]} | {parts[2]} |")
+            nm = parts[1]
+            # 名称列异常值（空/市值格式）→ 显示"—"
+            if not nm or re.match(r"^\d+\.?\d*\s*亿?$", nm) or len(nm) > 12:
+                nm = "—"
+            A(f"| {parts[0]} | {nm} | {parts[2]} |")
             n += 1
         if n >= 15:
             A(f"| ... | 其余{n if n < len(passes) else len(passes)}只见股池跟踪报告 | — |")
