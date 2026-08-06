@@ -175,9 +175,9 @@ def main():
     A("\n---")
     A("> ⚠️ 本报告为量化规律统计，不构成投资建议。周线信号持有4周，止损=信号周低点。")
 
-    out_dir = os.path.join(BASE, "outputs")
-    os.makedirs(out_dir, exist_ok=True)
-    fp = os.path.join(out_dir, f"反转数值周线信号_{today}.md")
+    # 输出到当前工作目录的 outputs/（GitHub runner=仓库根/outputs，与workflow检查一致）
+    os.makedirs("outputs", exist_ok=True)
+    fp = os.path.join("outputs", f"反转数值周线信号_{today}.md")
     with open(fp, "w", encoding="utf-8") as f:
         f.write("\n".join(L))
     print(f"\n✅ 信号总数: {total} | 报告: {fp}")
