@@ -120,7 +120,7 @@ jobs:
             python3 upload_ima.py --file "outputs/股池标的跟踪报告_$(date +%Y-%m-%d).md" --name "股池标的跟踪报告_$(date +%Y-%m-%d).md"
           fi
 
-      # ─── 第五.5步：自动生成复盘报告并上传（含③.5股池三阶漏斗状态引用）───
+      # ─── 第五.5步：自动生成复盘报告并上传（含③.5股池三阶漏斗状态引用 + 反转数值信号池）───
       - name: 自动生成复盘报告并上传
         continue-on-error: true
         env:
@@ -129,6 +129,8 @@ jobs:
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485234585035034
         run: |
+          # 先运行反转数值周线扫描（≤10元），供复盘报告明日展望章节引用
+          python3 quant_scripts/reversal_funnel_screener.py --weeks 2 --max-price 10 || echo "反转数值扫描失败, 复盘继续"
           python3 quant_scripts/gen_review_report.py
           python3 quant_scripts/report_selfcheck.py --review "outputs/复盘报告_$(date +%Y-%m-%d).md" --today "$(date +%Y-%m-%d)" --alert || echo "自检发现问题(已推送报警), 不阻断流程"
 
@@ -164,8 +166,8 @@ jobs:
             python3 upload_ima.py --file "outputs/纸面组合跟踪报告_$(date +%Y-%m-%d).md" --name "纸面组合跟踪报告_$(date +%Y-%m-%d).md"
           fi
 
-      # ─── 第五.8步：反转数值周线漏斗扫描（沪深300，F/D层重仓信号）───
-      - name: 反转数值周线信号扫描（漏斗分层）
+      # ─── 第五.8步：反转数值周线信号上传+推送（信号md已由复盘步骤生成）───
+      - name: 反转数值周线信号上传推送
         continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
@@ -174,9 +176,9 @@ jobs:
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
-          python3 quant_scripts/reversal_funnel_screener.py --weeks 2 --push
           if [ -f "outputs/反转数值周线信号_$(date +%Y-%m-%d).md" ]; then
             python3 upload_ima.py --file "outputs/反转数值周线信号_$(date +%Y-%m-%d).md" --name "反转数值周线信号_$(date +%Y-%m-%d).md"
+            python3 quant_scripts/reversal_funnel_screener.py --push-only --file "outputs/反转数值周线信号_$(date +%Y-%m-%d).md" || true
           fi
 
       - name: 推送扫描结果到微信+邮件（完整版报告）

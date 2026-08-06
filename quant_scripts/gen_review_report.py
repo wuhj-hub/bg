@@ -557,6 +557,38 @@ def gen_report(today_str):
     lines.append(f"| 操作基调 | {tone} |")
     lines.append(f"| 明日预判 | {outlook} |")
     lines.append(f"| 关注信号 | 鱼身温度、猛兽安全评分、双弦定性 |")
+
+    # 反转数值周线信号池联动（F/D层，≤10元）
+    fx_lines = []
+    fx_fp = os.path.join("outputs", f"反转数值周线信号_{today_str}.md")
+    if os.path.exists(fx_fp):
+        try:
+            content = open(fx_fp, encoding="utf-8").read()
+            # 解析F层/D层表格行: | code | name | date | price | fz | depth | green | div |
+            f_sigs, d_sigs = [], []
+            cur_level = None
+            for ln in content.splitlines():
+                if "F层精选" in ln:
+                    cur_level = "F"
+                elif "D层标准" in ln:
+                    cur_level = "D"
+                elif cur_level and ln.startswith("| ") and "|:--" not in ln and ln.count("|") >= 7:
+                    parts = [p.strip() for p in ln.split("|")[1:-1]]
+                    if len(parts) >= 4 and parts[0].startswith(("sh", "sz")):
+                        sig_str = f"{parts[1]}({parts[0]})"
+                        if cur_level == "F":
+                            f_sigs.append(sig_str)
+                        elif cur_level == "D":
+                            d_sigs.append(sig_str)
+            if f_sigs or d_sigs:
+                fx_lines.append("| 反转数值周线信号 | "
+                                + ("🔴F: " + "、".join(f_sigs[:6]) if f_sigs else "🔴F: 无")
+                                + ("；🟡D: " + "、".join(d_sigs[:6]) if d_sigs else "；🟡D: 无") + " |")
+                fx_lines.append("| 信号说明 | 周线翻红+回调+超跌+底背离（F重仓/ D标准），持有4周，止损=信号周低点 |")
+        except Exception as e:
+            print(f"[warn] 反转数值信号解析失败: {e}")
+    if fx_lines:
+        lines.extend(fx_lines)
     
     lines.append("\n---\n")
     lines.append("⚠️ 本报告基于公开市场数据整理，不构成投资建议。\n")

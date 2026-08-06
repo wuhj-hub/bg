@@ -48,22 +48,27 @@ def has_divergence(macd, closes, j, lookback=12):
     return c[l2] < c[l1] and s[l2] > s[l1]
 
 
-def fetch_weekly(code):
-    """westock拉周线，返回 [(date, open, close, high, low)] 升序"""
-    try:
-        r = subprocess.run(f"{WESTOCK} kline {code} --period week --limit 130",
-                           shell=True, capture_output=True, text=True, timeout=60)
-        rows = []
-        for ln in r.stdout.splitlines():
-            m = re.match(r"\|\s*([\d-]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)", ln)
-            if m:
-                rows.append((m.group(1), float(m.group(2)), float(m.group(3)),
-                             float(m.group(4)), float(m.group(5))))
-        rows.sort(key=lambda r: r[0])
-        return rows
-    except Exception as e:
-        print(f"  [warn] {code} 拉取失败: {e}")
-        return []
+def fetch_weekly_batch(codes):
+    """westock批量拉周线（100只/批），返回 {code: rows}"""
+    out = {}
+    for i in range(0, len(codes), 100):
+        batch = codes[i:i + 100]
+        try:
+            r = subprocess.run(f"{WESTOCK} kline {','.join(batch)} --period week --limit 130",
+                               shell=True, capture_output=True, text=True, timeout=180)
+            rows_map = {}
+            for ln in r.stdout.splitlines():
+                m = re.match(r"\|\s*([a-z]{2}\d{6})\s*\|\s*([\d-]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)", ln)
+                if m:
+                    sym = m.group(1)
+                    rows_map.setdefault(sym, []).append((m.group(2), float(m.group(3)), float(m.group(4)),
+                                                         float(m.group(5)), float(m.group(6))))
+            for sym, rows in rows_map.items():
+                rows.sort(key=lambda r: r[0])
+                out[sym] = rows
+        except Exception as e:
+            print(f"  [warn] 批{i//100+1}拉取失败: {e}")
+    return out
 
 
 def detect_signal(rows, weeks=1):
@@ -124,8 +129,34 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pool", default="", help="代码列表(逗号分隔)，默认沪深300")
     ap.add_argument("--weeks", type=int, default=1, help="检测最近N根周线内信号(默认1)")
+    ap.add_argument("--max-price", type=float, default=0, help="仅保留现价≤该值的信号(0=不限)")
     ap.add_argument("--push", action="store_true", help="PushPlus推送")
+    ap.add_argument("--push-only", action="store_true", help="仅推送已有报告文件(不扫描)")
+    ap.add_argument("--file", default="", help="--push-only时推送的文件路径")
     a = ap.parse_args()
+
+    # ── 仅推送模式：读取已有报告文件推送 ──
+    if a.push_only:
+        import urllib.request, urllib.parse
+        token = os.environ.get("PUSH_TOKEN", "")
+        fp = a.file or f"outputs/反转数值周线信号_{datetime.now():%Y-%m-%d}.md"
+        if not token:
+            print("[push-only] PUSH_TOKEN未设置, 跳过")
+            return
+        if not os.path.exists(fp):
+            print(f"[push-only] 文件不存在: {fp}")
+            return
+        content = open(fp, encoding="utf-8").read()
+        content = content[:3500] + ("\n...(完整报告见 IMA 知识库)" if len(content) > 3500 else "")
+        body = urllib.parse.urlencode({"token": token,
+                                       "title": f"🔄 反转数值周线信号 {datetime.now():%Y-%m-%d}",
+                                       "content": content, "template": "markdown"}).encode()
+        try:
+            r = urllib.request.urlopen(urllib.request.Request("https://pushplus.plus/send", data=body), timeout=30)
+            print(f"[pushplus] {r.read().decode()[:80]}")
+        except Exception as e:
+            print(f"[pushplus] 失败: {e}")
+        return
 
     pool = load_pool(a.pool)
     if not pool:
@@ -134,21 +165,27 @@ def main():
     print(f"🔍 反转数值周线漏斗扫描 | 标的{len(pool)}只 | 检测最近{a.weeks}周 | {datetime.now():%Y-%m-%d %H:%M}")
 
     signals = {"F": [], "D": [], "E": [], "C": [], "B": [], "A": []}
+    codes_all = [c for c, n in pool]
+    rows_map = fetch_weekly_batch(codes_all)
+    print(f"  数据就绪: {len(rows_map)}/{len(pool)}只")
     for code, name in pool:
-        rows = fetch_weekly(code)
+        rows = rows_map.get(code)
         if not rows:
             continue
         r = detect_signal(rows, a.weeks)
         if r:
             level, det = r
+            if a.max_price > 0 and det["close"] > a.max_price:
+                continue  # 股价过滤（如≤10元）
             det["code"], det["name"] = code, name
             signals[level].append(det)
 
     today = datetime.now().strftime("%Y-%m-%d")
     L = []
     A = L.append
+    price_note = f"，现价≤{a.max_price:.0f}元" if a.max_price > 0 else ""
     A(f"# 🔄 反转数值周线信号扫描（{today}）\n")
-    A(f"> 股票池：沪深300成分股{len(pool)}只 | 信号窗口：最近{a.weeks}根周线 | 漏斗：翻红→回调→超跌→底背离\n")
+    A(f"> 股票池：沪深300成分股{len(pool)}只 | 信号窗口：最近{a.weeks}根周线{price_note} | 漏斗：翻红→回调→超跌→底背离\n")
     A(f"> 体系：🔴F重仓(66.7%/+11.7%) | 🟡D标准(57%/+4.5%) | 🟢A基础(51%/+2.2%) | 持有4周\n")
 
     lvl_meta = [("F", "🔴 F层精选（翻红+回调≥3周+超跌+底背离）· 重仓级"), 
