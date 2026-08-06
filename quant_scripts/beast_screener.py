@@ -1633,6 +1633,42 @@ def main():
         print("\n❌ 无候选股，终止扫描")
         return
 
+    # ---- Step 2.5: 产业锚定4 · 三季盈增基本面预筛选 ----
+    try:
+        import sys, os
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        if script_dir not in sys.path:
+            sys.path.insert(0, script_dir)
+        from industrial_anchor4 import calc_quarterly_growth
+        
+        anchor_enabled = os.environ.get("ANCHOR4_ENABLED", "true").lower() == "true"
+        if anchor_enabled and len(candidates) > 3:
+            print("\n🏭 Step 2.5: 产业锚定4 · 三季盈增筛选")
+            print("-" * 40)
+            anchor_passed = []
+            total_candidates = len(candidates)
+            for i, c in enumerate(candidates):
+                print(f"  [{i+1}/{total_candidates}] {c['code']} {c['name']}...", end="\r")
+                r = calc_quarterly_growth(c["code"])
+                if r.get("error"):
+                    # akshare可能失败，放行
+                    anchor_passed.append(c)
+                elif r["qualify"]:
+                    c["anchor_score"] = r["score"]
+                    c["avg_rev_growth"] = r["avg_rev_growth"]
+                    c["avg_profit_growth"] = r["avg_profit_growth"]
+                    anchor_passed.append(c)
+                # 不通过的跳过
+            if anchor_passed:
+                print(f"  ✅ 通过三季盈增: {len(anchor_passed)}/{len(candidates)} 只")
+                candidates = anchor_passed
+            else:
+                print(f"  ⚠️ 全部未通过，放行全部（保守策略）")
+        else:
+            print("  ⏭️ 产业锚定4跳过（未启用或候选过少）")
+    except Exception as e:
+        print(f"  ⚠️ 产业锚定4异常: {e}（跳过该筛选）")
+
     # ---- Step 2.6: 月线框架闸门（曾星智体系: MA6半年线+MA12年线+月线反转）----
     try:
         import sys, os
@@ -1842,8 +1878,8 @@ def main():
     print("📋 四、候选股综合评分表")
     print("=" * 90)
     print(f"  {'排名':>3} {'代码':<11} {'名称':<7} "
-          f"{'总分':>4} {'VCP':>3} {'均线':>3} {'量能':>3} {'VAD':>3} {'突破':>3} {'断层':>3} {'强度':>4} {'合计':>4}")
-    print("  " + "-" * 80)
+          f"{'总分':>4} {'VCP':>3} {'均线':>3} {'量能':>3} {'VAD':>3} {'突破':>3} {'断层':>3} {'强度':>4} {'锚定':>4} {'合计':>4}")
+    print("  " + "-" * 86)
 
     for i, s in enumerate(setup_results, 1):
         d = s["details"]
@@ -1858,6 +1894,8 @@ def main():
             cat = "回调"
 
         gap_mark = "⍟" if s.get("gap_score_display", 0) >= 8 else ""
+        anchor_score = next((c.get("anchor_score", "-") for c in candidates if c["code"] == s["code"]), "-")
+        anchor_str = f"{int(anchor_score)}" if isinstance(anchor_score, (int, float)) else "-"
         print(f"  {i:>2}  {s['code']:<11} {s['name']:<7} "
               f"{s['setup_total']:>3}/{100:<2} "
               f"{s['vcp_score']:>2}/{20:<2} "
@@ -1867,6 +1905,7 @@ def main():
               f"{s['breakout_score']:>2}/{15:<2} "
               f"{s['gap_score']:>1}/{10:<2}{gap_mark}"
               f"{d.get('rsva_20',0):>4.0f}  "
+              f"{anchor_str:>4} "
               f"{total:>4} {cat}")
 
     # ---- Step 5: 操作建议 ----
@@ -1883,7 +1922,7 @@ def main():
         print(f"\n  🟢 【领先股关注】突破信号清晰, 可跟踪枢轴点确认")
         for s in leaders:
             d = s["details"]
-            gap_info = f" [断层{s['gap_score_display']}分]" if s["gap_score_display"] >= 8 else ""
+            gap_info = f" [断层{s.get('gap_score_display', 0)}分]" if s.get("gap_score_display", 0) >= 8 else ""
             gpoint_info = f" [⚡G点]" if d.get("has_gpoint", False) else ""
             mode_info = f" ({s['trade_mode']})" if s.get("trade_mode") else ""
             print(f"     {s['name']}({s['code']}) Setup={s['setup_total']}分 "
@@ -1949,6 +1988,14 @@ def main():
     print(f"  领先板块: {len(sectors)}个 | 领先股: {len(leaders)}只 | 回调股: {len(pullbacks)}只")
     print(f"  净利润断层: {len(gap_sigs)}只 | G点信号: {len(gpoint_sigs)}只")
     print(f"  伏击线低吸: {len(ambush_sigs)}只 | RS_D背离: {len(rsd_sigs)}只")
+    # 统计三季盈增通过数
+    anchor_count = sum(1 for c in candidates if c.get("anchor_score", 0) > 0)
+    if anchor_count:
+        # total_candidates 在 Step 2.5 中定义
+        try:
+            print(f"  🏭 产业锚定4通过: {anchor_count}/{total_candidates}只")
+        except NameError:
+            print(f"  🏭 产业锚定4通过: {anchor_count}只")
     print(f"\n  📌 信号分类解读:")
     print(f"     🟢 领先股 = 强势突破+高RSVA+孤狼 → 跟踪枢轴点确认")
     print(f"     🔵 回调股 = VCP收缩+量缩回踩 → 等待放量突破/伏击线/RS_D确认")
