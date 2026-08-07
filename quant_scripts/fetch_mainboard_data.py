@@ -51,28 +51,45 @@ def fetch_daily_batch(codes):
 
 
 def fetch_m30(code):
+    """腾讯ifzq分钟K线（320根30m≈2个月），fallback新浪"""
     fp = os.path.join(DATA_DIR, f"{code}_m30.csv")
     if os.path.exists(fp):
         return
+    # 腾讯源
     for attempt in range(3):
         try:
-            url = (f"https://quotes.sina.cn/cn/api/jsonp_v2.php/var/"
-                   f"CN_MarketDataService.getKLineData?symbol={code}&scale=30&ma=no&datalen=1000")
-            r = subprocess.run(f"curl -s -m 20 '{url}'", shell=True, capture_output=True, text=True, timeout=30)
-            m = re.search(r"var\((.*)\)\s*;?\s*$", r.stdout, re.S)
-            if not m:
-                raise ValueError("解析失败")
-            data = json.loads(m.group(1))
-            if len(data) < 100:
-                return  # 数据不足跳过
+            url = f"https://ifzq.gtimg.cn/appstock/app/kline/mkline?param={code},m30,,320"
+            r = subprocess.run(f"curl -s -m 15 '{url}'", shell=True, capture_output=True, text=True, timeout=25)
+            d = json.loads(r.stdout)
+            m30 = (d.get("data") or {}).get(code, {}).get("m30") or []
+            if len(m30) < 100:
+                raise ValueError(f"腾讯数据不足({len(m30)})")
             with open(fp, "w", encoding="utf-8") as f:
-                for d in data:
-                    f.write(f"{d['day']},{d['open']},{d['high']},{d['low']},{d['close']}\n")
+                for k in m30:
+                    # 列序: [时间, open, close, high, low, volume...]
+                    t = k[0]
+                    dt = f"{t[:4]}-{t[4:6]}-{t[6:8]} {t[8:10]}:{t[10:12]}"
+                    f.write(f"{dt},{k[1]},{k[3]},{k[4]},{k[2]}\n")  # date,open,high,low,close
             return
         except Exception as e:
             if attempt == 2:
+                # fallback新浪
+                try:
+                    url2 = (f"https://quotes.sina.cn/cn/api/jsonp_v2.php/var/"
+                            f"CN_MarketDataService.getKLineData?symbol={code}&scale=30&ma=no&datalen=1000")
+                    r2 = subprocess.run(f"curl -s -m 15 '{url2}'", shell=True, capture_output=True, text=True, timeout=25)
+                    m2 = re.search(r"var\((.*)\)\s*;?\s*$", r2.stdout, re.S)
+                    if m2:
+                        data = json.loads(m2.group(1))
+                        if len(data) >= 100:
+                            with open(fp, "w", encoding="utf-8") as f:
+                                for d2 in data:
+                                    f.write(f"{d2['day']},{d2['open']},{d2['high']},{d2['low']},{d2['close']}\n")
+                            return
+                except Exception:
+                    pass
                 print(f"  [warn] {code} m30失败: {e}")
-            time.sleep(0.5)
+            time.sleep(0.3)
 
 
 def main():
@@ -89,7 +106,7 @@ def main():
     if which in ("m30", "both"):
         missing = [c for c in codes if not os.path.exists(os.path.join(DATA_DIR, f"{c}_m30.csv"))]
         print(f"30m待拉: {len(missing)}")
-        with ThreadPoolExecutor(max_workers=10) as ex:
+        with ThreadPoolExecutor(max_workers=5) as ex:
             futs = {ex.submit(fetch_m30, c): c for c in missing}
             for i, f in enumerate(as_completed(futs)):
                 f.result()
