@@ -55,17 +55,52 @@ jobs:
 
       # ─── 第三步：三系统预运行 ───
       - name: 量化系统预运行（双弦+鱼身+猛兽）
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
         run: python3 quant_scripts/run_all_quant.py
+
+      # ─── 第三步.4：上传三系统原始数据到知识库（供次日盘前报告引用，防止缺失）───
+      - name: 上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          # 鱼身JSON+报告（原内部上传因无凭证静默失败，改为workflow统一上传）
+          FISH_JSON=$(ls outputs/fish_body_enhanced_*.json 2>/dev/null | head -1)
+          FISH_MD=$(ls outputs/鱼身报告_*.md 2>/dev/null | head -1)
+          if [ -n "$FISH_JSON" ]; then
+            python3 upload_ima.py --file "$FISH_JSON" --name "$(basename $FISH_JSON)" || echo "鱼身JSON上传失败"
+          fi
+          if [ -n "$FISH_MD" ]; then
+            python3 upload_ima.py --file "$FISH_MD" --name "$(basename $FISH_MD)" || echo "鱼身报告上传失败"
+          fi
+          # 量化汇总JSON（盘前premarket_quant引用）
+          QJSON=$(ls outputs/quant_results_$(date +%Y-%m-%d).json 2>/dev/null | head -1)
+          if [ -n "$QJSON" ]; then
+            python3 upload_ima.py --file "$QJSON" --name "$(basename $QJSON)" || echo "量化汇总上传失败"
+          fi
+          # 猛兽原始输出
+          if [ -f "outputs/beast_results.txt" ]; then
+            python3 upload_ima.py --file "outputs/beast_results.txt" --name "beast_results_$(date +%Y-%m-%d).txt" || echo "猛兽输出上传失败"
+          fi
 
       # ─── 第三步.5：提交量化汇总（供次日盘前报告引用三系统信号）───
       - name: 提交量化汇总到仓库（供盘前报告引用）
         run: |
           cp outputs/quant_results_$(date +%Y-%m-%d).json quant_results_latest.json 2>/dev/null || cp outputs/quant_results_latest.json quant_results_latest.json 2>/dev/null || true
-          if [ -f quant_results_latest.json ]; then
+          # 鱼身JSON一并提交（盘前premarket_fishbody从GitHub拉取，防止知识库上传失败导致缺失）
+          cp outputs/fish_body_enhanced_*.json fish_body_latest.json 2>/dev/null || true
+          cp outputs/鱼身报告_*.md 鱼身报告_latest.md 2>/dev/null || true
+          if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add quant_results_latest.json
-            git commit -m "chore: update quant_results_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
+            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
+            git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
             for i in 1 2 3; do
               git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true
               if git push origin main 2>/dev/null; then
