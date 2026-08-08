@@ -162,6 +162,17 @@ def main():
     os.makedirs("outputs", exist_ok=True)
     path = f"outputs/黑石板块共振对照_{date_arg}.md"
     open(path, "w", encoding="utf-8").write("\n".join(L))
+    # JSON输出（供盘前/复盘引用）
+    js = {
+        "date": date_arg,
+        "resonance_boards": [{"name": name_map.get(c, c), "code": c} for c, _ in sorted(res_sec.items(), key=lambda x: -x[1])],
+        "grab_top": [{"name": name_map.get(c, c), "code": c, "value": round(v, 2)} for c, v in sorted(grab_sec.items(), key=lambda x: -x[1])[:10]],
+        "entry_top": [{"name": name_map.get(c, c), "code": c, "value": round(v, 2)} for c, v in sorted(ent_sec.items(), key=lambda x: -x[1])[:10]],
+        "absorption_top": [{"name": name_map.get(c, c), "code": c, "value": round(v, 2)} for c, v in sorted(abs_sec.items(), key=lambda x: -x[1])[:10]],
+    }
+    json_path = "outputs/黑石板块共振_latest.json"
+    open(json_path, "w", encoding="utf-8").write(json.dumps(js, ensure_ascii=False, indent=1))
+    print(f"[OK] {json_path}")
     print(f"[OK] {path}")
 
 

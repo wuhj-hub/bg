@@ -61,6 +61,11 @@ jobs:
         continue-on-error: true
         run: python3 minute_strength.py --limit 20
 
+      # ─── 第二步.3：黑石板块资金共振对照（第5次深挖：板块资金三维因子，盘前③.3引用）───
+      - name: 黑石板块资金共振对照（外部验证）
+        continue-on-error: true
+        run: python3 heshi_sector_resonance.py
+
       # ─── 第二步.5：动态生成鱼身股票池 ───
       - name: 动态生成鱼身股票池（近20日日均成交额排名前300）
         run: python3 quant_scripts/gen_fish_pool.py
