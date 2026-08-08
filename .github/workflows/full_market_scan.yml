@@ -52,6 +52,10 @@ jobs:
           # 归档资金快照（含资金行为四态phase，供按四态胜率跟踪）
           cp panhou_lianghua.csv outputs/资金快照_$(date +%Y-%m-%d).csv || echo "归档失败(不影响扫描)"
 
+      # ─── 第二步.1：市场宽度指标（黑石marketChangeDist启发：全主板涨跌家数分布）───
+      - name: 市场宽度扫描（全主板涨跌家数分布）
+        run: python3 market_width.py all_mainboard.csv
+
       # ─── 第二步.5：动态生成鱼身股票池 ───
       - name: 动态生成鱼身股票池（近20日日均成交额排名前300）
         run: python3 quant_scripts/gen_fish_pool.py

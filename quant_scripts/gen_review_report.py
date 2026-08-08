@@ -271,6 +271,18 @@ def read_lianghua_report():
                 data[f"资金_{parts[0]}"] = parts[1]
     return data
 
+def read_market_width():
+    """读市场宽度指标（market_width_latest.json），失败返回None"""
+    import json as _json
+    for p in ("outputs/market_width_latest.json", "../outputs/market_width_latest.json",
+              "/sandbox/workspace/github_bg/outputs/market_width_latest.json"):
+        try:
+            return _json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
 def read_lianghua_csv():
     """读取全量CSV中提取主力信号低价股"""
     csv_path = "panhou_lianghua.csv"
@@ -457,6 +469,12 @@ def gen_report(today_str):
             lines.append("**资金行为四态**（抢筹/进场/控盘/观望）：")
             for k, desc in ph_meanings.items():
                 lines.append(f"- {k.replace('资金_','')}: {dist.get(k, 0)}（{desc}）")
+        # 市场宽度指标（黑石marketChangeDist启发：全主板涨跌家数分布）
+        mw = read_market_width()
+        if mw:
+            lines.append("")
+            lines.append(f"**市场宽度**（全主板涨跌家数，黑石启发）：上涨{mw.get('up','—')}/{mw.get('valid','—')}只 · 强势≥5% {mw.get('strong','—')} · 涨停{mw.get('limitup','—')} · 弱势≤-5% {mw.get('weak','—')} · 跌停{mw.get('limitdown','—')}")
+            lines.append(f"→ 宽度分 {mw.get('score','—')}/100 **{mw.get('level','')}**")
     
     # ════════════════════════════════════════
     # 四、💰 主力信号专表

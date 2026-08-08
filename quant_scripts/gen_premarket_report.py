@@ -274,6 +274,10 @@ def gen_report(today_str):
     ph = read_fund_phase()
     if ph:
         lines.append(f"| 💰 资金行为 | 抢筹{ph.get('抢筹','—')} / 进场{ph.get('进场','—')} / 控盘{ph.get('控盘','—')}（昨日全市场） |")
+    # 市场宽度指标（黑石marketChangeDist启发：全主板涨跌家数分布）
+    mw = read_market_width()
+    if mw:
+        lines.append(f"| 📊 市场宽度 | 上涨{mw.get('up','—')}/{mw.get('valid','—')}只 · 强势{mw.get('strong','—')} · 涨停{mw.get('limitup','—')} · 跌停{mw.get('limitdown','—')} → 宽度分{mw.get('score','—')} {mw.get('level','')} |")
     
     # ②.5.1 曾星智+双弦双体系市场定性（8大指数月线）
     zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
@@ -411,6 +415,17 @@ def calc_factor_analysis():
     if out.get("mom_high") and out.get("emotion_high") and out.get("fund_high"):
         out["signals"].append("✅ 动量+情绪+资金三高 = **多头共振**（趋势加速）")
     return out
+
+
+def read_market_width():
+    """读市场宽度指标（market_width_latest.json），失败返回None"""
+    for p in ("outputs/market_width_latest.json", "../outputs/market_width_latest.json",
+              "/sandbox/workspace/github_bg/outputs/market_width_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
 
 
 def read_fund_phase():
