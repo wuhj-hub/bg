@@ -73,8 +73,9 @@ def main():
         for c, r_ in zip(chunk, codes):
             kl = data.get(r_, [])
             if len(kl) >= 2:
-                d_prev, c_prev = kl[0]
-                d_last, c_last = kl[1]
+                # ⚠️ westock批量输出date降序（最新在前）：kl[0]=最新, kl[1]=前一日
+                d_last, c_last = kl[0]
+                d_prev, c_prev = kl[1]
                 if c_prev and c_prev > 0:
                     pct = (c_last - c_prev) / c_prev * 100
                     chg.append((c["code"], c["name"], round(pct, 2)))
@@ -92,7 +93,8 @@ def main():
     score = width_score(up_pct, len(strong), len(lu), n)
 
     if score >= 70:
-        level = "🔥 强势（普涨格局）"
+        # 赚钱效应强但涨少跌多 → 结构性行情（涨停潮+分化）
+        level = "🔥 结构性强（涨停潮·涨少跌多分化）" if up_pct < 0.45 else "🔥 强势（普涨格局）"
     elif score >= 55:
         level = "偏强（涨多跌少）"
     elif score >= 40:
