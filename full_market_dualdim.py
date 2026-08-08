@@ -135,6 +135,25 @@ def to_westock_code(code):
     return code
 
 
+def fund_phase(precip, cjb30, m5, m10, m20, mainflow, jumbo):
+    """资金行为四态（黑石SUPER_CAPITAL三维启发：进场→抢筹→控盘）
+    控盘 = 缩量高沉淀（筹码锁定，趋势延续）
+    抢筹 = 超大单+放量（加速建仓/拉升）
+    进场 = 今日净流转正+5D累计正（温和建仓）
+    观望 = 无明确资金行为
+    """
+    if cjb30 < 50 and precip >= 10:
+        return "控盘"
+    # 抢筹：放量 + 超大单主导（超大单占5D净流≥30%）
+    if jumbo > 0 and cjb30 >= 50 and m5 != 0 and jumbo / abs(m5) >= 0.3:
+        return "抢筹"
+    if mainflow > 0 and m5 > 0:
+        return "进场"
+    if m5 > 0 and precip >= 5:
+        return "进场"
+    return "观望"
+
+
 def process(stock):
     code, name = stock
     wcode = to_westock_code(code)
@@ -152,14 +171,18 @@ def process(stock):
         m5 = fnum(ar, "MainNetFlow5D")
         m10 = fnum(ar, "MainNetFlow10D")
         m20 = fnum(ar, "MainNetFlow20D")
+        mainflow = fnum(ar, "MainNetFlow")
+        jumbo = fnum(ar, "JumboNetFlow")
         denom = sum(amounts[-5:])
         precip = m5 / denom * 100 if denom else 0.0
         vol, lv, sig = classify(bt["cjb30"], precip)
+        phase = fund_phase(precip, bt["cjb30"], m5, m10, m20, mainflow, jumbo)
         return {
             "code": code, "name": name,
             "cjb30": bt["cjb30"], "b30v100": bt["b30v100"], "veab": bt["veab"],
             "precip": round(precip, 2), "m5": round(m5), "m10": round(m10), "m20": round(m20),
-            "vol": vol, "lv": lv, "sig": sig,
+            "mainflow": round(mainflow), "jumbo": round(jumbo),
+            "vol": vol, "lv": lv, "sig": sig, "phase": phase,
             "price": kr[-1]["last"] if kr else 0,
         }
     except Exception as e:
@@ -177,6 +200,23 @@ def gen_report(results, dist, today):
     L.append("|---|---|")
     for k, v in sorted(dist.items(), key=lambda x: SIGNAL_ORDER.get(x[0], 9)):
         L.append(f"| {k} | {v} |")
+    L.append("")
+    L.append("## 一.5 资金行为分布（四态：进场/抢筹/控盘/观望，黑石三维启发）\n")
+    ph_dist = Counter(r["phase"] for r in results)
+    L.append("| 资金行为 | 数量 | 含义 |")
+    L.append("|---|---|---|")
+    for ph, desc in [("抢筹", "超大单+放量，加速建仓/拉升，最强"), ("进场", "今日净流转正+5D累计正，温和建仓"),
+                     ("控盘", "缩量高沉淀，筹码锁定，趋势延续"), ("观望", "无明确资金行为")]:
+        L.append(f"| {ph} | {ph_dist.get(ph, 0)} | {desc} |")
+    L.append("")
+    L.append("### 资金行为 TOP15（抢筹/进场优先）\n")
+    ph_order = {"抢筹": 0, "进场": 1, "控盘": 2, "观望": 3}
+    ph_sorted = sorted(results, key=lambda r: (ph_order.get(r.get("phase", "观望"), 9), -r["precip"]))
+    L.append("| 代码 | 名称 | 资金行为 | CJB30 | 沉淀率 | 5D净流(亿) | 今日净流(亿) | 超大单(亿) |")
+    L.append("|---|---|---|---|---|---|---|---|")
+    for r in [x for x in ph_sorted if x.get("phase") in ("抢筹", "进场")][:15]:
+        L.append(f"| {r['code']} | {r['name']} | {r['phase']} | {r['cjb30']} | {r['precip']}% | "
+                 f"{r['m5']/1e8:.2f} | {r['mainflow']/1e8:.2f} | {r['jumbo']/1e8:.2f} |")
     L.append("")
     L.append("## 二、重点标的（按信号强度 + 沉淀率降序，前 50）\n")
     L.append("| 代码 | 名称 | CJB30 | 沉淀率 | 5D主力净流(亿) | 定性 |")
@@ -202,7 +242,9 @@ def gen_report(results, dist, today):
     L.append("- 主力主导放量🔥(最强)：放量且高沉淀，主力建仓特征，优先关注（四号是最强信号）")
     L.append("- 游资情绪：放量但低沉淀，情绪驱动，需结合技术确认")
     L.append("- 主力控盘：缩量高沉淀，筹码锁定，观察突破")
-    L.append("- 数据由 GitHub Actions 自动扫描生成，回传 ima 知识库\n")
+    L.append("- 数据由 GitHub Actions 自动扫描生成，回传 ima 知识库")
+    L.append("")
+    L.append("> 📌 资金行为四态（黑石SUPER_CAPITAL三维启发）：抢筹=超大单+放量（最强）/ 进场=今日净流转正 / 控盘=缩量高沉淀 / 观望；与双维定性互补——定性看放量缩量，四态看资金行为阶段\n")
     open("panhou_lianghua.md", "w", encoding="utf-8").write("\n".join(L))
 
 
@@ -225,7 +267,8 @@ def main():
                 print(f"[PROGRESS] {done}/{len(stocks)} ok={len(results)}")
     with open("panhou_lianghua.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["code", "name", "price", "cjb30", "b30v100", "veab",
-                                          "precip", "m5", "m10", "m20", "vol", "lv", "sig"])
+                                          "precip", "m5", "m10", "m20", "mainflow", "jumbo",
+                                          "vol", "lv", "sig", "phase"])
         w.writeheader()
         for r in results:
             w.writerow(r)
