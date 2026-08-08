@@ -189,6 +189,58 @@ def fund_mode(r5, r10, r20):
     return "资金观望型"
 
 
+
+def fetch_profit(wcode):
+    """获取最新TTM归母净利润（元），失败返回None"""
+    try:
+        txt = run(["finance", wcode, "--num", "1"])
+        for ln in txt.splitlines():
+            s = ln.strip()
+            if not s.startswith("|"):
+                continue
+            parts = [p.strip() for p in s.strip("|").split("|")]
+            if "NPParentCompanyOwnersTTM" in parts:
+                continue
+            if "---" in parts[0]:
+                continue
+            for i, p in enumerate(parts):
+                if p == "NPParentCompanyOwnersTTM":
+                    continue
+            # 按表头定位
+            if len(parts) >= 10:
+                try:
+                    return float(parts[parts.index("NPParentCompanyOwnersTTM")] if "NPParentCompanyOwnersTTM" in parts else 0)
+                except Exception:
+                    pass
+            break
+    except Exception:
+        pass
+    return None
+
+
+def fetch_profit_simple(wcode):
+    """简化版：解析finance输出的TTM净利润列"""
+    try:
+        txt = run(["finance", wcode, "--num", "1"])
+        header = None
+        for ln in txt.splitlines():
+            s = ln.strip()
+            if not s.startswith("|"):
+                continue
+            parts = [p.strip() for p in s.strip("|").split("|")]
+            if "NPParentCompanyOwnersTTM" in parts:
+                header = parts
+                continue
+            if header and "---" not in parts[0] and len(parts) == len(header):
+                try:
+                    return float(parts[header.index("NPParentCompanyOwnersTTM")])
+                except (ValueError, IndexError):
+                    return None
+    except Exception:
+        pass
+    return None
+
+
 def process(stock):
     code, name = stock
     wcode = to_westock_code(code)
@@ -220,12 +272,25 @@ def process(stock):
         r10 = (m10 - m5) / turn5 * 100 if turn5 else 0  # 5-10日段占比
         r20 = (m20 - m10) / turn10 * 100 if turn10 else 0  # 10-20日段占比
         mode = fund_mode(r5, r10, r20)
+        # 资金×业绩匹配（黑石第2层：只对流入类查财务，控制耗时）
+        matching = ""
+        if phase in ("抢筹", "吸筹", "进场"):
+            profit = fetch_profit_simple(wcode)
+            if profit is not None:
+                if profit > 0:
+                    matching = "资金+业绩共振(双击候选)" if phase != "控盘" else "控盘+盈利(稳健)"
+                else:
+                    matching = "纯资金炒作(亏损风险)"
+        elif phase == "控盘":
+            profit = fetch_profit_simple(wcode)
+            if profit is not None:
+                matching = "控盘+盈利(稳健)" if profit > 0 else "控盘+亏损(警惕)"
         return {
             "code": code, "name": name,
             "cjb30": bt["cjb30"], "b30v100": bt["b30v100"], "veab": bt["veab"],
             "precip": round(precip, 2), "m5": round(m5), "m10": round(m10), "m20": round(m20),
             "mainflow": round(mainflow), "jumbo": round(jumbo), "small": round(small),
-            "vol": vol, "lv": lv, "sig": sig, "phase": phase, "mode": mode,
+            "vol": vol, "lv": lv, "sig": sig, "phase": phase, "mode": mode, "matching": matching,
             "price": kr[-1]["last"] if kr else 0,
         }
     except Exception as e:
@@ -277,6 +342,18 @@ def gen_report(results, dist, today):
                      ("资金观望型", "资金行为不明确")]:
         L.append(f"| {md} | {md_dist.get(md, 0)} | {desc} |")
     L.append("")
+    # 一.7 资金×业绩匹配（黑石第2层启发）
+    dbl = [r for r in results if r.get("matching") == "资金+业绩共振(双击候选)"]
+    if dbl:
+        L.append("## 一.7 资金×业绩匹配（双击候选：流入+盈利）\n")
+        L.append("| 代码 | 名称 | 资金行为 | 模式 | CJB30 | 沉淀率 | 5D净流(亿) |")
+        L.append("|---|---|---|---|---|---|---|")
+        for r in sorted(dbl, key=lambda x: -x["precip"])[:15]:
+            L.append(f"| {r['code']} | {r['name']} | {r['phase']} | {r.get('mode','')} | {r['cjb30']} | {r['precip']}% | {r['m5']/1e8:.2f} |")
+        L.append("")
+    pure = [r for r in results if r.get("matching") == "纯资金炒作(亏损风险)"]
+    if pure:
+        L.append(f"> ⚠️ 纯资金炒作警示（流入+亏损）：{len(pure)}只，见CSV matching字段\n")
     L.append("## 二、重点标的（按信号强度 + 沉淀率降序，前 50）\n")
     L.append("| 代码 | 名称 | CJB30 | 沉淀率 | 5D主力净流(亿) | 定性 |")
     L.append("|---|---|---|---|---|---|")
@@ -310,7 +387,7 @@ def gen_report(results, dist, today):
 def main():
     inp = sys.argv[1] if len(sys.argv) > 1 else "all_mainboard.csv"
     workers = int(os.environ.get("SCAN_WORKERS", "6"))
-    rows = list(csv.DictReader(open(inp, encoding="utf-8")))
+    rows = list(csv.DictReader(open(inp, encoding="utf-8-sig")))
     stocks = [(r["code"], r["name"]) for r in rows]
     print(f"[INFO] total stocks={len(stocks)} workers={workers}")
     results = []
@@ -327,7 +404,7 @@ def main():
     with open("panhou_lianghua.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["code", "name", "price", "cjb30", "b30v100", "veab",
                                           "precip", "m5", "m10", "m20", "mainflow", "jumbo", "small",
-                                          "vol", "lv", "sig", "phase", "mode"])
+                                          "vol", "lv", "sig", "phase", "mode", "matching"])
         w.writeheader()
         for r in results:
             w.writerow(r)
