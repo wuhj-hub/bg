@@ -56,6 +56,11 @@ jobs:
       - name: 市场宽度扫描（全主板涨跌家数分布）
         run: python3 market_width.py all_mainboard.csv
 
+      # ─── 第二步.2：分时强度分析（黑石minuteMacd启发：信号股分时MACD+封板+尾盘方向）───
+      - name: 分时强度分析（信号股分时MACD）
+        continue-on-error: true
+        run: python3 minute_strength.py --limit 20
+
       # ─── 第二步.5：动态生成鱼身股票池 ───
       - name: 动态生成鱼身股票池（近20日日均成交额排名前300）
         run: python3 quant_scripts/gen_fish_pool.py
