@@ -1,0 +1,19 @@
+{
+ "strategy": "month_reversal",
+ "params": {
+  "hold_days": 20
+ },
+ "pool": "/tmp/sigpool.csv",
+ "limit": 10,
+ "seed": 42,
+ "signals": 32,
+ "samples": 32,
+ "win_rate": 18.8,
+ "avg": -16.15,
+ "median": -18.54,
+ "avg_win": 13.59,
+ "avg_loss": -23.01,
+ "profit_ratio": 0.59,
+ "max_drawdown": 99.8,
+ "ts": "20260808_153931"
+}

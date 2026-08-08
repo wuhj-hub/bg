@@ -1,0 +1,23 @@
+{
+ "strategy": "month_reversal",
+ "params": {
+  "g1": true,
+  "min_support": 5,
+  "profit_filter": true,
+  "min_ratio": 2,
+  "hold_months": 6
+ },
+ "pool": "all_mainboard.csv",
+ "limit": 300,
+ "seed": 42,
+ "signals": 24,
+ "samples": 24,
+ "win_rate": 54.2,
+ "avg": 6.55,
+ "median": 4.64,
+ "avg_win": 18.28,
+ "avg_loss": -7.31,
+ "profit_ratio": 2.5,
+ "max_drawdown": 44.3,
+ "ts": "20260808_164439"
+}

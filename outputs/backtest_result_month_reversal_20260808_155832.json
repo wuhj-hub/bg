@@ -1,0 +1,19 @@
+{
+ "strategy": "month_reversal",
+ "params": {
+  "hold_days": 120
+ },
+ "pool": "all_mainboard.csv",
+ "limit": 300,
+ "seed": 42,
+ "signals": 1499,
+ "samples": 1499,
+ "win_rate": 45.1,
+ "avg": 7.33,
+ "median": -4.38,
+ "avg_win": 44.78,
+ "avg_loss": -23.43,
+ "profit_ratio": 1.91,
+ "max_drawdown": 100.0,
+ "ts": "20260808_155832"
+}
