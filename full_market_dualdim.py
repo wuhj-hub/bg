@@ -241,6 +241,40 @@ def fetch_profit_simple(wcode):
     return None
 
 
+def qiankun_grade(r):
+    """乾坤分级矩阵（黑石乾坤大师启发）：A金股候选/B关注/C谨慎/D回避"""
+    phase = r.get("phase", "")
+    mode = r.get("mode", "")
+    matching = r.get("matching", "")
+    sig = r.get("sig", "")
+    if matching == "资金+业绩共振(双击候选)":
+        if sig == "主力主导放量🔥(最强)":
+            return "A", "金股候选：资金强攻+业绩共振"
+        return "B", "关注：资金+业绩共振"
+    if matching == "控盘+盈利(稳健)":
+        return "B", "关注：控盘稳健+盈利"
+    if matching == "纯资金炒作(亏损风险)":
+        return "C", "谨慎：纯资金炒作"
+    if matching == "控盘+亏损(警惕)":
+        return "C", "谨慎：控盘但亏损"
+    if phase in ("抢筹", "吸筹", "进场"):
+        return "C", "谨慎：资金流入未验证业绩"
+    if mode == "资金撤退型":
+        return "D", "回避：资金撤退"
+    return "D", "回避：资金观望"
+
+
+def fund_score(r):
+    """百大金股综合评分（资金40%+业绩40%+技术20%）0-100"""
+    phase_w = {"抢筹": 10, "进场": 8, "吸筹": 6, "控盘": 5}.get(r.get("phase", ""), 0)
+    match_w = {"资金+业绩共振(双击候选)": 10, "控盘+盈利(稳健)": 8,
+               "纯资金炒作(亏损风险)": -5, "控盘+亏损(警惕)": -3}.get(r.get("matching", ""), 0)
+    sig_w = {"主力主导放量🔥(最强)": 5, "主力偏强放量": 4, "主力控盘": 4,
+             "主力惜售": 3, "游资情绪": 2, "情绪退潮": 0}.get(r.get("sig", ""), 1)
+    precip_w = min(r.get("precip", 0) / 3, 5)
+    return round(phase_w * 4 + match_w * 4 + sig_w * 4 + precip_w, 1)
+
+
 def process(stock):
     code, name = stock
     wcode = to_westock_code(code)
@@ -278,19 +312,24 @@ def process(stock):
             profit = fetch_profit_simple(wcode)
             if profit is not None:
                 if profit > 0:
-                    matching = "资金+业绩共振(双击候选)" if phase != "控盘" else "控盘+盈利(稳健)"
+                    if precip >= 0:
+                        matching = "资金+业绩共振(双击候选)"
+                    else:
+                        matching = "机构吸筹+盈利(关注)"
                 else:
                     matching = "纯资金炒作(亏损风险)"
         elif phase == "控盘":
             profit = fetch_profit_simple(wcode)
             if profit is not None:
                 matching = "控盘+盈利(稳健)" if profit > 0 else "控盘+亏损(警惕)"
+        g = qiankun_grade({"phase": phase, "mode": mode, "matching": matching, "sig": sig})
         return {
             "code": code, "name": name,
             "cjb30": bt["cjb30"], "b30v100": bt["b30v100"], "veab": bt["veab"],
             "precip": round(precip, 2), "m5": round(m5), "m10": round(m10), "m20": round(m20),
             "mainflow": round(mainflow), "jumbo": round(jumbo), "small": round(small),
             "vol": vol, "lv": lv, "sig": sig, "phase": phase, "mode": mode, "matching": matching,
+            "grade": g[0], "greason": g[1], "score": fund_score(dict(code=code, name=name, phase=phase, mode=mode, matching=matching, sig=sig, precip=round(precip, 2))),
             "price": kr[-1]["last"] if kr else 0,
         }
     except Exception as e:
@@ -354,6 +393,43 @@ def gen_report(results, dist, today):
     pure = [r for r in results if r.get("matching") == "纯资金炒作(亏损风险)"]
     if pure:
         L.append(f"> ⚠️ 纯资金炒作警示（流入+亏损）：{len(pure)}只，见CSV matching字段\n")
+
+    # 一.8 乾坤分级矩阵（黑石乾坤大师启发：有庄/多空/六维评分 → A/B/C/D）
+    gr = {}
+    for r in results:
+        g = r.get("grade", "D")
+        gr.setdefault(g, []).append(r)
+    L.append("## 一.8 乾坤分级矩阵（A金股候选/B关注/C谨慎/D回避）\n")
+    L.append(f"- 分布：A级{len(gr.get('A', []))}只 | B级{len(gr.get('B', []))}只 | C级{len(gr.get('C', []))}只 | D级{len(gr.get('D', []))}只\n")
+    for g in ("A", "B"):
+        lst = gr.get(g, [])
+        if not lst:
+            continue
+        L.append(f"### {g}级（{len(lst)}只）")
+        L.append("| 代码 | 名称 | 资金行为 | 模式 | 信号 | 沉淀率 | 评分 | 理由 |")
+        L.append("|---|---|---|---|---|---|---|---|")
+        for r in sorted(lst, key=lambda x: -x.get("score", 0))[:15]:
+            L.append(f"| {r['code']} | {r['name']} | {r['phase']} | {r.get('mode','')} | {r['sig']} | {r['precip']}% | {r.get('score',0)} | {r.get('greason','')} |")
+        L.append("")
+    if gr.get("C"):
+        c_li = [r for r in gr["C"] if r.get("matching") == "纯资金炒作(亏损风险)"]
+        if c_li:
+            L.append(f"### C级警示（纯炒作亏损 {len(c_li)}只，前10）")
+            L.append("| 代码 | 名称 | 模式 | 沉淀率 |")
+            L.append("|---|---|---|---|")
+            for r in sorted(c_li, key=lambda x: -x["precip"])[:10]:
+                L.append(f"| {r['code']} | {r['name']} | {r.get('mode','')} | {r['precip']}% |")
+            L.append("")
+
+    # 二.3 百大金股榜单（黑石百大金股启发：资金+业绩+技术综合评分）
+    top = sorted([r for r in results if r.get("score", 0) >= 20], key=lambda x: -x["score"])[:100]
+    L.append("## 二.3 百大金股榜单（综合评分：资金40%+业绩40%+技术20%）\n")
+    L.append(f"- 共{len(top)}只达标（评分≥20），以下为前30\n")
+    L.append("| 排名 | 代码 | 名称 | 评分 | 资金行为 | 信号 | 沉淀率 | 匹配 |")
+    L.append("|---|---|---|---|---|---|---|---|")
+    for i, r in enumerate(top[:30], 1):
+        L.append(f"| {i} | {r['code']} | {r['name']} | {r.get('score',0)} | {r['phase']} | {r['sig']} | {r['precip']}% | {r.get('matching','')} |")
+    L.append(f"> 📋 完整榜单见CSV（score字段），达标{len(top)}只\n")
     L.append("## 二、重点标的（按信号强度 + 沉淀率降序，前 50）\n")
     L.append("| 代码 | 名称 | CJB30 | 沉淀率 | 5D主力净流(亿) | 定性 |")
     L.append("|---|---|---|---|---|---|")
@@ -388,7 +464,7 @@ def main():
     inp = sys.argv[1] if len(sys.argv) > 1 else "all_mainboard.csv"
     workers = int(os.environ.get("SCAN_WORKERS", "6"))
     rows = list(csv.DictReader(open(inp, encoding="utf-8-sig")))
-    stocks = [(r["code"], r["name"]) for r in rows]
+    stocks = [(r["code"], r["name"]) for r in rows if "退" not in r.get("name", "")]
     print(f"[INFO] total stocks={len(stocks)} workers={workers}")
     results = []
     done = 0
@@ -404,7 +480,8 @@ def main():
     with open("panhou_lianghua.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["code", "name", "price", "cjb30", "b30v100", "veab",
                                           "precip", "m5", "m10", "m20", "mainflow", "jumbo", "small",
-                                          "vol", "lv", "sig", "phase", "mode", "matching"])
+                                          "vol", "lv", "sig", "phase", "mode", "matching",
+                                          "grade", "greason", "score"])
         w.writeheader()
         for r in results:
             w.writerow(r)
