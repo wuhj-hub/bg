@@ -51,6 +51,9 @@ def parse_kline(txt):
 
 def signal_return(code, signal_date):
     """信号日收盘 → 当前收益（%），以及自然日数"""
+    # 兼容无前缀代码（快照CSV: 000009 → sz000009）
+    if re.match(r"^\d{6}$", code):
+        code = ("sh" if code.startswith("6") else "sz") + code
     rows = []
     for _ in range(3):
         txt = run(["kline", code, "--period", "day", "--limit", "120"])
@@ -71,12 +74,61 @@ def signal_return(code, signal_date):
     days = (datetime.strptime(rows[-1][0], "%Y-%m-%d") - datetime.strptime(signal_date, "%Y-%m-%d")).days
     return (cur / entry - 1) * 100, days
 
+def by_phase(min_days=3, workers=8):
+    """按资金行为四态分组统计胜率（读 outputs/资金快照_*.csv 归档）"""
+    import glob
+    snaps = sorted(glob.glob("outputs/资金快照_*.csv"))
+    if not snaps:
+        print("❌ 无资金快照归档（workflow全量扫描后自动生成）")
+        return
+    print(f"资金快照: {len(snaps)} 个交易日（{snaps[0].split('_')[-1][:10]} ~ {snaps[-1].split('_')[-1][:10]}）\n")
+    groups = {}
+    for fp in snaps:
+        d = os.path.basename(fp).replace("资金快照_", "").replace(".csv", "")
+        with open(fp, encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                ph = row.get("phase", "观望")
+                groups.setdefault(ph, []).append((d, row["code"], row.get("name", "")))
+    results = {}
+    for ph, items in groups.items():
+        rets = []
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            futs = {ex.submit(signal_return, code, d): (d, code, name) for d, code, name in items}
+            for f in as_completed(futs):
+                d, code, name = futs[f]
+                ret, days = f.result()
+                if ret is not None and days >= min_days:
+                    rets.append({"ret": ret, "days": days, "code": code, "name": name, "date": d})
+        results[ph] = rets
+    print(f"有效样本（≥{min_days}日）按资金行为四态:\n")
+    print(f"{'资金行为':<8}{'样本':>7}{'胜率':>8}{'平均':>8}{'中位':>8}{'盈亏比':>7}{'最差':>8}")
+    print("-" * 60)
+    order = ["抢筹", "进场", "控盘", "观望"]
+    for ph in order:
+        rets = results.get(ph, [])
+        if len(rets) < 10:
+            print(f"{ph:<8}{len(rets):>7}{'样本不足':>12}")
+            continue
+        rs = [r["ret"] for r in rets]
+        wins = [r for r in rs if r > 0]
+        avg = sum(rs) / len(rs)
+        pl = sum(r for r in rs if r > 0) / max(1, len(wins))
+        ls = abs(sum(r for r in rs if r <= 0) / max(1, len(rs) - len(wins)))
+        print(f"{ph:<8}{len(rs):>7}{len(wins)/len(rs)*100:>7.1f}%{avg:>+8.2f}%"
+              f"{sorted(rs)[len(rs)//2]:>+8.2f}%{pl/ls if ls else 99:>7.2f}{min(rs):>+8.2f}%")
+    print("\n> 📌 四态定义：抢筹=超大单+放量(最强)/ 进场=今日净流转正 / 控盘=缩量高沉淀 / 观望")
+    print("> ⚠️ 样本按快照日逐日累积，2-4周后四态对比更有意义")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--log", default="outputs/pool_signals_log.csv")
     ap.add_argument("--min-days", type=int, default=3, help="信号后最少观察天数")
     ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--by-phase", action="store_true", help="按资金行为四态分组统计(读资金快照)")
     a = ap.parse_args()
+    if a.by_phase:
+        return by_phase(a.min_days, a.workers)
 
     if not os.path.exists(a.log):
         print(f"❌ 信号日志不存在: {a.log}\n提示: 先运行 pool_tracking_report.py 累积日志")

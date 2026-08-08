@@ -264,6 +264,11 @@ def read_lianghua_report():
             parts = [p.strip() for p in line.strip("|").split("|")]
             if len(parts) >= 2:
                 data[parts[0]] = parts[1]
+        # 资金行为四态（一.5章节，黑石三维启发）
+        if re.match(r"^\|\s*(抢筹|进场|控盘|观望)\s*\|", line) and "资金行为" not in line:
+            parts = [p.strip() for p in line.strip("|").split("|")]
+            if len(parts) >= 2:
+                data[f"资金_{parts[0]}"] = parts[1]
     return data
 
 def read_lianghua_csv():
@@ -443,6 +448,15 @@ def gen_report(today_str):
             if sig in dist:
                 meaning = sig_meanings.get(sig, "")
                 lines.append(f"| {sig} | {dist[sig]} | {meaning} |")
+        # 资金行为四态（黑石三维启发）
+        ph_meanings = {"资金_抢筹": "超大单+放量，加速建仓/拉升（最强）", "资金_进场": "今日净流转正+5D正，温和建仓",
+                       "资金_控盘": "缩量高沉淀，筹码锁定", "资金_观望": "无明确资金行为"}
+        ph_vals = [f"{dist.get(k, 0)}" for k in ["资金_抢筹", "资金_进场", "资金_控盘", "资金_观望"]]
+        if any(v != "0" for v in ph_vals):
+            lines.append("")
+            lines.append("**资金行为四态**（抢筹/进场/控盘/观望）：")
+            for k, desc in ph_meanings.items():
+                lines.append(f"- {k.replace('资金_','')}: {dist.get(k, 0)}（{desc}）")
     
     # ════════════════════════════════════════
     # 四、💰 主力信号专表

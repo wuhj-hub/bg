@@ -47,7 +47,10 @@ jobs:
       - name: 全量量化扫描（盘后量化）
         env:
           SCAN_WORKERS: "16"
-        run: python3 full_market_dualdim.py all_mainboard.csv
+        run: |
+          python3 full_market_dualdim.py all_mainboard.csv
+          # 归档资金快照（含资金行为四态phase，供按四态胜率跟踪）
+          cp panhou_lianghua.csv outputs/资金快照_$(date +%Y-%m-%d).csv || echo "归档失败(不影响扫描)"
 
       # ─── 第二步.5：动态生成鱼身股票池 ───
       - name: 动态生成鱼身股票池（近20日日均成交额排名前300）
