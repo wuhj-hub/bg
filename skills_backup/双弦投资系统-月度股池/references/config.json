@@ -1,0 +1,14 @@
+{
+  "skill_name": "双弦投资系统-月度股池",
+  "version": "1.0",
+  "description": "双弦投资系统增强模块 - 月度股池积累与推送",
+  "scripts": {
+    "monthly_pool": "scripts/monthly_pool.py",
+    "pool_adapter": "scripts/pool_adapter.py"
+  },
+  "config": {
+    "max_price": 10.0,
+    "min_resonance_score": 1,
+    "pool_dir": "pools"
+  }
+}
