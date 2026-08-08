@@ -143,6 +143,9 @@ def main():
         "limitup": len(lu), "limitdown": len(ld),
         "up_pct": round(up_pct * 100, 1), "score": score, "level": level,
         "top": sorted(chg, key=lambda x: -x[2])[:10],
+        # 涨停/强势完整名单（供市场风格轴判中军结构）
+        "limitup_list": [{"code": c, "name": nm, "pct": p} for c, nm, p in sorted(lu, key=lambda x: -x[2])],
+        "strong_list": [{"code": c, "name": nm, "pct": p} for c, nm, p in sorted(strong, key=lambda x: -x[2])],
     }
     json_path = os.path.join(OUT_DIR, "market_width_latest.json")
     open(json_path, "w", encoding="utf-8").write(json.dumps(js, ensure_ascii=False, indent=1))

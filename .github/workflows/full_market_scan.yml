@@ -56,6 +56,12 @@ jobs:
       - name: 市场宽度扫描（全主板涨跌家数分布）
         run: python3 market_width.py all_mainboard.csv
 
+      # ─── 第二步.1b：市场风格轴（指数市/均衡/情绪市：机构主导 vs 游资主导）───
+      # 依赖 market_width_latest.json（涨停名单）与 quant_scripts/hs300.csv（中军判断）
+      - name: 市场风格轴扫描（机构主导 vs 游资主导）
+        continue-on-error: true
+        run: python3 market_style.py
+
       # ─── 第二步.2：分时强度分析（黑石minuteMacd启发：信号股分时MACD+封板+尾盘方向）───
       - name: 分时强度分析（信号股分时MACD）
         continue-on-error: true
@@ -113,10 +119,13 @@ jobs:
           # 鱼身JSON一并提交（盘前premarket_fishbody从GitHub拉取，防止知识库上传失败导致缺失）
           cp outputs/fish_body_enhanced_*.json fish_body_latest.json 2>/dev/null || true
           cp outputs/鱼身报告_*.md 鱼身报告_latest.md 2>/dev/null || true
+          # 市场宽度+市场风格轴JSON（盘前②.5/②.5.2从GitHub拉取）
+          cp outputs/market_width_latest.json market_width_latest.json 2>/dev/null || true
+          cp outputs/market_style_latest.json market_style_latest.json 2>/dev/null || true
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
+            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
             git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
             for i in 1 2 3; do
               git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true

@@ -290,6 +290,27 @@ def gen_report(today_str):
         lines.append(zx_table)
         lines.append("")
     
+    # ②.5.2 市场风格轴（指数市/均衡/情绪市：机构主导 vs 游资主导）
+    ms = read_market_style()
+    if ms:
+        sd = ms.get("score_detail", {})
+        det = ms.get("size_style", {})
+        lu = ms.get("limitup_structure", {})
+        vc = ms.get("volume_structure", {})
+        sf = ms.get("sector_fund", {})
+        lines.append("\n### 🎛️ 市场风格轴（机构主导 vs 游资主导）\n")
+        lines.append(f"- 风格：**{ms.get('icon','')} {ms.get('style','—')}**（风格分 {ms.get('score',0):+d}，数据截止 {ms.get('data_date','—')}）")
+        lines.append(f"- 大小盘：沪深300 5日 {det.get('hs300_5d','—')}% vs 中证1000 5日 {det.get('zz1000_5d','—')}%（相对 {det.get('rel_5d','—')}%；正=小盘领涨·情绪 / 负=大盘领涨·机构）")
+        lines.append(f"- 涨停结构：涨停 {lu.get('limitup','—')} 家 · 中军涨停(沪深300成分) {lu.get('zhongjun_cnt','—')} 家 · 强势 {lu.get('strong','—')} 家")
+        lines.append(f"- 成交结构：{vc.get('vol_shift','—')}（中证1000/沪深300成交比 {vc.get('small_big_ratio_now','—')} vs 5日均 {vc.get('small_big_ratio_5d','—')}）")
+        if sf.get("sectors"):
+            tags = "、".join(f"{s['name']}{s['tag']}" for s in sf["sectors"][:3])
+            lines.append(f"- 板块资金：热点板块定性 {tags}")
+        else:
+            lines.append(f"- 板块资金：{sf.get('err','无数据')}")
+        lines.append(f"- 操作映射：{ms.get('advice','')}")
+        lines.append("")
+
     # ②.6 综合决策
     idx_rows_all = []
     for code in ["sh000001", "sz399001", "sz399006", "sh000688"]:
@@ -448,8 +469,19 @@ def read_heshi_resonance():
 
 def read_market_width():
     """读市场宽度指标（market_width_latest.json），失败返回None"""
-    for p in ("outputs/market_width_latest.json", "../outputs/market_width_latest.json",
+    for p in ("market_width_latest.json", "outputs/market_width_latest.json", "../outputs/market_width_latest.json",
               "/sandbox/workspace/github_bg/outputs/market_width_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def read_market_style():
+    """读市场风格轴（market_style_latest.json），失败返回None"""
+    for p in ("market_style_latest.json", "outputs/market_style_latest.json", "../outputs/market_style_latest.json",
+              "/sandbox/workspace/github_bg/outputs/market_style_latest.json"):
         try:
             return json.load(open(p, encoding="utf-8"))
         except Exception:
