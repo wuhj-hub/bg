@@ -369,6 +369,7 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/sandbox_push_report
 16. **创业板精选池维护**：`filter_rules.py` 中的 `CHINEXT_TOP50` 字典为创业板精选池，每季度更新一次（剔除市值跌出前80的，补入市值进入前30的）
 17. **三系统数据完整性自检（防缺失）**：Step 2.8/2.9/2.10 采集后必须验证鱼身/双弦/猛兽三数据源齐备——premarket_quant.py 与 premarket_fishbody.py 输出为空或含"暂无数据"时，须**本地补跑对应系统**（双弦 run_shuangxian.py / 鱼身 fish_body_enhanced.py --pool stock_pool.txt / 猛兽 beast_screener.py），并将本地结果写入标准路径（outputs/beast_scan_output.txt、outputs/fish_body_enhanced_最新.json）。报告中④.2/②.1等章节**标注数据来源**（"GitHub 8/6收盘实采" 或 "本地兜底 160只池"），禁止静默降级为仅温度描述。鱼身数据源优先级：本地最新JSON → GitHub仓库 fish_body_latest.json（workflow每日提交）→ 本地补跑。
 18. **资金行为四态引用（黑石启发）**：信号快照卡💰行引用昨日全盘量化报告（panhou_lianghua.md 一.5章节）的四态计数（抢筹/进场/控盘），标注"昨日全市场"；若报告不存在或未生成，该行省略不影响报告完整性。数据由 full_market_dualdim.py 每日扫描产出（fund_phase：抢筹=超大单占5D净流≥30%+放量 / 进场=今日净流转正+5D正 / 控盘=缩量高沉淀 / 观望）。
+19. **四因子背离/共振标注（黑石启发）**：盘前报告②.4综合决策输出四因子（均线=上证vs MA5/MA20、动量=5日涨幅、情绪=情绪退潮占比、资金=抢筹+吸筹占比）及背离/共振信号（资金高+情绪低=聪明钱布局 / 资金低+情绪高=诱多 / 动量高+情绪低=无量空涨 / 动量低+资金高=底部蓄力 / 三高=多头共振）。数据源：上证25日K线（westock）+ panhou_lianghua.md 双维分布 + 资金五态。
 
 ---
 
