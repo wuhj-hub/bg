@@ -217,6 +217,25 @@ def main():
         json.dump(results, f, ensure_ascii=False, indent=2)
     print(f"\n[OK] 汇总结果 → {summary_file}")
 
+    # 三系统共振因子落盘（对齐黑石RESONANCE_SIGNAL：个股共振信号因子）
+    try:
+        sx = results.get("shuangxian", {})
+        pool = sx.get("pool_data") or {}
+        res_stocks = pool.get("resonance_stocks") or []
+        # 兜底：从stdout正则提取共振股行
+        if not res_stocks and sx.get("stdout"):
+            import re
+            for m in re.finditer(r"✅ (\S+) (\S+) 评分(\S+) 共振(\S+)", sx.get("stdout", "")):
+                res_stocks.append({"code": m.group(1), "name": m.group(2), "total_score": m.group(3), "resonance": m.group(4)})
+        if res_stocks:
+            res_file = OUTPUTS_DIR / f"三系统共振_{TODAY}.json"
+            with open(res_file, "w", encoding="utf-8") as f:
+                json.dump({"date": TODAY, "resonance_stocks": res_stocks,
+                           "count": len(res_stocks)}, f, ensure_ascii=False, indent=1)
+            print(f"[OK] 三系统共振因子 → {res_file} ({len(res_stocks)}只)")
+    except Exception as e:
+        print(f"[WARN] 三系统共振因子落盘失败: {e}")
+
     # 列出所有输出文件
     print("\n📋 输出文件列表:")
     for f in sorted(OUTPUTS_DIR.iterdir()):
