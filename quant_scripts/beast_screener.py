@@ -2005,6 +2005,37 @@ def main():
     print(f"     📉 RS_D背离 = 斜率差底背离 → 动量角度低吸信号")
     print("=" * 90)
 
+    # ---- Step 6: 双模式市场聚合（堆量/欧马 → 与市场风格轴交叉验证） ----
+    try:
+        from collections import Counter
+        def _mc(items):
+            return dict(Counter(s.get("trade_mode", "未知") for s in items))
+        agg = {
+            "date": datetime.now().strftime("%Y-%m-%d"),
+            "total_scored": len(setup_results),
+            "all": _mc(setup_results),
+            "leaders": _mc(leaders),
+            "pullbacks": _mc(pullbacks),
+            "gpoints": _mc(gpoint_sigs),
+        }
+        dom_pool = {**agg["leaders"], **agg["pullbacks"]}
+        valid_dom = {k: v for k, v in dom_pool.items() if k in ("堆量模式", "欧马模式")}
+        agg["dominant"] = max(valid_dom, key=valid_dom.get) if valid_dom else "无显著主导"
+        os.makedirs("outputs", exist_ok=True)
+        with open("outputs/mode_aggregate_latest.json", "w", encoding="utf-8") as f:
+            json.dump(agg, f, ensure_ascii=False, indent=1)
+        print("\n" + "=" * 72)
+        print("📦 Step 6: 双模式市场聚合（堆量 vs 欧马 · 与市场风格轴交叉验证）")
+        print("=" * 72)
+        print(f"  评分股总数: {agg['total_scored']}只")
+        print(f"  全部信号: {json.dumps(agg['all'], ensure_ascii=False)}")
+        print(f"  领先股:   {json.dumps(agg['leaders'], ensure_ascii=False)}")
+        print(f"  回调股:   {json.dumps(agg['pullbacks'], ensure_ascii=False)}")
+        print(f"  G点信号:  {json.dumps(agg['gpoints'], ensure_ascii=False)}")
+        print(f"  主导模式: {agg['dominant']}  → outputs/mode_aggregate_latest.json")
+    except Exception as e:
+        print(f"  [WARN] 双模式聚合失败(不影响主流程): {e}")
+
 
 if __name__ == "__main__":
     main()

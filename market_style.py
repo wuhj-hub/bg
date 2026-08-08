@@ -86,6 +86,19 @@ def load_width(width_path):
         return None
 
 
+def load_mode_aggregate():
+    """读猛兽双模式市场聚合（mode_aggregate_latest.json），失败返回None"""
+    for p in ("outputs/mode_aggregate_latest.json", "mode_aggregate_latest.json",
+              "../outputs/mode_aggregate_latest.json",
+              "/sandbox/workspace/github_bg/outputs/mode_aggregate_latest.json"):
+        if os.path.exists(p):
+            try:
+                return json.load(open(p, encoding="utf-8"))
+            except Exception:
+                continue
+    return None
+
+
 def load_hs300(hs300_path):
     """读hs300成分股代码集合（含sh/sz前缀）"""
     p = find_file(hs300_path) or find_file([
@@ -311,6 +324,9 @@ def main():
             hs300_path = [argv[i + 1]]
 
     width = load_width(width_path)
+    mode_agg = load_mode_aggregate()
+    if mode_agg:
+        print(f"[INFO] 猛兽双模式聚合: 主导={mode_agg.get('dominant','—')} {json.dumps(mode_agg.get('leaders', {}), ensure_ascii=False)}", flush=True)
     hs300_set = load_hs300(hs300_path)
     if width:
         print(f"[INFO] 市场宽度: 分{width.get('score')} {width.get('level','')} 涨停{width.get('limitup')} 强势{width.get('strong')}", flush=True)
@@ -350,6 +366,22 @@ def main():
 
     today = datetime.now().strftime("%Y-%m-%d")
     data_date = kl["sh000300"][0][0] if kl.get("sh000300") else today
+    # ⑤ 猛兽双模式交叉验证（不参与打分，仅交叉确认）
+    cross = {}
+    if mode_agg:
+        dom = mode_agg.get("dominant", "无显著主导")
+        if (style == "情绪市" and dom == "堆量模式") or (style == "指数市" and dom == "欧马模式"):
+            verdict = "✅ 强共振（风格轴与猛兽双模式一致）"
+        elif style == "均衡市":
+            verdict = "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）"
+        else:
+            verdict = "⚠️ 背离（风格轴与猛兽信号偏好不一致，注意结构分化）"
+        cross = {"dominant": dom, "all": mode_agg.get("all", {}),
+                 "leaders": mode_agg.get("leaders", {}), "pullbacks": mode_agg.get("pullbacks", {}),
+                 "gpoints": mode_agg.get("gpoints", {}), "verdict": verdict,
+                 "total_scored": mode_agg.get("total_scored", 0)}
+    dom = cross.get("dominant", "无猛兽数据") if cross else "无猛兽数据"
+    verdict = cross.get("verdict", "⚠️ 猛兽未运行或未输出聚合") if cross else "⚠️ 猛兽未运行或未输出聚合"
     js = {
         "date": today, "data_date": data_date,
         "style": style, "icon": icon, "score": total,
@@ -357,6 +389,7 @@ def main():
                          "volume_structure": sc_c, "sector_fund": sc_d},
         "size_style": det_a, "limitup_structure": det_b,
         "volume_structure": det_c, "sector_fund": det_d,
+        "mode_cross": cross,
         "advice": adv,
     }
     os.makedirs(OUT_DIR, exist_ok=True)
@@ -398,7 +431,14 @@ def main():
             md += f"| {s['name']} | {s['zdf']} | {s['main_net5d']} | {s['retail_net']} | {s['tag']} |\n"
     else:
         md += f"- {dd.get('err', '无数据')}\n"
-    md += """
+    md += f"""
+## ⑥ 猛兽双模式交叉验证（堆量 vs 欧马）
+
+- 主导模式：**{dom}**（评分股 {cross.get('total_scored', 0)} 只）
+- 领先股 {json.dumps(cross.get('leaders', {}), ensure_ascii=False)} · 回调股 {json.dumps(cross.get('pullbacks', {}), ensure_ascii=False)} · G点 {json.dumps(cross.get('gpoints', {}), ensure_ascii=False)}
+- 交叉验证：{verdict}
+- 说明：猛兽信号=热搜候选池当日评分（样本小，仅作次级确认）；堆量=情绪+资金溢出小盘 / 欧马=产业+业绩成长中大盘
+
 ## ⑤ 消息面逻辑深度 · 文章标准⑤（人工研判项）
 - 机构主导特征：持续产业逻辑（订单/出货/毛利率可量化验证）+ 研报密集覆盖
 - 游资主导特征：单一事件催化 + 逻辑模糊难证伪 + 股吧/短视频传播

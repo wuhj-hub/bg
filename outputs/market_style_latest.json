@@ -3,12 +3,12 @@
  "data_date": "2026-08-07",
  "style": "情绪市",
  "icon": "🔥",
- "score": 53,
+ "score": 51,
  "score_detail": {
   "size_style": 15,
   "limitup_structure": 33,
   "volume_structure": 8,
-  "sector_fund": -3
+  "sector_fund": -5
  },
  "size_style": {
   "hs300_5d": 2.32,
@@ -37,24 +37,24 @@
  "sector_fund": {
   "sectors": [
    {
-    "name": "半导体",
-    "zdf": "3.29",
-    "main_net5d": 143.1,
-    "retail_net": -106.7,
-    "tag": "机构型"
-   },
-   {
-    "name": "元件",
-    "zdf": "6.74",
-    "main_net5d": 278.7,
-    "retail_net": -118.5,
-    "tag": "机构型"
-   },
-   {
     "name": "医疗服务",
     "zdf": "8.40",
     "main_net5d": 15.5,
     "retail_net": -25.8,
+    "tag": "机构型"
+   },
+   {
+    "name": "小金属",
+    "zdf": "4.30",
+    "main_net5d": 100.9,
+    "retail_net": -27.0,
+    "tag": "机构型"
+   },
+   {
+    "name": "CRO",
+    "zdf": "10.63",
+    "main_net5d": 22.6,
+    "retail_net": -26.7,
     "tag": "机构型"
    },
    {
@@ -65,13 +65,34 @@
     "tag": "游资型"
    },
    {
-    "name": "化学制药",
-    "zdf": "5.21",
-    "main_net5d": -34.5,
-    "retail_net": -40.8,
-    "tag": "游资型"
+    "name": "通信设备",
+    "zdf": "0.31",
+    "main_net5d": 325.9,
+    "retail_net": 19.7,
+    "tag": "混合"
    }
   ]
+ },
+ "mode_cross": {
+  "dominant": "堆量模式",
+  "all": {
+   "堆量模式": 14,
+   "欧马模式": 5,
+   "混合模式": 2
+  },
+  "leaders": {
+   "堆量模式": 4,
+   "欧马模式": 1
+  },
+  "pullbacks": {
+   "堆量模式": 3,
+   "欧马模式": 1
+  },
+  "gpoints": {
+   "堆量模式": 2
+  },
+  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
+  "total_scored": 21
  },
  "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
 }

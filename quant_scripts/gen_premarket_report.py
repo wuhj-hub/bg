@@ -298,6 +298,7 @@ def gen_report(today_str):
         lu = ms.get("limitup_structure", {})
         vc = ms.get("volume_structure", {})
         sf = ms.get("sector_fund", {})
+        mc = ms.get("mode_cross", {})
         lines.append("\n### 🎛️ 市场风格轴（机构主导 vs 游资主导）\n")
         lines.append(f"- 风格：**{ms.get('icon','')} {ms.get('style','—')}**（风格分 {ms.get('score',0):+d}，数据截止 {ms.get('data_date','—')}）")
         lines.append(f"- 大小盘：沪深300 5日 {det.get('hs300_5d','—')}% vs 中证1000 5日 {det.get('zz1000_5d','—')}%（相对 {det.get('rel_5d','—')}%；正=小盘领涨·情绪 / 负=大盘领涨·机构）")
@@ -308,6 +309,8 @@ def gen_report(today_str):
             lines.append(f"- 板块资金：热点板块定性 {tags}")
         else:
             lines.append(f"- 板块资金：{sf.get('err','无数据')}")
+        if mc:
+            lines.append(f"- 猛兽双模式：{mc.get('verdict','—')}（主导 **{mc.get('dominant','—')}** · 领先股 {json.dumps(mc.get('leaders',{}), ensure_ascii=False)}）")
         lines.append(f"- 操作映射：{ms.get('advice','')}")
         lines.append("")
 

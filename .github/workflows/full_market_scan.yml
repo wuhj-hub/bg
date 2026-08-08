@@ -56,12 +56,6 @@ jobs:
       - name: 市场宽度扫描（全主板涨跌家数分布）
         run: python3 market_width.py all_mainboard.csv
 
-      # ─── 第二步.1b：市场风格轴（指数市/均衡/情绪市：机构主导 vs 游资主导）───
-      # 依赖 market_width_latest.json（涨停名单）与 quant_scripts/hs300.csv（中军判断）
-      - name: 市场风格轴扫描（机构主导 vs 游资主导）
-        continue-on-error: true
-        run: python3 market_style.py
-
       # ─── 第二步.2：分时强度分析（黑石minuteMacd启发：信号股分时MACD+封板+尾盘方向）───
       - name: 分时强度分析（信号股分时MACD）
         continue-on-error: true
@@ -112,7 +106,12 @@ jobs:
             python3 upload_ima.py --file "outputs/beast_results.txt" --name "beast_results_$(date +%Y-%m-%d).txt" || echo "猛兽输出上传失败"
           fi
 
-      # ─── 第三步.5：提交量化汇总（供次日盘前报告引用三系统信号）───
+      # ─── 第三步.5：市场风格轴（依赖市场宽度+猛兽双模式聚合，须在三系统预运行之后）───
+      - name: 市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证）
+        continue-on-error: true
+        run: python3 market_style.py
+
+      # ─── 第三步.6：提交量化汇总（供次日盘前报告引用三系统信号）───
       - name: 提交量化汇总到仓库（供盘前报告引用）
         run: |
           cp outputs/quant_results_$(date +%Y-%m-%d).json quant_results_latest.json 2>/dev/null || cp outputs/quant_results_latest.json quant_results_latest.json 2>/dev/null || true
@@ -122,10 +121,11 @@ jobs:
           # 市场宽度+市场风格轴JSON（盘前②.5/②.5.2从GitHub拉取）
           cp outputs/market_width_latest.json market_width_latest.json 2>/dev/null || true
           cp outputs/market_style_latest.json market_style_latest.json 2>/dev/null || true
+          cp outputs/mode_aggregate_latest.json mode_aggregate_latest.json 2>/dev/null || true
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
+            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
             git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
             for i in 1 2 3; do
               git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true
