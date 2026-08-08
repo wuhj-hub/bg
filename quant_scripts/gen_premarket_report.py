@@ -305,7 +305,17 @@ def gen_report(today_str):
     lines.append(f"- 大盘方向：**{j['tone']}**")
     lines.append(f"- 操作基调：**{j['operation']}**")
     lines.append(f"- 板块方向：{j['sectors']}")
-    lines.append(f"- 关键位：{j['key_levels']}\n")
+    lines.append(f"- 关键位：{j['key_levels']}")
+    # 四因子背离/共振（黑石启发）
+    try:
+        fa = calc_factor_analysis()
+        if fa.get("ma"):
+            lines.append(f"- 四因子：{fa.get('ma','')} | {fa.get('mom','')} | {fa.get('emotion','')} | {fa.get('fund','')}")
+        for s in fa.get("signals", []):
+            lines.append(f"  {s}")
+        lines.append("")
+    except Exception as e:
+        lines.append(f"- 四因子：计算失败({e})\n")
     
     lines.append("\n## ③ 板块排行\n")
     board = get_board_data()
@@ -320,12 +330,88 @@ def gen_report(today_str):
     lines.append("\n## ⑤ 策略要点\n")
     lines.append(f"- 操作基调：{j['operation']}")
     lines.append(f"- 关注板块：{j['sectors']}")
-    lines.append(f"- 关键位：{j['key_levels']}\n")
+    lines.append(f"- 关键位：{j['key_levels']}")
+    # 四因子背离/共振（黑石启发）
+    try:
+        fa = calc_factor_analysis()
+        if fa.get("ma"):
+            lines.append(f"- 四因子：{fa.get('ma','')} | {fa.get('mom','')} | {fa.get('emotion','')} | {fa.get('fund','')}")
+        for s in fa.get("signals", []):
+            lines.append(f"  {s}")
+        lines.append("")
+    except Exception as e:
+        lines.append(f"- 四因子：计算失败({e})\n")
     
     lines.append("---\n")
     lines.append("⚠️ 本报告基于公开市场数据整理，不构成投资建议。\n")
     
     return "\n".join(lines), j
+
+
+def calc_factor_analysis():
+    """四因子背离/共振分析（黑石启发：因子背离即机会，共振即趋势）
+    均线=上证vs MA5/MA20 | 动量=5日涨幅 | 情绪=情绪退潮占比 | 资金=抢筹+吸筹占比
+    """
+    import statistics
+    out = {"lines": [], "signals": []}
+    # 1. 均线+动量（上证25日K线）
+    rows = []
+    try:
+        txt = run(["kline", "sh000001", "--period", "day", "--limit", "25"])
+        rows = parse_kline_table(txt)
+    except Exception:
+        pass
+    if len(rows) >= 21:
+        closes = [float(r["last"]) for r in rows]
+        ma5 = sum(closes[-5:]) / 5
+        ma20 = sum(closes[-20:]) / 20
+        cur = closes[-1]
+        mom5 = (closes[-1] / closes[-6] - 1) * 100
+        out["ma"] = f"上证{cur:.0f} vs MA5({ma5:.0f})/MA20({ma20:.0f})" + ("站上双均线" if cur > ma5 and cur > ma20 else "双均线下方" if cur < ma5 and cur < ma20 else "均线纠缠")
+        out["mom"] = f"5日动量{mom5:+.1f}%"
+        out["mom_high"] = mom5 > 2
+        out["mom_low"] = mom5 < -1
+    # 2. 情绪因子（情绪退潮占比）
+    retreat = total = 0
+    for name in ["panhou_lianghua.md", "outputs/panhou_lianghua.md"]:
+        if os.path.exists(name):
+            txt = open(name, encoding="utf-8").read()
+            for ln in txt.splitlines():
+                m = re.match(r"^\|\s*情绪退潮\s*\|\s*(\d+)\s*\|", ln)
+                if m:
+                    retreat = int(m.group(1))
+                m2 = re.match(r"^\|\s*主力主导放量.*?\|\s*(\d+)\s*\|", ln) or re.match(r"^\|\s*游资情绪\s*\|\s*(\d+)\s*\|", ln)
+            # 总数近似：退潮+游资+惜售+控盘+偏强+主导（从分布表汇总）
+            sigs = re.findall(r"^\|\s*(?:主力主导放量.*?|主力偏强放量|主力控盘|主力惜售|游资情绪|情绪退潮)\s*\|\s*(\d+)\s*\|", txt, re.M)
+            total = sum(int(x) for x in sigs) if sigs else 0
+            break
+    if total > 0:
+        retreat_pct = retreat / total * 100
+        out["emotion"] = f"情绪退潮占比{retreat_pct:.0f}%（{retreat}/{total}）"
+        out["emotion_high"] = retreat_pct < 40  # 退潮少=情绪活跃
+        out["emotion_low"] = retreat_pct > 60   # 退潮多=情绪冰点
+    # 3. 资金因子（抢筹+吸筹占比）
+    ph = read_fund_phase() or {}
+    grab = int(ph.get("抢筹", 0)) + int(ph.get("吸筹", 0))
+    total_ph = sum(int(ph.get(k, 0)) for k in ["抢筹", "吸筹", "进场", "控盘", "观望"])
+    if total_ph > 0:
+        grab_pct = grab / total_ph * 100
+        out["fund"] = f"资金行为抢筹+吸筹{grab_pct:.0f}%（{grab}/{total_ph}）"
+        out["fund_high"] = grab_pct > 20
+        out["fund_low"] = grab_pct < 8
+    # 4. 背离/共振判定（黑石四组合）
+    if out.get("fund_high") and out.get("emotion_low"):
+        out["signals"].append("🔵 资金高+情绪低 = **聪明钱逆势布局**（机构在散户恐惧时吸筹）")
+    if out.get("fund_low") and out.get("emotion_high"):
+        out["signals"].append("🔴 资金低+情绪高 = **散户追高、主力出货**（诱多风险）")
+    if out.get("mom_high") and out.get("emotion_low"):
+        out["signals"].append("🟡 动量高+情绪低 = **无量空涨**（动能不可持续）")
+    if out.get("mom_low") and out.get("fund_high"):
+        out["signals"].append("🟢 动量低+资金高 = **底部蓄力**（方向选择在即）")
+    if out.get("mom_high") and out.get("emotion_high") and out.get("fund_high"):
+        out["signals"].append("✅ 动量+情绪+资金三高 = **多头共振**（趋势加速）")
+    return out
+
 
 def read_fund_phase():
     """读取昨日全盘量化报告的资金行为四态（panhou_lianghua.md 一.5章节）"""
