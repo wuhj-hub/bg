@@ -270,6 +270,10 @@ def gen_report(today_str):
     lines.append(f"| 🌡️ 鱼身温度 | {ft_v}/100" if ft_v is not None else "| 🌡️ 鱼身温度 | ⏳ 待量化运行 |")
     lines.append(f"| 🛡️ 猛兽安全评分 | {bs}/100" if bs is not None else "| 🛡️ 猛兽安全评分 | ⏳ 待量化运行 |")
     lines.append(f"| 🧭 双弦 | 空头{sx_air}/8" if sx_air is not None else "| 🧭 双弦 | ⏳ 待量化运行 |")
+    # 资金行为四态（读昨日全盘量化 panhou_lianghua.md 一.5章节）
+    ph = read_fund_phase()
+    if ph:
+        lines.append(f"| 💰 资金行为 | 抢筹{ph.get('抢筹','—')} / 进场{ph.get('进场','—')} / 控盘{ph.get('控盘','—')}（昨日全市场） |")
     
     # ②.5.1 曾星智+双弦双体系市场定性（8大指数月线）
     zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
@@ -322,6 +326,21 @@ def gen_report(today_str):
     lines.append("⚠️ 本报告基于公开市场数据整理，不构成投资建议。\n")
     
     return "\n".join(lines), j
+
+def read_fund_phase():
+    """读取昨日全盘量化报告的资金行为四态（panhou_lianghua.md 一.5章节）"""
+    import glob
+    for name in ["panhou_lianghua.md", "outputs/panhou_lianghua.md"]:
+        if os.path.exists(name):
+            txt = open(name, encoding="utf-8").read()
+            ph = {}
+            for ln in txt.splitlines():
+                m = re.match(r"^\|\s*(抢筹|吸筹|进场|控盘|观望)\s*\|\s*(\d+)\s*\|", ln)
+                if m and "资金行为" not in ln:
+                    ph[m.group(1)] = m.group(2)
+            return ph if ph else None
+    return None
+
 
 def main():
     today = datetime.now().strftime("%Y-%m-%d")

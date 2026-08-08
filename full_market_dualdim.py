@@ -158,6 +158,37 @@ def fund_phase(precip, cjb30, m5, m10, m20, mainflow, jumbo, small):
     return "观望"
 
 
+
+def fund_mode(r5, r10, r20):
+    """8大资金模式（黑石启发，r5=近5日沉淀率, r10=5-10日段占比, r20=10-20日段占比）"""
+    pos5, pos10, pos20 = r5 > 0, r10 > 0, r20 > 0
+    # 主力强攻型：近期强流入+中期正（机构/游资联合拉升）
+    if r5 > 5 and r10 > 3 and pos20:
+        return "主力强攻型"
+    # 主力建仓型：温和持续流入（中长期有序建仓）
+    if r5 > 2 and r10 > 2 and pos20:
+        return "主力建仓型"
+    # 短线抢筹型：近期强+中期弱正+20日负（游资短炒无沉淀）
+    if r5 > 5 and r10 > 1 and not pos20:
+        return "短线抢筹型"
+    # 长线吸筹型：近期弱+20日强正（耐心资金逆向布局）
+    if r5 < 2 and r10 < 2 and r20 > 3:
+        return "长线吸筹型"
+    # 资金撤退型：三周期全负
+    if not pos5 and not pos10 and not pos20:
+        return "资金撤退型"
+    # 高位分歧型：短期出货+中长期沉淀
+    if not pos5 and pos10 and r20 > 2:
+        return "高位分歧型"
+    # 趋势转多型：近两段转正+20日仍负（由空翻多）
+    if pos5 and pos10 and not pos20:
+        return "趋势转多型"
+    # 均衡流入型：三周期温和正
+    if pos5 and pos10 and pos20:
+        return "均衡流入型"
+    return "资金观望型"
+
+
 def process(stock):
     code, name = stock
     wcode = to_westock_code(code)
@@ -182,12 +213,19 @@ def process(stock):
         precip = m5 / denom * 100 if denom else 0.0
         vol, lv, sig = classify(bt["cjb30"], precip)
         phase = fund_phase(precip, bt["cjb30"], m5, m10, m20, mainflow, jumbo, small)
+        # 8大资金模式（黑石启发）
+        turn5 = sum(amounts[-5:])
+        turn10 = sum(amounts[-10:])
+        r5 = precip  # 近5日沉淀率
+        r10 = (m10 - m5) / turn5 * 100 if turn5 else 0  # 5-10日段占比
+        r20 = (m20 - m10) / turn10 * 100 if turn10 else 0  # 10-20日段占比
+        mode = fund_mode(r5, r10, r20)
         return {
             "code": code, "name": name,
             "cjb30": bt["cjb30"], "b30v100": bt["b30v100"], "veab": bt["veab"],
             "precip": round(precip, 2), "m5": round(m5), "m10": round(m10), "m20": round(m20),
             "mainflow": round(mainflow), "jumbo": round(jumbo), "small": round(small),
-            "vol": vol, "lv": lv, "sig": sig, "phase": phase,
+            "vol": vol, "lv": lv, "sig": sig, "phase": phase, "mode": mode,
             "price": kr[-1]["last"] if kr else 0,
         }
     except Exception as e:
@@ -222,6 +260,22 @@ def gen_report(results, dist, today):
     for r in [x for x in ph_sorted if x.get("phase") in ("抢筹", "吸筹", "进场")][:15]:
         L.append(f"| {r['code']} | {r['name']} | {r['phase']} | {r['cjb30']} | {r['precip']}% | "
                  f"{r['m5']/1e8:.2f} | {r['mainflow']/1e8:.2f} | {r['jumbo']/1e8:.2f} |")
+    L.append("")
+    # 一.6 资金模式分布（8大模式，黑石启发）
+    md_dist = Counter(r.get("mode", "资金观望型") for r in results)
+    L.append("## 一.6 资金模式分布（8大模式：强攻/建仓/抢筹/吸筹/转多/均衡/撤退/分歧）\n")
+    L.append("| 资金模式 | 数量 | 解读 |")
+    L.append("|---|---|---|")
+    for md, desc in [("主力强攻型", "机构/游资联合拉升，短期趋势明确"),
+                     ("主力建仓型", "中长期资金有序流入，回调加仓机会"),
+                     ("长线吸筹型", "耐心资金逆向布局，等待催化引爆"),
+                     ("趋势转多型", "由空翻多底部回补，拐点确认后跟进"),
+                     ("均衡流入型", "三周期温和流入，稳健上行弹性有限"),
+                     ("短线抢筹型", "游资短炒无沉淀，脉冲行情追高危险"),
+                     ("高位分歧型", "短期出货中长期沉淀，看量判洗盘/出货"),
+                     ("资金撤退型", "资金持续出走，回避为主"),
+                     ("资金观望型", "资金行为不明确")]:
+        L.append(f"| {md} | {md_dist.get(md, 0)} | {desc} |")
     L.append("")
     L.append("## 二、重点标的（按信号强度 + 沉淀率降序，前 50）\n")
     L.append("| 代码 | 名称 | CJB30 | 沉淀率 | 5D主力净流(亿) | 定性 |")
@@ -273,7 +327,7 @@ def main():
     with open("panhou_lianghua.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["code", "name", "price", "cjb30", "b30v100", "veab",
                                           "precip", "m5", "m10", "m20", "mainflow", "jumbo", "small",
-                                          "vol", "lv", "sig", "phase"])
+                                          "vol", "lv", "sig", "phase", "mode"])
         w.writeheader()
         for r in results:
             w.writerow(r)
