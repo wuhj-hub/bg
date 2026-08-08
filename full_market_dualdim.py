@@ -135,10 +135,11 @@ def to_westock_code(code):
     return code
 
 
-def fund_phase(precip, cjb30, m5, m10, m20, mainflow, jumbo):
-    """资金行为四态（黑石SUPER_CAPITAL三维启发：进场→抢筹→控盘）
+def fund_phase(precip, cjb30, m5, m10, m20, mainflow, jumbo, small):
+    """资金行为五态（黑石SUPER_CAPITAL三维+机构吸筹启发）
     控盘 = 缩量高沉淀（筹码锁定，趋势延续）
-    抢筹 = 超大单+放量（加速建仓/拉升）
+    抢筹 = 超大单+放量（加速建仓/拉升，最激进）
+    吸筹 = 机构买+散户卖（Jumbo>0 & Small<0 & Jumbo>|Small|，黑石机构流/散户流反向）
     进场 = 今日净流转正+5D累计正（温和建仓）
     观望 = 无明确资金行为
     """
@@ -147,6 +148,9 @@ def fund_phase(precip, cjb30, m5, m10, m20, mainflow, jumbo):
     # 抢筹：放量 + 超大单主导（超大单占5D净流≥30%）
     if jumbo > 0 and cjb30 >= 50 and m5 != 0 and jumbo / abs(m5) >= 0.3:
         return "抢筹"
+    # 吸筹：机构超大单买入 + 散户小单卖出（黑石机构吸筹组合）
+    if jumbo > 0 and small < 0 and jumbo > abs(small):
+        return "吸筹"
     if mainflow > 0 and m5 > 0:
         return "进场"
     if m5 > 0 and precip >= 5:
@@ -173,15 +177,16 @@ def process(stock):
         m20 = fnum(ar, "MainNetFlow20D")
         mainflow = fnum(ar, "MainNetFlow")
         jumbo = fnum(ar, "JumboNetFlow")
+        small = fnum(ar, "SmallNetFlow")
         denom = sum(amounts[-5:])
         precip = m5 / denom * 100 if denom else 0.0
         vol, lv, sig = classify(bt["cjb30"], precip)
-        phase = fund_phase(precip, bt["cjb30"], m5, m10, m20, mainflow, jumbo)
+        phase = fund_phase(precip, bt["cjb30"], m5, m10, m20, mainflow, jumbo, small)
         return {
             "code": code, "name": name,
             "cjb30": bt["cjb30"], "b30v100": bt["b30v100"], "veab": bt["veab"],
             "precip": round(precip, 2), "m5": round(m5), "m10": round(m10), "m20": round(m20),
-            "mainflow": round(mainflow), "jumbo": round(jumbo),
+            "mainflow": round(mainflow), "jumbo": round(jumbo), "small": round(small),
             "vol": vol, "lv": lv, "sig": sig, "phase": phase,
             "price": kr[-1]["last"] if kr else 0,
         }
@@ -201,20 +206,20 @@ def gen_report(results, dist, today):
     for k, v in sorted(dist.items(), key=lambda x: SIGNAL_ORDER.get(x[0], 9)):
         L.append(f"| {k} | {v} |")
     L.append("")
-    L.append("## 一.5 资金行为分布（四态：进场/抢筹/控盘/观望，黑石三维启发）\n")
+    L.append("## 一.5 资金行为分布（五态：抢筹/吸筹/进场/控盘/观望，黑石启发）\n")
     ph_dist = Counter(r["phase"] for r in results)
     L.append("| 资金行为 | 数量 | 含义 |")
     L.append("|---|---|---|")
-    for ph, desc in [("抢筹", "超大单+放量，加速建仓/拉升，最强"), ("进场", "今日净流转正+5D累计正，温和建仓"),
-                     ("控盘", "缩量高沉淀，筹码锁定，趋势延续"), ("观望", "无明确资金行为")]:
+    for ph, desc in [("抢筹", "超大单+放量，加速建仓/拉升，最强"), ("吸筹", "机构买+散户卖（Jumbo>0&Small<0），黑石机构吸筹组合"),
+                     ("进场", "今日净流转正+5D累计正，温和建仓"), ("控盘", "缩量高沉淀，筹码锁定，趋势延续"), ("观望", "无明确资金行为")]:
         L.append(f"| {ph} | {ph_dist.get(ph, 0)} | {desc} |")
     L.append("")
-    L.append("### 资金行为 TOP15（抢筹/进场优先）\n")
-    ph_order = {"抢筹": 0, "进场": 1, "控盘": 2, "观望": 3}
+    L.append("### 资金行为 TOP15（抢筹/吸筹优先）\n")
+    ph_order = {"抢筹": 0, "吸筹": 1, "进场": 2, "控盘": 3, "观望": 4}
     ph_sorted = sorted(results, key=lambda r: (ph_order.get(r.get("phase", "观望"), 9), -r["precip"]))
     L.append("| 代码 | 名称 | 资金行为 | CJB30 | 沉淀率 | 5D净流(亿) | 今日净流(亿) | 超大单(亿) |")
     L.append("|---|---|---|---|---|---|---|---|")
-    for r in [x for x in ph_sorted if x.get("phase") in ("抢筹", "进场")][:15]:
+    for r in [x for x in ph_sorted if x.get("phase") in ("抢筹", "吸筹", "进场")][:15]:
         L.append(f"| {r['code']} | {r['name']} | {r['phase']} | {r['cjb30']} | {r['precip']}% | "
                  f"{r['m5']/1e8:.2f} | {r['mainflow']/1e8:.2f} | {r['jumbo']/1e8:.2f} |")
     L.append("")
@@ -267,7 +272,7 @@ def main():
                 print(f"[PROGRESS] {done}/{len(stocks)} ok={len(results)}")
     with open("panhou_lianghua.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["code", "name", "price", "cjb30", "b30v100", "veab",
-                                          "precip", "m5", "m10", "m20", "mainflow", "jumbo",
+                                          "precip", "m5", "m10", "m20", "mainflow", "jumbo", "small",
                                           "vol", "lv", "sig", "phase"])
         w.writeheader()
         for r in results:
