@@ -399,27 +399,56 @@ def read_shuangxian_pool(today):
 
 
 def read_beast_pool(today):
-    """读猛兽本月股池主池 → [(name, rating, setup)]"""
+    """读猛兽本月股池 → (主池[(name,rating,setup)], 观察池[name列表], 信号子池文本)"""
+    # 信号子池：从 quant_results beast.stdout 提取（G点/伏击线/RS_D/断层）
+    sig_txt = ""
+    import json as _j
+    b = ""
+    for _n in (f"quant_results_{today}.json", f"outputs/quant_results_{today}.json",
+               "quant_results_latest.json", "outputs/quant_results_latest.json"):
+        if os.path.exists(_n):
+            try:
+                _q = _j.load(open(_n, encoding="utf-8"))
+                b = (_q.get("beast") or {}).get("stdout", "") or ""
+                break
+            except Exception:
+                continue
+    import re as _re
+    g = _re.search(r"G点信号: (\d+)只", b)
+    v = _re.search(r"伏击线低吸: (\d+)只", b)
+    r = _re.search(r"RS_D背离: (\d+)只", b)
+    d = _re.search(r"净利润断层: (\d+)只", b)
+    parts = []
+    if g: parts.append(f"G点{g.group(1)}")
+    if v: parts.append(f"伏击{v.group(1)}")
+    if r: parts.append(f"RS_D{r.group(1)}")
+    if d: parts.append(f"断层{d.group(1)}")
+    sig_txt = "信号子池: " + " / ".join(parts) if parts else ""
     for path in (f"outputs/猛兽本月股池_{today}.md", f"猛兽本月股池_{today}.md"):
         if not os.path.exists(path):
             continue
         try:
-            rows = []
-            in_main = False
+            rows, watch = [], []
+            in_main = in_watch = False
             for ln in open(path, encoding="utf-8"):
                 if "🏦 主池" in ln:
-                    in_main = True
+                    in_main, in_watch = True, False
                     continue
-                if in_main and "观察池" in ln:
-                    break
+                if "👀 观察池" in ln:
+                    in_main, in_watch = False, True
+                    continue
                 if in_main and ln.strip().startswith("|") and "代码" not in ln and "---" not in ln:
                     parts = [p.strip() for p in ln.strip("|").split("|")]
                     if len(parts) >= 7:
                         rows.append((parts[1], parts[2], parts[5]))
-            return rows if rows else None
+                if in_watch and ln.strip().startswith("|") and "代码" not in ln and "---" not in ln:
+                    parts = [p.strip() for p in ln.strip("|").split("|")]
+                    if len(parts) >= 3:
+                        watch.append(parts[1])
+            return (rows if rows else None), watch, sig_txt
         except Exception:
-            return None
-    return None
+            return None, [], sig_txt
+    return None, [], sig_txt
 
 
 def read_fish_signals():
@@ -453,13 +482,18 @@ def pool_overview_section(today):
     else:
         A("| 🔗 双弦 | 月度共振池 | ⏳ 数据缺失 | quant_results 未产出 |")
 
-    # 猛兽本月池
-    bp = read_beast_pool(today)
+    # 猛兽本月池（主池+观察池+信号子池）
+    bp, bp_watch, bp_sig = read_beast_pool(today)
     if bp:
         detail = "、".join(f"{n}({r}{s})" for n, r, s in bp)
-        A(f"| 🐅 猛兽 | 本月主池 | {len(bp)} | {detail} |")
+        n_total = len(bp) + len(bp_watch)
+        if bp_watch:
+            detail += f"｜观察{len(bp_watch)}: {'、'.join(bp_watch)}"
+        if bp_sig:
+            detail += f"｜{bp_sig}"
+        A(f"| 🐅 猛兽 | 本月主池+观察池 | {n_total} | {detail} |")
     else:
-        A("| 🐅 猛兽 | 本月主池 | ⏳ 数据缺失 | 猛兽本月股池未产出 |")
+        A(f"| 🐅 猛兽 | 本月主池 | ⏳ 数据缺失 | 猛兽本月股池未产出 {bp_sig} |")
 
     # 鱼身
     fish = read_fish_signals()

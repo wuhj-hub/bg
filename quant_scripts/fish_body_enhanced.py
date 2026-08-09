@@ -299,6 +299,31 @@ def is_valid_stock(code):
         return False
     return True
 
+def process_batch(batch):
+    """处理3只批次：批量technical + 逐只多维评分/共振/模式识别。返回 (signals, multis)"""
+    local_sigs, local_multis = [], []
+    cs = ','.join(batch)
+    tech_rows = parse_table(run(f"{WESTOCK_CMD} technical {cs} --group all 2>/dev/null"))
+    for row in tech_rows:
+        code = row.get('code', row.get('symbol', ''))
+        name = row.get('name', '')
+        if not code:
+            continue
+        if 'ST' in name.upper() or '*ST' in name.upper():
+            continue
+        multi = score_stock_multi(code)
+        local_multis.append({'code': code, 'name': name, 'score': multi['score']})
+        res = verify_resonance(code)
+        sigs = detect_fish_patterns(row, multi['score'], res)
+        for s in sigs:
+            if s.get('mode') == 1 and s.get('final_score', 0) >= 55:
+                if detect_golden_breakout(code):
+                    s['tag'] = '黄金起爆'
+            s['resonance_detail'] = res
+            local_sigs.append(s)
+    return local_sigs, local_multis
+
+
 def main():
     import argparse
     p=argparse.ArgumentParser()
@@ -356,33 +381,15 @@ def main():
     print(f"{c('─'*50,C.C)}")
     
     all_sigs=[]; multis=[]
-    for i in range(0,len(pool),3):
-        batch=pool[i:i+3]
-        cs=','.join(batch)
-        tech_rows=parse_table(run(f"{WESTOCK_CMD} technical {cs} --group all 2>/dev/null"))
-        for row in tech_rows:
-            code=row.get('code',row.get('symbol',''))
-            name=row.get('name','')
-            if not code: continue
-            # 过滤ST/*ST
-            if 'ST' in name.upper() or '*ST' in name.upper():
-                continue
-            multi=score_stock_multi(code)
-            multis.append({'code':code,'name':name,'score':multi['score']})
-            res=verify_resonance(code)
-            sigs=detect_fish_patterns(row,multi['score'],res)
-            # 黄金起爆检测：仅对 MACD空中加油 信号
-            for s in sigs:
-                if s.get('mode') == 1 and s.get('final_score', 0) >= 55:
-                    if detect_golden_breakout(code):
-                        s['tag'] = '黄金起爆'
-                s['resonance_detail']=res
-                all_sigs.append(s)
-            sc=C.G if multi['score']>=65 else (C.Y if multi['score']>=50 else C.N)
-            det=" | ".join([f"{k}={v}" for k,v in multi['detail'].items()])
-            pats=" ".join([s['pattern'] for s in sigs])
-            print(f"  {code} {name:8s} 多维:{c(str(multi['score'])+'分',sc)} {det}  {pats}")
-        time.sleep(0.3)
+    from concurrent.futures import ThreadPoolExecutor
+    batches=[pool[i:i+3] for i in range(0,len(pool),3)]
+    print(f"  → 并发扫描 {len(batches)} 批 × 4 workers（优化超时问题）")
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        for sigs_b, multis_b in ex.map(process_batch, batches):
+            all_sigs.extend(sigs_b)
+            multis.extend(multis_b)
+            if len(all_sigs) % 50 == 0 and all_sigs:
+                print(f"  ...已识别 {len(all_sigs)} 信号")
     
     if args.mode!='all':
         mm={'1':1,'2':2,'3':3}

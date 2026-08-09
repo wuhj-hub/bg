@@ -26,7 +26,7 @@ from urllib.request import Request, urlopen
 
 KLINE = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
 HEADERS = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com"}
-TOP_N = 300
+TOP_N = 150  # 2026-08-09 优化：300→150，解决鱼身扫描超时（与116只大池口径一致）
 RECENT = 20
 CORE = [("sh603669", "灵康药业"), ("sh600400", "红豆股份"), ("sz002520", "日发精机")]
 
