@@ -121,19 +121,28 @@ jobs:
             python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "猛兽本月股池上传失败"
           fi
 
-      # ─── 第三步.4.6：双弦本月股池同步（价格≤10共振/低吸，上传知识库「双弦」月度股池）───
-      - name: 双弦本月股池同步（共振/低吸 + 剔除不符合）
+      # ─── 第三步.4.6：双弦每日报告+月度股池同步（收编sx2：上传知识库「双弦」+推送）───
+      - name: 双弦每日报告+月度股池同步（收编sx2单一出口）
         continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: zw56pWsoAd18wp9A_2-_vFFAPbG51UZsuaGyvynm66g=
           IMA_FOLDER_ID: folder_7484244066591607
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
+          # 每日报告 → 双弦KB「每日报告」文件夹（folder_7484244062400511）
+          RPT=$(ls outputs/shuangxian_v2_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$RPT" ]; then
+            IMA_FOLDER_ID=folder_7484244062400511 python3 upload_ima.py --file "$RPT" --name "$(basename $RPT)" || echo "双弦每日报告上传失败"
+            # PushPlus推送（复用push_report.py，PUSH_REPORT指向报告）
+            PUSH_REPORT="$RPT" python3 push_report.py || echo "双弦推送失败(非致命)"
+          fi
+          # 月度股池 → 双弦KB「月度股池」文件夹
           python3 quant_scripts/dual_pool_sync.py --date "$(date +%Y-%m-%d)"
           F=$(ls outputs/双弦本月股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
           if [ -n "$F" ]; then
-            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "双弦本月股池上传失败"
+            IMA_FOLDER_ID=folder_7484244066591607 python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "双弦本月股池上传失败"
           fi
 
       # ─── 第三步.5：市场风格轴（依赖市场宽度+猛兽双模式聚合，须在三系统预运行之后）───

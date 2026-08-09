@@ -87,6 +87,15 @@ def run_shuangxian():
 
     stdout, stderr = run_py("quant_scripts/run_shuangxian.py", cwd=str(REPO_DIR))
 
+    # 双弦每日报告落盘（收编sx2：完整stdout→md，供上传知识库每日报告文件夹+推送）
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        report_path = REPO_DIR / "outputs" / f"shuangxian_v2_{today}.md"
+        report_path.write_text(f"# 🔗 双弦投资系统每日报告 {today}\n\n" + stdout, encoding="utf-8")
+        print(f"[OK] 双弦每日报告: {report_path.name}")
+    except Exception as e:
+        print(f"[WARN] 双弦报告落盘失败: {e}")
+
     # 收集双弦输出
     result = {"stdout": stdout[:2000], "stderr": stderr[:1000]}
 
