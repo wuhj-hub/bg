@@ -381,7 +381,113 @@ def read_pool_status(today):
             return text, stars, passes, src_date
         except Exception:
             pass
-    return None, [], []
+    return None, [], [], ""
+
+def read_shuangxian_pool(today):
+    """读双弦月度股池（quant_results pool_data）→ [(name, price, score)]"""
+    import json as _j
+    for name in (f"quant_results_{today}.json", f"outputs/quant_results_{today}.json",
+                 "quant_results_latest.json", "outputs/quant_results_latest.json"):
+        if os.path.exists(name):
+            try:
+                d = _j.load(open(name, encoding="utf-8"))
+                entries = (d.get("shuangxian", {}) or {}).get("pool_data", {}).get("entries", [])
+                return [(e.get("name",""), e.get("price",""), e.get("score","")) for e in entries]
+            except Exception:
+                pass
+    return None
+
+
+def read_beast_pool(today):
+    """读猛兽本月股池主池 → [(name, rating, setup)]"""
+    for path in (f"outputs/猛兽本月股池_{today}.md", f"猛兽本月股池_{today}.md"):
+        if not os.path.exists(path):
+            continue
+        try:
+            rows = []
+            in_main = False
+            for ln in open(path, encoding="utf-8"):
+                if "🏦 主池" in ln:
+                    in_main = True
+                    continue
+                if in_main and "观察池" in ln:
+                    break
+                if in_main and ln.strip().startswith("|") and "代码" not in ln and "---" not in ln:
+                    parts = [p.strip() for p in ln.strip("|").split("|")]
+                    if len(parts) >= 7:
+                        rows.append((parts[1], parts[2], parts[5]))
+            return rows if rows else None
+        except Exception:
+            return None
+    return None
+
+
+def read_fish_signals():
+    """读鱼身最近扫描JSON → (temp, signals列表) 或 None"""
+    import glob as _g
+    cands = sorted(_g.glob("outputs/fish_body_enhanced_*.json"), reverse=True)
+    if not cands:
+        return None
+    try:
+        d = json.load(open(cands[0], encoding="utf-8"))
+        temp = (d.get("market_temp") or {}).get("temp")
+        sigs = d.get("signals", []) or []
+        return temp, sigs
+    except Exception:
+        return None
+
+
+def pool_overview_section(today):
+    """③.6 各体系股池速览：双弦/猛兽/鱼身/乾坤/武威"""
+    L = []
+    A = L.append
+    A("\n### ③.6 各体系股池速览\n")
+    A("| 体系 | 股池 | 标的数 | 当日标的（价格/评分） |")
+    A("|---|---|---|---|")
+
+    # 双弦月度池
+    sx = read_shuangxian_pool(today)
+    if sx:
+        detail = "、".join(f"{n}{p}({s})" for n, p, s in sx)
+        A(f"| 🔗 双弦 | 月度共振池(≤10元) | {len(sx)} | {detail} |")
+    else:
+        A("| 🔗 双弦 | 月度共振池 | ⏳ 数据缺失 | quant_results 未产出 |")
+
+    # 猛兽本月池
+    bp = read_beast_pool(today)
+    if bp:
+        detail = "、".join(f"{n}({r}{s})" for n, r, s in bp)
+        A(f"| 🐅 猛兽 | 本月主池 | {len(bp)} | {detail} |")
+    else:
+        A("| 🐅 猛兽 | 本月主池 | ⏳ 数据缺失 | 猛兽本月股池未产出 |")
+
+    # 鱼身
+    fish = read_fish_signals()
+    if fish:
+        temp, sigs = fish
+        tmp = f"{temp}/100" if temp is not None else "—"
+        if sigs:
+            names = [s.get("name", "") if isinstance(s, dict) else str(s) for s in sigs][:6]
+            A(f"| 🐟 鱼身 | 当日信号 | {len(sigs)} | 温度{tmp} · {'、'.join(names)}{'…' if len(sigs) > 6 else ''} |")
+        else:
+            A(f"| 🐟 鱼身 | 当日信号 | 0 | 温度{tmp} · 无信号 |")
+    else:
+        A("| 🐟 鱼身 | 当日信号 | ⏳ 超时/未产出 | fish_body_enhanced JSON 缺失 |")
+
+    # 乾坤A级
+    qa = read_qiankun_a()
+    if qa and qa.get("stocks"):
+        names = [f"{s.get('name','')}({s.get('score','')})" for s in qa["stocks"][:5]]
+        A(f"| 👑 乾坤 | A级金股 | {qa.get('count', len(qa['stocks']))} | {'、'.join(names)}{'…' if qa.get('count',0) > 5 else ''} |")
+    else:
+        A("| 👑 乾坤 | A级金股 | 0 | 当日无A级（分级严格，属正常） |")
+
+    # 武威（月度频率）
+    A("| 📐 武威 | 月线精选池 | 月度 | 每月1日自动扫描（最近2026-07：飞亚达重仓）；8月池 9/1 更新 |")
+
+    L.append("")
+    return "\n".join(L)
+
 
 def pool_status_section(today):
     """生成复盘报告中的「股池三阶漏斗状态」章节"""
@@ -634,6 +740,8 @@ def gen_report(today_str):
     
     # 五.5 股池三阶漏斗状态（当日，pool_tracking_report.py 产出）
     lines.append(pool_status_section(today))
+    # 五.5b 各体系股池速览（双弦/猛兽/鱼身/乾坤/武威）
+    lines.append(pool_overview_section(today))
 
     # ════════════════════════════════════════
     # 六、明日展望（新增！闭环收口）
