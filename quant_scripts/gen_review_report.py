@@ -523,6 +523,51 @@ def pool_overview_section(today):
     return "\n".join(L)
 
 
+
+def quad_resonance_section(today):
+    """③.7 四维共振速览：政策/资金/筹码/关联方 四维评分（quad_resonance.py 产出）"""
+    j = None
+    for p in (f"outputs/四维共振_{today}.json", "outputs/四维共振_latest.json",
+              "四维共振_latest.json", "../outputs/四维共振_latest.json",
+              "/sandbox/workspace/github_bg/outputs/四维共振_latest.json"):
+        if os.path.exists(p):
+            try:
+                j = json.load(open(p, encoding="utf-8"))
+                break
+            except Exception:
+                continue
+    if not j:
+        return "\n### ③.7 四维共振评分\n\n> ⏳ 当日四维共振评分缺失（quad_resonance.py 未产出）。可运行 `python3 quad_resonance.py --pool panhou_lianghua.csv` 补生成后重新生成复盘。\n"
+    L = []
+    A = L.append
+    lv = j.get("levels", {})
+    A("\n### ③.7 四维共振评分（政策/资金/筹码/关联方）\n")
+    A(f"> 池子 {j.get('pool_size', '—')} 只 | 政策维度={j.get('policy', 0)}({'人工研判' if j.get('policy') == 0 else '已赋值'}) | 判定：≥10★★★ / 7-9★★ / 4-6★ / ≤3无")
+    A("")
+    A(f"**共振级分布**：★★★必然级 {lv.get('必然级', 0)} | ★★高置信 {lv.get('高置信', 0)} | ★弱共振 {lv.get('弱共振', 0)} | 无共振 {lv.get('无共振', 0)} | 否决 {lv.get('否决', 0)}")
+    A("")
+    top = [r for r in j.get("stocks", []) if r.get("total", 0) >= 7]
+    if not top:
+        top = j.get("stocks", [])[:5]
+    if top:
+        A("**TOP 共振标的**（总分≥7 或前5）：")
+        A("| 代码 | 名称 | 资金 | 筹码 | 关联方 | 政策 | 总分 | 共振级 | 证据链 |")
+        A("|---|---|---|---|---|---|---|---|---|")
+        for r in top:
+            v = f" ⚠️{r['veto']}" if r.get("veto") else ""
+            ev = f"{r.get('chip_detail', '')}；{r.get('related_detail', '')}"
+            A(f"| {r['code']} | {r['name']} | {r['fund']} | {r['chip']} | {r['related']} | {r['policy']} | {r['total']} | {r['level']}{v} | {ev} |")
+        A("")
+    veto = [r for r in j.get("stocks", []) if r.get("veto")]
+    if veto:
+        A(f"**反向否决**：{len(veto)} 只（资金流出+关联方减持）→ " + "、".join(f"{r['name']}({r['code']})" for r in veto))
+        A("")
+    A("> 四维独立信源同向=证据链闭合（必然级）；政策维度需人工研判（--policy 0-3）。完整清单见独立报告《四维共振_%s.md》" % (j.get("date", today)))
+    L.append("")
+    return "\n".join(L)
+
+
+
 def pool_status_section(today):
     """生成复盘报告中的「股池三阶漏斗状态」章节"""
     text, stars, passes, src_date = read_pool_status(today)
@@ -776,6 +821,8 @@ def gen_report(today_str):
     lines.append(pool_status_section(today))
     # 五.5b 各体系股池速览（双弦/猛兽/鱼身/乾坤/武威）
     lines.append(pool_overview_section(today))
+    # 五.5c 四维共振评分速览（quad_resonance.py 产出）
+    lines.append(quad_resonance_section(today))
 
     # ════════════════════════════════════════
     # 六、明日展望（新增！闭环收口）

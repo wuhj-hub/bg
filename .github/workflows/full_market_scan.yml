@@ -150,6 +150,11 @@ jobs:
         continue-on-error: true
         run: python3 market_style.py
 
+      # ─── 第三步.5b：四维共振评分（政策/资金/筹码/关联方，依赖第二步panhou_lianghua.csv）───
+      - name: 四维共振评分（政策/资金/筹码/关联方四维证据链）
+        continue-on-error: true
+        run: python3 quad_resonance.py --pool panhou_lianghua.csv --top 15
+
       # ─── 第三步.6：提交量化汇总（供次日盘前报告引用三系统信号）───
       - name: 提交量化汇总到仓库（供盘前报告引用）
         run: |
@@ -164,10 +169,11 @@ jobs:
           # 板块共振（本地复算）+ 乾坤A级金股（第四信号源）
           cp outputs/板块共振_latest.json 板块共振_latest.json 2>/dev/null || true
           cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
+          cp outputs/四维共振_latest.json 四维共振_latest.json 2>/dev/null || true
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
+            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 四维共振_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
             git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
             for i in 1 2 3; do
               git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true
