@@ -287,6 +287,7 @@ def main():
                     help="自动并入全盘量化当日主力信号（panhou_lianghua.md）")
     ap.add_argument("--holdings", default="", help="持仓代码列表(逗号分隔)，离场计分卡仅对持仓生效")
     ap.add_argument("--holdings-file", default="holdings.txt", help="持仓文件(每行一个代码)")
+    ap.add_argument("--date", default="", help="指定日期(默认今天)，用于补生成历史股池跟踪")
     a = ap.parse_args()
 
     # 持仓集合
@@ -499,7 +500,7 @@ def main():
     A("\n> 💡 离场计分卡（八维启发）：月线破MA6(-2)/ATR止损破位(-2)/日线破MA20(-1)/MACD死叉(-1)；≤-2强制离场（仅对已持仓标的有约束力）")
 
     md = "\n".join(L)
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = a.date if a.date else datetime.now().strftime("%Y-%m-%d")
     os.makedirs("outputs", exist_ok=True)
     out = os.path.join("outputs", f"股池标的跟踪报告_{today}.md")
     with open(out, "w", encoding="utf-8") as f:
