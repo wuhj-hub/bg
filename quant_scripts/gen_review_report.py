@@ -693,6 +693,8 @@ def gen_report(today_str):
 
 def main():
     today = datetime.now().strftime("%Y-%m-%d")
+    if "--date" in sys.argv:
+        today = sys.argv[sys.argv.index("--date") + 1]
     md = gen_report(today)
     fname = f"复盘报告_{today}.md"
     os.makedirs("outputs", exist_ok=True)
