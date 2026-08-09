@@ -18,15 +18,12 @@ POOLS_DIR = BASE_DIR / "pools"
 SCRIPTS_DIR = BASE_DIR / "scripts"
 sys.path.insert(0, str(SCRIPTS_DIR))
 
-# 加入双弦投资系统脚本路径（月度股池模块）
-SHUANGXIAN_SCRIPTS = str(Path("/sandbox/workspace/skills/双弦投资系统/scripts"))
-if SHUANGXIAN_SCRIPTS not in sys.path:
-    sys.path.insert(0, SHUANGXIAN_SCRIPTS)
-
-# 猛兽体系v3.0函数库路径
-BEAST_DIR = str(Path("/sandbox/workspace/skills/猛兽体系/scripts"))
-if BEAST_DIR not in sys.path:
-    sys.path.insert(0, BEAST_DIR)
+# 加入脚本路径（月度股池模块/猛兽函数库）——优先同目录 quant_scripts，沙箱 skills 作降级
+for _d in (str(BASE_DIR / "quant_scripts"),
+           "/sandbox/workspace/skills/双弦投资系统/scripts",
+           "/sandbox/workspace/skills/猛兽体系/scripts"):
+    if _d not in sys.path:
+        sys.path.insert(0, _d)
 
 POOLS_DIR.mkdir(exist_ok=True)
 os.chdir(BASE_DIR)
