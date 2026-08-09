@@ -1,6 +1,7 @@
 {
  "date": "2026-08-09",
- "source": "local(westock复算·自成一体)",
+ "source": "local(westock独立口径·无外部依赖)",
+ "pool_size": 46,
  "resonance_boards": [
   {
    "name": "元件",
@@ -25,6 +26,39 @@
    ]
   },
   {
+   "name": "医疗服务",
+   "code": "pt01801156",
+   "zdf": 8.4,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "玻璃玻纤",
+   "code": "pt01801712",
+   "zdf": 7.11,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "化学制药",
+   "code": "pt01801151",
+   "zdf": 5.21,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
    "name": "CRO",
    "code": "pt02251441",
    "zdf": 10.63,
@@ -39,28 +73,6 @@
    "name": "半导体",
    "code": "pt01801081",
    "zdf": 3.29,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "医疗服务",
-   "code": "pt01801156",
-   "zdf": 8.4,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "zdf": 3.21,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -91,9 +103,86 @@
    ]
   },
   {
-   "name": "玻璃玻纤",
-   "code": "pt01801712",
-   "zdf": 7.11,
+   "name": "贵金属",
+   "code": "pt01801053",
+   "zdf": 3.21,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "铜概念",
+   "code": "pt02050001",
+   "zdf": 2.46,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "基础化工",
+   "code": "pt01801030",
+   "zdf": 1.23,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "稀土永磁",
+   "code": "pt02003578",
+   "zdf": 2.3,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "专用设备",
+   "code": "pt01801074",
+   "zdf": 2.08,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "电子",
+   "code": "pt01801080",
+   "zdf": 3.53,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "固态电池",
+   "code": "pt02081407",
+   "zdf": 1.72,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "黄金概念",
+   "code": "pt02003547",
+   "zdf": 1.83,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -106,6 +195,76 @@
    "code": "pt01801054",
    "zdf": 4.3,
    "strength": 6,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "光学光电子",
+   "code": "pt01801084",
+   "zdf": 2.49,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "昨日连板",
+   "code": "pt02031398",
+   "zdf": 2.36,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "zdf": 0.59,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "自动化设备",
+   "code": "pt01801078",
+   "zdf": 3.18,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "广告营销",
+   "code": "pt01801765",
+   "zdf": 0.91,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "消费电子",
+   "code": "pt01801085",
+   "zdf": 1.46,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "化学制品",
+   "code": "pt01801034",
+   "zdf": 0.91,
+   "strength": 5,
    "factors": [
     "进场",
     "吸筹"
@@ -124,33 +283,8 @@
    "value": 8
   },
   {
-   "name": "CRO",
-   "code": "pt02251441",
-   "value": 7
-  },
-  {
-   "name": "半导体",
-   "code": "pt01801081",
-   "value": 7
-  },
-  {
    "name": "医疗服务",
    "code": "pt01801156",
-   "value": 7
-  },
-  {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "value": 7
-  },
-  {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "value": 7
-  },
-  {
-   "name": "有色金属",
-   "code": "pt01801050",
    "value": 7
   },
   {
@@ -161,10 +295,40 @@
   {
    "name": "化学制药",
    "code": "pt01801151",
-   "value": 3
+   "value": 7
+  },
+  {
+   "name": "CRO",
+   "code": "pt02251441",
+   "value": 7
+  },
+  {
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 7
+  },
+  {
+   "name": "工业金属",
+   "code": "pt01801055",
+   "value": 7
+  },
+  {
+   "name": "有色金属",
+   "code": "pt01801050",
+   "value": 7
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 7
   }
  ],
  "entry_top": [
+  {
+   "name": "电子",
+   "code": "pt01801080",
+   "value": 614.8
+  },
   {
    "name": "PCB概念",
    "code": "pt02101284",
@@ -173,7 +337,7 @@
   {
    "name": "元件",
    "code": "pt01801083",
-   "value": 278.7
+   "value": 298.0
   },
   {
    "name": "有色金属",
@@ -183,7 +347,12 @@
   {
    "name": "半导体",
    "code": "pt01801081",
-   "value": 143.1
+   "value": 140.0
+  },
+  {
+   "name": "铜概念",
+   "code": "pt02050001",
+   "value": 112.8
   },
   {
    "name": "小金属",
@@ -191,29 +360,19 @@
    "value": 100.9
   },
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "value": 42.9
+   "name": "消费电子",
+   "code": "pt01801085",
+   "value": 85.5
   },
   {
-   "name": "CRO",
-   "code": "pt02251441",
-   "value": 22.6
+   "name": "黄金概念",
+   "code": "pt02003547",
+   "value": 75.1
   },
   {
-   "name": "玻璃玻纤",
-   "code": "pt01801712",
-   "value": 21.8
-  },
-  {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "value": 16.3
-  },
-  {
-   "name": "医疗服务",
-   "code": "pt01801156",
-   "value": 15.5
+   "name": "固态电池",
+   "code": "pt02081407",
+   "value": 68.2
   }
  ],
  "absorption_top": [
@@ -225,7 +384,7 @@
   {
    "name": "元件",
    "code": "pt01801083",
-   "value": 3.61
+   "value": 3.86
   },
   {
    "name": "PCB概念",
@@ -238,34 +397,34 @@
    "value": 2.06
   },
   {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "value": 1.47
+   "name": "铜概念",
+   "code": "pt02050001",
+   "value": 2.05
   },
   {
-   "name": "CRO",
-   "code": "pt02251441",
-   "value": 1.3
+   "name": "自动化设备",
+   "code": "pt01801078",
+   "value": 1.97
   },
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "value": 1.21
+   "name": "稀土永磁",
+   "code": "pt02003578",
+   "value": 1.91
   },
   {
-   "name": "玻璃玻纤",
-   "code": "pt01801712",
-   "value": 1.13
+   "name": "消费电子",
+   "code": "pt01801085",
+   "value": 1.81
   },
   {
-   "name": "医疗服务",
-   "code": "pt01801156",
-   "value": 0.76
+   "name": "黄金概念",
+   "code": "pt02003547",
+   "value": 1.68
   },
   {
-   "name": "半导体",
-   "code": "pt01801081",
-   "value": 0.63
+   "name": "光学光电子",
+   "code": "pt01801084",
+   "value": 1.62
   }
  ],
  "control_top": []
