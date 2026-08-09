@@ -295,6 +295,18 @@ def read_market_style():
     return None
 
 
+def read_qiankun_a():
+    """读乾坤A级金股JSON（qiankun_a_latest.json，full_market_dualdim输出），失败返回None"""
+    import json as _json
+    for p in ("outputs/qiankun_a_latest.json", "qiankun_a_latest.json", "../outputs/qiankun_a_latest.json",
+              "/sandbox/workspace/github_bg/outputs/qiankun_a_latest.json"):
+        try:
+            return _json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
 def read_lianghua_csv():
     """读取全量CSV中提取主力信号低价股"""
     csv_path = "panhou_lianghua.csv"
@@ -542,6 +554,17 @@ def gen_report(today_str):
             lines.append(f"| {i} | {s['code']} | {s['name']} | {s['price']:.2f} | {emoji} {s['sig'][:12]} | {s['precip']}% | {s['m5']:.2f} | {focus} |")
     
     # ════════════════════════════════════════
+    # ── 乾坤A级金股（第四信号源：资金强攻+业绩共振，full_market_dualdim黑石启发）──
+    qa = read_qiankun_a()
+    if qa and qa.get("stocks"):
+        lines.append("\n### 👑 乾坤A级金股（资金强攻+业绩共振）\n")
+        lines.append(f"> 来源：乾坤分级矩阵 A级（{qa.get('count', 0)} 只，按综合评分排序）· 指数市环境下权重提升\n")
+        lines.append("| # | 代码 | 名称 | 价格 | 资金阶段 | 资金模式 | 沉淀率 | 评分 | 理由 |")
+        lines.append("|---|------|------|:---:|:-----|:-----|:----:|:----:|:-----|")
+        for i, s in enumerate(qa.get("stocks", [])[:15], 1):
+            lines.append(f"| {i} | {s.get('code','')} | {s.get('name','')} | {s.get('price',0):.2f} | {s.get('phase','')} | {s.get('mode','')} | {s.get('precip','')}% | {s.get('score',0)} | {s.get('greason','')} |")
+        lines.append("")
+
     # 五、尾盘异动扫描（新增！）
     # ════════════════════════════════════════
     lines.append("\n## 五、尾盘异动\n")

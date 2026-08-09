@@ -488,6 +488,21 @@ def main():
     dist = Counter(r["sig"] for r in results)
     print("[DIST]", dict(dist))
     gen_report(results, dist, time.strftime("%Y-%m-%d"))
+    # ── 乾坤A级金股 JSON（供复盘④/盘前③.3引用，第四信号源）──
+    try:
+        a_list = [{"code": r["code"], "name": r["name"], "price": r.get("price", 0),
+                   "phase": r.get("phase", ""), "mode": r.get("mode", ""), "sig": r.get("sig", ""),
+                   "precip": round(r.get("precip", 0), 2), "score": r.get("score", 0),
+                   "greason": r.get("greason", "")}
+                  for r in results if r.get("grade") == "A"]
+        a_list.sort(key=lambda x: -x["score"])
+        os.makedirs("outputs", exist_ok=True)
+        with open("outputs/qiankun_a_latest.json", "w", encoding="utf-8") as f:
+            json.dump({"date": time.strftime("%Y-%m-%d"), "count": len(a_list),
+                       "stocks": a_list[:50]}, f, ensure_ascii=False, indent=1)
+        print(f"[OK] 乾坤A级金股 {len(a_list)} 只 -> outputs/qiankun_a_latest.json")
+    except Exception as e:
+        print(f"[WARN] 乾坤A级JSON输出失败: {e}")
     print(f"[OK] scanned={len(results)} -> panhou_lianghua.csv + panhou_lianghua.md")
 
 

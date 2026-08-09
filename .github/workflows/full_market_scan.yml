@@ -61,10 +61,10 @@ jobs:
         continue-on-error: true
         run: python3 minute_strength.py --limit 20
 
-      # ─── 第二步.3：黑石板块资金共振对照（第5次深挖：板块资金三维因子，盘前③.3引用）───
-      - name: 黑石板块资金共振对照（外部验证）
+      # ─── 第二步.3：板块资金共振（本地复算三维因子，盘前③.3引用；替代黑石外部API，自成一体）───
+      - name: 板块资金共振（本地复算·无外部依赖）
         continue-on-error: true
-        run: python3 heshi_sector_resonance.py
+        run: python3 sector_resonance_local.py
 
       # ─── 第二步.5：动态生成鱼身股票池 ───
       - name: 动态生成鱼身股票池（近20日日均成交额排名前300）
@@ -122,10 +122,13 @@ jobs:
           cp outputs/market_width_latest.json market_width_latest.json 2>/dev/null || true
           cp outputs/market_style_latest.json market_style_latest.json 2>/dev/null || true
           cp outputs/mode_aggregate_latest.json mode_aggregate_latest.json 2>/dev/null || true
+          # 板块共振（本地复算）+ 乾坤A级金股（第四信号源）
+          cp outputs/板块共振_latest.json 板块共振_latest.json 2>/dev/null || true
+          cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
+            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
             git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
             for i in 1 2 3; do
               git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true

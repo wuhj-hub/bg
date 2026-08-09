@@ -351,23 +351,23 @@ def gen_report(today_str):
         lines.append("| 排名 | 板块 | 涨跌幅 |")
         lines.append("|---|---|---|")
         lines.append(board)
-    # ③.3 资金维度板块主线（黑石第5次深挖：板块资金三维因子）
+    # ③.3 资金维度板块主线（本地复算板块共振：资金/涨幅/量能三维因子）
     hr = read_heshi_resonance()
     if hr:
         grab = hr.get("grab_top", [])[:5]
         entry = hr.get("entry_top", [])[:5]
         res = hr.get("resonance_boards", [])[:8]
         lines.append("")
-        lines.append("### ③.3 资金维度板块主线（黑石板块资金因子，外部验证）")
+        lines.append("### ③.3 资金维度板块主线（板块资金三维因子·本地复算）")
         lines.append("")
         if grab:
             lines.append(f"- 🚀 **抢筹TOP**（资金加速流入）：{' / '.join(f'{b["name"]}({b["value"]})' for b in grab)}")
         if entry:
             lines.append(f"- 📥 **进场TOP**（资金开始流入）：{' / '.join(f'{b["name"]}({b["value"]})' for b in entry)}")
         if res:
-            lines.append(f"- 🧭 **板块共振**（黑石信号触发）：{'、'.join(b["name"] for b in res)}")
+            lines.append(f"- 🧭 **板块共振**（资金因子≥2+上涨）：{'、'.join(b["name"] for b in res)}")
         lines.append("")
-        lines.append("> 说明：黑石因子库外部信号，用于验证板块主线一致性；⚠️该接口依赖黑石账号，缺失时自动降级为仅涨跌幅排行")
+        lines.append(f"> 说明：{hr.get('source', '本地复算')}；因子=主力5日净流入/散户流出/量能/沉淀率，缺失时自动降级为仅涨跌幅排行")
     
     lines.append("\n## ④ 个股定点\n")
     lines.append("⏳ 每日量化数据由15:30全盘量化扫描生成，盘前时段引用昨日数据。\n")
@@ -459,10 +459,11 @@ def calc_factor_analysis():
 
 
 def read_heshi_resonance():
-    """读黑石板块共振JSON（板块资金主线），失败返回None"""
+    """读板块共振JSON（本地复算优先，黑石外部版降级），失败返回None"""
     import json as _json
-    for p in ("outputs/黑石板块共振_latest.json", "../outputs/黑石板块共振_latest.json",
-              "/sandbox/workspace/github_bg/outputs/黑石板块共振_latest.json"):
+    for p in ("outputs/板块共振_latest.json", "板块共振_latest.json", "../outputs/板块共振_latest.json",
+              "outputs/黑石板块共振_latest.json", "../outputs/黑石板块共振_latest.json",
+              "/sandbox/workspace/github_bg/outputs/板块共振_latest.json"):
         try:
             return _json.load(open(p, encoding="utf-8"))
         except Exception:
