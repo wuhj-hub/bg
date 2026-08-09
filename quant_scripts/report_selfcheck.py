@@ -83,6 +83,13 @@ def check_review(path, today=""):
     # 3. ③.5股池章节（今日应有）
     if today and "股池三阶漏斗状态" not in text:
         issues.append(f"③.5股池三阶漏斗状态章节缺失（今日应引用股池跟踪报告）")
+    # 3.5 关键增强章节缺失（风格轴/宽度/主力信号——有数据应显示，缺失多为上游未跑）
+    if "市场风格轴" not in text:
+        issues.append("市场风格轴章节缺失（market_style_latest.json 未产出）")
+    if "市场宽度" not in text:
+        issues.append("市场宽度章节缺失（market_width_latest.json 未产出）")
+    if "主力信号专表" not in text:
+        issues.append("主力信号专表章节缺失（panhou_lianghua.csv 未产出）")
     # 4. 指数错位检测：今收列应为今日K线（无法直接验证数值，检查昨收/今收是否相同）
     m = re.findall(r"\| 上证指数 \| ([\d.]+) \| ([\d.]+) \|", text)
     if m and m[0][0] == m[0][1]:

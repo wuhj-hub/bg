@@ -85,6 +85,16 @@ def load_premarket_judgment(today):
                 pass
     return None
 
+def find_latest_file(pattern, default_today):
+    """防缺兜底：找当日文件；缺失则找同目录最近的同类文件（返回None表示都没有）"""
+    import glob
+    today_p = pattern.format(today=default_today)
+    if os.path.exists(today_p):
+        return today_p
+    cands = sorted(glob.glob(pattern.replace("{today}", "*")), reverse=True)
+    return cands[0] if cands else None
+
+
 def read_quant_results(today):
     """读取 run_all_quant.py 生成的量化汇总，提取三系统信号。返回dict或None。
     结构: {date, timestamp, shuangxian:{stdout,pool_file,pool_data}, fishbody:{market_temp,...}, beast:{stdout,...}}
@@ -332,10 +342,21 @@ def read_lianghua_csv():
     return stocks
 
 def read_pool_status(today):
-    """读取当日股池跟踪报告（pool_tracking_report.py 产出），提取三阶共振/一阶通过标的"""
+    """读取当日股池跟踪报告（pool_tracking_report.py 产出），提取三阶共振/一阶通过标的。
+    当日缺失→自动沿用最近一份并标注来源日期"""
     for path in (f"outputs/股池标的跟踪报告_{today}.md", f"股池标的跟踪报告_{today}.md"):
         if not os.path.exists(path):
             continue
+        src_date = today
+        break
+    else:
+        path = find_latest_file("outputs/股池标的跟踪报告_{today}.md", today)
+        src_date = ""
+        if path:
+            m = re.search(r"(\d{4}-\d{2}-\d{2})", path)
+            src_date = m.group(1) if m else "最近"
+        if not path:
+            return None, [], [], src_date
         try:
             with open(path, encoding="utf-8") as f:
                 text = f.read()
@@ -357,19 +378,22 @@ def read_pool_status(today):
                         stars.append(s)
                     elif in_pass and s.count("|") >= 6:
                         passes.append(s)
-            return text, stars, passes
+            return text, stars, passes, src_date
         except Exception:
             pass
     return None, [], []
 
 def pool_status_section(today):
     """生成复盘报告中的「股池三阶漏斗状态」章节"""
-    text, stars, passes = read_pool_status(today)
+    text, stars, passes, src_date = read_pool_status(today)
     if not text:
-        return ""
+        return "\n### ③.5 股池三阶漏斗状态（当日）\n\n> ⏳ 当日股池跟踪报告缺失（pool_tracking_report 未产出）。可运行 `pool_tracking_report.py --date {today}` 补生成后重新生成复盘。\n".format(today=today)
     L = []
     A = L.append
-    A("\n### ③.5 股池三阶漏斗状态（当日）\n")
+    if src_date and src_date != today:
+        A(f"\n### ③.5 股池三阶漏斗状态（当日·沿用{src_date}数据）\n")
+    else:
+        A("\n### ③.5 股池三阶漏斗状态（当日）\n")
     if stars:
         A("**★ 三阶共振标的（可执行）**\n")
         A("| 代码 | 名称 | 建议 |")
