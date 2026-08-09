@@ -106,6 +106,21 @@ jobs:
             python3 upload_ima.py --file "outputs/beast_results.txt" --name "beast_results_$(date +%Y-%m-%d).txt" || echo "猛兽输出上传失败"
           fi
 
+      # ─── 第三步.4.5：猛兽本月股池同步（分层构建+剔除+月度累积，上传知识库「猛兽」本月股池）───
+      - name: 猛兽本月股池同步（主池/观察池分层 + 剔除不符合）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: 9wlJWgbFxvKhhxzobeMHSJ7_eaUmHutVQXMzeNxh4DM=
+          IMA_FOLDER_ID: folder_7483172363202542
+        run: |
+          python3 quant_scripts/monthly_pool_sync.py --date "$(date +%Y-%m-%d)"
+          F=$(ls outputs/猛兽本月股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "猛兽本月股池上传失败"
+          fi
+
       # ─── 第三步.5：市场风格轴（依赖市场宽度+猛兽双模式聚合，须在三系统预运行之后）───
       - name: 市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证）
         continue-on-error: true
