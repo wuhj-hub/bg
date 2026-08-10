@@ -586,6 +586,40 @@ def quad_resonance_section(today):
     return "\n".join(L)
 
 
+def signal_arbiter_section(today):
+    """③.8 六套信号仲裁速览：四维/猛兽/鱼身/双弦/乾坤统一打分排序（signal_arbiter.py 产出）"""
+    j = None
+    for p in (f"outputs/信号仲裁_{today}.json", "outputs/信号仲裁_latest.json",
+              "信号仲裁_latest.json", "../outputs/信号仲裁_latest.json"):
+        if os.path.exists(p):
+            try:
+                j = json.load(open(p, encoding="utf-8"))
+                break
+            except Exception:
+                continue
+    if not j:
+        return "\n### ③.8 六套信号仲裁\n\n> ⏳ 当日信号仲裁缺失（signal_arbiter.py 未产出）。可运行 `python3 signal_arbiter.py` 补生成后重新生成复盘。\n"
+    L = []
+    A = L.append
+    src = j.get("sources", {})
+    cnt = j.get("counts", {})
+    A("\n### ③.8 六套信号仲裁（统一优先级排序）\n")
+    A(f"> 信号源：四维{src.get('四维', 0)} / 鱼身{src.get('鱼身', 0)} / 猛兽{src.get('猛兽', 0)} / 双弦{src.get('双弦', 0)} / 乾坤{src.get('乾坤', 0)}")
+    A(f"**分级分布**：★★★全信号共振 {cnt.get('★★★', 0)} | ★★多信号 {cnt.get('★★', 0)} | ★双信号 {cnt.get('★', 0)} | 观察 {cnt.get('观察', 0)}")
+    A("")
+    ranked = j.get("ranked", [])[:10]
+    if ranked:
+        A("**仲裁 TOP10**（总分=多信号加权，月线BLOCK强制降级）：")
+        A("| 排名 | 代码 | 总分 | 分级 | 月线 | 信号来源 |")
+        A("|:----|:----|:----:|:----|:----:|:----|")
+        for i, r in enumerate(ranked, 1):
+            A(f"| {i} | {r['code']} | **{r['pts']}** | {r['level']} | {r.get('month', '?')} | {'；'.join(r['src'][:4])}{'…' if len(r['src']) > 4 else ''} |")
+        A("")
+    A("> 仲裁优先级：四维证据链 > 猛兽强度 > 乾坤/鱼身买点 > 双弦/反转；月线闸门前置过滤。完整清单见独立报告《信号仲裁_%s.md》" % (j.get("date", today)))
+    L.append("")
+    return "\n".join(L)
+
+
 
 def pool_status_section(today):
     """生成复盘报告中的「股池三阶漏斗状态」章节"""
@@ -842,6 +876,8 @@ def gen_report(today_str):
     lines.append(pool_overview_section(today))
     # 五.5c 四维共振评分速览（quad_resonance.py 产出）
     lines.append(quad_resonance_section(today))
+    # 五.5d 六套信号仲裁速览（signal_arbiter.py 产出，B1）
+    lines.append(signal_arbiter_section(today))
 
     # ════════════════════════════════════════
     # 六、明日展望（新增！闭环收口）
