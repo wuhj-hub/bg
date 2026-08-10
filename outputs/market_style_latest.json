@@ -1,98 +1,81 @@
 {
- "date": "2026-08-08",
- "data_date": "2026-08-07",
+ "date": "2026-08-10",
+ "data_date": "2026-08-10",
  "style": "情绪市",
  "icon": "🔥",
- "score": 51,
+ "score": 57,
  "score_detail": {
   "size_style": 15,
   "limitup_structure": 33,
   "volume_structure": 8,
-  "sector_fund": -5
+  "sector_fund": 1
  },
  "size_style": {
-  "hs300_5d": 2.32,
-  "hs300_10d": 0.97,
-  "zz1000_5d": 8.54,
-  "zz1000_10d": 9.78,
-  "rel_5d": 6.22,
-  "rel_10d": 8.8,
-  "rel_20d": -4.52,
-  "zz500_5d": 6.49
+  "hs300_5d": 3.5,
+  "hs300_10d": -0.01,
+  "zz1000_5d": 9.24,
+  "zz1000_10d": 6.99,
+  "rel_5d": 5.74,
+  "rel_10d": 7.0,
+  "rel_20d": -0.83,
+  "hs300_ma_trend": "多头排列",
+  "zz500_5d": 8.31
  },
  "limitup_structure": {
-  "limitup": 57,
-  "strong": 165,
-  "width_score": 72.2,
-  "level": "🔥 结构性强（涨停潮·涨少跌多分化）",
+  "limitup": 89,
+  "strong": 216,
+  "width_score": 100,
+  "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 5.6
+  "strong_ratio": 7.4,
+  "zhaban_rate": 32.1,
+  "lianban": 11
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.182,
-  "small_big_ratio_5d": 1.033,
+  "small_big_ratio_now": 1.204,
+  "small_big_ratio_5d": 1.066,
   "vol_shift": "资金流向中小盘"
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "医疗服务",
-    "zdf": "8.40",
-    "main_net5d": 15.5,
-    "retail_net": -25.8,
-    "tag": "机构型"
-   },
-   {
-    "name": "小金属",
-    "zdf": "4.30",
-    "main_net5d": 100.9,
-    "retail_net": -27.0,
-    "tag": "机构型"
-   },
-   {
-    "name": "CRO",
-    "zdf": "10.63",
-    "main_net5d": 22.6,
-    "retail_net": -26.7,
-    "tag": "机构型"
-   },
-   {
-    "name": "医药生物",
-    "zdf": "4.77",
-    "main_net5d": -34.5,
-    "retail_net": -87.8,
+    "name": "地面兵装Ⅱ",
+    "zdf": "5.12",
+    "main_net5d": -7.7,
+    "retail_net": -6.6,
     "tag": "游资型"
    },
    {
-    "name": "通信设备",
-    "zdf": "0.31",
-    "main_net5d": 325.9,
-    "retail_net": 19.7,
+    "name": "电力",
+    "zdf": "0.79",
+    "main_net5d": -42.6,
+    "retail_net": 2.5,
+    "tag": "游资型"
+   },
+   {
+    "name": "半导体",
+    "zdf": "-0.36",
+    "main_net5d": 140.0,
+    "retail_net": 64.6,
     "tag": "混合"
+   },
+   {
+    "name": "贵金属",
+    "zdf": "3.89",
+    "main_net5d": 11.9,
+    "retail_net": -11.4,
+    "tag": "机构型"
+   },
+   {
+    "name": "医疗服务",
+    "zdf": "3.92",
+    "main_net5d": 34.2,
+    "retail_net": -0.3,
+    "tag": "机构型"
    }
   ]
  },
- "mode_cross": {
-  "dominant": "堆量模式",
-  "all": {
-   "堆量模式": 14,
-   "欧马模式": 5,
-   "混合模式": 2
-  },
-  "leaders": {
-   "堆量模式": 4,
-   "欧马模式": 1
-  },
-  "pullbacks": {
-   "堆量模式": 3,
-   "欧马模式": 1
-  },
-  "gpoints": {
-   "堆量模式": 2
-  },
-  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
-  "total_scored": 21
- },
+ "mode_cross": {},
  "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
 }

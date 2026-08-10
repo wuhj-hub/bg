@@ -499,6 +499,35 @@ def main():
         A(f"| {r['code']} | {r['name']} | {held} | {r['mf']['trend']} | {g.get('atr')} | {g.get('stop')} | {g.get('rr')} | {g['exit_score']} | {status} | {reasons} |")
     A("\n> 💡 离场计分卡（八维启发）：月线破MA6(-2)/ATR止损破位(-2)/日线破MA20(-1)/MACD死叉(-1)；≤-2强制离场（仅对已持仓标的有约束力）")
 
+    # ─── 六、组合层风控（B2·2026-08-10）：集中度/同向/组合离场联动 ───
+    A("\n## 六、组合层风控（集中度 / 同向 / 组合离场）\n")
+    A("> 默认约束（可调整）：单票≤15% / 单一板块≤30% / 同向信号≤5只 / 持仓≤5只\n")
+    hold_scores = []
+    for r in results:
+        if r.get("ok") and r["code"] in holdings:
+            g = r.get("guard")
+            if g and g.get("ok"):
+                hold_scores.append({"code": r["code"], "name": r["name"],
+                                    "exit_score": g.get("exit_score", 0),
+                                    "action": g.get("exit_action", "")})
+    if hold_scores:
+        n_hold = len(hold_scores)
+        n_exit = sum(1 for h in hold_scores if h["exit_score"] <= -2)
+        est_pos = min(100, n_hold * 15)  # 默认单票15%估算组合仓位
+        A("| 约束项 | 状态 | 说明 |")
+        A("|:----|:----|:----|")
+        A(f"| 持仓数量 | {'✅' if n_hold <= 5 else '⚠️ 超限'} | {n_hold} 只（≤5默认）|")
+        A(f"| 估算总仓位 | {'✅' if est_pos <= 60 else '⚠️ 偏高'} | 按单票15%估算 ≈ {est_pos}%（实际以你账户为准）|")
+        A(f"| 触发离场 | {'⚠️' if n_exit >= 1 else '✅'} | {n_exit} 只触发离场卡 |")
+        if n_exit >= 2:
+            A(f"\n🔴 **组合降仓信号**：{n_exit} 只持仓触发强制离场（≥2），建议总仓位降至≤30%，优先处理离场分最低的标的\n")
+        elif n_exit == 1:
+            A(f"\n⚠️ **组合预警**：1 只持仓触发离场，关注是否扩散（≥2只=组合降仓）\n")
+        else:
+            A("\n✅ 组合健康：无持仓触发离场卡\n")
+    else:
+        A("（无持仓数据，跳过组合层风控——通过 --holdings / --holdings-file 传入持仓）\n")
+
     md = "\n".join(L)
     today = a.date if a.date else datetime.now().strftime("%Y-%m-%d")
     os.makedirs("outputs", exist_ok=True)
@@ -534,6 +563,13 @@ def main():
                     lines.append(f"- 原因：{reasons}")
                     lines.append("")
                 push_pushplus(token, f"🔴 持仓离场预警 {today}", content="\n".join(lines))
+            # 组合降仓信号：≥2只持仓触发离场 → 独立推送（B2组合层风控）
+            if len(alerts) >= 2:
+                combo = [f"**{r['name']}（{r['code']}）** 离场分 {r['guard'].get('exit_score', 0)}" for r in alerts]
+                push_pushplus(token, f"🔴🔴 组合降仓信号 {today}", content=(
+                    f"### 组合层风控：{len(alerts)} 只持仓触发强制离场（≥2阈值）\n\n"
+                    + "\n".join(combo)
+                    + "\n\n建议：总仓位降至≤30%，优先处理离场分最低标的"))
         else:
             print("[push] 跳过（PUSH_TOKEN未设置）")
     print(md[:600])

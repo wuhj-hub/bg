@@ -217,6 +217,18 @@ def score_limitup_structure(width, hs300_set):
     elif wscore >= 25: sc -= 5
     else: sc -= 10
 
+    # 炸板率修正（2026-08-10 涨停池代理·连板/炸板自算）：<20%情绪健康加分 / >40%退潮预警减分
+    st = width.get("limitup_stats") or {}
+    zr = st.get("zhaban_rate")
+    if zr is not None:
+        det["zhaban_rate"] = zr
+        det["lianban"] = st.get("lianban", 0)
+        if zr < 20:
+            sc += 4  # 炸板率低=封板坚决，情绪健康
+        elif zr < 40:
+            sc += 0
+        else:
+            sc -= 8  # 炸板率高=触板即被砸，情绪退潮
     return max(-35, min(35, sc)), det
 
 

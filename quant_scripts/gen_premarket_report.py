@@ -39,7 +39,8 @@ def load_quant_latest():
     return None
 
 def build_judgment(idx_rows, sectors, quant):
-    """基于三系统+指数+板块生成结构化预判（供复盘报告真实验证）"""
+    """基于三系统+指数+板块生成结构化预判（供复盘报告真实验证）
+    A3风格轴硬接线（2026-08-10）：仓位=基准(三系统) + 风格分修正(±10%) + 温度修正(沸点-10%)，clamp 10%~70%"""
     fish = (quant.get("fish_body") or {}) if quant else {}
     beast = (quant.get("beast") or {}) if quant else {}
     sx = (quant.get("shuangxian") or {}) if quant else {}
@@ -49,7 +50,7 @@ def build_judgment(idx_rows, sectors, quant):
     sx_air = sx.get("air_count") if isinstance(sx, dict) else None  # 空头指数数量
     tl = sx.get("temperature") if isinstance(sx, dict) else None
 
-    # 综合决策规则
+    # 基准仓位（三系统综合）
     bearish = 0
     if sx_air is not None and sx_air >= 5:
         bearish += 1
@@ -58,14 +59,49 @@ def build_judgment(idx_rows, sectors, quant):
     if ft_v is not None and ft_v < 45:
         bearish += 1
     if bearish >= 2:
-        tone = "防守"
-        operation = "仓位≤30%，以防守为主，不开新仓"
+        tone, base_pos, note = "防守", 30, "以防守为主，不开新仓"
     elif bearish == 1:
-        tone = "中性偏防守"
-        operation = "仓位≤40%，轻仓参与，严格止损"
+        tone, base_pos, note = "中性偏防守", 40, "轻仓参与，严格止损"
     else:
-        tone = "中性偏多·结构性机会"
-        operation = "仓位≤50%，可参与但控制仓位"
+        tone, base_pos, note = "中性偏多·结构性机会", 50, "可参与但控制仓位"
+
+    # A3 风格分修正（读 market_style_latest.json）：情绪市+10% / 指数市-10%
+    ms = read_market_style()
+    style_fix = 0
+    style_txt = ""
+    mode_txt = ""
+    if ms:
+        try:
+            sc = float(ms.get("score", 0))
+            style = ms.get("style", "")
+            if sc >= 25:      # 🔥情绪市：游资场子，仓位可上修，堆量/G1优先
+                style_fix = 10
+                style_txt = f"🔥情绪市({sc:+.0f})仓位+10%"
+                mode_txt = "·主扫堆量模式/武威G1低吸"
+            elif sc <= -25:   # 🏦指数市：机构场子，仓位下修，欧马/乾坤优先
+                style_fix = -10
+                style_txt = f"🏦指数市({sc:+.0f})仓位-10%"
+                mode_txt = "·主扫欧马模式/乾坤金股"
+            else:
+                style_txt = f"⚖️均衡市({sc:+.0f})仓位不变"
+        except (TypeError, ValueError):
+            pass
+    # 温度修正：鱼身>80 沸点减仓-10%
+    temp_fix = 0
+    try:
+        if ft_v is not None and float(ft_v) > 80:
+            temp_fix = -10
+            style_txt += "·🔥沸点(温度>80)仓位-10%"
+    except (TypeError, ValueError):
+        pass
+    pos = max(10, min(70, base_pos + style_fix + temp_fix))
+    if bearish >= 2:
+        pos = min(pos, 30)
+    operation = f"仓位≤{pos}%，{note}"
+    if style_txt:
+        operation += f"（{style_txt}）"
+    if mode_txt:
+        operation += mode_txt
     # 板块方向：领涨板块前3 + 提示
     sec_names = [r.get("name", "") for r in sectors[:3]]
     sector_hint = "、".join(sec_names) if sec_names else "关注领涨板块持续性"
@@ -89,6 +125,9 @@ def build_judgment(idx_rows, sectors, quant):
         "fish_temp": f"{ft_v}/100" if ft_v is not None else "—",
         "beast_score": f"{bs}/100" if bs is not None else "—",
         "shuangxian": (f"空头{sx_air}/8" if sx_air is not None else "—"),
+        "style_score": (ms or {}).get("score"),
+        "style_name": (ms or {}).get("style"),
+        "base_pos": base_pos, "style_fix": style_fix, "temp_fix": temp_fix, "final_pos": pos,
     }
 
 

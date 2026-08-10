@@ -62,6 +62,12 @@ def check_premarket(path, today=""):
     dt = str(d.get("date", ""))
     if today and dt and dt != today:
         issues.append(f"JSON日期{dt}≠今日{today}")
+    # 5. A3风格轴硬接线：style_score缺失 或 operation未体现仓位映射
+    if d.get("style_score") is None:
+        issues.append("风格轴评分缺失（market_style_latest.json 未读取，仓位映射未生效）")
+    op = str(d.get("operation", ""))
+    if "仓位≤" not in op:
+        issues.append(f"操作基调未含仓位映射: {op[:60]}")
     return issues
 
 def check_review(path, today=""):
@@ -90,6 +96,16 @@ def check_review(path, today=""):
         issues.append("市场宽度章节缺失（market_width_latest.json 未产出）")
     if "主力信号专表" not in text:
         issues.append("主力信号专表章节缺失（panhou_lianghua.csv 未产出）")
+    # 3.6 四维共振章节缺失 / 沸点标注缺失
+    if "四维共振" not in text:
+        issues.append("③.7四维共振评分章节缺失（quad_resonance.py 未产出）")
+    m_temp = re.search(r"鱼身温度\|\s*(\d+)/100", text)
+    if m_temp:
+        try:
+            if int(m_temp.group(1)) > 80 and "沸点" not in text:
+                issues.append("鱼身温度>80但无🔥沸点标注（沸点规则未生效）")
+        except ValueError:
+            pass
     # 4. 指数错位检测：今收列应为今日K线（无法直接验证数值，检查昨收/今收是否相同）
     m = re.findall(r"\| 上证指数 \| ([\d.]+) \| ([\d.]+) \|", text)
     if m and m[0][0] == m[0][1]:

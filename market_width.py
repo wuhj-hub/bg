@@ -25,7 +25,8 @@ def run(args, timeout=120):
 
 
 def parse_batch(txt):
-    """解析批量kline输出：{code: [(date, close), ...] 按日期升序}"""
+    """解析批量kline输出：{code: [(date, close, high), ...] 按日期升序}
+    ⚠️ westock批量输出date降序（最新在前），调用方自行处理"""
     out = {}
     cur = None
     for ln in txt.splitlines():
@@ -33,11 +34,12 @@ def parse_batch(txt):
         if not s.startswith("|"):
             continue
         parts = [p.strip() for p in s.strip("|").split("|")]
-        if len(parts) < 4 or parts[0] == "symbol" or "---" in parts[0]:
+        if len(parts) < 5 or parts[0] == "symbol" or "---" in parts[0]:
             continue
         if re.match(r"^(sh|sz|bj)\d{6}$", parts[0]):
             cur = parts[0]
-            out.setdefault(cur, []).append((parts[1], float(parts[3])))  # date, last(close)
+            # 批量列序: symbol|date|open|last|high|low|volume|amount|exchange
+            out.setdefault(cur, []).append((parts[1], float(parts[3]), float(parts[4])))
     return out
 
 
@@ -65,20 +67,35 @@ def main():
     print(f"[INFO] 股票池 {total}只（已过滤退市）", flush=True)
 
     chg = []  # (code, name, pct)
+    touched, zhaban, lianban = [], [], []  # 涨停池代理：触板/炸板/二连板
     for i in range(0, total, batch):
         chunk = rows[i:i + batch]
         codes = [("sh" if c["code"].startswith("60") else "sz") + c["code"] for c in chunk]
-        txt = run(["kline", ",".join(codes), "--period", "day", "--limit", "2"])
+        txt = run(["kline", ",".join(codes), "--period", "day", "--limit", "3"])
         data = parse_batch(txt)
         for c, r_ in zip(chunk, codes):
             kl = data.get(r_, [])
             if len(kl) >= 2:
                 # ⚠️ westock批量输出date降序（最新在前）：kl[0]=最新, kl[1]=前一日
-                d_last, c_last = kl[0]
-                d_prev, c_prev = kl[1]
+                d_last, c_last, h_last = kl[0]
+                d_prev, c_prev, _ = kl[1]
                 if c_prev and c_prev > 0:
                     pct = (c_last - c_prev) / c_prev * 100
                     chg.append((c["code"], c["name"], round(pct, 2)))
+                    # 涨停池代理（2026-08-10·无涨停池接口自算）：
+                    # 触板=盘中最高≥前收×1.10×0.99；炸板=触板但收盘未涨停
+                    limit_p = c_prev * 1.10
+                    if h_last and h_last >= limit_p * 0.99:
+                        touched.append(c["code"])
+                        if pct < 9.8:
+                            zhaban.append(c["code"])
+                    # 二连板=今日涨停且昨日涨停（需limit 3）
+                    if pct >= 9.8 and len(kl) >= 3:
+                        d2, c2, _ = kl[2]
+                        if c2 and c2 > 0:
+                            y_pct = (c_prev - c2) / c2 * 100
+                            if y_pct >= 9.8:
+                                lianban.append(c["code"])
         print(f"[{i + len(chunk)}/{total}] 已处理", flush=True)
 
     n = len(chg)
@@ -132,6 +149,18 @@ def main():
     for c, nm, p in sorted(chg, key=lambda x: x[2])[:10]:
         md += f"| {c} | {nm} | {p} |\n"
 
+    # 涨停池代理（2026-08-10·无涨停池接口自算）：连板高度/炸板率
+    n_touch = len(set(touched))
+    n_zhaban = len(set(zhaban))
+    n_lianban = len(set(lianban))
+    zhaban_rate = round(n_zhaban / n_touch * 100, 1) if n_touch else 0.0
+    md += "\n## 涨停池代理（连板/炸板·批量K线自算）\n"
+    md += "| 指标 | 数值 | 解读 |\n|---|---|---|\n"
+    md += f"| 触板数(盘中触及涨停) | {n_touch} | 含涨停+炸板 |\n"
+    md += f"| 炸板数(触板未封) | {n_zhaban} | {n_zhaban}/{n_touch} |\n"
+    md += f"| **炸板率** | **{zhaban_rate}%** | {'✅情绪健康(<20%)' if zhaban_rate < 20 else ('⚠️情绪降温(20-40%)' if zhaban_rate < 40 else '🔴退潮预警(≥40%)')} |\n"
+    md += f"| 二连板数(今日+昨日均涨停) | {n_lianban} | 连板高度代理 |\n"
+
     os.makedirs(OUT_DIR, exist_ok=True)
     md_path = os.path.join(OUT_DIR, f"market_width_{today}.md")
     open(md_path, "w", encoding="utf-8").write(md)
@@ -146,12 +175,15 @@ def main():
         # 涨停/强势完整名单（供市场风格轴判中军结构）
         "limitup_list": [{"code": c, "name": nm, "pct": p} for c, nm, p in sorted(lu, key=lambda x: -x[2])],
         "strong_list": [{"code": c, "name": nm, "pct": p} for c, nm, p in sorted(strong, key=lambda x: -x[2])],
+        # 涨停池代理（连板/炸板）
+        "limitup_stats": {"touched": n_touch, "zhaban": n_zhaban, "zhaban_rate": zhaban_rate,
+                          "lianban": n_lianban, "lianban_list": sorted(set(lianban))},
     }
     json_path = os.path.join(OUT_DIR, "market_width_latest.json")
     open(json_path, "w", encoding="utf-8").write(json.dumps(js, ensure_ascii=False, indent=1))
     print(f"[OK] {md_path}")
     print(f"[OK] {json_path}")
-    print(f"宽度分={score} 等级={level} 上涨{len(up)} 强势{len(strong)} 涨停{len(lu)} 弱势{len(weak)} 跌停{len(ld)}")
+    print(f"宽度分={score} 等级={level} 上涨{len(up)} 强势{len(strong)} 涨停{len(lu)} 弱势{len(weak)} 跌停{len(ld)} | 触板{n_touch} 炸板{n_zhaban}({zhaban_rate}%) 二连板{n_lianban}")
 
 
 if __name__ == "__main__":
