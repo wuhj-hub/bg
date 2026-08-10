@@ -57,6 +57,50 @@ def parse_table(txt):
 # ============================================================
 # 维度评分
 # ============================================================
+def parse_asfund_simple(txt):
+    """asfund 表头驱动解析（兼容 lhb/blocktrade JSON 混入）：返回 {列名: 值}"""
+    lines = [ln.strip() for ln in txt.splitlines() if ln.strip().startswith("|")]
+    if len(lines) < 2:
+        return {}
+    header = [p.strip() for p in lines[0].strip("|").split("|")]
+    for ln in reversed(lines[1:]):
+        d = [p.strip() for p in ln.strip("|").split("|")]
+        if len(d) == len(header):
+            return dict(zip(header, d))
+    return {}
+
+
+def fund_layer_check(code):
+    """四层资金验证（黑石启发·多周期资金验证）：
+    当日/5日/10日/20日主力净流 → 洗盘vs出货判定
+      ⛔出货   = 四层全负（主力已离场，坚决规避）
+      🌀洗盘   = 当日负但20日控盘正（回调洗盘，可逢低关注）
+      📈共振   = 当日正且20日正（资金共振，健康上行）
+      ⚖️中性   = 其余（观察）
+    """
+    row = parse_asfund_simple(run(["asfund", code]))
+    if not row:
+        return None
+    try:
+        m1 = float(row.get("MainNetFlow", 0) or 0)
+        m5 = float(row.get("MainNetFlow5D", 0) or 0)
+        m10 = float(row.get("MainNetFlow10D", 0) or 0)
+        m20 = float(row.get("MainNetFlow20D", 0) or 0)
+    except Exception:
+        return None
+    neg = [x < 0 for x in (m1, m5, m10, m20)]
+    if all(neg):
+        tag = "⛔出货·全周期流出"
+    elif m1 < 0 and m20 > 0:
+        tag = "🌀回调洗盘·20日控盘正"
+    elif m1 > 0 and m20 > 0:
+        tag = "📈资金共振·控盘正"
+    else:
+        tag = "⚖️中性"
+    return {"m1": round(m1 / 1e8, 2), "m5": round(m5 / 1e8, 2),
+            "m10": round(m10 / 1e8, 2), "m20": round(m20 / 1e8, 2), "tag": tag}
+
+
 def score_fund(phase, precip):
     """资金维度 0-3：四态优先，沉淀率兜底"""
     s = {"抢筹": 3, "吸筹": 2, "进场": 1, "控盘": 1, "观望": 0}.get(phase, 0)
@@ -164,6 +208,7 @@ def main():
         fs = score_fund(phase, precip)
         cs, cd = score_chip(full)
         rs, rd = score_related(full)
+        fl = fund_layer_check(full)  # 四层资金验证（洗盘/出货标签）
         total = fs + cs + rs + policy
         if total >= 10: level = "★★★ 必然级"
         elif total >= 7: level = "★★ 高置信"
@@ -176,7 +221,9 @@ def main():
             level = "否决"
         return {"code": code, "name": name, "fund": fs, "chip": cs, "related": rs,
                 "policy": policy, "total": total, "level": level, "veto": veto,
-                "chip_detail": cd, "related_detail": rd}
+                "chip_detail": cd, "related_detail": rd,
+                "fund_tag": (fl or {}).get("tag", ""),
+                "fund_layers": (fl or {})}
 
     results = []
     with ThreadPoolExecutor(max_workers=4) as ex:
@@ -205,14 +252,17 @@ def main():
     L.append(f"- ★★★ 必然级: {js['levels']['必然级']} | ★★ 高置信: {js['levels']['高置信']} | ★ 弱共振: {js['levels']['弱共振']} | 无共振: {js['levels']['无共振']} | 否决: {js['levels']['否决']}")
     L.append("")
     L.append("## 四维评分明细（TOP{0}）".format(min(top_n, len(results))))
-    L.append("| 代码 | 名称 | 资金 | 筹码 | 关联方 | 政策 | 总分 | 共振级 | 筹码/关联方明细 |")
-    L.append("|---|---|---|---|---|---|---|---|---|")
+    L.append("| 代码 | 名称 | 资金 | 筹码 | 关联方 | 政策 | 总分 | 共振级 | 资金四层(日/5/10/20日·亿) | 筹码/关联方明细 |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|")
     for r in results[:top_n]:
         v = f" {r['veto']}" if r["veto"] else ""
-        L.append(f"| {r['code']} | {r['name']} | {r['fund']} | {r['chip']} | {r['related']} | {r['policy']} | {r['total']} | {r['level']}{v} | {r['chip_detail']}；{r['related_detail']} |")
+        fl = r.get("fund_layers") or {}
+        fl_txt = f"{r.get('fund_tag','')} {fl.get('m1','—')}/{fl.get('m5','—')}/{fl.get('m10','—')}/{fl.get('m20','—')}" if fl else "—"
+        L.append(f"| {r['code']} | {r['name']} | {r['fund']} | {r['chip']} | {r['related']} | {r['policy']} | {r['total']} | {r['level']}{v} | {fl_txt} | {r['chip_detail']}；{r['related_detail']} |")
     L.append("")
     L.append("## 说明")
     L.append("- 资金=四态(抢筹3/吸筹2/进场1)+沉淀率兜底 | 筹码=获利盘≥70%+集中度<15加成 | 关联方=龙虎榜机构3/游资2+大宗溢价2/平价1")
+    L.append("- 资金四层标签（黑石启发·多周期验证）：⛔出货=日/5/10/20日全负规避；🌀洗盘=当日负但20日控盘正可低吸；📈共振=当日+20日双正")
     L.append("- 政策维度需人工研判（--policy 0-3），当前为0不代表政策面差，而是未赋值")
     L.append("- 四维独立信源同向=证据链闭合；反向否决=资金流出且关联方减持时强制降级")
     md_path = os.path.join(OUT_DIR, f"四维共振_{today}.md")

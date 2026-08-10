@@ -116,6 +116,17 @@ def read_quant_results(today):
                 else:
                     ft_v = None
                 out["🌡️ 鱼身温度"] = f"{ft_v}/100" if ft_v is not None else "—"
+                # 沸点/冰点规则（黑石启发·市场温度阈值）：>80 沸点减仓止盈；<40 偏冷暂停开仓
+                try:
+                    ft_f = float(ft_v)
+                    if ft_f > 80:
+                        out["🌡️ 鱼身温度"] += "·🔥沸点(减仓止盈)"
+                    elif ft_f < 40:
+                        out["🌡️ 鱼身温度"] += "·❄️偏冷(暂停开仓)"
+                    elif ft_f >= 60:
+                        out["🌡️ 鱼身温度"] += "·🌡️偏热"
+                except (TypeError, ValueError):
+                    pass
                 # 猛兽安全评分（stdout文本提取）
                 bs = beast.get("safety_score")
                 if bs is None:
@@ -500,6 +511,14 @@ def pool_overview_section(today):
     if fish:
         temp, sigs = fish
         tmp = f"{temp}/100" if temp is not None else "—"
+        try:
+            tf = float(temp)
+            if tf > 80:
+                tmp += "·🔥沸点(减仓止盈)"
+            elif tf < 40:
+                tmp += "·❄️偏冷(暂停开仓)"
+        except (TypeError, ValueError):
+            pass
         if sigs:
             names = [s.get("name", "") if isinstance(s, dict) else str(s) for s in sigs][:6]
             A(f"| 🐟 鱼身 | 当日信号 | {len(sigs)} | 温度{tmp} · {'、'.join(names)}{'…' if len(sigs) > 6 else ''} |")

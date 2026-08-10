@@ -112,6 +112,42 @@ def parse_asfund(raw):
     return {}
 
 
+def lookup_code_by_name(name):
+    """search 命令：板块领涨股名字→A股主板代码（排除科创/创业/北交/ST）"""
+    txt = run(["search", name])
+    for ln in txt.splitlines():
+        s = ln.strip()
+        if not s.startswith("|") or "---" in s:
+            continue
+        parts = [p.strip() for p in s.strip("|").split("|")]
+        if len(parts) >= 3 and re.match(r"^(sh|sz)\d{6}$", parts[0]):
+            code = parts[0]
+            if code.startswith(("sh60", "sz00")):  # 沪深主板 600/601/603/605 + 000/001/002/003
+                return code
+    return None
+
+
+def parse_lead(lead):
+    """board 段 leadStock 列 '药明康德(8.49)' → (名字, 涨幅)；失败返回 (原文, None)"""
+    m = re.match(r"(.+?)\(([+-]?[\d.]+)%?\)", lead or "")
+    if m:
+        return m.group(1).strip(), m.group(2)
+    return (lead or "").strip(), None
+
+
+def fetch_stock_precip(code):
+    """个股 asfund：当日/5日主力净流入(亿)，用于中军资金验证"""
+    row = parse_asfund(run(["asfund", code]))
+    if not row:
+        return None
+    try:
+        main1 = float(row.get("MainNetFlow", 0) or 0) / 1e8
+        main5 = float(row.get("MainNetFlow5D", 0) or 0) / 1e8
+        return {"main1": round(main1, 2), "main5": round(main5, 2)}
+    except Exception:
+        return None
+
+
 def sector_factors(name, info, pt_code, retail_net, kl_rows):
     """单板块因子。info含 zdf/zdf5/main_in/main_in5d/lead；retail_net=散户净流(亿)或None；kl_rows降序"""
     f = {"name": name, "code": pt_code or "", "zdf": info.get("zdf", 0),
@@ -212,6 +248,23 @@ def main():
     abs_top = sorted([r for r in results if "吸筹" in r["factors"]], key=lambda r: -r["precip"] if r["precip"] else 0)[:10]
     ctl_top = sorted([r for r in results if "控盘" in r["factors"]], key=lambda r: -r["precip"] if r["precip"] else 0)[:10]
 
+    # 主线中军捕获器（黑石启发）：共振板块 → 板块领涨股(lead) → search解析代码 → asfund资金验证
+    zhongjun = []
+    for r in res_boards[:10]:
+        lead_name, lead_zdf = parse_lead(r.get("lead"))
+        if not lead_name:
+            continue
+        code = lookup_code_by_name(lead_name)
+        if not code:
+            continue
+        fd = fetch_stock_precip(code)
+        if fd:
+            zhongjun.append({"board": r["name"], "stock": lead_name, "code": code,
+                             "zdf": lead_zdf, "main1": fd["main1"], "main5": fd["main5"]})
+        time.sleep(0.3)
+    zhongjun.sort(key=lambda x: -(x["main5"] or 0))
+    print(f"[INFO] 主线中军候选 {len(zhongjun)} 只", flush=True)
+
     today = datetime.now().strftime("%Y-%m-%d")
     js = {
         "date": today, "source": "local(westock独立口径·无外部依赖)",
@@ -222,6 +275,7 @@ def main():
         "entry_top": [{"name": r["name"], "code": r["code"], "value": r["main_net_5d"]} for r in entry_top],
         "absorption_top": [{"name": r["name"], "code": r["code"], "value": r["precip"] if r["precip"] else 0} for r in abs_top],
         "control_top": [{"name": r["name"], "code": r["code"], "value": r["precip"] if r["precip"] else 0} for r in ctl_top],
+        "zhongjun_candidates": zhongjun,
     }
     os.makedirs(OUT_DIR, exist_ok=True)
     json_path = os.path.join(OUT_DIR, "板块共振_latest.json")
@@ -259,6 +313,16 @@ def main():
     L.append("|---|---|---|---|---|")
     for r in ctl_top:
         L.append(f"| {r['name']} | {r['zdf']} | {r['vol_ratio'] if r['vol_ratio'] is not None else '—'} | {r['precip'] if r['precip'] is not None else '—'} | {r['main_net_5d']} |")
+    L.append("")
+    L.append(f"## 六、🎯 主线中军捕获器（共振板块领涨龙头·资金验证）")
+    L.append("> 黑石启发：板块启动后买中军龙头。对共振板块取板块领涨股，search解析代码 → asfund验证主力5日净流入。")
+    L.append("| 板块 | 中军候选 | 代码 | 领涨% | 当日主力(亿) | 5日主力(亿) |")
+    L.append("|---|---|---|---|---|---|")
+    if zhongjun:
+        for z in zhongjun:
+            L.append(f"| {z['board']} | {z['stock']} | {z['code']} | {z['zdf'] if z['zdf'] else '—'} | {z['main1']} | {z['main5']} |")
+    else:
+        L.append("| — | 无（共振板块领涨股代码解析失败或资金数据缺失） | — | — | — | — |")
     L.append("")
     md_path = os.path.join(OUT_DIR, f"板块共振对照_{today}.md")
     open(md_path, "w", encoding="utf-8").write("\n".join(L))

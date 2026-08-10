@@ -365,7 +365,11 @@ def gen_report(today_str):
         if entry:
             lines.append(f"- 📥 **进场TOP**（资金开始流入）：{' / '.join(f'{b["name"]}({b["value"]})' for b in entry)}")
         if res:
-            lines.append(f"- 🧭 **板块共振**（资金因子≥2+上涨）：{'、'.join(b["name"] for b in res)}")
+            lines.append(f"- 🧭 **板块共振**（资金因子≥2+上涨）：{'、'.join(b['name'] for b in res)}")
+        # 🎯 主线中军捕获器（黑石启发：共振板块领涨龙头·资金验证）
+        zj = hr.get("zhongjun_candidates", [])[:6]
+        if zj:
+            lines.append(f"- 🎯 **主线中军**（共振板块领涨龙头·5日主力验证）：{' / '.join(z['stock'] + '(' + z['board'] + '·5日' + str(z['main5']) + '亿)' for z in zj)}")
         lines.append("")
         lines.append(f"> 说明：{hr.get('source', '本地复算')}；因子=主力5日净流入/散户流出/量能/沉淀率，缺失时自动降级为仅涨跌幅排行")
     
