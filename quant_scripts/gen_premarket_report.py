@@ -555,7 +555,12 @@ def read_fund_phase():
 
 
 def main():
+    # 支持 --date 参数（沙箱时钟比平台慢8小时，必须显式传平台日期，2026-08-12修复）
     today = datetime.now().strftime("%Y-%m-%d")
+    if len(sys.argv) > 1:
+        m = re.match(r"^(\d{4}-\d{2}-\d{2})$", sys.argv[1])
+        if m:
+            today = m.group(1)
     md, judgment = gen_report(today)
     fname = f"盘前市场报告_{today}.md"
     with open(fname, "w", encoding="utf-8") as f:
