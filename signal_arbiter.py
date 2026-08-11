@@ -339,13 +339,41 @@ def main():
     L.append("")
     L.append("## 说明")
     L.append("- 仲裁优先级（冲突时资金分配）：四维证据链 > 猛兽强度 > 乾坤/鱼身买点 > 双弦/反转")
-    L.append("- 武威（月度）与反转数值（暂无当日结构化输出）预留接口，待接入")
+    L.append("- 武威（月度）与反转数值（周线）已接入，数据出现时自动参与打分")
     L.append("- 月线闸门对TOP标的逐只校验（BLOCK=月线空头强制降级）；四维否决(-3)即使其他信号强也只到观察")
     md_path = os.path.join(OUT_DIR, f"信号仲裁_{today}.md")
     open(md_path, "w", encoding="utf-8").write("\n".join(L))
     print(f"[OK] {json_path}")
     print(f"[OK] {md_path}")
     print(f"分布: ★★★{js['counts']['★★★']} ★★{js['counts']['★★']} ★{js['counts']['★']} 观察{js['counts']['观察']}")
+
+    # E2 自选清单（2026-08-11）：★★★/★★/★ 代码清单，可直接导入交易软件
+    try:
+        watch = []
+        for r in ranked:
+            if r["level"].startswith("★") and r.get("month", "?") != "BLOCK":
+                code = r["code"]
+                watch.append(f"{code}  # {r['pts']}分 {r['level']}")
+        with open(os.path.join(OUT_DIR, f"自选清单_{today}.txt"), "w", encoding="utf-8") as f:
+            f.write(f"# 信号仲裁自选清单 {today}（导入交易软件用）\n")
+            f.write("# 格式: 代码 # 总分 分级（月线BLOCK已剔除）\n")
+            f.write("\n".join(watch) + "\n")
+        print(f"[OK] 自选清单 {len(watch)} 只 → outputs/自选清单_{today}.txt")
+    except Exception as e:
+        print(f"[WARN] 自选清单失败: {e}")
+
+    # V3 仲裁信号日志（2026-08-11）：累积 date,code,pts,level,month,src 供胜率分层
+    try:
+        log_path = os.path.join(OUT_DIR, "仲裁信号日志.csv")
+        new = not os.path.exists(log_path)
+        with open(log_path, "a", encoding="utf-8") as f:
+            if new:
+                f.write("date,code,pts,level,month,src\n")
+            for r in ranked[:20]:
+                f.write(f"{today},{r['code']},{r['pts']},{r['level']},{r.get('month','?')},{'|'.join(r['src'][:4])}\n")
+        print(f"[OK] 仲裁日志累积 → outputs/仲裁信号日志.csv")
+    except Exception as e:
+        print(f"[WARN] 仲裁日志失败: {e}")
 
 
 if __name__ == "__main__":

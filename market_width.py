@@ -67,11 +67,12 @@ def main():
     print(f"[INFO] 股票池 {total}只（已过滤退市）", flush=True)
 
     chg = []  # (code, name, pct)
-    touched, zhaban, lianban = [], [], []  # 涨停池代理：触板/炸板/二连板
+    touched, zhaban, lianban, lianban3 = [], [], [], []  # 涨停池代理：触板/炸板/连板(≥2)/高连板(≥3)
+    lianban_cnt = {}  # code -> 连续涨停天数
     for i in range(0, total, batch):
         chunk = rows[i:i + batch]
         codes = [("sh" if c["code"].startswith("60") else "sz") + c["code"] for c in chunk]
-        txt = run(["kline", ",".join(codes), "--period", "day", "--limit", "3"])
+        txt = run(["kline", ",".join(codes), "--period", "day", "--limit", "10"])
         data = parse_batch(txt)
         for c, r_ in zip(chunk, codes):
             kl = data.get(r_, [])
@@ -82,20 +83,27 @@ def main():
                 if c_prev and c_prev > 0:
                     pct = (c_last - c_prev) / c_prev * 100
                     chg.append((c["code"], c["name"], round(pct, 2)))
-                    # 涨停池代理（2026-08-10·无涨停池接口自算）：
-                    # 触板=盘中最高≥前收×1.10×0.99；炸板=触板但收盘未涨停
+                    # 涨停池代理（2026-08-10）：触板/炸板
                     limit_p = c_prev * 1.10
                     if h_last and h_last >= limit_p * 0.99:
                         touched.append(c["code"])
                         if pct < 9.8:
                             zhaban.append(c["code"])
-                    # 二连板=今日涨停且昨日涨停（需limit 3）
-                    if pct >= 9.8 and len(kl) >= 3:
-                        d2, c2, _ = kl[2]
-                        if c2 and c2 > 0:
-                            y_pct = (c_prev - c2) / c2 * 100
-                            if y_pct >= 9.8:
-                                lianban.append(c["code"])
+                    # S4 连板高度（2026-08-11）：limit 10 算连续涨停天数
+                    days_lb = 0
+                    for i in range(len(kl) - 1):
+                        _, c0, _ = kl[i]
+                        _, c1, _ = kl[i + 1]
+                        if c1 > 0 and (c0 - c1) / c1 * 100 >= 9.8:
+                            days_lb += 1
+                        else:
+                            break
+                    if days_lb >= 1:
+                        lianban_cnt[c["code"]] = days_lb
+                        if days_lb >= 2:
+                            lianban.append(c["code"])
+                        if days_lb >= 3:
+                            lianban3.append(c["code"])
         print(f"[{i + len(chunk)}/{total}] 已处理", flush=True)
 
     n = len(chg)
@@ -153,13 +161,22 @@ def main():
     n_touch = len(set(touched))
     n_zhaban = len(set(zhaban))
     n_lianban = len(set(lianban))
+    n_lianban3 = len(set(lianban3))
+    max_lb = max(lianban_cnt.values()) if lianban_cnt else 0
     zhaban_rate = round(n_zhaban / n_touch * 100, 1) if n_touch else 0.0
     md += "\n## 涨停池代理（连板/炸板·批量K线自算）\n"
     md += "| 指标 | 数值 | 解读 |\n|---|---|---|\n"
     md += f"| 触板数(盘中触及涨停) | {n_touch} | 含涨停+炸板 |\n"
     md += f"| 炸板数(触板未封) | {n_zhaban} | {n_zhaban}/{n_touch} |\n"
     md += f"| **炸板率** | **{zhaban_rate}%** | {'✅情绪健康(<20%)' if zhaban_rate < 20 else ('⚠️情绪降温(20-40%)' if zhaban_rate < 40 else '🔴退潮预警(≥40%)')} |\n"
-    md += f"| 二连板数(今日+昨日均涨停) | {n_lianban} | 连板高度代理 |\n"
+    md += f"| 二连板数 | {n_lianban} | 连板高度代理 |\n"
+    md += f"| **三连板+** | {n_lianban3} | 最高连板 **{max_lb}板** |\n"
+
+    # R2 极端行情熔断（2026-08-11）：跌停≥100 或 宽度分<25 → 🔴熔断
+    fuse = ""
+    if len(ld) >= 100 or score < 25:
+        fuse = "🔴 极端行情熔断（跌停{}家 或 宽度分{}）——全仓防守，暂停开仓".format(len(ld), score)
+        md += f"\n## ⛔ 熔断预警\n{fuse}\n"
 
     # 200日成本线（猛兽派日报启发·2026-08-11）：上证近200日收盘均价 ≈ 市场成本
     cost = {}
@@ -209,7 +226,11 @@ def main():
         "strong_list": [{"code": c, "name": nm, "pct": p} for c, nm, p in sorted(strong, key=lambda x: -x[2])],
         # 涨停池代理（连板/炸板）
         "limitup_stats": {"touched": n_touch, "zhaban": n_zhaban, "zhaban_rate": zhaban_rate,
-                          "lianban": n_lianban, "lianban_list": sorted(set(lianban))},
+                          "lianban": n_lianban, "lianban3": n_lianban3, "max_lianban": max_lb,
+                          "lianban_list": sorted(set(lianban)),
+                          "lianban3_list": sorted(set(lianban3))},
+        # R2 极端熔断
+        "fuse": fuse,
         # 200日成本线（猛兽派启发）
         "cost_line": cost,
     }
