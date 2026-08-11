@@ -761,6 +761,9 @@ def gen_report(today_str):
             lines.append("")
             lines.append(f"**市场宽度**（全主板涨跌家数，黑石启发）：上涨{mw.get('up','—')}/{mw.get('valid','—')}只 · 强势≥5% {mw.get('strong','—')} · 涨停{mw.get('limitup','—')} · 弱势≤-5% {mw.get('weak','—')} · 跌停{mw.get('limitdown','—')}")
             lines.append(f"→ 宽度分 {mw.get('score','—')}/100 **{mw.get('level','')}**")
+            cl = mw.get("cost_line") or {}
+            if cl:
+                lines.append(f"→ **200日成本线**（猛兽派启发）：现价{cl.get('cur','—')} vs 成本{cl.get('cost200','—')}（{cl.get('ratio','—')}%·斜率{cl.get('slope','—')}）→ {cl.get('zone','')}")
         # 市场风格轴（指数市/均衡/情绪市：机构主导 vs 游资主导）
         ms = read_market_style()
         if ms:

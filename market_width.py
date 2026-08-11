@@ -161,6 +161,38 @@ def main():
     md += f"| **炸板率** | **{zhaban_rate}%** | {'✅情绪健康(<20%)' if zhaban_rate < 20 else ('⚠️情绪降温(20-40%)' if zhaban_rate < 40 else '🔴退潮预警(≥40%)')} |\n"
     md += f"| 二连板数(今日+昨日均涨停) | {n_lianban} | 连板高度代理 |\n"
 
+    # 200日成本线（猛兽派日报启发·2026-08-11）：上证近200日收盘均价 ≈ 市场成本
+    cost = {}
+    try:
+        ctxt = run(["kline", "sh000001", "--period", "day", "--limit", "250"])
+        closes = []
+        for ln in ctxt.splitlines():
+            s = ln.strip()
+            if s.startswith("|") and re.match(r"^\|\s*2026", s):
+                parts = [p.strip() for p in s.strip("|").split("|")]
+                # 单只K线列序: date|open|last|high|low (last=parts[2]，与批量symbol|date|open|last不同!)
+                if len(parts) >= 4 and parts[2]:
+                    try:
+                        closes.append(float(parts[2]))
+                    except ValueError:
+                        pass
+        if len(closes) >= 120:  # westock单只K线约146条上限，用实际可用数据近似成本线
+            closes = closes[:min(len(closes), 200)]
+            cost200 = sum(closes) / len(closes)
+            cur = closes[0]
+            ratio = round((cur - cost200) / cost200 * 100, 1)
+            ma20_cost = sum(closes[:min(20, len(closes))]) / min(20, len(closes))
+            slope = "上行" if ma20_cost > cost200 * 1.01 else ("下行" if ma20_cost < cost200 * 0.99 else "走平")
+            cost = {"cur": round(cur, 2), "cost200": round(cost200, 2), "ratio": ratio, "slope": slope,
+                    "zone": "浮盈·牛" if ratio > 0 else "浮亏·熊(解套抛压区)",
+                    "days": len(closes)}
+            md += "\n## 200日成本线（长期资金浮亏视角）\n"
+            md += f"| 现价 | 成本线({cost['days']}日均) | 偏离 | 斜率 | 状态 |\n|---|---|---|---|---|\n"
+            md += f"| {cost['cur']} | {cost['cost200']} | {cost['ratio']:+.1f}% | {cost['slope']} | **{cost['zone']}** |\n"
+            md += f"> 猛兽派启发：价格在成本线下方=长期资金浮亏，反弹至成本线附近撞解套抛压\n"
+    except Exception:
+        pass
+
     os.makedirs(OUT_DIR, exist_ok=True)
     md_path = os.path.join(OUT_DIR, f"market_width_{today}.md")
     open(md_path, "w", encoding="utf-8").write(md)
@@ -178,6 +210,8 @@ def main():
         # 涨停池代理（连板/炸板）
         "limitup_stats": {"touched": n_touch, "zhaban": n_zhaban, "zhaban_rate": zhaban_rate,
                           "lianban": n_lianban, "lianban_list": sorted(set(lianban))},
+        # 200日成本线（猛兽派启发）
+        "cost_line": cost,
     }
     json_path = os.path.join(OUT_DIR, "market_width_latest.json")
     open(json_path, "w", encoding="utf-8").write(json.dumps(js, ensure_ascii=False, indent=1))

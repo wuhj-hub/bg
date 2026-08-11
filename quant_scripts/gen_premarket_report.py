@@ -317,6 +317,9 @@ def gen_report(today_str):
     mw = read_market_width()
     if mw:
         lines.append(f"| 📊 市场宽度 | 上涨{mw.get('up','—')}/{mw.get('valid','—')}只 · 强势{mw.get('strong','—')} · 涨停{mw.get('limitup','—')} · 跌停{mw.get('limitdown','—')} → 宽度分{mw.get('score','—')} {mw.get('level','')} |")
+        cl = mw.get("cost_line") or {}
+        if cl:
+            lines.append(f"| 💰 200日成本线 | 现价{cl.get('cur','—')} vs 成本{cl.get('cost200','—')}（{cl.get('ratio','—')}%·斜率{cl.get('slope','—')}）→ **{cl.get('zone','')}** |")
     
     # ②.5.1 曾星智+双弦双体系市场定性（8大指数月线）
     zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()

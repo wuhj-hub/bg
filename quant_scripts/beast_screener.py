@@ -2036,6 +2036,43 @@ def main():
     except Exception as e:
         print(f"  [WARN] 双模式聚合失败(不影响主流程): {e}")
 
+    # ---- Step 7: 领先池动态统计（猛兽派日报启发：池宽/留存率/净流） ----
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        cur_codes = [s["code"] for s in leaders] + [s["code"] for s in pullbacks]
+        prev = {}
+        if os.path.exists("outputs/beast_pool_stats.json"):
+            try:
+                prev = json.load(open("outputs/beast_pool_stats.json", encoding="utf-8"))
+            except Exception:
+                prev = {}
+        prev_codes = (prev.get("leaders") or []) + (prev.get("pullbacks") or [])
+        prev_width = prev.get("width", len(prev_codes)) or len(prev_codes)
+        cur_set, prev_set = set(cur_codes), set(prev_codes)
+        retention = round(len(cur_set & prev_set) / len(prev_set), 2) if prev_set else 1.0
+        inflow = len(cur_set - prev_set)
+        outflow = len(prev_set - cur_set)
+        net = inflow - outflow
+        width = len(cur_set)
+        trend = "扩张" if width > prev_width else ("收缩" if width < prev_width else "持平")
+        stats = {"date": today, "width": width, "prev_date": prev.get("date"),
+                 "prev_width": prev_width,
+                 "leaders": [s["code"] for s in leaders],
+                 "pullbacks": [s["code"] for s in pullbacks],
+                 "retention": retention, "inflow": inflow, "outflow": outflow,
+                 "net": net, "trend": trend}
+        os.makedirs("outputs", exist_ok=True)
+        with open("outputs/beast_pool_stats.json", "w", encoding="utf-8") as f:
+            json.dump(stats, f, ensure_ascii=False, indent=1)
+        print("=" * 72)
+        print("📊 Step 7: 领先池动态统计（猛兽派日报启发：池宽/留存率/净流）")
+        print("=" * 72)
+        print(f"  池宽: {width} 只（{trend}，昨 {prev_width}）")
+        print(f"  留存率: {retention:.0%} | 新增 {inflow} / 淘汰 {outflow} / 净流 {net:+d}")
+        print(f"  → outputs/beast_pool_stats.json")
+    except Exception as e:
+        print(f"  [WARN] 领先池统计失败(不影响主流程): {e}")
+
 
 if __name__ == "__main__":
     main()
