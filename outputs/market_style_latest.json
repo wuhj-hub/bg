@@ -1,78 +1,55 @@
 {
- "date": "2026-08-10",
- "data_date": "2026-08-10",
+ "date": "2026-08-11",
+ "data_date": "2026-08-11",
  "style": "情绪市",
  "icon": "🔥",
- "score": 57,
+ "score": 40,
  "score_detail": {
-  "size_style": 15,
-  "limitup_structure": 33,
-  "volume_structure": 8,
-  "sector_fund": 1
+  "size_style": 20,
+  "limitup_structure": 16,
+  "volume_structure": 0,
+  "sector_fund": 4
  },
  "size_style": {
-  "hs300_5d": 3.5,
-  "hs300_10d": -0.01,
-  "zz1000_5d": 9.24,
-  "zz1000_10d": 6.99,
-  "rel_5d": 5.74,
-  "rel_10d": 7.0,
-  "rel_20d": -0.83,
-  "hs300_ma_trend": "多头排列",
-  "zz500_5d": 8.31
+  "hs300_5d": 1.37,
+  "hs300_10d": 2.06,
+  "zz1000_5d": 5.75,
+  "zz1000_10d": 9.56,
+  "rel_5d": 4.39,
+  "rel_10d": 7.5,
+  "rel_20d": -0.1,
+  "zz500_5d": 4.73
  },
  "limitup_structure": {
-  "limitup": 89,
-  "strong": 216,
-  "width_score": 100,
-  "level": "🔥 强势（普涨格局）",
+  "limitup": 52,
+  "strong": 79,
+  "width_score": 56.8,
+  "level": "偏强（涨多跌少）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 7.4,
-  "zhaban_rate": 32.1,
-  "lianban": 11
+  "strong_ratio": 2.7,
+  "zhaban_rate": 40.2,
+  "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.204,
-  "small_big_ratio_5d": 1.066,
-  "vol_shift": "资金流向中小盘"
+  "small_big_ratio_now": 1.207,
+  "small_big_ratio_5d": 1.101
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "地面兵装Ⅱ",
-    "zdf": "5.12",
-    "main_net5d": -7.7,
-    "retail_net": -6.6,
-    "tag": "游资型"
-   },
-   {
     "name": "电力",
-    "zdf": "0.79",
-    "main_net5d": -42.6,
-    "retail_net": 2.5,
+    "zdf": "0.38",
+    "main_net5d": -59.3,
+    "retail_net": 1.8,
     "tag": "游资型"
    },
    {
-    "name": "半导体",
-    "zdf": "-0.36",
-    "main_net5d": 140.0,
-    "retail_net": 64.6,
+    "name": "创新药",
+    "zdf": "0.69",
+    "main_net5d": 47.1,
+    "retail_net": 4.1,
     "tag": "混合"
-   },
-   {
-    "name": "贵金属",
-    "zdf": "3.89",
-    "main_net5d": 11.9,
-    "retail_net": -11.4,
-    "tag": "机构型"
-   },
-   {
-    "name": "医疗服务",
-    "zdf": "3.92",
-    "main_net5d": 34.2,
-    "retail_net": -0.3,
-    "tag": "机构型"
    }
   ]
  },
