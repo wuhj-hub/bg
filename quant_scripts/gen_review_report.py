@@ -79,7 +79,7 @@ def load_premarket_judgment(today):
             try:
                 with open(name, "r", encoding="utf-8") as f:
                     d = json.load(f)
-                if d.get("date", "").startswith(today[:7]):
+                if d.get("date", "") == today:  # 严格当日校验（2026-08-11修复：原只校验月份，GitHub端8/7的latest曾被8/11误用）
                     return d
             except Exception:
                 pass
@@ -354,12 +354,12 @@ def read_lianghua_csv():
 
 def read_pool_status(today):
     """读取当日股池跟踪报告（pool_tracking_report.py 产出），提取三阶共振/一阶通过标的。
-    当日缺失→自动沿用最近一份并标注来源日期"""
+    当日缺失→自动沿用最近一份并标注来源日期
+    （2026-08-11修复：原try块缩进在else兜底分支内，当日文件存在走break时跳过读取直接返回None）"""
     for path in (f"outputs/股池标的跟踪报告_{today}.md", f"股池标的跟踪报告_{today}.md"):
-        if not os.path.exists(path):
-            continue
-        src_date = today
-        break
+        if os.path.exists(path):
+            src_date = today
+            break
     else:
         path = find_latest_file("outputs/股池标的跟踪报告_{today}.md", today)
         src_date = ""
@@ -368,31 +368,30 @@ def read_pool_status(today):
             src_date = m.group(1) if m else "最近"
         if not path:
             return None, [], [], src_date
-        try:
-            with open(path, encoding="utf-8") as f:
-                text = f.read()
-            stars, passes = [], []
-            in_star = in_pass = False
-            for ln in text.splitlines():
-                if "二、三阶共振" in ln:
-                    in_star, in_pass = True, False
-                    continue
-                if "三、信号明细" in ln or "三、二阶共振" in ln:
-                    in_star, in_pass = False, True
-                    continue
-                if "四、否决" in ln or "## 四" in ln:
-                    in_star = in_pass = False
-                    continue
-                s = ln.strip()
-                if s.startswith("|") and not s.startswith("|:") and "代码" not in s:
-                    if in_star and "三重共振" in s and "当前无" not in s:
-                        stars.append(s)
-                    elif in_pass and s.count("|") >= 6:
-                        passes.append(s)
-            return text, stars, passes, src_date
-        except Exception:
-            pass
-    return None, [], [], ""
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        stars, passes = [], []
+        in_star = in_pass = False
+        for ln in text.splitlines():
+            if "二、三阶共振" in ln:
+                in_star, in_pass = True, False
+                continue
+            if "三、信号明细" in ln or "三、二阶共振" in ln:
+                in_star, in_pass = False, True
+                continue
+            if "四、否决" in ln or "## 四" in ln:
+                in_star = in_pass = False
+                continue
+            s = ln.strip()
+            if s.startswith("|") and not s.startswith("|:") and "代码" not in s:
+                if in_star and "三重共振" in s and "当前无" not in s:
+                    stars.append(s)
+                elif in_pass and s.count("|") >= 6:
+                    passes.append(s)
+        return text, stars, passes, src_date
+    except Exception:
+        return None, [], [], src_date
 
 def read_shuangxian_pool(today):
     """读双弦月度股池（quant_results pool_data）→ [(name, price, score)]"""
@@ -658,6 +657,9 @@ def pool_status_section(today):
             break
     if not stars and not passes:
         A("> 股池跟踪报告已生成（见全盘量化文件夹），当前无三阶共振/信号标的\n")
+    m_dd = re.search(r"[^\n]*组合回撤[^\n]*", text)
+    if m_dd:
+        A(f"**📉 组合回撤（R1）**：{m_dd.group(0).strip()}\n")
     A("\n> 📌 三阶漏斗=月线反转(趋势)→武威G1(低吸)→v2.1质量否决(支撑≥5%+盈利)，详见股池标的跟踪报告\n")
     return "\n".join(L)
 
@@ -709,7 +711,10 @@ def gen_report(today_str):
     # 二、盘前预判验证（新增！闭环核心）
     # ════════════════════════════════════════
     lines.append("\n## 二、盘前预判验证\n")
-    lines.append(f"> 验证对象：盘前市场报告_{today} 的预判 vs 今日实际走势\n")
+    if load_premarket_judgment(today):
+        lines.append(f"> 验证对象：盘前市场报告_{today} 的预判（judgment源：当日JSON） vs 今日实际走势\n")
+    else:
+        lines.append(f"> ⚠️ 未找到当日盘前判断JSON（premarket_judgment_latest.json 可能过期），预判验证缺失或降级\n")
     
     judgments = estimate_premarket_judgment(idx_rows, today)
     if judgments:
