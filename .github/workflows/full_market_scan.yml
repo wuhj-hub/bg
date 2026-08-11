@@ -160,6 +160,16 @@ jobs:
         continue-on-error: true
         run: python3 signal_arbiter.py --top 20
 
+      # ─── 第三步.5d：创业板/科创四维补充通道（代表性优化A·2026-08-11）───
+      # 主板四维3032只为主通道；创业板300/301+科创688 约2600只补充扫描，输出独立文件不覆盖主版
+      - name: 创业板/科创四维补充扫描（代表性补充通道）
+        continue-on-error: true
+        run: |
+          python3 gen_mainboard.py --universe chinext_kcb
+          if [ -f all_chinext_kcb.csv ]; then
+            python3 quad_resonance.py --pool all_chinext_kcb.csv --top 20 --out-prefix 四维共振_chinext_kcb
+          fi
+
       # ─── 第三步.6：提交量化汇总（供次日盘前报告引用三系统信号）───
       - name: 提交量化汇总到仓库（供盘前报告引用）
         run: |
@@ -176,10 +186,11 @@ jobs:
           cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
           cp outputs/四维共振_latest.json 四维共振_latest.json 2>/dev/null || true
           cp outputs/信号仲裁_latest.json 信号仲裁_latest.json 2>/dev/null || true
+          cp outputs/四维共振_chinext_kcb_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || true
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
+            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
             git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
             for i in 1 2 3; do
               git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true

@@ -836,7 +836,7 @@ def get_sector_ranking(top_n: int = 5) -> list[dict]:
 # ============================================================
 #      Step 2: 候选股获取
 # ============================================================
-def get_candidate_stocks(max_count: int = 25) -> list[dict]:
+def get_candidate_stocks(max_count: int = 50) -> list[dict]:
     raw = cli("hot stock --limit 50")
     rows = parse_table(raw)
     candidates = []
@@ -1627,7 +1627,7 @@ def main():
     # ---- Step 2: 候选股获取 ----
     print("\n🎯 Step 2: 候选股筛选（热搜股·主板过滤）")
     print("-" * 40)
-    candidates = get_candidate_stocks(25)
+    candidates = get_candidate_stocks(50)
     print(f"  获取到 {len(candidates)} 只候选股")
     if not candidates:
         print("\n❌ 无候选股，终止扫描")

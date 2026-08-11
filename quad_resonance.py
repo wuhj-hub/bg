@@ -101,6 +101,25 @@ def fund_layer_check(code):
             "m10": round(m10 / 1e8, 2), "m20": round(m20 / 1e8, 2), "tag": tag}
 
 
+def load_sector_zhongjun():
+    """读板块共振 zhongjun_candidates（共振板块→中军龙头代码）→ {full_code: board_name}
+    板块共振优先加成（2026-08-11）：所在板块已共振的个股，证据链+1（β前置）"""
+    for p in ("outputs/板块共振_latest.json", "板块共振_latest.json",
+              "../outputs/板块共振_latest.json"):
+        if os.path.exists(p):
+            try:
+                d = json.load(open(p, encoding="utf-8"))
+                out = {}
+                for z in d.get("zhongjun_candidates", []) or []:
+                    c = z.get("code", "")
+                    if c:
+                        out[c] = z.get("board", "")
+                return out, [r.get("name", "") for r in d.get("resonance_boards", []) or []]
+            except Exception:
+                continue
+    return {}, []
+
+
 def score_fund(phase, precip):
     """资金维度 0-3：四态优先，沉淀率兜底"""
     s = {"抢筹": 3, "吸筹": 2, "进场": 1, "控盘": 1, "观望": 0}.get(phase, 0)
@@ -186,6 +205,7 @@ def main():
     pool_path = "panhou_lianghua.csv"
     policy = 0
     top_n = 15
+    out_prefix = "四维共振"
     argv = sys.argv[1:]
     for i, a in enumerate(argv):
         if a == "--pool" and i + 1 < len(argv):
@@ -194,6 +214,8 @@ def main():
             policy = int(argv[i + 1])
         if a == "--top" and i + 1 < len(argv):
             top_n = int(argv[i + 1])
+        if a == "--out-prefix" and i + 1 < len(argv):
+            out_prefix = argv[i + 1]
 
     if not os.path.exists(pool_path):
         print(f"[ERR] 股票池不存在: {pool_path}")
@@ -201,6 +223,8 @@ def main():
     rows = list(csv.DictReader(open(pool_path, encoding="utf-8")))
     stocks = [(r["code"], r["name"], r.get("phase", ""), r.get("precip", 0)) for r in rows]
     print(f"[INFO] 股票池 {len(stocks)} 只（四维评分，政策维度={policy}）", flush=True)
+    zhongjun_map, res_boards = load_sector_zhongjun()
+    print(f"[INFO] 板块共振加成: 中军{len(zhongjun_map)}只 / 共振板块{len(res_boards)}个", flush=True)
 
     def work(item):
         code, name, phase, precip = item
@@ -209,7 +233,11 @@ def main():
         cs, cd = score_chip(full)
         rs, rd = score_related(full)
         fl = fund_layer_check(full)  # 四层资金验证（洗盘/出货标签）
-        total = fs + cs + rs + policy
+        # 板块共振加成（2026-08-11）：命中板块共振中军 → +1 分（β前置，板块启动优先）
+        bonus = ""
+        if full in zhongjun_map:
+            bonus = f"🎯板块中军({zhongjun_map[full]})"
+        total = fs + cs + rs + policy + (1 if bonus else 0)
         if total >= 10: level = "★★★ 必然级"
         elif total >= 7: level = "★★ 高置信"
         elif total >= 4: level = "★ 弱共振"
@@ -221,7 +249,7 @@ def main():
             level = "否决"
         return {"code": code, "name": name, "fund": fs, "chip": cs, "related": rs,
                 "policy": policy, "total": total, "level": level, "veto": veto,
-                "chip_detail": cd, "related_detail": rd,
+                "chip_detail": cd, "related_detail": rd, "bonus": bonus,
                 "fund_tag": (fl or {}).get("tag", ""),
                 "fund_layers": (fl or {})}
 
@@ -241,7 +269,7 @@ def main():
                      "否决": sum(1 for r in results if r["level"] == "否决")},
           "stocks": results}
     os.makedirs(OUT_DIR, exist_ok=True)
-    json_path = os.path.join(OUT_DIR, "四维共振_latest.json")
+    json_path = os.path.join(OUT_DIR, f"{out_prefix}_latest.json")
     open(json_path, "w", encoding="utf-8").write(json.dumps(js, ensure_ascii=False, indent=1))
 
     L = [f"# 🧩 四维共振评分 {today}", "",
@@ -256,16 +284,18 @@ def main():
     L.append("|---|---|---|---|---|---|---|---|---|---|")
     for r in results[:top_n]:
         v = f" {r['veto']}" if r["veto"] else ""
+        b = f" {r.get('bonus','')}" if r.get("bonus") else ""
         fl = r.get("fund_layers") or {}
         fl_txt = f"{r.get('fund_tag','')} {fl.get('m1','—')}/{fl.get('m5','—')}/{fl.get('m10','—')}/{fl.get('m20','—')}" if fl else "—"
-        L.append(f"| {r['code']} | {r['name']} | {r['fund']} | {r['chip']} | {r['related']} | {r['policy']} | {r['total']} | {r['level']}{v} | {fl_txt} | {r['chip_detail']}；{r['related_detail']} |")
+        L.append(f"| {r['code']} | {r['name']} | {r['fund']} | {r['chip']} | {r['related']} | {r['policy']} | {r['total']} | {r['level']}{v}{b} | {fl_txt} | {r['chip_detail']}；{r['related_detail']} |")
     L.append("")
     L.append("## 说明")
     L.append("- 资金=四态(抢筹3/吸筹2/进场1)+沉淀率兜底 | 筹码=获利盘≥70%+集中度<15加成 | 关联方=龙虎榜机构3/游资2+大宗溢价2/平价1")
     L.append("- 资金四层标签（黑石启发·多周期验证）：⛔出货=日/5/10/20日全负规避；🌀洗盘=当日负但20日控盘正可低吸；📈共振=当日+20日双正")
+    L.append("- 板块共振加成（2026-08-11）：命中板块共振主线中军（zhongjun_candidates）的标的 +1 分并标注🎯板块中军（β前置：板块已启动的个股优先）")
     L.append("- 政策维度需人工研判（--policy 0-3），当前为0不代表政策面差，而是未赋值")
     L.append("- 四维独立信源同向=证据链闭合；反向否决=资金流出且关联方减持时强制降级")
-    md_path = os.path.join(OUT_DIR, f"四维共振_{today}.md")
+    md_path = os.path.join(OUT_DIR, f"{out_prefix}_{today}.md")
     open(md_path, "w", encoding="utf-8").write("\n".join(L))
     print(f"[OK] {json_path}")
     print(f"[OK] {md_path}")
