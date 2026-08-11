@@ -94,6 +94,37 @@ def load_signal_pool():
             pass
     return pool
 
+
+def load_dynamic_pool():
+    """P3 动态监控池（2026-08-11）：持仓(holdings.txt) + 信号仲裁TOP5 自动纳入盘中监控
+    返回 [(code纯数字, name)]，去重"""
+    extra = []
+    try:
+        if os.path.exists("holdings.txt"):
+            for ln in open("holdings.txt", encoding="utf-8"):
+                s = ln.strip()
+                if not s or s.startswith("#"):
+                    continue
+                parts = s.split()
+                if not parts:
+                    continue
+                code = parts[0].replace("sh", "").replace("sz", "")
+                name = s.split("#")[-1].strip() if "#" in s else code
+                if code.isdigit():
+                    extra.append((code, name))
+        for p in ("outputs/信号仲裁_latest.json", "信号仲裁_latest.json"):
+            if os.path.exists(p):
+                with open(p, encoding="utf-8") as f:
+                    d = json.load(f)
+                for r in d.get("ranked", [])[:5]:
+                    code = r.get("code", "").replace("sh", "").replace("sz", "")
+                    if code.isdigit():
+                        extra.append((code, r.get("code", code)))
+                break
+    except Exception as e:
+        print(f"[WARN] 动态监控池加载失败: {e}")
+    return extra
+
 def fetch_minute(code):
     """获取个股最新分时价格"""
     prefix = "sh" if code.startswith(("6", "9")) else "sz"
@@ -198,6 +229,12 @@ def main():
 
     signals = []
     pool = CORE_STOCKS + WATCHLIST + load_signal_pool()
+    # P3 动态纳入：持仓 + 仲裁TOP5（2026-08-11）
+    seen = {c for c, _ in pool}
+    for c, n in load_dynamic_pool():
+        if c not in seen:
+            pool.append((c, n))
+            seen.add(c)
     # 去重
     seen = set()
     unique_pool = []
