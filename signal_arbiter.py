@@ -175,6 +175,39 @@ def load_qiankun():
     return out
 
 
+def load_wuwei():
+    """武威月线精选池（月度频率·容错）：outputs/武威精选池_*.md，重仓+2/精选+1"""
+    import glob
+    files = sorted(glob.glob("outputs/武威精选池_*.md"))
+    if not files:
+        return {}
+    txt = open(files[-1], encoding="utf-8").read()
+    heavy = "重仓" in txt
+    out = {}
+    for m in re.finditer(r"((?:sh|sz)\d{6})", txt):
+        out[m.group(1)] = 2 if heavy else 1
+    return out
+
+
+def load_reversal():
+    """反转数值周线信号（周线频率·容错）：outputs/反转数值周线信号_*.md，F重仓+2/其他+1"""
+    import glob
+    files = sorted(glob.glob("outputs/反转数值周线信号_*.md"))
+    if not files:
+        return {}
+    txt = open(files[-1], encoding="utf-8").read()
+    out = {}
+    cur_lv = 1
+    for ln in txt.splitlines():
+        if "重仓" in ln or "F" in ln:
+            cur_lv = 2
+        elif "标准" in ln:
+            cur_lv = 1
+        for m in re.finditer(r"((?:sh|sz)\d{6})", ln):
+            out[m.group(1)] = cur_lv
+    return out
+
+
 def month_gate(code):
     """月线闸门：PASS(收盘>MA6>MA12) / WARN(收盘>MA6但MA6<MA12) / BLOCK(收盘<MA6)"""
     txt = run(["kline", code, "--period", "month", "--limit", "12"])
@@ -212,7 +245,9 @@ def main():
     beast = load_beast()
     sx = load_shuangxian()
     qk = load_qiankun()
-    print(f"[INFO] 信号源: 四维{len(four)} 鱼身{len(fish)} 猛兽{len(beast)} 双弦{len(sx)} 乾坤{len(qk)}", flush=True)
+    wuwei = load_wuwei()
+    reversal = load_reversal()
+    print(f"[INFO] 信号源: 四维{len(four)} 鱼身{len(fish)} 猛兽{len(beast)} 双弦{len(sx)} 乾坤{len(qk)} 武威{len(wuwei)} 反转{len(reversal)}", flush=True)
 
     # 汇总打分
     scores = {}
@@ -248,6 +283,12 @@ def main():
     for code, info in qk.items():
         scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 2
         scores[code]["src"].append(f"乾坤{info.get('grade','A')}级")
+    for code, pts in wuwei.items():  # 武威月线精选（2026-08-11接入）
+        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
+        scores[code]["src"].append(f"武威精选(+{pts})")
+    for code, pts in reversal.items():  # 反转数值周线（2026-08-11接入）
+        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
+        scores[code]["src"].append(f"反转数值(+{pts})")
 
     # 分级
     ranked = []
@@ -273,7 +314,7 @@ def main():
 
     today = datetime.now().strftime("%Y-%m-%d")
     js = {"date": today, "sources": {"四维": len(four), "鱼身": len(fish), "猛兽": len(beast),
-                                      "双弦": len(sx), "乾坤": len(qk)},
+                                      "双弦": len(sx), "乾坤": len(qk), "武威": len(wuwei), "反转": len(reversal)},
           "counts": {"★★★": sum(1 for r in ranked if r["level"].startswith("★★★")),
                      "★★": sum(1 for r in ranked if r["level"].startswith("★★")),
                      "★": sum(1 for r in ranked if r["level"].startswith("★")),
@@ -284,7 +325,7 @@ def main():
     open(json_path, "w", encoding="utf-8").write(json.dumps(js, ensure_ascii=False, indent=1))
 
     L = [f"# ⚖️ 六套信号仲裁 {today}", "",
-         f"> 数据源：四维{len(four)}只 / 鱼身{len(fish)} / 猛兽Setup{len(beast)} / 双弦{len(sx)} / 乾坤{len(qk)}",
+         f"> 数据源：四维{len(four)}只 / 鱼身{len(fish)} / 猛兽Setup{len(beast)} / 双弦{len(sx)} / 乾坤{len(qk)} / 武威{len(wuwei)} / 反转{len(reversal)}",
          "> 仲裁权重：四维高置信+3｜猛兽Setup≥60+3/≥50+2｜乾坤A+2｜鱼身加油≥70+2｜伏击/RS_D/G点+1｜双弦共振+1｜四维否决-3",
          "> 分级：≥7 ★★★全信号共振(≤15%) / 5-6 ★★(≤10%) / 3-4 ★(≤5%) / <3 观察；月线BLOCK强制降级", ""]
     L.append("## 仲裁结果 TOP{0}".format(min(top_n, len(ranked))))

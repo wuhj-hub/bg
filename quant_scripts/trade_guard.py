@@ -169,7 +169,7 @@ def exit_score(month_rows, day_rows, mult=2.0):
     return score, action, reasons
 
 def check_stock(code):
-    """综合交易防护检查"""
+    """综合交易防护检查（P1主动止盈系统 2026-08-11）"""
     day_rows = fetch_kline(code, "day", 40)
     month_rows = fetch_kline(code, "month", 15)
     if not day_rows or not month_rows:
@@ -177,6 +177,17 @@ def check_stock(code):
     cur = day_rows[-1]["last"]
     rr, target, stop, atr = calc_risk_reward(month_rows, day_rows)
     escore, eaction, ereasons = exit_score(month_rows, day_rows)
+    # P1 主动止盈（2026-08-11）：目标位分批兑现 + 移动止盈（2×ATR跟踪）
+    tp = {}
+    if target and cur < target:
+        tp = {"t1_33": round(target * 0.8, 2), "t2_66": round(target, 2),
+              "t3_100": round(target * 1.2, 2),
+              "space": round((target - cur) / cur * 100, 1)}
+    trail = None
+    if atr and day_rows:
+        hi10 = max(r["last"] for r in day_rows[-10:])
+        raw_trail = hi10 - 2 * atr
+        trail = round(max(raw_trail, stop), 2) if stop else round(raw_trail, 2)
     out = {
         "code": code, "ok": True, "price": round(cur, 2),
         "atr": round(atr, 3) if atr else None,
@@ -185,6 +196,7 @@ def check_stock(code):
         "rr": round(rr, 2) if rr else None,
         "rr_pass": rr is not None and rr >= 2.0,
         "exit_score": escore, "exit_action": eaction, "exit_reasons": ereasons,
+        "take_profit": tp, "trail_stop": trail,
     }
     return out
 
