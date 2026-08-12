@@ -66,6 +66,11 @@ search(source="kb", kb_id="6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs=", questi
 
 ### Step 3：盘前预判验证
 
+**数据源（2026-08-11 断链修复后强制规范）**：
+- 真实验证必须读取 `premarket_judgment_{date}.json`（**当日严格校验**，date 字段必须==当日；仅校验月份会误用 GitHub 端过期的 latest——曾发生 8/7 判断被用于 8/11 验证、预判准确率失真为 25%）
+- 盘前报告生成后**必须立即 push** `premarket_judgment_{date}.json` + `premarket_judgment_latest.json` 到 GitHub（git_api_commit.py 的 CHANGES 已含该路径），否则 GitHub workflow 复盘读不到当日判断、fallback 到过期 latest
+- 当日 judgment 缺失时复盘须标注"⚠️ 未找到当日盘前判断JSON"，不得静默使用旧判断
+
 对盘前报告的每个关键判断进行验证：
 
 | 验证项 | 盘前判断 | 收盘实际 | 结果 |
@@ -75,6 +80,11 @@ search(source="kb", kb_id="6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs=", questi
 | 板块主线 | 盘前关注方向 | 实际涨幅 + 资金分布 | ✅/❌ |
 | 个股信号 | 关注标的 | 实际涨跌 | ✅/❌ |
 | 预警触发 | 触发项 | 实际表现 | ✅/❌ |
+
+**量价时空（2026-08-12落地·源自OPPO笔记）**：复盘③市场宽度段后展示四维检查（gen_review_report.py render_ljsk）：量=宽度/涨停、价=现价vs200日成本线、时=上证月线MA6/MA12、空=板块共振广度，输出 X/4 达标
+**抗跌性（2026-08-12落地）**：复盘③.5 三阶漏斗候选附抗跌性排序（anti_resilience.py 产出），熊市/弱势市过滤优先（超额≥0 抗跌强，<-5% 回避）
+**出货完成度（2026-08-12落地）**：quad_resonance.py 资金维度区分"⛔出货中"（四层全负未收窄，规避）vs"🌀出货完成·抛压枯竭"（当日流出收窄至5日1/4以下且5日较10日递减，可关注反抽）
+**组合回撤（R1）**：复盘③.5股池章节必须展示组合回撤行（读股池跟踪报告"六、组合层风控"），格式如"✅ 组合回撤 2.0%（距20日高点，≤10%正常区间）"
 
 **评分原则**：
 - ✅ 准确：预判与实际情况一致
