@@ -387,6 +387,13 @@ def gen_report(today_str):
     except Exception as e:
         lines.append(f"- 四因子：计算失败({e})\n")
     
+    # 量价时空四维检查清单（2026-08-12落地，源自OPPO笔记·熊市先看抗跌/量价时空）
+    try:
+        lines.append("**量价时空四维检查**")
+        lines.append(render_ljsk())
+        lines.append("")
+    except Exception as e:
+        lines.append(f"- 量价时空：计算失败({e})")
     lines.append("\n## ③ 板块排行\n")
     board = get_board_data()
     if board:
@@ -526,6 +533,64 @@ def read_market_width():
         except Exception:
             continue
     return None
+
+
+def render_ljsk(now=""):
+    """量价时空四维检查清单（2026-08-12落地，源自OPPO笔记"量价时空"）
+    量=市场宽度/涨停结构；价=现价vs200日成本线；时=上证月线级别；空=板块共振广度"""
+    L = []
+    ok_n = 0
+    # 📊 量：宽度分 + 涨停家数
+    mw = read_market_width()
+    if mw and mw.get("score") is not None:
+        sc, lv, zt = mw["score"], mw.get("level", ""), mw.get("limitup", 0)
+        l_ok = sc >= 40 and (zt or 0) >= 20
+        ok_n += l_ok
+        L.append(f"- 📊 量：宽度{sc}{lv}·涨停{zt}家{'✅' if l_ok else '⚠️'}")
+    else:
+        L.append("- 📊 量：⚠️数据缺失")
+    # 📈 价：现价 vs 200日成本线（cost_line）
+    if mw and mw.get("cost_line"):
+        cl = mw["cost_line"]
+        p_ok = cl.get("ratio", -100) >= 0
+        ok_n += p_ok
+        L.append(f"- 📈 价：现价{cl.get('cur','?')} vs 成本线{cl.get('cost200','?')}（{cl.get('ratio','?')}% {cl.get('zone','')}）{'✅' if p_ok else '⚠️'}")
+    else:
+        L.append("- 📈 价：⚠️成本线缺失")
+    # 🕐 时：上证月线 MA6/MA12 级别
+    try:
+        mtxt = run(["kline", "sh000001", "--period", "month", "--limit", "13"])
+        mrows = parse_kline_table(mtxt)
+        closes = [float(r["last"]) for r in mrows if "last" in r]
+        if len(closes) >= 12:
+            c = closes[-1]; ma6 = sum(closes[-6:]) / 6; ma12 = sum(closes[-12:]) / 12
+            if c > ma6 > ma12:
+                shi, t_ok = "月线多头", True
+            elif c < ma6 and c < ma12:
+                shi, t_ok = "月线空头", False
+            else:
+                shi, t_ok = "月线纠缠", False
+            ok_n += t_ok
+            L.append(f"- 🕐 时：上证{shi}（MA6 {ma6:.0f}/MA12 {ma12:.0f}）{'✅' if t_ok else '⚠️'}")
+        else:
+            L.append("- 🕐 时：⚠️月线数据不足")
+    except Exception:
+        L.append("- 🕐 时：⚠️计算失败")
+    # 🗺️ 空：板块共振广度
+    try:
+        sr = read_heshi_resonance()
+        if sr:
+            boards = sr.get("resonance_boards") or []
+            zj = sr.get("zhongjun_candidates") or []
+            k_ok = len(boards) >= 3
+            ok_n += k_ok
+            L.append(f"- 🗺️ 空：共振板块{len(boards)}个·中军{len(zj)}只{'✅' if k_ok else '⚠️'}")
+        else:
+            L.append("- 🗺️ 空：⚠️板块共振数据缺失")
+    except Exception:
+        L.append("- 🗺️ 空：⚠️计算失败")
+    L.append(f"- **量价时空综合：{ok_n}/4 维度达标**")
+    return "\n".join(L)
 
 
 def read_market_style():
