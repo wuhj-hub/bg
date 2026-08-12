@@ -153,3 +153,11 @@ AND NOT(NAMELIKE('ST')) AND NOT(NAMELIKE('*ST'))
 ### 🔧 优化
 
 - chore: update quant/fish_latest (2026-08-10) (0ffa688)
+---
+
+## v2.9 (2026-08-12)
+
+
+### 🔧 优化
+
+- chore: update quant/fish_latest (2026-08-12) (a98099f)
