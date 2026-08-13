@@ -223,8 +223,17 @@ def main():
     if not os.path.exists(pool_path):
         print(f"[ERR] 股票池不存在: {pool_path}")
         sys.exit(1)
-    rows = list(csv.DictReader(open(pool_path, encoding="utf-8")))
-    stocks = [(r["code"], r["name"], r.get("phase", ""), r.get("precip", 0)) for r in rows]
+    # 兼容两种池格式：有表头(panhou_lianghua.csv: code,name,phase,precip) / 无表头(all_mainboard.csv: code,name)
+    first = open(pool_path, encoding="utf-8-sig").readline()  # utf-8-sig 去BOM
+    if "code" in first.lower() and "," in first:
+        rows = list(csv.DictReader(open(pool_path, encoding="utf-8-sig")))
+        stocks = [(r["code"], r["name"], r.get("phase", ""), r.get("precip", 0)) for r in rows]
+    else:
+        stocks = []
+        for ln in open(pool_path, encoding="utf-8"):
+            pp = ln.strip().split(",")
+            if len(pp) >= 2 and re.match(r"^\d{6}$", pp[0].strip()):
+                stocks.append((pp[0].strip(), pp[1].strip(), "", 0))
     print(f"[INFO] 股票池 {len(stocks)} 只（四维评分，政策维度={policy}）", flush=True)
     zhongjun_map, res_boards = load_sector_zhongjun()
     print(f"[INFO] 板块共振加成: 中军{len(zhongjun_map)}只 / 共振板块{len(res_boards)}个", flush=True)

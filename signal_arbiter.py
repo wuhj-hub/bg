@@ -214,7 +214,7 @@ def month_gate(code):
     closes = []
     for ln in txt.splitlines():
         s = ln.strip()
-        if s.startswith("|") and re.match(r"^\|\s*2026", s):
+        if s.startswith("|") and re.match(r"^\|\s*20\d{2}", s):  # 2026-08-13修复：原仅匹配2026开头，2025年月K被过滤致closes不足返回"?"
             parts = [p.strip() for p in s.strip("|").split("|")]
             if len(parts) >= 4 and parts[3]:
                 try:
