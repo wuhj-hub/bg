@@ -18,7 +18,7 @@ guard.py —— 量化体系防护工具（防回滚 / 防覆盖 / 防丢失）
 依赖: 环境变量 GITHUB_TOKEN（默认内置token）
 ================================================================
 """
-import base64, json, os, re, subprocess, sys, time
+import base64, json, os, re, subprocess, sys, tempfile, time
 
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
 if not TOKEN:
@@ -63,20 +63,29 @@ LOG_FILES = ["pool_signals_log.csv", "仲裁信号日志.csv", "paper_portfolio.
 # ============================================================
 def gh(method, path, body=None, retry=3):
     url = f"{API}/{path}"
-    cmd = ["curl", "-s", "--max-time", "60", "-X", method,
+    cmd = ["curl", "-s", "--max-time", "120", "-X", method,
            "-H", f"Authorization: token {TOKEN}"]
+    tmp = None
     if body is not None:
-        cmd += ["-H", "Content-Type: application/json", "-d", json.dumps(body)]
+        # 大内容用 -d @文件 方式（Linux 单参数 128KB 限制，base64大文件会E2BIG）
+        fd, tmp = tempfile.mkstemp(suffix=".json", prefix="guard_")
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(body, f)
+        cmd += ["-H", "Content-Type: application/json", "-d", f"@{tmp}"]
     cmd.append(url)
-    for i in range(retry):
-        try:
-            r = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
-            if r.stdout.strip():
-                return r.stdout
-        except subprocess.TimeoutExpired:
-            pass
-        time.sleep(2)
-    return None
+    try:
+        for i in range(retry):
+            try:
+                r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+                if r.stdout.strip():
+                    return r.stdout
+            except subprocess.TimeoutExpired:
+                pass
+            time.sleep(2)
+        return None
+    finally:
+        if tmp and os.path.exists(tmp):
+            os.unlink(tmp)
 
 def gh_get(path):
     out = gh("GET", path)
