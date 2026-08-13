@@ -157,38 +157,59 @@ def collect_local_files():
 
 
 # ============================================================
+# 快速 sha 对比（trees API 一次拿全量 + git hash-object）
+# ============================================================
+def get_all_gh_shas():
+    """返回 {path: blob_sha}（仓库全部文件）"""
+    url = f"https://api.github.com/repos/{REPO}/git/trees/main?recursive=1"
+    cmd = ["curl", "-s", "--max-time", "120", "-H", f"Authorization: token {TOKEN}", url]
+    for i in range(3):
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            d = json.loads(r.stdout)
+            if "tree" in d:
+                return {t["path"]: t["sha"] for t in d["tree"] if t["type"] == "blob"}
+        except Exception:
+            pass
+        time.sleep(2)
+    return {}
+
+def local_blob_sha(path):
+    """本地文件 blob sha（与GitHub一致）"""
+    try:
+        r = subprocess.run(["git", "hash-object", path], capture_output=True, text=True, timeout=10)
+        return r.stdout.strip()
+    except Exception:
+        return None
+
+
+# ============================================================
 # 子命令
 # ============================================================
 def cmd_status(files):
     print("=" * 70)
-    print("🔍 guard status —— 本地 vs GitHub 差异检测")
+    print("🔍 guard status —— 本地 vs GitHub 差异检测（sha快速对比）")
     print("=" * 70)
-    rolled_back, modified, missing, ok = [], [], [], 0
+    gh_shas = get_all_gh_shas()
+    if not gh_shas:
+        print("ERROR: 无法获取GitHub文件树（限流/网络）")
+        return [], []
+    modified, missing, ok = [], [], 0
     for rel, lp, gp in files:
-        local_missing = not os.path.exists(lp)
-        gsha = gh_sha(gp)
-        if local_missing:
+        if not os.path.exists(lp):
             missing.append(rel)
             continue
+        lsha = local_blob_sha(lp)
+        gsha = gh_shas.get(gp)
         if gsha is None:
             modified.append((rel, "GitHub无此文件(新文件待sync)"))
-            continue
-        # 比较内容（通过本地读+GitHub拉内容对比sha不可行，直接对比内容）
-        local_b64 = base64.b64encode(open(lp, "rb").read()).decode()
-        # 用内容哈希近似：GitHub sha 是 blob sha，无法本地复算，改用内容GET
-        gd = gh_get(gp)
-        if not gd or "content" not in gd:
-            modified.append((rel, "GitHub读取失败"))
-            continue
-        gcontent = gd["content"].replace("\n", "")
-        if local_b64 == gcontent:
+        elif lsha == gsha:
             ok += 1
         else:
-            # 启发判断：本地文件mtime在平台回滚时间点(整点14:04/22:00等)且GitHub内容不同
             mtime = os.path.getmtime(lp)
             import datetime
             t = datetime.datetime.fromtimestamp(mtime)
-            modified.append((rel, f"内容不同(本地mtime {t.strftime('%m-%d %H:%M')})"))
+            modified.append((rel, f"内容不同(本地mtime {t.strftime('%m-%d %H:%M')} UTC)"))
     print(f"\n✅ 一致: {ok} | ⚠️ 差异: {len(modified)} | ❌ 缺失: {len(missing)}")
     if modified:
         print("\n⚠️ 差异文件（可能是新修改或回滚，请人工判断）:")
@@ -199,6 +220,7 @@ def cmd_status(files):
         for rel in missing[:20]:
             print(f"   {rel}")
     return modified, missing
+
 
 
 def cmd_sync(files, dry=False):
