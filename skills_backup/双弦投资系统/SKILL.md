@@ -13,6 +13,20 @@ description: 双弦投资系统v2.3 ima运行版 - 基于双弦体系+猛兽v3.0
 | ② 信号标注 | 猛兽 G点/伏击线/RS_D/SSV | 月度股池每条标注猛兽信号标签 |
 | ③ 低吸检测 | 猛兽VAD趋势替代原MACD简版 | 更准确的趋势判断 |
 
+## 运行出口（2026-08-09 收编至 bg 单跑）
+
+- 双弦唯一运行出口 = **bg 仓库 full_market_scan.yml 第三步**（run_all_quant → run_shuangxian）
+- 每日产出：① quant_results_{date}.json（含pool_data）② outputs/shuangxian_v2_{date}.md（每日报告）③ pools/pool_YYYY-MM.json（月度股池）
+- workflow 第三步.4.6：每日报告→双弦KB「每日报告」文件夹(folder_7484244062400511)+PushPlus推送；月度池→「月度股池」文件夹(folder_7484244066591607)
+- ⚠️ sx2 仓库 daily_review.yml 已禁用 schedule（仅手动兜底），不再双跑
+
+## 月度股池同步（bg workflow 第三步.4.6 · 2026-08-09修复断链）
+
+- 快照脚本：`quant_scripts/dual_pool_sync.py`（读 quant_results_{date}.json 的 shuangxian.pool_data → 生成 双弦本月股池_{date}.md）
+- 剔除规则：价格>10元剔除（MAX_PRICE=10）/ 评分<50剔除 / 跨月轮动移除（v2.4）
+- 每日自动上传知识库「双弦」月度股池文件夹（folder_7484244066591607）
+- ⚠️ 历史断链：sx2 workflow 只传每日报告未传月度池；run_shuangxian 曾硬编码沙箱路径（已修为优先 quant_scripts 同目录）
+
 ## 运行方式
 
 ```bash
