@@ -144,29 +144,6 @@ def v21_decision(sig_type, support, finance):
         return "轻仓", "一阴仅轻仓(永不重仓)"
     return "观察", "未触发G1"
 
-def load_regime_from_quant():
-    """从quant_results_latest.json读取市场档位（猛兽评分/双弦温度）"""
-    try:
-        for p in ("quant_results_latest.json", "outputs/quant_results_latest.json"):
-            if os.path.exists(p):
-                with open(p, encoding="utf-8") as f:
-                    d = json.load(f)
-                beast = d.get("beast") or {}
-                sx = d.get("shuangxian") or {}
-                bstd = beast.get("stdout", "")
-                m = re.search(r"安全评分:\s*([\d.]+)/100", bstd)
-                bs = float(m.group(1)) if m else None
-                sstd = sx.get("stdout", "")
-                m2 = re.search(r"温度[:计]?\s*([\d.]+)", sstd)
-                temp = float(m2.group(1)) if m2 else None
-                gate = "关闭" in sstd and "开启" not in sstd
-                from trade_guard import market_regime
-                regime, hint = market_regime(bs, temp, not gate)
-                return regime, hint
-    except Exception:
-        pass
-    return "震荡", "标准档：信号正常，仓位上限50%"
-
 def track_stock(code, name=""):
     rows = []
     for _ in range(3):
@@ -184,16 +161,8 @@ def track_stock(code, name=""):
     if rows and re.match(r"^\d{4}-08", rows[-1]["date"]):
         rows_g1 = rows[:-1]
     g1, support, shrink = wuwei_g1(rows_g1)
-    # 交易防护（ATR止损/盈亏比/离场计分）
-    guard = None
-    try:
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from trade_guard import check_stock
-        guard = check_stock(code)
-    except Exception:
-        pass
     return {"code": code, "name": name, "ok": True, "mf": mf, "g1": g1,
-            "support": support, "shrink": shrink, "price": cur_price, "guard": guard}
+            "support": support, "shrink": shrink, "price": cur_price}
 
 def load_pool_file(path="stock_pool.txt"):
     """读取股票池配置文件（兼容 '代码 # 名称' 或 'sh600000 名称' 或纯代码行）"""
@@ -215,15 +184,14 @@ def load_pool_file(path="stock_pool.txt"):
             pool.append((code, name))
     return pool
 
-def push_pushplus(token, title, file_path=None, content=None):
-    """PushPlus推送报告摘要或自定义内容"""
+def push_pushplus(token, title, file_path):
+    """PushPlus推送报告摘要"""
     import urllib.request, urllib.parse
     try:
-        if content is None:
-            with open(file_path, encoding="utf-8") as f:
-                content = f.read()
-            # 截取报告前部关键内容（信号卡/总览）
-            content = content[:4000] + ("\n\n...（完整报告见 IMA 知识库全盘量化文件夹）" if len(content) > 4000 else "")
+        with open(file_path, encoding="utf-8") as f:
+            content = f.read()
+        # 截取报告前部关键内容（信号卡/总览）
+        content = content[:4000] + ("\n\n...（完整报告见 IMA 知识库全盘量化文件夹）" if len(content) > 4000 else "")
         body = urllib.parse.urlencode({"token": token, "title": title, "content": content, "template": "markdown"}).encode()
         req = urllib.request.Request("https://pushplus.plus/send", data=body)
         with urllib.request.urlopen(req, timeout=30) as r:
@@ -283,25 +251,10 @@ def main():
     ap.add_argument("--name", default="")
     ap.add_argument("--pool-file", default="stock_pool.txt", help="股票池配置文件路径")
     ap.add_argument("--push", action="store_true", help="推送PushPlus")
+    ap.add_argument("--out-file", default="", help="自定义输出文件名（默认 股池标的跟踪报告_日期.md）")
     ap.add_argument("--auto-extend", action="store_true",
                     help="自动并入全盘量化当日主力信号（panhou_lianghua.md）")
-    ap.add_argument("--holdings", default="", help="持仓代码列表(逗号分隔)，离场计分卡仅对持仓生效")
-    ap.add_argument("--holdings-file", default="holdings.txt", help="持仓文件(每行一个代码)")
-    ap.add_argument("--date", default="", help="指定日期(默认今天)，用于补生成历史股池跟踪")
     a = ap.parse_args()
-
-    # 持仓集合
-    holdings = set()
-    if a.holdings:
-        holdings = {c.strip() for c in a.holdings.split(",") if c.strip()}
-    elif os.path.exists(a.holdings_file):
-        with open(a.holdings_file, encoding="utf-8") as f:
-            for ln in f:
-                s = ln.split("#")[0].strip()
-                for c in s.replace("，", ",").split(","):
-                    c = c.strip()
-                    if c:
-                        holdings.add(c)
 
     DEFAULT_POOL = [
         ("sz000779", "甘咨询"), ("sz002596", "海南瑞泽"), ("sh600095", "湘财股份"),
@@ -335,13 +288,6 @@ def main():
             new = [(c, n) for c, n in extend if c not in existing]
             pool = pool + new
             pool_src += f" + 当日主力信号{len(extend)}只(新增{len(new)})"
-    # 持仓强制并入跟踪池（确保离场计分卡每日都有数据，即使持仓不在任何股池）
-    if holdings:
-        pool_codes = {c for c, _ in pool}
-        missing = [c for c in holdings if c not in pool_codes]
-        if missing:
-            pool = pool + [(c, f"持仓:{c}") for c in missing]
-            pool_src += f" + 持仓{len(missing)}只(强制跟踪)"
     print(f"跟踪标的: {len(pool)} 只（来源: {pool_src}）\n")
 
     results = []
@@ -357,14 +303,12 @@ def main():
 
     # ═══ 生成报告 ═══
     title = a.name or "股池标的跟踪报告"
-    regime, regime_hint = load_regime_from_quant()
     L = []
     A = L.append
-    A(f"# 📊 {title} · 三阶漏斗+交易防护整合版\n")
-    A(f"> 生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')} | 数据：月线/日线K线+利润表（westock）")
+    A(f"# 📊 {title} · 三阶漏斗整合版\n")
+    A("> 生成时间：2026-08-04 18:11 | 数据：月线K线+利润表（westock）")
     A("> **三阶漏斗**：① 月线反转（曾星智MA6/MA12+陶博士）→ ② 武威G1（双阴/一阴缩量回调）→ ③ v2.1质量否决（支撑≥5%+盈利）")
-    A("> **交易防护**：ATR动态止损 + 盈亏比门槛(≥2) + 离场计分卡（八维计分卡启发）")
-    A(f"> 📅 信号基准月：**2026-07**（月末完整月） | 股池来源：**{pool_src}** | 市场档位：**{regime}**（{regime_hint}）\n")
+    A(f"> 📅 信号基准月：**2026-07**（月末完整月） | 股池来源：**{pool_src}**\n")
 
     # 汇总表（只显示有信号价值的：月线PASS或有G1信号；其余合并统计）
     sig_results = [r for r in results if r["ok"] and
@@ -374,28 +318,23 @@ def main():
     block_count = len([r for r in results if r["ok"] and r["mf"]["gate"] == "BLOCK"])
     data_na = len([r for r in results if not r["ok"]])
     A("## 一、三阶漏斗总览\n")
-    A(f"| 代码 | 名称 | 现价 | ①月线 | 闸门 | 反转信号 | ②G1 | 支撑 | ③v2.1 | 盈亏比 | 止损 | 决策 |")
-    A("|:----|:----|:----:|:----:|:----:|:--------|:----:|:----:|:----:|:----:|:----:|:----:|")
+    A(f"| 代码 | 名称 | 现价 | ①月线 | 闸门 | 反转信号 | ②G1 | 支撑 | ③v2.1 | 决策 |")
+    A("|:----|:----|:----:|:----:|:----:|:--------|:----:|:----:|:----:|:----:|")
     for r in sig_results:
         mf, g1 = r["mf"], r["g1"]
         sup_txt = f"{r['support']*100:.0f}%" if r["support"] is not None else "—"
         fst = fin.get(r["code"], "无数据")
         gate_txt = {"PASS": "🟢", "WARN": "🟡"}.get(mf["gate"], "❔")
         rev_txt = mf["reversal"] or "—"
-        # 交易防护
-        rr = r["guard"].get("rr") if r.get("guard") else None
-        rr_txt = f"{rr:.1f}✅" if rr and rr >= 2 else f"{rr:.1f}❌" if rr else "—"
-        stop_txt = str(r["guard"].get("stop")) if r.get("guard") and r["guard"].get("stop") else "—"
-        rr_ok = rr is not None and rr >= 2.0
         if mf["gate"] == "PASS" and g1 in ("双阴", "一阴") and fst == "盈利" and (r["support"] or 0) >= 0.05:
-            dec = "★ 三重共振" if rr_ok else "★ 共振(盈亏比不足)"
+            dec = "★ 三重共振"
         elif mf["gate"] == "PASS" and g1 in ("双阴", "一阴"):
             dec = "二阶共振"
         elif mf["gate"] == "PASS":
             dec = "一阶通过"
         else:
             dec = "G1低吸信号"
-        A(f"| {r['code']} | {r['name']} | {r['price']} | {mf['trend']} | {gate_txt} | {rev_txt} | {g1} | {sup_txt} | {fst} | {rr_txt} | {stop_txt} | **{dec}** |")
+        A(f"| {r['code']} | {r['name']} | {r['price']} | {mf['trend']} | {gate_txt} | {rev_txt} | {g1} | {sup_txt} | {fst} | **{dec}** |")
     if warn_count:
         A(f"| ... | **{warn_count} 只月线纠缠**（无G1信号） | — | 🟡 | — | — | — | — | — | 待确认 |")
     if block_count:
@@ -465,77 +404,10 @@ def main():
     A("\n---")
     A("⚠️ 本报告基于公开市场数据整理，不构成投资建议。三阶漏斗为量化历史规律总结，实战需结合大盘温度动态调整。")
 
-    # 交易防护明细（ATR/离场计分）：持仓标的全显示 + 有信号标的
-    A("\n## 五、交易防护明细（ATR止损 / 离场计分卡）\n")
-    A(f"> 持仓 {len(holdings)} 只（--holdings）；离场计分仅对持仓有约束力，未持仓标的行为参考\n")
-    A("| 代码 | 名称 | 持仓 | 月线 | ATR | ATR止损 | 盈亏比 | 离场分 | 离场状态 | 原因 | 止盈参考(t1/t2/t3·移动) |")
-    A("|:----|:----|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----|:----|")
-    shown = set()
-    # 持仓标的第一优先
-    for r in results:
-        if not r["ok"] or r["code"] not in holdings:
-            continue
-        shown.add(r["code"])
-        g = r.get("guard")
-        mf = r["mf"]
-        if g and g.get("ok"):
-            reasons = "、".join(g.get("exit_reasons", [])[:3]) or "—"
-            tp = g.get("take_profit") or {}
-            tp_txt = f"{tp.get('t1_33','—')}/{tp.get('t2_66','—')}/{tp.get('t3_100','—')}·移{g.get('trail_stop','—')}" if tp else "—"
-            A(f"| {r['code']} | {r['name']} | ✅ | {mf['trend']} | {g.get('atr')} | {g.get('stop')} | {g.get('rr')} | {g['exit_score']} | {g['exit_action']} | {reasons} | {tp_txt} |")
-        else:
-            A(f"| {r['code']} | {r['name']} | ✅ | {mf['trend']} | 数据获取失败 | — | — | — | — | — | — |")
-    # 其余有信号标的（参考）
-    for r in sig_results:
-        if r["code"] in shown:
-            continue
-        g = r.get("guard")
-        if not g or not g.get("ok"):
-            continue
-        held = "✅" if r["code"] in holdings else "—"
-        reasons = "、".join(g.get("exit_reasons", [])[:3]) or "—"
-        if r["code"] not in holdings and g["exit_score"] <= -2:
-            status = "未持仓·参考"
-        else:
-            status = g["exit_action"]
-        tp = g.get("take_profit") or {}
-        tp_txt = f"{tp.get('t1_33','—')}/{tp.get('t2_66','—')}/{tp.get('t3_100','—')}·移{g.get('trail_stop','—')}" if tp else "—"
-        A(f"| {r['code']} | {r['name']} | {held} | {r['mf']['trend']} | {g.get('atr')} | {g.get('stop')} | {g.get('rr')} | {g['exit_score']} | {status} | {reasons} | {tp_txt} |")
-    A("\n> 💡 离场计分卡（八维启发）：月线破MA6(-2)/ATR止损破位(-2)/日线破MA20(-1)/MACD死叉(-1)；≤-2强制离场（仅对已持仓标的有约束力）")
-
-    # ─── 六、组合层风控（B2·2026-08-10）：集中度/同向/组合离场联动 ───
-    A("\n## 六、组合层风控（集中度 / 同向 / 组合离场）\n")
-    A("> 默认约束（可调整）：单票≤15% / 单一板块≤30% / 同向信号≤5只 / 持仓≤5只\n")
-    hold_scores = []
-    for r in results:
-        if r.get("ok") and r["code"] in holdings:
-            g = r.get("guard")
-            if g and g.get("ok"):
-                hold_scores.append({"code": r["code"], "name": r["name"],
-                                    "exit_score": g.get("exit_score", 0),
-                                    "action": g.get("exit_action", "")})
-    if hold_scores:
-        n_hold = len(hold_scores)
-        n_exit = sum(1 for h in hold_scores if h["exit_score"] <= -2)
-        est_pos = min(100, n_hold * 15)  # 默认单票15%估算组合仓位
-        A("| 约束项 | 状态 | 说明 |")
-        A("|:----|:----|:----|")
-        A(f"| 持仓数量 | {'✅' if n_hold <= 5 else '⚠️ 超限'} | {n_hold} 只（≤5默认）|")
-        A(f"| 估算总仓位 | {'✅' if est_pos <= 60 else '⚠️ 偏高'} | 按单票15%估算 ≈ {est_pos}%（实际以你账户为准）|")
-        A(f"| 触发离场 | {'⚠️' if n_exit >= 1 else '✅'} | {n_exit} 只触发离场卡 |")
-        if n_exit >= 2:
-            A(f"\n🔴 **组合降仓信号**：{n_exit} 只持仓触发强制离场（≥2），建议总仓位降至≤30%，优先处理离场分最低的标的\n")
-        elif n_exit == 1:
-            A(f"\n⚠️ **组合预警**：1 只持仓触发离场，关注是否扩散（≥2只=组合降仓）\n")
-        else:
-            A("\n✅ 组合健康：无持仓触发离场卡\n")
-    else:
-        A("（无持仓数据，跳过组合层风控——通过 --holdings / --holdings-file 传入持仓）\n")
-
     md = "\n".join(L)
-    today = a.date if a.date else datetime.now().strftime("%Y-%m-%d")
+    today = datetime.now().strftime("%Y-%m-%d")
     os.makedirs("outputs", exist_ok=True)
-    out = os.path.join("outputs", f"股池标的跟踪报告_{today}.md")
+    out = os.path.join("outputs", a.out_file or f"股池标的跟踪报告_{today}.md")
     with open(out, "w", encoding="utf-8") as f:
         f.write(md)
     print(f"[OK] {out} ({len(md)} chars)")
@@ -548,32 +420,6 @@ def main():
         token = os.environ.get("PUSH_TOKEN", "")
         if token:
             push_pushplus(token, f"📊 {title} {today}", out)
-            # 持仓离场预警：持仓标的离场分≤-2时单独推送（醒目提醒）
-            alerts = []
-            for r in results:
-                if not r["ok"] or r["code"] not in holdings:
-                    continue
-                g = r.get("guard")
-                if g and g.get("ok") and g.get("exit_score", 0) <= -2:
-                    alerts.append(r)
-            if alerts:
-                lines = [f"### 🔴 持仓离场预警 {today}", "",
-                         f"> 以下持仓触发离场计分卡（≤-2 强制离场），请及时处理：", ""]
-                for r in alerts:
-                    g = r["guard"]
-                    reasons = "、".join(g.get("exit_reasons", [])[:3]) or "—"
-                    lines.append(f"**{r['name']}（{r['code']}）**：离场分 **{g['exit_score']}** → {g['exit_action']}")
-                    lines.append(f"- 月线：{r['mf']['trend']} | ATR止损：{g.get('stop')} | 盈亏比：{g.get('rr')}")
-                    lines.append(f"- 原因：{reasons}")
-                    lines.append("")
-                push_pushplus(token, f"🔴 持仓离场预警 {today}", content="\n".join(lines))
-            # 组合降仓信号：≥2只持仓触发离场 → 独立推送（B2组合层风控）
-            if len(alerts) >= 2:
-                combo = [f"**{r['name']}（{r['code']}）** 离场分 {r['guard'].get('exit_score', 0)}" for r in alerts]
-                push_pushplus(token, f"🔴🔴 组合降仓信号 {today}", content=(
-                    f"### 组合层风控：{len(alerts)} 只持仓触发强制离场（≥2阈值）\n\n"
-                    + "\n".join(combo)
-                    + "\n\n建议：总仓位降至≤30%，优先处理离场分最低标的"))
         else:
             print("[push] 跳过（PUSH_TOKEN未设置）")
     print(md[:600])
