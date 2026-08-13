@@ -312,6 +312,17 @@ def main():
                    'results': results}, f, ensure_ascii=False, indent=2)
     print(f"[INFO] 报告: {md_path}")
     print(f"[INFO] JSON: {json_path}")
+
+    # 自动更新股池配置文件（供 pool_tracking_report.py 三阶漏斗跟踪，每日刷新为当日信号）
+    pool_txt = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'caige_pool.txt')
+    plines = [f"# 才哥战法股池 {date_str}（自动生成，四战法：王者倍量柱/旭日东升/凤凰归巢/瞒天过海）",
+              "# 格式：代码 # 名称（战法类型）"]
+    for tname, _ in DETECTORS:
+        for s in results[tname]:
+            plines.append(f"{s['code']} # {s['name']}（{tname}）")
+    with open(pool_txt, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(plines) + '\n')
+    print(f"[INFO] 股池配置已更新: {pool_txt}（{sum(len(v) for v in results.values())}只）")
     for tname, _ in DETECTORS:
         print(f"  {tname}: {len(results[tname])} 只")
         for s in results[tname]:
