@@ -145,6 +145,31 @@ jobs:
             IMA_FOLDER_ID=folder_7484244066591607 python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "双弦本月股池上传失败"
           fi
 
+      # ─── 第三步.4.7：才哥战法股池（王者倍量柱正版/旭日东升/凤凰归巢/瞒天过海，与双弦/猛兽同等股池）───
+      - name: 才哥战法股池扫描+跟踪（四战法独立股池）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          # 1. 四战法全市场扫描（约8-10分钟）+ 自动刷新 caige_pool.txt 为当日信号
+          python3 quant_scripts/caige_pool.py
+          # 2. 三阶漏斗跟踪（自定义文件名，避免与第五步主股池跟踪报告冲突）
+          python3 quant_scripts/pool_tracking_report.py --pool-file quant_scripts/caige_pool.txt --name "才哥战法股池跟踪" --out-file "才哥战法跟踪_$(date +%Y-%m-%d).md" || echo "才哥跟踪报告生成失败(非致命)"
+          # 3. 上传股池报告+跟踪报告到盘后量化文件夹，并推送
+          F=$(ls outputs/才哥战法股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "才哥股池报告上传失败"
+          fi
+          T=$(ls outputs/才哥战法跟踪_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$T" ]; then
+            python3 upload_ima.py --file "$T" --name "$(basename $T)" || echo "才哥跟踪报告上传失败"
+            PUSH_REPORT="$T" python3 push_report.py || echo "才哥推送失败(非致命)"
+          fi
+
       # ─── 第三步.5：市场风格轴（依赖市场宽度+猛兽双模式聚合，须在三系统预运行之后）───
       - name: 市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证）
         continue-on-error: true
@@ -190,7 +215,7 @@ jobs:
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
+            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json quant_scripts/caige_pool.txt 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
             git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
             for i in 1 2 3; do
               git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true
