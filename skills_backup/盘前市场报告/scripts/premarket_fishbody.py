@@ -16,27 +16,9 @@ import glob
 import json
 import os
 import sys
-import urllib.request
 
 OUTPUTS_DIR = "/sandbox/workspace/outputs"
 JSON_GLOB = os.path.join(OUTPUTS_DIR, "fish_body_enhanced_*.json")
-GITHUB_RAW = "https://raw.githubusercontent.com/wuhj-hub/bg/main/fish_body_latest.json"
-
-
-def load_latest_json():
-    """数据源优先级：本地最新JSON → GitHub仓库 fish_body_latest.json → None"""
-    files = sorted(glob.glob(JSON_GLOB), key=os.path.getmtime, reverse=True)
-    if files:
-        try:
-            with open(files[0], encoding="utf-8") as f:
-                return json.load(f), f"本地({os.path.basename(files[0])})"
-        except Exception:
-            pass
-    try:
-        r = urllib.request.urlopen(GITHUB_RAW, timeout=20)
-        return json.loads(r.read().decode()), "GitHub(fish_body_latest.json)"
-    except Exception:
-        return None, ""
 
 
 def emit_comment(msg):
@@ -64,9 +46,16 @@ def pick(sig, keys):
 
 
 def main():
-    data, src = load_latest_json()
-    if not data:
-        emit_comment("暂无扫描数据（鱼身系统未运行，或大盘偏冷全池暂停；本地与GitHub均无JSON）")
+    files = sorted(glob.glob(JSON_GLOB), reverse=True)
+    if not files:
+        emit_comment("暂无扫描数据（鱼身系统未运行，或大盘偏冷全池暂停）")
+
+    latest = files[0]
+    try:
+        with open(latest, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        emit_comment("JSON 读取失败：%s" % e)
 
     if not isinstance(data, dict):
         emit_comment("数据结构异常：根节点非 dict")
@@ -82,8 +71,7 @@ def main():
 
     temp_str = ("%s/100" % temp) if temp is not None else "N/A"
     cold = "（偏冷·谨慎）" if (isinstance(temp, (int, float)) and temp < 40) else ""
-    src_note = (" | 数据源：%s" % src) if src else ""
-    print("> 大盘温度计：**%s** %s%s%s" % (temp_str, (level or ""), cold, src_note))
+    print("> 大盘温度计：**%s** %s%s" % (temp_str, (level or ""), cold))
     print()
 
     headers = ["标签", "代码", "名称", "模式", "评分", "信号价", "止损", "目标", "共振"]
