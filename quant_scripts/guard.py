@@ -51,7 +51,8 @@ SELF_SKILLS = [
 WS_ROOT_PATTERNS = [r".*\.py$", r"^caige_pool\.txt$", r"^all_mainboard\.csv$",
                     r"^holdings\.txt$", r"^王者倍量柱_正版指标\.md$"]
 WS_EXCLUDE = [r"__pycache__", r"\.DS_Store", r"^outputs/", r"^uploads/",
-              r"^connectors/", r"^skills/", r"^node_modules/"]
+              r"^connectors/", r"^skills/", r"^node_modules/",
+              r"^guard_selfcheck\.py$", r"^guard_selfcheck\.yml$"]
 
 # 日志类文件：本地为唯一真源，禁止从GitHub拉旧版覆盖
 LOG_FILES = ["pool_signals_log.csv", "仲裁信号日志.csv", "paper_portfolio.json",
