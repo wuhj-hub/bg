@@ -217,15 +217,22 @@ jobs:
             git config user.email "actions@github.com"
             git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json quant_scripts/caige_pool.txt 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
             git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
+            PUSHED=0
             for i in 1 2 3; do
-              git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true
+              # rebase冲突时回退到merge，避免 || true 吞掉冲突导致push永败
+              git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || { git rebase --abort 2>/dev/null; git pull origin main --allow-unrelated-histories 2>/dev/null || true; }
               if git push origin main 2>/dev/null; then
                 echo "[OK] quant_results_latest pushed (attempt $i)"
+                PUSHED=1
                 break
               fi
               echo "push attempt $i failed, retry after 15s"
               sleep 15
             done
+            if [ "$PUSHED" != "1" ]; then
+              echo "::error::quant_latest 推送失败（3次尝试均失败，多为并发提交冲突）。需人工处理: git pull && git push"
+              exit 1
+            fi
           fi
 
       # ─── 第四步：上传所有结果 ───
