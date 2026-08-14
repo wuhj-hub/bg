@@ -25,11 +25,9 @@ SELF_SKILLS = [
     "xihu-report", "bo-duan-sao-miao", "duo-wei-du", "fish-body-trading",
     "强势体系", "个人23策略股票分析技能",
 ]
-SKILLS_WITH_SCRIPTS = [  # 这些技能必须保留 scripts/*.py
-    "复盘报告", "猛兽体系", "盘前市场报告", "双弦投资系统",
-    "双弦投资系统-月度股池", "鱼身", "wangbei-report", "wuwei-report",
-    "xihu-report", "bo-duan-sao-miao", "duo-wei-du", "fish-body-trading",
-    "强势体系", "个人23策略股票分析技能",
+SKILLS_WITH_SCRIPTS = [  # 必须有 scripts/*.py 的技能（依据GitHub实际备份结构）
+    "猛兽体系", "盘前市场报告", "双弦投资系统", "双弦投资系统-月度股池",
+    "鱼身", "bo-duan-sao-miao", "duo-wei-du", "fish-body-trading",
 ]
 REQUIRED_QUANT = [  # quant_scripts/ 关键脚本（缺任一即告警）
     "caige_pool.py", "pool_tracking_report.py", "beast_screener.py",
@@ -56,8 +54,9 @@ def check():
             issues.append(f"⚠️ 技能「{skill}」SKILL.md 过小({os.path.getsize(md)}B)")
         else:
             ok_count += 1
-        if skill in SKILLS_WITH_SCRIPTS:
-            py_files = glob.glob(f"skills_backup/{skill}/scripts/*.py")
+        sc_dir = f"skills_backup/{skill}/scripts"
+        if os.path.isdir(sc_dir) or skill in SKILLS_WITH_SCRIPTS:
+            py_files = glob.glob(f"{sc_dir}/*.py")
             if not py_files:
                 issues.append(f"⚠️ 技能「{skill}」scripts 无 .py 脚本")
             else:
