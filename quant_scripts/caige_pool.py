@@ -125,13 +125,42 @@ def detect_wangzhe(bars, name):
     if sum(x['vol'] for x in b[t + 1:t + 4]) / 3 >= b[t]['vol']:
         return None
     return {
-        'type': '王者倍量柱',
+        'type': '王者倍量柱(确认)',
         'limit_date': b[t]['date'],
         'limit_close': b[t]['close'],
         'vol_ratio': round(b[t]['vol'] / b[t - 1]['vol'], 2),
         'turnover': round(b[t]['turnover'], 2),
-        'note': f'涨停日{b[t]["date"]} 量比{b[t]["vol"]/b[t-1]["vol"]:.2f} 换手{b[t]["turnover"]:.1f}%'
+        'note': f'确认·涨停日{b[t]["date"]} 量比{b[t]["vol"]/b[t-1]["vol"]:.2f} 换手{b[t]["turnover"]:.1f}%'
     }
+
+def detect_wangzhe_watch(bars, name):
+    """涨停王者倍量柱·观察级：涨停+换手>5%+量比1.5~4出现即入池（T+0~T+2，等待3天确认升级）"""
+    if len(bars) < 65:
+        return None
+    i = len(bars) - 1
+    b = bars
+    is_st = 'ST' in name.upper()
+    pct = 0.05 if is_st else 0.10
+    # 观察级：涨停倍量柱出现在最近3天内（t∈[i-2, i]），尚未走完3天确认期
+    # （t=i-3 及更早已过确认期，由确认级 detect_wangzhe 判定，不重复入观察池）
+    for t in range(max(1, i - 2), i + 1):
+        if t < 1:
+            continue
+        limit_price = round(b[t - 1]['close'] * (1 + pct), 2)
+        if b[t]['close'] < limit_price - 0.001:
+            continue
+        if b[t]['turnover'] > 5 and 1.5 <= b[t]['vol'] / b[t - 1]['vol'] <= 4:
+            # 已出现且未走完3天确认（含今天出现）
+            return {
+                'type': '王者倍量柱(观察)',
+                'limit_date': b[t]['date'],
+                'limit_close': b[t]['close'],
+                'vol_ratio': round(b[t]['vol'] / b[t - 1]['vol'], 2),
+                'turnover': round(b[t]['turnover'], 2),
+                'note': f'观察·涨停日{b[t]["date"]} 量比{b[t]["vol"]/b[t-1]["vol"]:.2f} 换手{b[t]["turnover"]:.1f}% 待3日确认'
+            }
+    return None
+
 
 def detect_xuri(bars, name=None):
     """旭日东升：6日内>=4阴 + 跌幅达标 + 缩量 + 高开反包阳"""
@@ -208,6 +237,7 @@ def detect_mantian(bars, name=None):
 # ============================================================
 DETECTORS = [
     ('王者倍量柱', detect_wangzhe),
+    ('王者倍量柱(观察)', detect_wangzhe_watch),
     ('旭日东升', detect_xuri),
     ('凤凰归巢', detect_fenghuang),
     ('瞒天过海', detect_mantian),
@@ -291,6 +321,8 @@ def main():
             if not is_mainboard(code):
                 continue
             if not args.include_st and 'ST' in name.upper():
+                continue
+            if '退' in name:  # 退市股排除
                 continue
             pool.append((normalize_code(code), name))
     if args.limit:
