@@ -251,8 +251,6 @@ def main():
     ap.add_argument("--name", default="")
     ap.add_argument("--pool-file", default="stock_pool.txt", help="股票池配置文件路径")
     ap.add_argument("--push", action="store_true", help="推送PushPlus")
-    ap.add_argument("--out-file", default="", help="自定义输出文件名（默认 股池标的跟踪报告_日期.md）")
-    ap.add_argument("--hide-rejected", action="store_true", help="隐藏被否决标的（月线空头/纠缠合并行+否决明细表）")
     ap.add_argument("--auto-extend", action="store_true",
                     help="自动并入全盘量化当日主力信号（panhou_lianghua.md）")
     a = ap.parse_args()
@@ -336,13 +334,13 @@ def main():
         else:
             dec = "G1低吸信号"
         A(f"| {r['code']} | {r['name']} | {r['price']} | {mf['trend']} | {gate_txt} | {rev_txt} | {g1} | {sup_txt} | {fst} | **{dec}** |")
-    if warn_count and not a.hide_rejected:
+    if warn_count:
         A(f"| ... | **{warn_count} 只月线纠缠**（无G1信号） | — | 🟡 | — | — | — | — | — | 待确认 |")
-    if block_count and not a.hide_rejected:
+    if block_count:
         A(f"| ... | **{block_count} 只月线空头** | — | 🔴 被月线闸门拦截 | — | — | — | — | — | 否决 |")
-    if data_na and not a.hide_rejected:
+    if data_na:
         A(f"| ... | **{data_na} 只数据不足** | — | — | — | — | — | — | — | ⚠️ |")
-    if not sig_results and (a.hide_rejected or (not warn_count and not block_count and not data_na)):
+    if not sig_results and not warn_count and not block_count and not data_na:
         A("| — | 无标的 | — | — | — | — | — | — | — | — |")
 
     # 三阶共振明细
@@ -380,28 +378,27 @@ def main():
         sup_txt = f"支撑{round((r['support'] or 0)*100)}%" if r["support"] else ""
         A(f"| {r['code']} | {r['name']} | {mf['trend']}{'⚡'+mf['reversal'] if mf['reversal'] else ''} | {g1} | {fst}·{sup_txt} | 观察 |")
 
-    # 被否决明细（仅BLOCK或数据不足；--hide-rejected 时整节隐藏）
-    if not a.hide_rejected:
-        A("\n## 四、否决 / 拦截标的（三阶漏斗未通过）\n")
-        A("| 代码 | 名称 | 拦截原因 |")
-        A("|:----|:----|:--------|")
-        for r in results:
-            if not r["ok"]:
-                A(f"| {r['code']} | {r['name']} | 数据不足 |")
-                continue
-            mf, g1 = r["mf"], r["g1"]
-            fst = fin.get(r["code"], "无数据")
-            if mf["gate"] != "BLOCK":
-                continue
-            reason = []
-            reason.append("月线空头(BLOCK)")
-            if g1 == "无":
-                reason.append("无武威G1信号")
-            if fst == "亏损":
-                reason.append("亏损股")
-            elif (r["support"] or 0) < 0.05 and r["support"] is not None:
-                reason.append(f"浅支撑{round(r['support']*100)}%<5%")
-            A(f"| {r['code']} | {r['name']} | {'、'.join(reason) or '未达条件'} |")
+    # 被否决明细（仅BLOCK或数据不足）
+    A("\n## 四、否决 / 拦截标的（三阶漏斗未通过）\n")
+    A("| 代码 | 名称 | 拦截原因 |")
+    A("|:----|:----|:--------|")
+    for r in results:
+        if not r["ok"]:
+            A(f"| {r['code']} | {r['name']} | 数据不足 |")
+            continue
+        mf, g1 = r["mf"], r["g1"]
+        fst = fin.get(r["code"], "无数据")
+        if mf["gate"] != "BLOCK":
+            continue
+        reason = []
+        reason.append("月线空头(BLOCK)")
+        if g1 == "无":
+            reason.append("无武威G1信号")
+        if fst == "亏损":
+            reason.append("亏损股")
+        elif (r["support"] or 0) < 0.05 and r["support"] is not None:
+            reason.append(f"浅支撑{round(r['support']*100)}%<5%")
+        A(f"| {r['code']} | {r['name']} | {'、'.join(reason) or '未达条件'} |")
 
     A("\n---")
     A("⚠️ 本报告基于公开市场数据整理，不构成投资建议。三阶漏斗为量化历史规律总结，实战需结合大盘温度动态调整。")
@@ -409,7 +406,7 @@ def main():
     md = "\n".join(L)
     today = datetime.now().strftime("%Y-%m-%d")
     os.makedirs("outputs", exist_ok=True)
-    out = os.path.join("outputs", a.out_file or f"股池标的跟踪报告_{today}.md")
+    out = os.path.join("outputs", f"股池标的跟踪报告_{today}.md")
     with open(out, "w", encoding="utf-8") as f:
         f.write(md)
     print(f"[OK] {out} ({len(md)} chars)")
