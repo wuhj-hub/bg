@@ -1,0 +1,41 @@
+name: guard备份自检
+
+on:
+  schedule:
+    # 北京时间 09:30（UTC 01:30），每日检查备份完整性（避开15:30全盘扫描）
+    - cron: "30 1 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: guard-selfcheck
+  cancel-in-progress: false
+
+jobs:
+  selfcheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 运行备份完整性自检（skills_backup + quant_scripts）
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: python3 guard_selfcheck.py
+
+      - name: 上传自检报告到盘后量化文件夹（供查阅）
+        if: always()
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          F=guard_selfcheck_$(date +%Y-%m-%d).md
+          if [ -f "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$F" || echo "自检报告上传失败(非致命)"
+          fi
