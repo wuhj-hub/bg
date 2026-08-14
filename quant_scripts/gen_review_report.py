@@ -1049,7 +1049,8 @@ def main():
         f.write(md)
     print(f"[OK] {fname} generated")
     
-    # 上传
+    # 上传（IMA失效兜底：显式告警 + git落盘仓库，防报告丢失）
+    upload_ok = False
     for i in 1, 2, 3:
         r = subprocess.run(
             ["python3", "upload_ima.py", "--file", f"outputs/{fname}", "--name", fname],
@@ -1058,6 +1059,7 @@ def main():
         if r.returncode == 0:
             print("[OK] uploaded to IMA")
             print(r.stdout[-300:] if r.stdout else "")
+            upload_ok = True
             break
         print(f"attempt {i} failed: rc={r.returncode}")
         if r.stdout:
@@ -1065,6 +1067,22 @@ def main():
         if r.stderr:
             print("stderr:", r.stderr[-300:])
         time.sleep(10)
+    if not upload_ok:
+        # IMA失效/网络问题：显式标红（不再静默success）+ git落盘仓库兜底
+        print("::error::复盘报告上传IMA失败（凭证失效或网络），已尝试git落盘兜底，凭证恢复后需补传知识库")
+        try:
+            subprocess.run(["git", "add", f"outputs/{fname}"], capture_output=True, timeout=30)
+            subprocess.run(["git", "commit", "-m", f"chore: 复盘报告落盘兜底 {fname} (IMA上传失败)"],
+                           capture_output=True, timeout=30)
+            subprocess.run(["git", "pull", "--rebase", "origin", "main"],
+                           capture_output=True, timeout=60)
+            p = subprocess.run(["git", "push", "origin", "main"], capture_output=True, text=True, timeout=90)
+            if p.returncode == 0:
+                print(f"[OK] 报告已git落盘仓库: outputs/{fname}（IMA凭证恢复后可补传知识库）")
+            else:
+                print(f"[WARN] git push失败(可能是并发提交): {p.stderr[-200:]}")
+        except Exception as e:
+            print(f"[WARN] git落盘兜底失败: {e}")
     
     # 输出推送摘要
     print(f"\n=== PUSH SUMMARY ===")
