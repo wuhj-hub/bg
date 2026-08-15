@@ -195,6 +195,22 @@ jobs:
             PUSH_REPORT="$T" python3 push_report.py || echo "一统天下推送失败(非致命)"
           fi
 
+      # ─── 第三步.4.9：妖股发现与跟踪池（启动发现+6维跟踪+出货/分歧预警）───
+      - name: 妖股发现与跟踪池（启动入池+出货预警推送）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/yao_gu_pool.py
+          F=$(ls outputs/妖股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "妖股池上传失败(非致命)"
+          fi
+
       # ─── 第三步.5：市场风格轴（依赖市场宽度+猛兽双模式聚合，须在三系统预运行之后）───
       - name: 市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证）
         continue-on-error: true
@@ -240,7 +256,7 @@ jobs:
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             git config user.name "github-actions"
             git config user.email "actions@github.com"
-            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
+            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
             git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
             PUSHED=0
             for i in 1 2 3; do
