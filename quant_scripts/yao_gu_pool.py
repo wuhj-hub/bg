@@ -25,6 +25,12 @@ yao_gu_pool.py —— 妖股发现与跟踪系统 v1.0
 import subprocess, sys, os, re, json, time, argparse
 from datetime import datetime, timezone, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import sys as _sys
+_sys.path.insert(0, "/sandbox/workspace")
+try:
+    import emotion_forecast as emo
+except Exception:
+    emo = None
 
 BJ = timezone(timedelta(hours=8))
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
@@ -207,6 +213,20 @@ def main():
     args = ap.parse_args()
     date_str = datetime.now(BJ).strftime("%Y-%m-%d")
 
+    # 情绪状态（颜劼转移矩阵）
+    emotion_block = ""
+    if emo:
+        lu, wd = emo.get_limitup_from_width()
+        if lu is None:
+            print("[INFO] 计算当日涨停家数（情绪判定）...", flush=True)
+            lu = emo.calc_limitup_live()
+        ej = emo.judge(lu, date_str) if lu is not None else None
+        if ej:
+            emotion_block = (f"\n## 🎭 市场情绪（颜劼转移矩阵）\n"
+                             f"当日涨停 **{ej['limitup']}** 家 | 状态【{ej['state']}】 | "
+                             f"**次日预判: {ej['next']}（{ej['next_prob']}%）**\n"
+                             f"> {ej['advice']}\n")
+
     # 股票池
     pool = []
     with open("/sandbox/workspace/all_mainboard.csv", encoding="utf-8-sig") as f:
@@ -273,6 +293,8 @@ def main():
     md = [f"# 🐉 妖股发现与跟踪池 {date_str}\n",
           f"**扫描**: {len(pool)} 只主板 | **候选**: {len(cand)} | **分级**: " +
           " ".join(f"{lvl}{sum(1 for r in results if r['level'] == lvl)}" for lvl in order) + "\n"]
+    if emotion_block:
+        md.insert(1, emotion_block)
     for lvl in ("💥出货", "⚡分歧", "🔥加速", "👀观察", "📉退潮"):
         grp = [r for r in results if r["level"] == lvl]
         if not grp:
@@ -305,6 +327,8 @@ def main():
         try:
             import urllib.request, urllib.parse
             lines = [f"🐉 妖股预警 {date_str}\n"]
+            if emotion_block:
+                lines.append(emotion_block.replace("\n", "\n").strip() + "\n")
             for r in alerts[:10]:
                 lines.append(f"- {r['code']} {r['name']} {r['price']:.2f} [{r['level']}] {r['alert']}")
             body = urllib.parse.urlencode({"token": os.environ.get("PUSH_TOKEN", ""),
