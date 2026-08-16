@@ -40,3 +40,11 @@ jobs:
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           python3 intraday_monitor.py
+
+      # ─── 开盘八法：9:45扫描强形态 + 盘中突破监控（auto分阶段）───
+      - name: 开盘八法强形态扫描+突破监控
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/kaipan_8.py --auto
