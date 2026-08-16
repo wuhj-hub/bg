@@ -140,12 +140,79 @@ def analyze(code, name, prev_close_map):
         return None
     return {"code": code, "name": name, "price": rows[-1]["price"], **r}
 
+def push_alert(title, content):
+    try:
+        import urllib.request, urllib.parse
+        tok = os.environ.get("PUSH_TOKEN", "")
+        if not tok:
+            return
+        body = urllib.parse.urlencode({"token": tok, "title": title, "content": content,
+                                       "template": "markdown"}).encode()
+        urllib.request.urlopen(urllib.request.Request("https://pushplus.plus/send", data=body), timeout=15)
+        print("[push] 已推送:", title)
+    except Exception as e:
+        print("[push] 失败:", e)
+
+def monitor_once(date_str):
+    """突破监控：读当日强形态池，检查现价是否突破9:45高点"""
+    jpath = f"/sandbox/workspace/outputs/开盘强形态_{date_str}.json"
+    if not os.path.exists(jpath):
+        print("[monitor] 无当日强形态数据，跳过")
+        return
+    data = json.load(open(jpath, encoding="utf-8"))
+    strong = data.get("strong", [])
+    if not strong:
+        return
+    # 已推送过的突破（防重复）
+    pushed_file = f"/sandbox/workspace/outputs/开盘突破已推送_{date_str}.json"
+    pushed = set()
+    if os.path.exists(pushed_file):
+        pushed = set(json.load(open(pushed_file, encoding="utf-8")))
+    breaks = []
+    for s in strong:
+        code = s["code"]
+        rows = fetch_minute(code)
+        if not rows:
+            continue
+        cur = rows[-1]["price"]
+        target = s["h3"]
+        if cur >= target and code not in pushed:
+            pct = (cur - s["prev_close"]) / s["prev_close"] * 100
+            breaks.append(f"- {code} {s['name']} **突破{target:.2f}** 现价{cur:.2f}（{pct:+.1f}%）[{s['pattern']}]")
+            pushed.add(code)
+    if breaks:
+        msg = f"📈 开盘强形态突破 {date_str}\n\n" + "\n".join(breaks)
+        push_alert("📈突破预警", msg)
+        json.dump(sorted(pushed), open(pushed_file, "w", encoding="utf-8"))
+        print(f"[monitor] 突破 {len(breaks)} 只")
+    else:
+        print(f"[monitor] 无新突破（监控 {len(strong)} 只）")
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--monitor", action="store_true", help="突破监控模式（循环检查）")
+    ap.add_argument("--monitor", action="store_true", help="突破监控（读当日强形态池检查突破）")
+    ap.add_argument("--auto", action="store_true", help="自动模式：9:45-9:55扫描，之后监控")
     ap.add_argument("--pool-file", default="")
     args = ap.parse_args()
     date_str = datetime.now(BJ).strftime("%Y-%m-%d")
+    now_bj = datetime.now(BJ)
+    if args.auto:
+        # 自动分阶段：9:40-9:55 扫描；9:55+ 监控；非交易时段跳过
+        hm = now_bj.hour * 100 + now_bj.minute
+        if 940 <= hm <= 955:
+            args.monitor = False
+            print(f"[auto] {hm} 扫描阶段")
+        elif 955 < hm <= 1430:
+            args.monitor = True
+            print(f"[auto] {hm} 监控阶段")
+            monitor_once(date_str)
+            return
+        else:
+            print(f"[auto] {hm} 非交易时段，跳过")
+            return
+    if args.monitor:
+        monitor_once(date_str)
+        return
     t0 = time.time()
 
     pool = load_pool()
@@ -215,6 +282,12 @@ def main():
     # 突破预警位 JSON（供监控）
     with open(f"/sandbox/workspace/outputs/开盘强形态_{date_str}.json", "w", encoding="utf-8") as f:
         json.dump({"date": date_str, "elapsed": elapsed, "strong": strong}, f, ensure_ascii=False, indent=1)
+    # 推送强形态清单
+    if strong:
+        lines = [f"🌅 开盘强形态 {date_str}（{len(strong)}只）\n"]
+        for r in strong[:12]:
+            lines.append(f"- {r['code']} {r['name']} **{r['pattern']}** 突破位{r['h3']:.2f}")
+        push_alert("🌅开盘强形态", "\n".join(lines))
 
 if __name__ == "__main__":
     main()
