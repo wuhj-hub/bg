@@ -88,10 +88,15 @@ def fetch_asfund_lhb(symbol):
             inst_net = None
             if detail and detail != "-":
                 inst_buy = inst_sell = 0.0
-                for item in json.loads(detail):
-                    if "机构专用" in str(item.get("Name", "")):
-                        inst_buy += float(item.get("Buy") or 0)
-                        inst_sell += float(item.get("Sell") or 0)
+                try:
+                    parsed = json.loads(detail)
+                    if isinstance(parsed, list):
+                        for item in parsed:
+                            if "机构专用" in str(item.get("Name", "")):
+                                inst_buy += float(item.get("Buy") or 0)
+                                inst_sell += float(item.get("Sell") or 0)
+                except Exception:
+                    parsed = None
                 if inst_buy or inst_sell:
                     inst_net = round((inst_buy - inst_sell) / 1e8, 2)
             flow = float(parts[14]) / 1e8 if len(parts) > 14 else 0
@@ -189,22 +194,59 @@ def main():
     # 跟风：涨停但连板=1 且成交额较小
     gen = [s for s in zt_stocks.values() if s["boards"] == 1]
 
-    # Step3: 板块归属（hot board 领涨股匹配）
-    hot = cli("hot board --limit 20")
-    sector_map = {}  # code -> 板块
+    # Step3: 板块归属（board 行业涨幅榜 leadStock → 名称匹配全市场）
+    hot = cli("board")
+    sector_lead = {}  # 板块名 -> 领涨股名
+    sector_rank = {}  # 板块名 -> 排名（顺序）
+    _rk = 0
     for ln in hot.splitlines():
         s = ln.strip()
-        if not s.startswith("|") or "leadStock" in s:
+        if not s.startswith("|") or "leadStock" in s or "---" in s:
             continue
         parts = [p.strip() for p in s.strip("|").split("|")]
-        if len(parts) >= 9:
-            name = parts[7]
-            lead = parts[8]
+        if len(parts) >= 6:
+            _rk += 1
+            name = parts[0]
+            lead = parts[5]
             m = re.search(r"([\u4e00-\u9fffA-Za-z]+)\((\d+\.?\d*)\)", lead)
-            if m and m.group(2):
-                # 领涨股名 → 代码（用搜索近似：跳过，标注板块名）
-                pass
-    # 简化板块归属：涨停股按名称关键词常见板块（医药/科技/能源等）—— 第一版省略精确归属，用连板梯队为主
+            if m:
+                sector_lead[name] = m.group(1)
+                sector_rank[name] = _rk
+    # 名称 → 代码映射（all_mainboard）
+    name2code = {n.replace(" ", ""): c for c, n in pool}
+    # 涨停股板块归属：领涨股名匹配
+    for code, st in zt_stocks.items():
+        nm = st["name"].replace(" ", "")
+        for sec, lead in sector_lead.items():
+            if lead.replace(" ", "") == nm:
+                st["sector"] = sec
+                st["sector_rank"] = sector_rank.get(sec, 99)
+                break
+        else:
+            st["sector"] = ""
+            st["sector_rank"] = 99
+    # 板块龙头：板块内涨停股中连板最高者
+    sector_boss = {}
+    for code, st in zt_stocks.items():
+        if st.get("sector"):
+            sec = st["sector"]
+            if sec not in sector_boss or st["boards"] > sector_boss[sec]["boards"]:
+                sector_boss[sec] = st
+    # 中军补充板块标注
+    for st in jun_cand:
+        nm = st["name"].replace(" ", "")
+        st["sector"] = next((sec for sec, lead in sector_lead.items() if lead.replace(" ", "") == nm), "")
+
+    # Step3.5: 机构锁仓识别（高连板梯队拉龙虎榜）
+    print("[INFO] 高连板机构龙虎榜检查...", flush=True)
+    gaolb_tmp = [s for s in zt_stocks.values() if s["boards"] >= 2]
+    for s in gaolb_tmp:
+        f = fetch_asfund_lhb(s["code"])
+        s["inst_net"] = f["inst_net"] if f else None
+        s["main_flow"] = f["flow"] if f else None
+        s["inst_tag"] = "🏛️机构" if f and f["inst_net"] and f["inst_net"] > 0 else ""
+        time.sleep(0.5)
+    print(f"  机构龙虎榜完成 {len(gaolb_tmp)} 只")
 
     # Step4: 五维评分（简版：连板+量比+成交额+炸板）
     def score5(s):
@@ -235,10 +277,17 @@ def main():
     gaolb = sorted([s for s in zt_stocks.values() if s["boards"] >= 2], key=lambda s: (-s["boards"], -s["amount"]))
     L.append(f"\n## 🏆 高连板梯队（2板以上 {len(gaolb)}只）\n")
     if gaolb:
-        L.append("| 代码 | 名称 | 连板 | 涨幅% | 成交亿 | 量比 | 五维分 |")
-        L.append("|------|------|:---:|:---:|:---:|:---:|:---:|")
+        L.append("| 代码 | 名称 | 连板 | 涨幅% | 成交亿 | 量比 | 板块 | 机构 | 五维分 |")
+        L.append("|------|------|:---:|:---:|:---:|:---:|------|:---:|:---:|")
         for s in gaolb[:20]:
-            L.append(f"| {s['code']} | {s['name']} | {s['boards']}板 | {s['chg']:+.1f} | {s['amount']} | {s['vol_ratio']} | {s['score5']} |")
+            L.append(f"| {s['code']} | {s['name']} | {s['boards']}板 | {s['chg']:+.1f} | {s['amount']} | {s['vol_ratio']} | {s.get('sector','')} | {s.get('inst_tag','')} | {s['score5']} |")
+    # 板块龙头表
+    L.append(f"\n## 🗂️ 板块龙头（{len(sector_boss)}个板块）\n")
+    if sector_boss:
+        L.append("| 板块 | 龙头 | 代码 | 连板 | 板块热度排名 |")
+        L.append("|------|------|------|:---:|:---:|")
+        for sec, st in sorted(sector_boss.items(), key=lambda x: x[1].get("sector_rank", 99))[:12]:
+            L.append(f"| {sec} | {st['name']} | {st['code']} | {st['boards']}板 | {st.get('sector_rank','-')} |")
     # 中军
     L.append(f"\n## 🏛️ 中军候选（成交额TOP30非涨停·趋势核心）\n")
     L.append("| 代码 | 名称 | 涨幅% | 成交亿 | 量比 | 五维分 |")
@@ -250,9 +299,29 @@ def main():
     gen.sort(key=lambda s: -s["amount"])
     for s in gen[:15]:
         L.append(f"- {s['code']} {s['name']} 首板 {s['chg']:+.1f}% 成交{s['amount']}亿")
-    # 见顶预警
+    # 见顶预警（含量价背离）
     L.append(f"\n## ⚠️ 见顶五维预警\n")
     warns = []
+    # ① 量价背离：指数创新高但缩量
+    try:
+        idx = cli("kline sh000001 --period day --limit 6 --fq qfq")
+        idx_rows = []
+        for ln in idx.splitlines():
+            s = ln.strip()
+            if not s.startswith("|") or "date" in s or "---" in s:
+                continue
+            parts = [p.strip() for p in s.strip("|").split("|")]
+            if re.match(r"\d{4}-\d{2}-\d{2}", parts[0]):
+                try:
+                    idx_rows.append({"d": parts[0], "c": float(parts[2]), "v": float(parts[5])})
+                except ValueError:
+                    continue
+        if len(idx_rows) >= 3:
+            last, prev = idx_rows[-1], idx_rows[-2]
+            if last["c"] >= max(r["c"] for r in idx_rows[:-1]) and last["v"] < prev["v"] * 0.9:
+                warns.append(f"①量价背离：指数创{len(idx_rows)-1}日新高但缩量({last['v']/1e8:.0f}亿 vs 前日{prev['v']/1e8:.0f}亿)")
+    except Exception:
+        pass
     if zong and any(s["tian_di"] or s["open_board"] for s in zong):
         warns.append("②龙头崩塌：总龙头开板/天地板")
     lb_2plus = sum(1 for s in zt_stocks.values() if s["boards"] >= 2)
