@@ -209,6 +209,7 @@ jobs:
           F=$(ls outputs/妖股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
           if [ -n "$F" ]; then
             python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "妖股池上传失败(非致命)"
+            PUSH_REPORT="$F" python3 push_report.py || echo "妖股池推送失败(非致命)"
           fi
 
       # ─── 第三步.4.10：龙头定位（五维模板·总龙头/板块龙/中军/跟风梯队+见顶预警）───
@@ -219,11 +220,13 @@ jobs:
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           python3 quant_scripts/longtou.py
           F=$(ls outputs/龙头定位_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
           if [ -n "$F" ]; then
             python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "龙头定位上传失败(非致命)"
+            PUSH_REPORT="$F" python3 push_report.py || echo "龙头定位推送失败(非致命)"
           fi
 
       # ─── 第三步.5：市场风格轴（依赖市场宽度+猛兽双模式聚合，须在三系统预运行之后）───
