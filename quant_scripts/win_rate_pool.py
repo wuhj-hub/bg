@@ -144,11 +144,26 @@ def collect_system_signals():
             signals.setdefault("双弦月度池", []).append(
                 (e.get("code"), e.get("name", ""), e.get("date_str", date), e.get("price", 0),
                  f"共振{e.get('score','')}分"))
-        # 鱼身信号（stdout 正则）
-        fs = j.get("fishbody", {}).get("stdout", "")
-        for m in re.finditer(r"#\d+\s+(sh\d{6}|sz\d{6})\s+(\S+)\s+\d+分\s+现价([\d.]+)", fs):
-            signals.setdefault("鱼身信号", []).append(
-                (m.group(1), m.group(2), date, float(m.group(3)), "鱼身模式"))
+        # 鱼身信号：优先 fish_body_latest.json（完整36信号），stdout 正则兜底
+        fish_signals = []
+        try:
+            req2 = urllib.request.Request(
+                "https://api.github.com/repos/wuhj-hub/bg/contents/fish_body_latest.json",
+                headers={"Authorization": "token " + os.environ.get("GITHUB_TOKEN", "")} if os.environ.get("GITHUB_TOKEN") else {})
+            d2 = json.loads(urllib.request.urlopen(req2, timeout=30).read().decode())
+            fj = json.loads(base64.b64decode(d2["content"]).decode())
+            for s in fj.get("signals", []):
+                fish_signals.append((s.get("code"), s.get("name", ""),
+                                     fj.get("date", date), s.get("price", 0),
+                                     f"{s.get('pattern','')}{s.get('final_score',s.get('score',''))}分"))
+        except Exception:
+            pass
+        if not fish_signals:
+            fs = j.get("fishbody", {}).get("stdout", "")
+            for m in re.finditer(r"#\d+\s+(sh\d{6}|sz\d{6})\s+(\S+)\s+\d+分\s+现价([\d.]+)", fs):
+                fish_signals.append((m.group(1), m.group(2), date, float(m.group(3)), "鱼身模式"))
+        signals.setdefault("鱼身信号", []).extend(fish_signals)
+        print(f"[INFO] 鱼身信号 {len(fish_signals)} 只（fish_body_latest）")
     except Exception as e:
         print("[WARN] 三系统数据拉取失败:", e)
     # 猛兽领先股（8/13 知识库提取，价格按日期补）
