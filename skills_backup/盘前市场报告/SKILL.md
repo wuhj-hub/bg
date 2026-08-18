@@ -273,9 +273,9 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/forward_look_scanne
 # 第一步：IMA 会话中调用通达信 tdx_screener 导出涨停数据（连板数据唯一可靠源，westock无涨停池接口）
 #   tdx_screener(message="涨停", pageSize="50", rang="AG")   → 按 total 翻页取全量
 #   tdx_screener(message="2连板以上", pageSize="20", rang="AG") → 连板梯队全量
-# 第二步：把两次结果合并保存为 outputs/tdx_{date}.json（data 数组合并去重，含 meta.total）
-# 第三步：运行热点情绪模块
-python3 /sandbox/workspace/skills/盘前市场报告/scripts/hot_emotion.py --date {date} --input outputs/tdx_{date}.json
+# 第二步：把两次结果分别保存为 outputs/tdx_{date}_a.json / tdx_{date}_b.json（无需手工合并）
+# 第三步：运行热点情绪模块（--input 可多个，自动合并去重）
+python3 /sandbox/workspace/skills/盘前市场报告/scripts/hot_emotion.py --date {date} --input outputs/tdx_{date}_a.json --input outputs/tdx_{date}_b.json
 ```
 
 输出（均落盘 `scripts/outputs/`）：
