@@ -391,7 +391,7 @@ def render_md(date, stats, score, persistence, alerts, sample_note=""):
 def main():
     ap = argparse.ArgumentParser(description="热点情绪模块：连板梯队+板块持续性+退潮预警")
     ap.add_argument("--date", default=datetime.now().strftime("%Y-%m-%d"), help="交易日 YYYY-MM-DD")
-    ap.add_argument("--input", help="tdx_screener 导出的 JSON 文件路径")
+    ap.add_argument("--input", action="append", help="tdx_screener 导出的 JSON 文件路径（可多个，自动合并去重）")
     ap.add_argument("--westock", action="store_true", help="westock 批量K线自算模式（降级）")
     ap.add_argument("--kline-file", help="westock 模式：kline 批量输出文本文件")
     ap.add_argument("--outdir", default=OUT_DIR, help="输出目录")
@@ -413,14 +413,23 @@ def main():
         if not args.input:
             print("错误：需要 --input（tdx_screener 导出的 JSON）或 --westock", file=sys.stderr)
             sys.exit(1)
-        with open(args.input, "r", encoding="utf-8") as f:
-            tdx = json.load(f)
-        rows = parse_tdx_json(tdx)
+        # 支持多文件：--input a.json --input b.json（"涨停"全量 + "2连板以上"），自动合并去重
+        all_rows = []
+        seen_codes = set()
         total_hint = None
-        # 尝试从 meta.total 取全量数
-        if isinstance(tdx, dict):
-            meta = tdx.get("meta", {})
-            total_hint = meta.get("total")
+        for in_path in args.input:
+            with open(in_path, "r", encoding="utf-8") as f:
+                tdx = json.load(f)
+            for r in parse_tdx_json(tdx):
+                if r["code"] not in seen_codes:
+                    seen_codes.add(r["code"])
+                    all_rows.append(r)
+            if isinstance(tdx, dict):
+                meta = tdx.get("meta", {})
+                t = meta.get("total")
+                if t and (total_hint is None or t > total_hint):
+                    total_hint = t
+        rows = all_rows
         sample_note = "" if total_hint and total_hint == len(rows) else \
             f"样本 {len(rows)}/{total_hint or '?'} 只涨停（tdx导出截断）"
 
