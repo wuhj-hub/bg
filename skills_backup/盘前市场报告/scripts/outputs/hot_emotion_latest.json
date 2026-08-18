@@ -25,10 +25,10 @@
    "heat": 31.0,
    "zt": 23,
    "lianban": 4,
-   "streak": 0,
-   "appear_5d": 0,
-   "prev_heat": null,
-   "prev_zt": null,
+   "streak": 1,
+   "appear_5d": 1,
+   "prev_heat": 31.0,
+   "prev_zt": 23,
    "kind": "强主线"
   },
   {
@@ -36,10 +36,10 @@
    "heat": 21.0,
    "zt": 15,
    "lianban": 3,
-   "streak": 0,
-   "appear_5d": 0,
-   "prev_heat": null,
-   "prev_zt": null,
+   "streak": 1,
+   "appear_5d": 1,
+   "prev_heat": 21.0,
+   "prev_zt": 15,
    "kind": "强主线"
   },
   {
@@ -47,10 +47,10 @@
    "heat": 18.0,
    "zt": 12,
    "lianban": 3,
-   "streak": 0,
-   "appear_5d": 0,
-   "prev_heat": null,
-   "prev_zt": null,
+   "streak": 1,
+   "appear_5d": 1,
+   "prev_heat": 18.0,
+   "prev_zt": 12,
    "kind": "强主线"
   },
   {
@@ -58,10 +58,10 @@
    "heat": 17.0,
    "zt": 11,
    "lianban": 3,
-   "streak": 0,
-   "appear_5d": 0,
-   "prev_heat": null,
-   "prev_zt": null,
+   "streak": 1,
+   "appear_5d": 1,
+   "prev_heat": 17.0,
+   "prev_zt": 11,
    "kind": "强主线"
   },
   {
@@ -69,10 +69,10 @@
    "heat": 11.0,
    "zt": 5,
    "lianban": 3,
-   "streak": 0,
-   "appear_5d": 0,
-   "prev_heat": null,
-   "prev_zt": null,
+   "streak": 1,
+   "appear_5d": 1,
+   "prev_heat": 11.0,
+   "prev_zt": 5,
    "kind": "强主线"
   },
   {
@@ -80,33 +80,33 @@
    "heat": 8.0,
    "zt": 6,
    "lianban": 1,
-   "streak": 0,
-   "appear_5d": 0,
-   "prev_heat": null,
-   "prev_zt": null,
-   "kind": "新方向"
+   "streak": 1,
+   "appear_5d": 1,
+   "prev_heat": 8.0,
+   "prev_zt": 6,
+   "kind": "发酵中"
   },
   {
    "tag": "储能/绿电",
    "heat": 8.0,
    "zt": 6,
    "lianban": 1,
-   "streak": 0,
-   "appear_5d": 0,
-   "prev_heat": null,
-   "prev_zt": null,
-   "kind": "新方向"
+   "streak": 1,
+   "appear_5d": 1,
+   "prev_heat": 8.0,
+   "prev_zt": 6,
+   "kind": "发酵中"
   },
   {
    "tag": "华为概念",
    "heat": 7.0,
    "zt": 5,
    "lianban": 1,
-   "streak": 0,
-   "appear_5d": 0,
-   "prev_heat": null,
-   "prev_zt": null,
-   "kind": "新方向"
+   "streak": 1,
+   "appear_5d": 1,
+   "prev_heat": 7.0,
+   "prev_zt": 5,
+   "kind": "发酵中"
   }
  ],
  "alerts": [],
