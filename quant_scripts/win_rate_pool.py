@@ -128,9 +128,43 @@ def collect_signals():
                     (s.get("code"), s.get("name", ""), date, s.get("close", 0), tag))
     return signals
 
+def collect_system_signals():
+    """从GitHub quant_results_latest 提取双弦/鱼身/猛兽信号（8/13）"""
+    import base64, urllib.request
+    signals = {}
+    try:
+        req = urllib.request.Request(
+            "https://api.github.com/repos/wuhj-hub/bg/contents/quant_results_latest.json",
+            headers={"Authorization": "token " + os.environ.get("GITHUB_TOKEN", "")} if os.environ.get("GITHUB_TOKEN") else {})
+        d = json.loads(urllib.request.urlopen(req, timeout=30).read().decode())
+        j = json.loads(base64.b64decode(d["content"]).decode())
+        date = j.get("date", "?")
+        # 双弦池
+        for e in j.get("shuangxian", {}).get("pool_data", {}).get("entries", []):
+            signals.setdefault("双弦月度池", []).append(
+                (e.get("code"), e.get("name", ""), e.get("date_str", date), e.get("price", 0),
+                 f"共振{e.get('score','')}分"))
+        # 鱼身信号（stdout 正则）
+        fs = j.get("fishbody", {}).get("stdout", "")
+        for m in re.finditer(r"#\d+\s+(sh\d{6}|sz\d{6})\s+(\S+)\s+\d+分\s+现价([\d.]+)", fs):
+            signals.setdefault("鱼身信号", []).append(
+                (m.group(1), m.group(2), date, float(m.group(3)), "鱼身模式"))
+    except Exception as e:
+        print("[WARN] 三系统数据拉取失败:", e)
+    # 猛兽领先股（8/13 知识库提取，价格按日期补）
+    beast = [("sz000802", "北京文化", "领先66分"), ("sh603259", "药明康德", "领先51分"),
+             ("sh600721", "百花医药", "领先50分"), ("sz001258", "立新能源", "领先48分"),
+             ("sh605179", "一鸣食品", "领先46分"), ("sz002400", "省广集团", "领先41分"),
+             ("sh600664", "哈药股份", "回调53分"), ("sz000938", "紫光股份", "回调50分")]
+    for code, name, tag in beast:
+        signals.setdefault("猛兽股池", []).append((code, name, "2026-08-13", 0, tag))
+    return signals
+
 def main():
     date_str = datetime.now(BJ).strftime("%Y-%m-%d")
     signals = collect_signals()
+    for k, v in collect_system_signals().items():
+        signals.setdefault(k, []).extend(v)
     # 去重：同池同code取最早信号
     all_codes = set()
     for pool, lst in signals.items():
@@ -147,7 +181,7 @@ def main():
 
     L = [f"# 📊 五大股池周度胜率汇总 {date_str}\n",
          f"> 统计各股池历史信号（信号日收盘价→最新收盘）\n"]
-    order = ["才哥战法", "一统天下", "妖股池", "龙头定位"]
+    order = ["才哥战法", "一统天下", "妖股池", "龙头定位", "双弦月度池", "鱼身信号", "猛兽股池"]
     for pool in order:
         lst = signals.get(pool, [])
         rets = []
