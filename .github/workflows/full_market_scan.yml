@@ -21,6 +21,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # 沙箱路径兼容层：部分脚本硬编码 /sandbox/workspace（沙箱路径），GitHub runner 上不存在
+      # 通过软链接把 /sandbox/workspace 指向仓库根，无需逐个改脚本
+      - name: 沙箱路径兼容层（/sandbox/workspace → 仓库根）
+        run: |
+          sudo mkdir -p /sandbox
+          sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
+          ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪: /sandbox/workspace -> $GITHUB_WORKSPACE"
+
       - name: Setup Node.js（westock npx 依赖）
         uses: actions/setup-node@v4
         with:
@@ -272,26 +280,12 @@ jobs:
           cp outputs/信号仲裁_latest.json 信号仲裁_latest.json 2>/dev/null || true
           cp outputs/四维共振_chinext_kcb_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || true
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
-            git config user.name "github-actions"
-            git config user.email "actions@github.com"
-            git add quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt 2>/dev/null || git add quant_results_latest.json fish_body_latest.json
-            git commit -m "chore: update quant/fish_latest ($(date +%Y-%m-%d))" || echo "no changes to commit"
-            PUSHED=0
-            for i in 1 2 3; do
-              # rebase冲突时回退到merge，避免 || true 吞掉冲突导致push永败
-              git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || { git rebase --abort 2>/dev/null; git pull origin main --allow-unrelated-histories 2>/dev/null || true; }
-              if git push origin main 2>/dev/null; then
-                echo "[OK] quant_results_latest pushed (attempt $i)"
-                PUSHED=1
-                break
-              fi
-              echo "push attempt $i failed, retry after 15s"
-              sleep 15
-            done
-            if [ "$PUSHED" != "1" ]; then
-              echo "::error::quant_latest 推送失败（3次尝试均失败，多为并发提交冲突）。需人工处理: git pull && git push"
-              exit 1
-            fi
+            # 改用 Contents API 提交（git pull/push 浅克隆+并发冲突导致 8/17 起连续失败，阻断后续上传）
+            python3 git_api_commit.py --msg "chore: update quant/fish_latest ($(date +%Y-%m-%d))" \
+              quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
+              market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json \
+              四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json \
+              quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt
           fi
 
       # ─── 第四步：上传所有结果 ───
@@ -440,14 +434,16 @@ jobs:
             SCORE=$(python3 -c "import json; print(json.load(open('health_status.json'))['health_score'])")
             GRADE=$(python3 -c "import json; print(json.load(open('health_status.json'))['health_grade'])")
             REGIME=$(python3 -c "import json; print(json.load(open('health_status.json'))['market_regime'])")
-            ISSUES=$(python3 -c "
+            ISSUES=$(python3 <<'PYEOF'
             import json
-            d=json.load(open('health_status.json'))
-            all_i=[]
-            for k,v in d.get('checks',{}).items():
-                if isinstance(v,dict): all_i.extend(v.get('issues',[]))
+            d = json.load(open('health_status.json'))
+            all_i = []
+            for k, v in d.get('checks', {}).items():
+                if isinstance(v, dict):
+                    all_i.extend(v.get('issues', []))
             print('; '.join(all_i[:3]) if all_i else '无')
-            ")
+            PYEOF
+            )
             MSG="🏥 体系自检报告 - $(date +%Y-%m-%d)\n\n健康评分: ${SCORE}/100 (${GRADE})\n市场状态: ${REGIME}\n问题摘要: ${ISSUES}"
             curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=🏥体系自检&content=${MSG}&template=txt" > /dev/null
           fi
