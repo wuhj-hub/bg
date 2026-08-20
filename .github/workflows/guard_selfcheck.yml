@@ -26,6 +26,18 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: python3 guard_selfcheck.py
 
+      - name: IMA 凭证预检（失效/疑似过期立即微信告警）
+        if: always()
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          # probe：凭证失效(401)立即推送告警；staleness：距上次成功>7天推送疑似过期预警
+          python3 ima_cred_check.py --probe || true
+          python3 ima_cred_check.py --staleness 7 || true
+
       - name: 上传自检报告到盘后量化文件夹（供查阅）
         if: always()
         continue-on-error: true
