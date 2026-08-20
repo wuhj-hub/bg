@@ -44,20 +44,13 @@ jobs:
           python3 quant_scripts/report_selfcheck.py --premarket "premarket_judgment_$(date +%Y-%m-%d).json" --today "$(date +%Y-%m-%d)" --alert || echo "自检发现问题(已推送报警), 不阻断流程"
 
       - name: 提交盘前预判到仓库（供复盘报告真实验证）
+        # 防阻断：提交失败不阻断后续推送
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add premarket_judgment_latest.json "premarket_judgment_$(date +%Y-%m-%d).json" "盘前市场报告_$(date +%Y-%m-%d).md" 2>/dev/null
-          git commit -m "chore: update premarket judgment ($(date +%Y-%m-%d))" || echo "no changes to commit"
-          for i in 1 2 3; do
-            git pull --rebase origin main --allow-unrelated-histories 2>/dev/null || true
-            if git push origin main 2>/dev/null; then
-              echo "[OK] premarket judgment pushed (attempt $i)"
-              break
-            fi
-            echo "push attempt $i failed, retry after 15s"
-            sleep 15
-          done
+          python3 git_api_commit.py --msg "chore: update premarket judgment ($(date +%Y-%m-%d))" \
+            premarket_judgment_latest.json "premarket_judgment_$(date +%Y-%m-%d).json" "盘前市场报告_$(date +%Y-%m-%d).md"
 
       - name: 推送盘前报告到微信
         if: always()
