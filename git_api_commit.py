@@ -27,10 +27,16 @@ import os
 import subprocess
 import sys
 import time
+import urllib.parse
 
 REPO = os.environ.get("GH_REPO", "wuhj-hub/bg")
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
 BRANCH = "main"
+
+
+def gh_url(gh_path):
+    """GitHub API URL，路径段做 URL 编码（中文文件名必须编码）。"""
+    return f"https://api.github.com/repos/{REPO}/contents/{urllib.parse.quote(gh_path)}?ref={BRANCH}"
 
 
 def curl(method, url, payload=None):
@@ -53,7 +59,7 @@ def curl(method, url, payload=None):
 
 
 def get_sha(gh_path):
-    r = curl("GET", f"https://api.github.com/repos/{REPO}/contents/{gh_path}?ref={BRANCH}")
+    r = curl("GET", gh_url(gh_path))
     return r.get("sha") if isinstance(r, dict) else None
 
 
@@ -63,11 +69,11 @@ def put_file(gh_path, content_b64, msg, retries=3):
         payload = {"message": msg, "content": content_b64, "branch": BRANCH}
         if old_sha:
             payload["sha"] = old_sha
-        r = curl("PUT", f"https://api.github.com/repos/{REPO}/contents/{gh_path}", payload)
+        r = curl("PUT", gh_url(gh_path), payload)
         if isinstance(r, dict) and r.get("content"):
             return True
         # 409 并发冲突 → 拉最新 sha 重试
-        if isinstance(r, dict) and r.get("message", "").startswith("409"):
+        if isinstance(r, dict) and "409" in str(r.get("message", "")):
             time.sleep(3)
             continue
         print(f"  ⚠️ {gh_path}: {str(r)[:200]}")
@@ -90,13 +96,15 @@ def main():
         if not os.path.exists(path):
             print(f"⏭️ 本地缺失，跳过: {path}")
             continue
+        # GitHub 路径 = 相对仓库根；绝对路径取 basename（workflow 中 cwd=仓库根）
+        gh_path = os.path.basename(path) if path.startswith("/") else path
         with open(path, "rb") as f:
             content_b64 = base64.b64encode(f.read()).decode()
-        if put_file(path, content_b64, args.msg):
-            print(f"✅ {path} ({os.path.getsize(path)}B)")
+        if put_file(gh_path, content_b64, args.msg):
+            print(f"✅ {gh_path} ({os.path.getsize(path)}B)")
             ok += 1
         else:
-            print(f"❌ {path}")
+            print(f"❌ {gh_path}")
     print(f"\n完成 {ok}/{len(args.files)}")
     sys.exit(0 if ok > 0 else 1)
 
