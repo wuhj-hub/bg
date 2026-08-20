@@ -264,6 +264,8 @@ jobs:
 
       # ─── 第三步.6：提交量化汇总（供次日盘前报告引用三系统信号）───
       - name: 提交量化汇总到仓库（供盘前报告引用）
+        # 防阻断：提交失败不标记 job failure（避免后续上传/复盘全被跳过）
+        continue-on-error: true
         run: |
           cp outputs/quant_results_$(date +%Y-%m-%d).json quant_results_latest.json 2>/dev/null || cp outputs/quant_results_latest.json quant_results_latest.json 2>/dev/null || true
           # 鱼身JSON一并提交（盘前premarket_fishbody从GitHub拉取，防止知识库上传失败导致缺失）
@@ -290,6 +292,7 @@ jobs:
 
       # ─── 第四步：上传所有结果 ───
       - name: 上传全盘量化报告到全盘量化文件夹
+        if: always()  # 防阻断：前置步骤失败仍执行
         id: upload_main
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
@@ -318,6 +321,7 @@ jobs:
       # ─── 第五步：股池标的跟踪报告（三阶漏斗：月线反转→武威G1→v2.1质量否决）───
       # 先于复盘报告生成，供复盘③.5引用当日股池状态
       - name: 生成并上传股池标的跟踪报告（三阶漏斗）
+        if: always()  # 防阻断：前置步骤失败仍执行
         continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
@@ -334,6 +338,7 @@ jobs:
 
       # ─── 第五.5步：自动生成复盘报告并上传（含③.5股池三阶漏斗状态引用 + 反转数值信号池）───
       - name: 自动生成复盘报告并上传
+        if: always()  # 防阻断：前置步骤失败仍执行
         continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
@@ -348,6 +353,7 @@ jobs:
 
       # ─── 第五.6步：股池信号实盘胜率跟踪（每日累积，2-4周后可对比回测）───
       - name: 股池信号实盘胜率跟踪
+        if: always()  # 防阻断：前置步骤失败仍执行
         continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
@@ -362,6 +368,7 @@ jobs:
 
       # ─── 第五.7步：纸面组合跟踪（信号→虚拟持仓→每日盈亏，按方法分组对比）───
       - name: 纸面组合跟踪（选股方法对比）
+        if: always()  # 防阻断：前置步骤失败仍执行
         continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
@@ -380,6 +387,7 @@ jobs:
 
       # ─── 第五.8步：反转数值周线信号上传+推送（信号md已由复盘步骤生成）───
       - name: 反转数值周线信号上传推送
+        if: always()  # 防阻断：前置步骤失败仍执行
         continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
