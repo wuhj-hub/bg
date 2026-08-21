@@ -320,6 +320,13 @@ def gen_report(today_str):
         cl = mw.get("cost_line") or {}
         if cl:
             lines.append(f"| 💰 200日成本线 | 现价{cl.get('cur','—')} vs 成本{cl.get('cost200','—')}（{cl.get('ratio','—')}%·斜率{cl.get('slope','—')}）→ **{cl.get('zone','')}** |")
+    # 年线广度指标（V纪元方法论：站上年线个股占比=中期牛熊结构）
+    yl = read_yearline_breadth()
+    if yl:
+        yl_level = yl.get("level", "")
+        yl_icon = {"bull": "🟢", "mixed": "🟡", "bear": "🟠", "deep_bear": "🔴"}.get(yl_level, "")
+        yl_label = {"bull": "牛市结构", "mixed": "结构分化", "bear": "熊市结构", "deep_bear": "深度熊市"}.get(yl_level, yl_level)
+        lines.append(f"| 📈 年线广度 | 站上年线 **{yl.get('above','—')}/{yl.get('total','—')}**（{yl.get('ratio_pct','—')}%）{yl_icon} {yl_label} |")
     
     # ②.5.1 曾星智+双弦双体系市场定性（8大指数月线）
     zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
@@ -528,6 +535,18 @@ def read_market_width():
     """读市场宽度指标（market_width_latest.json），失败返回None"""
     for p in ("market_width_latest.json", "outputs/market_width_latest.json", "../outputs/market_width_latest.json",
               "/sandbox/workspace/github_bg/outputs/market_width_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def read_yearline_breadth():
+    """读年线广度指标（yearline_breadth_latest.json，V纪元方法论），失败返回None"""
+    for p in ("yearline_breadth_latest.json", "outputs/yearline_breadth_latest.json", "../outputs/yearline_breadth_latest.json",
+              "/sandbox/workspace/github_bg/outputs/yearline_breadth_latest.json",
+              "/sandbox/workspace/yearline/outputs/yearline_breadth_latest.json"):
         try:
             return json.load(open(p, encoding="utf-8"))
         except Exception:
