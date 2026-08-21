@@ -47,7 +47,7 @@ jobs:
         # 防阻断：提交失败不阻断后续推送
         continue-on-error: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           python3 git_api_commit.py --msg "chore: update premarket judgment ($(date +%Y-%m-%d))" \
             premarket_judgment_latest.json "premarket_judgment_$(date +%Y-%m-%d).json" "盘前市场报告_$(date +%Y-%m-%d).md"
