@@ -190,6 +190,8 @@ def get_hot_stocks():
             parts = [p.strip() for p in s.strip("|").split("|")]
             if len(parts) >= 5 and parts[0].startswith(("sh", "sz")):
                 name, zdf = parts[1], parts[2]
+                if "ST" in name.upper() or "退" in name:
+                    continue  # 剔除ST/退市（热搜常混入ST股）
                 lines.append(f"| {parts[0]} | {name} | {zdf} |")
     return "\n".join(lines[:10])
 
