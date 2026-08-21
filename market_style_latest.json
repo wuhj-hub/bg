@@ -1,97 +1,96 @@
 {
- "date": "2026-08-10",
- "data_date": "2026-08-10",
+ "date": "2026-08-21",
+ "data_date": "2026-08-21",
  "style": "情绪市",
  "icon": "🔥",
- "score": 70,
+ "score": 25,
  "score_detail": {
-  "size_style": 15,
-  "limitup_structure": 33,
-  "volume_structure": 15,
-  "sector_fund": 7
+  "size_style": -7,
+  "limitup_structure": 29,
+  "volume_structure": 0,
+  "sector_fund": 3
  },
  "size_style": {
-  "hs300_5d": 3.5,
-  "hs300_10d": -0.01,
-  "zz1000_5d": 9.24,
-  "zz1000_10d": 6.99,
-  "rel_5d": 5.74,
-  "rel_10d": 7.0,
-  "rel_20d": -0.83,
-  "hs300_ma_trend": "多头排列",
-  "zz500_5d": 8.31
+  "hs300_5d": -1.01,
+  "hs300_10d": -1.61,
+  "zz1000_5d": -2.16,
+  "zz1000_10d": -1.01,
+  "rel_5d": -1.16,
+  "rel_10d": 0.6,
+  "rel_20d": 9.32,
+  "zz500_5d": -1.7
  },
  "limitup_structure": {
-  "limitup": 94,
-  "strong": 222,
-  "width_score": 100,
-  "level": "🔥 强势（普涨格局）",
+  "limitup": 48,
+  "strong": 115,
+  "width_score": 72.9,
+  "level": "🔥 结构性强（涨停潮·涨少跌多分化）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 7.3
+  "strong_ratio": 3.8,
+  "zhaban_rate": 37.7,
+  "lianban": 9
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.204,
-  "small_big_ratio_5d": 1.066,
-  "vol_shift": "资金流向中小盘",
-  "small_vol_pulse": 97.24
+  "small_big_ratio_now": 1.283,
+  "small_big_ratio_5d": 1.234
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "地面兵装Ⅱ",
-    "zdf": "5.12",
-    "main_net5d": -7.7,
-    "retail_net": -6.6,
+    "name": "通信设备",
+    "zdf": "2.98",
+    "main_net5d": -170.4,
+    "retail_net": -88.9,
     "tag": "游资型"
    },
    {
-    "name": "半导体",
-    "zdf": "-0.36",
-    "main_net5d": 140.0,
-    "retail_net": 64.6,
-    "tag": "混合"
+    "name": "电子",
+    "zdf": "0.98",
+    "main_net5d": -800.8,
+    "retail_net": -92.8,
+    "tag": "游资型"
    },
    {
     "name": "贵金属",
-    "zdf": "3.89",
-    "main_net5d": 11.9,
-    "retail_net": -11.4,
+    "zdf": "4.64",
+    "main_net5d": 20.7,
+    "retail_net": -24.8,
     "tag": "机构型"
    },
    {
-    "name": "电网设备",
-    "zdf": "1.07",
-    "main_net5d": -19.3,
-    "retail_net": -10.0,
+    "name": "元件",
+    "zdf": "2.80",
+    "main_net5d": -264.2,
+    "retail_net": -46.8,
     "tag": "游资型"
    },
    {
-    "name": "电力",
-    "zdf": "0.79",
-    "main_net5d": -42.6,
-    "retail_net": 2.5,
-    "tag": "游资型"
+    "name": "工业金属",
+    "zdf": "2.42",
+    "main_net5d": 2.7,
+    "retail_net": -44.4,
+    "tag": "机构型"
    }
   ]
  },
  "mode_cross": {
-  "dominant": "欧马模式",
+  "dominant": "堆量模式",
   "all": {
-   "欧马模式": 7,
-   "堆量模式": 8
+   "堆量模式": 2,
+   "欧马模式": 5
   },
   "leaders": {
-   "欧马模式": 3,
-   "堆量模式": 5
+   "堆量模式": 2
   },
   "pullbacks": {
-   "堆量模式": 1,
-   "欧马模式": 2
+   "欧马模式": 1
   },
-  "gpoints": {},
-  "verdict": "⚠️ 背离（风格轴与猛兽信号偏好不一致，注意结构分化）",
-  "total_scored": 15
+  "gpoints": {
+   "欧马模式": 1
+  },
+  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
+  "total_scored": 7
  },
  "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
 }
