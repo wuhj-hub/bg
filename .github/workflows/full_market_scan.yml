@@ -73,6 +73,14 @@ jobs:
       - name: 市场宽度扫描（全主板涨跌家数分布）
         run: python3 market_width.py all_mainboard.csv
 
+      # ─── 第二步.1.5：年线广度指标（V纪元方法论：站上年线个股占比=中期牛熊结构）───
+      - name: 年线广度扫描（站上年线个股占比）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/yearline_breadth.py --list all_mainboard.csv --batch 50
+          cp outputs/yearline_breadth_latest.json yearline_breadth_latest.json 2>/dev/null || true
+          echo "年线广度: $(python3 -c "import json;d=json.load(open('outputs/yearline_breadth_latest.json'));print(f\"{d['above']}/{d['total']}={d['ratio_pct']}%\")" 2>/dev/null || echo '计算失败')"
+
       # ─── 第二步.2：分时强度分析（黑石minuteMacd启发：信号股分时MACD+封板+尾盘方向）───
       - name: 分时强度分析（信号股分时MACD）
         continue-on-error: true
@@ -275,6 +283,8 @@ jobs:
       - name: 提交量化汇总到仓库（供盘前报告引用）
         # 防阻断：提交失败不标记 job failure（避免后续上传/复盘全被跳过）
         continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           cp outputs/quant_results_$(date +%Y-%m-%d).json quant_results_latest.json 2>/dev/null || cp outputs/quant_results_latest.json quant_results_latest.json 2>/dev/null || true
           # 鱼身JSON一并提交（盘前premarket_fishbody从GitHub拉取，防止知识库上传失败导致缺失）
@@ -284,6 +294,8 @@ jobs:
           cp outputs/market_width_latest.json market_width_latest.json 2>/dev/null || true
           cp outputs/market_style_latest.json market_style_latest.json 2>/dev/null || true
           cp outputs/mode_aggregate_latest.json mode_aggregate_latest.json 2>/dev/null || true
+          # 年线广度（V纪元方法论：站上年线占比，盘前②.5.1从GitHub拉取）
+          cp outputs/yearline_breadth_latest.json yearline_breadth_latest.json 2>/dev/null || true
           # 板块共振（本地复算）+ 乾坤A级金股（第四信号源）
           cp outputs/板块共振_latest.json 板块共振_latest.json 2>/dev/null || true
           cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
@@ -295,7 +307,7 @@ jobs:
             python3 git_api_commit.py --msg "chore: update quant/fish_latest ($(date +%Y-%m-%d))" \
               quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
               market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json \
-              四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json \
+              四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json yearline_breadth_latest.json \
               quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
               ima_cred_last_ok.json
           fi
