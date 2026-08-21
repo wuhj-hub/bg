@@ -26,7 +26,7 @@ WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 OUT_DIR = "outputs"
 
 
-def run(args, timeout=60):
+def run(args, timeout=20):
     for i in range(3):
         try:
             r = subprocess.run(WESTOCK + args, capture_output=True, text=True, timeout=timeout)
