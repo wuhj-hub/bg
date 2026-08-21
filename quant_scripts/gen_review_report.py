@@ -358,6 +358,18 @@ def read_market_width():
     return None
 
 
+def read_yearline_breadth():
+    """读年线广度指标（yearline_breadth_latest.json，V纪元方法论），失败返回None"""
+    for p in ("yearline_breadth_latest.json", "outputs/yearline_breadth_latest.json", "../outputs/yearline_breadth_latest.json",
+              "/sandbox/workspace/github_bg/outputs/yearline_breadth_latest.json",
+              "/sandbox/workspace/yearline/outputs/yearline_breadth_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
 def read_sector_resonance():
     """读板块共振JSON（本地复算优先），失败返回None"""
     for p in ("outputs/板块共振_latest.json", "板块共振_latest.json", "../outputs/板块共振_latest.json"):
@@ -833,6 +845,19 @@ def gen_report(today_str):
             cl = mw.get("cost_line") or {}
             if cl:
                 lines.append(f"→ **200日成本线**（猛兽派启发）：现价{cl.get('cur','—')} vs 成本{cl.get('cost200','—')}（{cl.get('ratio','—')}%·斜率{cl.get('slope','—')}）→ {cl.get('zone','')}")
+        # 年线广度（V纪元方法论：站上年线个股占比=中期牛熊结构）
+        yl = read_yearline_breadth()
+        if yl:
+            yl_level = yl.get("level", "")
+            yl_icon = {"bull": "🟢", "mixed": "🟡", "bear": "🟠", "deep_bear": "🔴"}.get(yl_level, "")
+            yl_label = {"bull": "牛市结构", "mixed": "结构分化", "bear": "熊市结构", "deep_bear": "深度熊市"}.get(yl_level, yl_level)
+            lines.append("")
+            lines.append(f"**年线广度**（V纪元方法论·沪深主板收盘≥MA250）：站上年线 **{yl.get('above','—')}/{yl.get('total','—')}** = {yl.get('ratio_pct','—')}% {yl_icon} {yl_label}")
+            stocks = yl.get("above_stocks") or []
+            if stocks:
+                near = stocks[:5]
+                nlist = "、".join(f"{s['name']}({s['code']}+{s['dist_pct']}%)" for s in near)
+                lines.append(f"→ 临界站上年线（距年线最近）：{nlist}")
             # 量价时空四维检查（2026-08-12落地，源自OPPO笔记）
             try:
                 lines.append("")
