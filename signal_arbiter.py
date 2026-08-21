@@ -38,7 +38,7 @@ WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 OUT_DIR = "outputs"
 
 
-def run(args, timeout=60):
+def run(args, timeout=20):
     for i in range(3):
         try:
             r = subprocess.run(WESTOCK + args, capture_output=True, text=True, timeout=timeout)
@@ -48,6 +48,33 @@ def run(args, timeout=60):
             pass
         time.sleep(2)
     return ""
+
+
+def norm_cn(code):
+    """代码归一为纯数字（sh600519 -> 600519）"""
+    code = code.strip()
+    if code.startswith(("sh", "sz", "bj")):
+        return code[2:]
+    return code
+
+
+def load_legal_codes():
+    """加载主板清单白名单代码集合（all_mainboard.csv 已剔 ST/*ST/退市）"""
+    legal = set()
+    for p in ("all_mainboard.csv", "/sandbox/workspace/all_mainboard.csv",
+              "../all_mainboard.csv", "quant_scripts/all_mainboard.csv"):
+        try:
+            with open(p, encoding="utf-8-sig") as f:
+                next(f, None)
+                for ln in f:
+                    code = ln.strip().split(",")[0].strip()
+                    if code:
+                        legal.add(code)
+            if legal:
+                return legal
+        except Exception:
+            continue
+    return None
 
 
 def load_json(paths):
@@ -304,6 +331,14 @@ def main():
             lv = "观察"
         ranked.append({"code": code, "pts": pts, "level": lv, "src": v["src"]})
     ranked.sort(key=lambda x: (-x["pts"], x["code"]))
+
+    # ST/退市兜底：按主板清单白名单过滤（清单已剔ST/*ST/退市）
+    legal = load_legal_codes()
+    if legal:
+        before = len(ranked)
+        ranked = [r for r in ranked if norm_cn(r["code"]) in legal]
+        if len(ranked) < before:
+            print(f"[ST过滤] 剔除 {before - len(ranked)} 只非清单标的（ST/退市/创业板等）")
 
     # 月线闸门过滤（TOP N）
     for r in ranked[:top_n]:
