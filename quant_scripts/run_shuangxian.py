@@ -9,6 +9,8 @@
 import subprocess, json, sys, os, re
 from datetime import datetime, date
 from pathlib import Path
+import csv as _csv
+from concurrent.futures import ThreadPoolExecutor
 
 # ============================================================
 # 路径配置
@@ -141,6 +143,42 @@ def scan_sectors() -> dict:
 # ============================================================
 # 3. 候选股评分
 # ============================================================
+def norm_code(code):
+    """纯数字代码 → sh/sz前缀（panhou池为纯数字）"""
+    code = str(code).strip()
+    if code.startswith(("sh", "sz", "bj")):
+        return code
+    if code.startswith(("6", "9", "5")):
+        return "sh" + code
+    return "sz" + code
+
+
+def load_panhou_pool(path, phases=("抢筹", "吸筹", "进场"), limit=400):
+    """从 panhou_lianghua.csv 按资金行为四态过滤候选池（2026-08-22接入）
+    phases: 抢筹(加速建仓)/吸筹(机构买散户卖)/进场(温和建仓) —— 与双弦资金弦同源
+    剔除：ST/退市；观望/情绪退潮不入池
+    """
+    pool = []
+    try:
+        with open(path, encoding="utf-8-sig") as f:
+            for row in _csv.DictReader(f):
+                phase = (row.get("phase") or "").strip()
+                if phase not in phases:
+                    continue
+                code = (row.get("code") or "").strip()
+                name = (row.get("name") or "").strip().replace(" ", "")
+                if not code or not name:
+                    continue
+                if "ST" in name.upper() or "退" in name:
+                    continue
+                pool.append((norm_code(code), name))
+                if limit and len(pool) >= limit:
+                    break
+    except Exception as e:
+        print(f"[WARN] panhou池加载失败: {e}", file=sys.stderr)
+    return pool
+
+
 def score_stock(code: str, name: str, sector: str = "",
                 sector_zdf: float = 0, index_temp: int = 50) -> dict:
     """对单只股票进行三维评分（猛兽v3.0增强版）
@@ -371,8 +409,8 @@ def enrich_with_beast_signals(stocks: list[dict]) -> list[dict]:
 # ============================================================
 # 5. 主运行流程
 # ============================================================
-def run_daily():
-    """每日全量扫描"""
+def run_daily(pool_path=None):
+    """每日全量扫描（--pool panhou_lianghua.csv 接入资金四态动态池）"""
     today = date.today().isoformat()
     print(f"双弦投资系统 v2.2 ima版")
     print(f"运行时间: {today} {datetime.now().strftime('%H:%M:%S')}")
@@ -395,52 +433,62 @@ def run_daily():
         if s['zdf'] < 0:
             print(f"    - {s['name']} ({s['zdf']:.2f}%)")
 
-    # Step 2: 核心3只标的评分
-    print("\n[Step 2] 核心标的评分...")
-    core_stocks = [
+    # Step 2+3: 候选池评分（panhou资金四态动态池 + 硬编码保底，并发）
+    print("\n[Step 2+3] 候选池评分（panhou资金四态 + 硬编码保底）...")
+    # 硬编码保底（月度股池连续性：灵康/红豆/日发/蓝筹5只）
+    base_stocks = [
         ("sh603669", "灵康药业", "医药生物"),
         ("sh600400", "红豆股份", "纺织服饰"),
         ("sz002520", "日发精机", "机械设备"),
+        ("sh603501", "豪威集团", "半导体"),
+        ("sh603986", "兆易创新", "存储器"),
+        ("sh600487", "亨通光电", "通信设备"),
+        ("sh601857", "中国石油", "石油石化"),
+        ("sz002129", "TCL中环", "元件"),
     ]
+    dyn_pool = []
+    if pool_path and os.path.exists(pool_path):
+        dyn_pool = load_panhou_pool(pool_path)
+        print(f"  panhou资金四态候选: {len(dyn_pool)} 只（抢筹/吸筹/进场）")
+    else:
+        print("  ⚠️ 未指定panhou池（--pool），仅硬编码保底8只")
+
+    tasks, seen = [], set()
+    for code, name, sname in base_stocks:
+        if code in seen:
+            continue
+        seen.add(code)
+        tasks.append((code, name, sname))
+    for code, name in dyn_pool:
+        if code in seen:
+            continue
+        seen.add(code)
+        tasks.append((code, name, ""))
+    print(f"  总评分标的: {len(tasks)} 只（4线程并发）")
+
+    def _score(t):
+        code, name, sname = t
+        sector_zdf = 0
+        if sname:
+            for s in sectors['all']:
+                if sname[:2] in s['name'] or s['name'] in sname:
+                    sector_zdf = s['zdf']
+                    break
+        return score_stock(code, name, sname, sector_zdf, temp)
 
     scored = []
-    for code, name, sector in core_stocks:
-        # 找对应的板块涨跌幅
-        sector_zdf = 0
-        for s in sectors['all']:
-            if sector[:2] in s['name'] or s['name'] in sector:
-                sector_zdf = s['zdf']
-                break
-
-        r = score_stock(code, name, sector, sector_zdf, temp)
-        scored.append(r)
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        for r in ex.map(_score, tasks):
+            scored.append(r)
+    scored.sort(key=lambda x: -x["total_score"])
+    for r in scored[:15]:
         label = "S" if r["total_score"] >= 80 else "A" if r["total_score"] >= 65 else \
                 "B" if r["total_score"] >= 50 else "C"
         resonance_label = ["逆势", "偏空", "中性", "偏多", "强共振"][min(4, max(0, r["resonance"] + 3))]
-        print(f"  {code} {name}")
+        print(f"  {r['code']} {r['name']}")
         print(f"    评分: {r['total_score']}分({label}) | "
               f"资金{r['fund_score']}+技术{r['tech_score']}+趋势{r['trend_score']}")
         print(f"    价格: {r['price']} | 共振: {r['resonance']} ({resonance_label})")
-
-    # Step 3: 热门板块标的追加评分
-    print("\n[Step 3] 热门板块标的扫描...")
-    # 从板块排行中取流入为正的板块，选代表性主板标的
-    hot_picks = [
-        ("半导体", "sh603501", "豪威集团"),
-        ("存储器", "sh603986", "兆易创新"),
-        ("通信设备", "sh600487", "亨通光电"),
-        ("石油石化", "sh601857", "中国石油"),
-        ("元件", "sz002129", "TCL中环"),
-    ]
-
-    for sname, code, cname in hot_picks:
-        sector_zdf = 0
-        for s in sectors['all']:
-            if s['name'] == sname:
-                sector_zdf = s['zdf']
-                break
-        r = score_stock(code, cname, sname, sector_zdf, temp)
-        scored.append(r)
 
     # Step 4: AND门控 (猛兽增强版)
     print("\n[Step 4] AND门控过滤 (猛兽增强版)...")
@@ -629,4 +677,7 @@ def run_daily():
 # 命令行入口
 # ============================================================
 if __name__ == "__main__":
-    run_daily()
+    pool_path = None
+    if len(sys.argv) > 1 and sys.argv[1] == "--pool":
+        pool_path = sys.argv[2] if len(sys.argv) > 2 else None
+    run_daily(pool_path)
