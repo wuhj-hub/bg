@@ -433,25 +433,30 @@ def run_daily(pool_path=None):
         if s['zdf'] < 0:
             print(f"    - {s['name']} ({s['zdf']:.2f}%)")
 
-    # Step 2+3: 候选池评分（panhou资金四态动态池 + 硬编码保底，并发）
-    print("\n[Step 2+3] 候选池评分（panhou资金四态 + 硬编码保底）...")
-    # 硬编码保底（月度股池连续性：灵康/红豆/日发/蓝筹5只）
-    base_stocks = [
-        ("sh603669", "灵康药业", "医药生物"),
-        ("sh600400", "红豆股份", "纺织服饰"),
-        ("sz002520", "日发精机", "机械设备"),
-        ("sh603501", "豪威集团", "半导体"),
-        ("sh603986", "兆易创新", "存储器"),
-        ("sh600487", "亨通光电", "通信设备"),
-        ("sh601857", "中国石油", "石油石化"),
-        ("sz002129", "TCL中环", "元件"),
-    ]
+    # Step 2+3: 候选池评分（panhou资金四态动态池 + 当月股池保底，并发）
+    print("\n[Step 2+3] 候选池评分（panhou资金四态 + 当月股池保底）...")
+    # 保底池 = 当前月度股池（每月自动滚动，替代原硬编码8只，保股池连续性）
+    # 注：MonthlyPool.load_month 返回原始 dict 列表
+    base_stocks = []
+    try:
+        from monthly_pool import MonthlyPool
+        ym = datetime.now().strftime("%Y-%m")
+        for e in MonthlyPool.load_month(ym):
+            code = (e.get("code") or "").strip()
+            name = (e.get("name") or "").strip()
+            sector = (e.get("sector") or "").strip()
+            if code and name and "ST" not in name.upper() and "退" not in name:
+                base_stocks.append((code, name, sector))
+        print(f"  当月股池保底: {len(base_stocks)} 只（pools/{ym}）")
+    except Exception as e:
+        print(f"  ⚠️ 当月股池读取失败: {e}")
+
     dyn_pool = []
     if pool_path and os.path.exists(pool_path):
         dyn_pool = load_panhou_pool(pool_path)
         print(f"  panhou资金四态候选: {len(dyn_pool)} 只（抢筹/吸筹/进场）")
     else:
-        print("  ⚠️ 未指定panhou池（--pool），仅硬编码保底8只")
+        print("  ⚠️ 未指定panhou池（--pool），仅当月股池保底")
 
     tasks, seen = [], set()
     for code, name, sname in base_stocks:
