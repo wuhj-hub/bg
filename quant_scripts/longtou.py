@@ -331,6 +331,19 @@ def main():
         if s["tian_di"]:
             warns.append(f"天地板：{s['code']} {s['name']}")
     L.append("\n".join(f"- {w}" for w in warns) if warns else "- 暂无明显见顶信号")
+    # 实时ST/退市兜底（清单快照可能漏掉后续戴帽股）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from st_guard import check_st_batch
+        _codes = [c for c in zt_stocks.keys()]
+        _st, _ = check_st_batch(_codes)
+        for _c in _st:
+            zt_stocks.pop(_c, None)
+        if _st:
+            print(f"[ST过滤] 剔除 {len(_st)} 只ST/退市: {sorted(_st)}", flush=True)
+    except Exception as e:
+        print(f"[WARN] st_guard 校验失败: {e}", flush=True)
+
     report = "\n".join(L)
     md_path = f"/sandbox/workspace/outputs/龙头定位_{date_str}.md"
     with open(md_path, "w", encoding="utf-8") as f:
