@@ -335,6 +335,17 @@ def main():
 
     date_str = now_bj().strftime('%Y-%m-%d')
     os.makedirs(args.out_dir, exist_ok=True)
+    # 实时ST/退市兜底（清单快照可能漏掉后续戴帽股）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from st_guard import filter_st
+        for _t in results:
+            results[_t], _d = filter_st(results[_t])
+            if _d:
+                print(f"[ST过滤] {_t} 剔除 {len(_d)} 只: {[d['name'] for d in _d]}", flush=True)
+    except Exception as e:
+        print(f"[WARN] st_guard 校验失败: {e}", flush=True)
+
     md_path = os.path.join(args.out_dir, f'才哥战法股池_{date_str}.md')
     json_path = os.path.join(args.out_dir, f'才哥战法股池_{date_str}.json')
     with open(md_path, 'w', encoding='utf-8') as f:
