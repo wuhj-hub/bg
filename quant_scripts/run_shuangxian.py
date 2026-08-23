@@ -559,20 +559,27 @@ def run_daily(pool_path=None):
 
     enriched = enrich_with_beast_signals(all_candidates)
 
-    # 共振股池 (通过门控 + 价格≤10 + 有猛兽信号辅助)
+    # 分层管理（2026-08-24，方案3）：
+    #   核心层 = score≥65（A级）→ 进月度股池
+    #   观察层 = 50≤score<65（B级）→ 独立跟踪不入池
     resonance_list = []
+    watch_list = []
     for r in enriched:
         if r.get("score", 0) >= 50 and r["price"] <= 10 and r["price"] > 0:
             tags_str = " | ".join(r.get("beast_tags", []))
             mode_str = f" [{r.get('trade_mode','')}]" if r.get("trade_mode") else ""
             tags_display = f"猛兽: {tags_str}{mode_str}" if tags_str else ""
-            resonance_list.append({
+            entry = {
                 "code": r["code"], "name": r["name"], "price": r["price"],
                 "score": r["score"],
                 "resonance_label": f"{['逆势','偏空','中性','偏多','强共振'][min(4, max(0, r.get('resonance',0)+3))] if 'resonance' in r else '中性'}",
                 "sector": "",
                 "reason": f"双弦门控通过 | {tags_display}" if tags_display else "双弦门控通过",
-            })
+            }
+            if r.get("score", 0) >= 65:
+                resonance_list.append(entry)   # 核心层 → 月池
+            else:
+                watch_list.append(entry)       # 观察层 → 独立跟踪
 
     # 低吸池 (升级: RS_D背离 OR 伏击线≥3 OR G点触发)
     dip_list = []
@@ -605,7 +612,8 @@ def run_daily(pool_path=None):
         dip_stocks=dip_list,
     )
 
-    print(f"  共振新增: {len(resonance_list)}只 (含猛兽信号)")
+    print(f"  共振新增: {len(resonance_list)}只 (核心层≥65，入月池)")
+    print(f"  观察层: {len(watch_list)}只 (50≤评分<65，独立跟踪)")
     print(f"  低吸新增: {len(dip_list)}只 (RS_D/伏击线/G点)")
     print(f"  当前月度股池总计: {result['total_count']}只")
     
@@ -626,6 +634,22 @@ def run_daily(pool_path=None):
                 tags = r.get("beast_tags", [])
                 print(f"    📉 {r['code']} {r['name']} @{r['price']} "
                       f"评分{r['score']} | {', '.join(tags) if tags else '无信号'}")
+    if watch_list:
+        print("  【观察层·不入池】")
+        for w in sorted(watch_list, key=lambda x: -x["score"]):
+            print(f"    👁️ {w['code']} {w['name']} @{w['price']} 评分{w['score']}")
+
+    # 观察层持久化（供盘前/复盘引用，独立于月度股池）
+    try:
+        out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "outputs")
+        os.makedirs(out_dir, exist_ok=True)
+        with open(os.path.join(out_dir, "双弦观察池_latest.json"), "w", encoding="utf-8") as f:
+            json.dump({"date": today, "count": len(watch_list),
+                       "entries": sorted(watch_list, key=lambda x: -x["score"])},
+                      f, ensure_ascii=False, indent=1)
+        print(f"  [OK] 双弦观察池 → outputs/双弦观察池_latest.json ({len(watch_list)}只)")
+    except Exception as e:
+        print(f"  [WARN] 观察池写入失败: {e}")
 
     # Step 6: 输出报告 (含猛兽信号标签 + 轮动信息)
     print("\n[Step 6] 月度股池报告:")
