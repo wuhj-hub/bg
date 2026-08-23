@@ -1,7 +1,7 @@
 {
- "date": "2026-08-21",
+ "date": "2026-08-23",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 50,
+ "pool_size": 46,
  "resonance_boards": [
   {
    "name": "贵金属",
@@ -46,6 +46,27 @@
     "进场",
     "吸筹"
    ]
+  },
+  {
+   "name": "石油石化",
+   "code": "pt01801960",
+   "zdf": 1.36,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "化学原料",
+   "code": "pt01801033",
+   "zdf": 0.62,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
   }
  ],
  "grab_top": [
@@ -68,6 +89,11 @@
    "name": "航运港口",
    "code": "pt01801992",
    "value": 7
+  },
+  {
+   "name": "石油石化",
+   "code": "pt01801960",
+   "value": 7
   }
  ],
  "entry_top": [
@@ -87,9 +113,19 @@
    "value": 20.7
   },
   {
+   "name": "化学原料",
+   "code": "pt01801033",
+   "value": 11.9
+  },
+  {
    "name": "航运港口",
    "code": "pt01801992",
    "value": 9.7
+  },
+  {
+   "name": "石油石化",
+   "code": "pt01801960",
+   "value": 2.6
   }
  ],
  "absorption_top": [
@@ -109,9 +145,19 @@
    "value": 1.56
   },
   {
+   "name": "化学原料",
+   "code": "pt01801033",
+   "value": 1.15
+  },
+  {
    "name": "黄金概念",
    "code": "pt02003547",
    "value": 0.65
+  },
+  {
+   "name": "石油石化",
+   "code": "pt01801960",
+   "value": 0.26
   }
  ],
  "control_top": [],
