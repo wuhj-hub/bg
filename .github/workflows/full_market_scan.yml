@@ -310,6 +310,7 @@ jobs:
               四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json yearline_breadth_latest.json \
               quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
               pools/pool_$(date +%Y-%m).json \
+              all_mainboard.csv \
               ima_cred_last_ok.json
           fi
 
