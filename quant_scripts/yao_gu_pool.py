@@ -287,6 +287,15 @@ def main():
     # 排序：出货/分歧在前
     order = {"💥出货": 0, "⚡分歧": 1, "🔥加速": 2, "👀观察": 3, "📉退潮": 4}
     results.sort(key=lambda r: (order.get(r["level"], 9), -r["flow"]))
+    # 实时ST/退市兜底（清单快照可能漏掉后续戴帽股）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from st_guard import filter_st
+        results, _d = filter_st(results)
+        if _d:
+            print(f"[ST过滤] 剔除 {len(_d)} 只: {[d['name'] for d in _d]}", flush=True)
+    except Exception as e:
+        print(f"[WARN] st_guard 校验失败: {e}", flush=True)
 
     # 输出
     os.makedirs("/sandbox/workspace/outputs", exist_ok=True)
