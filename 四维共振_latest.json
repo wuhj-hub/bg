@@ -1,13 +1,13 @@
 {
- "date": "2026-08-21",
+ "date": "2026-08-23",
  "policy": 0,
  "pool_size": 3034,
  "levels": {
   "必然级": 1,
-  "高置信": 78,
-  "弱共振": 669,
-  "无共振": 2057,
-  "否决": 229
+  "高置信": 79,
+  "弱共振": 675,
+  "无共振": 2053,
+  "否决": 226
  },
  "stocks": [
   {
@@ -539,28 +539,6 @@
    }
   },
   {
-   "code": "002272",
-   "name": "川润股份",
-   "fund": 2,
-   "chip": 3,
-   "related": 3,
-   "policy": 0,
-   "total": 8,
-   "level": "★★ 高置信",
-   "veto": "",
-   "chip_detail": "获利盘71%·集中度26.6",
-   "related_detail": "龙虎榜净买20384万机构",
-   "bonus": "",
-   "fund_tag": "⚖️中性",
-   "fund_layers": {
-    "m1": 0.41,
-    "m5": 1.04,
-    "m10": 0.95,
-    "m20": -0.97,
-    "tag": "⚖️中性"
-   }
-  },
-  {
    "code": "002385",
    "name": "大北农",
    "fund": 3,
@@ -954,6 +932,28 @@
     "m10": 0.23,
     "m20": 0.3,
     "tag": "🌀回调洗盘·20日控盘正"
+   }
+  },
+  {
+   "code": "603958",
+   "name": "哈森股份",
+   "fund": 3,
+   "chip": 3,
+   "related": 2,
+   "policy": 0,
+   "total": 8,
+   "level": "★★ 高置信",
+   "veto": "",
+   "chip_detail": "获利盘79%·集中度30.5",
+   "related_detail": "龙虎榜净买4188万游资",
+   "bonus": "",
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.41,
+    "m5": 1.19,
+    "m10": 1.15,
+    "m20": 1.05,
+    "tag": "📈资金共振·控盘正"
    }
   },
   {
@@ -1723,6 +1723,28 @@
     "m5": 0.41,
     "m10": 0.49,
     "m20": 0.24,
+    "tag": "📈资金共振·控盘正"
+   }
+  },
+  {
+   "code": "603936",
+   "name": "博敏电子",
+   "fund": 3,
+   "chip": 2,
+   "related": 2,
+   "policy": 0,
+   "total": 7,
+   "level": "★★ 高置信",
+   "veto": "",
+   "chip_detail": "获利盘56%·集中度27.1",
+   "related_detail": "龙虎榜净买11327万游资",
+   "bonus": "",
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.87,
+    "m5": 4.45,
+    "m10": 5.56,
+    "m20": 5.84,
     "tag": "📈资金共振·控盘正"
    }
   },
@@ -3939,8 +3961,58 @@
    "chip_detail": "获利盘76%·集中度20.2",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.07,
+    "m5": 0.05,
+    "m10": -0.01,
+    "m20": -0.03,
+    "tag": "⚖️中性"
+   }
+  },
+  {
+   "code": "603929",
+   "name": "亚翔集成",
+   "fund": 2,
+   "chip": 1,
+   "related": 3,
+   "policy": 0,
+   "total": 6,
+   "level": "★ 弱共振",
+   "veto": "",
+   "chip_detail": "获利盘40%·集中度28.1",
+   "related_detail": "龙虎榜净买24104万机构",
+   "bonus": "",
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.33,
+    "m5": 2.49,
+    "m10": 3.75,
+    "m20": 6.75,
+    "tag": "📈资金共振·控盘正"
+   }
+  },
+  {
+   "code": "603939",
+   "name": "益丰药房",
+   "fund": 3,
+   "chip": 3,
+   "related": 0,
+   "policy": 0,
+   "total": 6,
+   "level": "★ 弱共振",
+   "veto": "",
+   "chip_detail": "获利盘79%·集中度12.7(集中)",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.06,
+    "m5": 0.9,
+    "m10": 0.73,
+    "m20": 1.14,
+    "tag": "📈资金共振·控盘正"
+   }
   },
   {
    "code": "603988",
@@ -5259,6 +5331,28 @@
     "m5": -0.11,
     "m10": 0.04,
     "m20": -0.03,
+    "tag": "⚖️中性"
+   }
+  },
+  {
+   "code": "002272",
+   "name": "川润股份",
+   "fund": 2,
+   "chip": 3,
+   "related": 0,
+   "policy": 0,
+   "total": 5,
+   "level": "★ 弱共振",
+   "veto": "",
+   "chip_detail": "获利盘71%·集中度26.6",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.41,
+    "m5": 1.04,
+    "m10": 0.95,
+    "m20": -0.97,
     "tag": "⚖️中性"
    }
   },
@@ -7969,28 +8063,6 @@
    }
   },
   {
-   "code": "603012",
-   "name": "创力集团",
-   "fund": 0,
-   "chip": 3,
-   "related": 2,
-   "policy": 0,
-   "total": 5,
-   "level": "★ 弱共振",
-   "veto": "",
-   "chip_detail": "获利盘51%·集中度10.5(集中)",
-   "related_detail": "龙虎榜净买797万游资",
-   "bonus": "",
-   "fund_tag": "⚖️中性",
-   "fund_layers": {
-    "m1": 0.07,
-    "m5": -0.64,
-    "m10": -1.26,
-    "m20": -1.75,
-    "tag": "⚖️中性"
-   }
-  },
-  {
    "code": "603065",
    "name": "宿迁联盛",
    "fund": 2,
@@ -8375,7 +8447,7 @@
    "level": "★ 弱共振",
    "veto": "",
    "chip_detail": "获利盘50%·集中度16.6",
-   "related_detail": "龙虎榜净卖9734万",
+   "related_detail": "无交易行为",
    "bonus": "",
    "fund_tag": "📈资金共振·控盘正",
    "fund_layers": {
@@ -8849,20 +8921,26 @@
    }
   },
   {
-   "code": "603929",
-   "name": "亚翔集成",
-   "fund": 2,
-   "chip": 0,
-   "related": 3,
+   "code": "603937",
+   "name": "丽岛新材",
+   "fund": 3,
+   "chip": 2,
+   "related": 0,
    "policy": 0,
    "total": 5,
    "level": "★ 弱共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "龙虎榜净买24104万机构",
+   "chip_detail": "获利盘60%·集中度26.2",
+   "related_detail": "龙虎榜净卖617万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.03,
+    "m5": 0.14,
+    "m10": 0.02,
+    "m20": -0.11,
+    "tag": "⚖️中性"
+   }
   },
   {
    "code": "603991",
@@ -9711,7 +9789,7 @@
    "level": "★ 弱共振",
    "veto": "",
    "chip_detail": "获利盘30%·集中度11.9(集中)",
-   "related_detail": "龙虎榜净卖35326万",
+   "related_detail": "无交易行为",
    "bonus": "",
    "fund_tag": "⚖️中性",
    "fund_layers": {
@@ -16201,7 +16279,7 @@
    "level": "★ 弱共振",
    "veto": "",
    "chip_detail": "获利盘65%·集中度17.9",
-   "related_detail": "无交易行为",
+   "related_detail": "龙虎榜净卖5208万",
    "bonus": "",
    "fund_tag": "🌀回调洗盘·20日控盘正",
    "fund_layers": {
@@ -16210,6 +16288,94 @@
     "m10": 0.7,
     "m20": 1.02,
     "tag": "🌀回调洗盘·20日控盘正"
+   }
+  },
+  {
+   "code": "603916",
+   "name": "苏博特",
+   "fund": 3,
+   "chip": 1,
+   "related": 0,
+   "policy": 0,
+   "total": 4,
+   "level": "★ 弱共振",
+   "veto": "",
+   "chip_detail": "获利盘48%·集中度23.5",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "🌀回调洗盘·20日控盘正",
+   "fund_layers": {
+    "m1": -0.02,
+    "m5": 0.57,
+    "m10": 0.93,
+    "m20": 0.69,
+    "tag": "🌀回调洗盘·20日控盘正"
+   }
+  },
+  {
+   "code": "603968",
+   "name": "醋化股份",
+   "fund": 2,
+   "chip": 2,
+   "related": 0,
+   "policy": 0,
+   "total": 4,
+   "level": "★ 弱共振",
+   "veto": "",
+   "chip_detail": "获利盘50%·集中度19.6",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "⛔出货中·全周期流出",
+   "fund_layers": {
+    "m1": -0.0,
+    "m5": -0.01,
+    "m10": -0.02,
+    "m20": -0.07,
+    "tag": "⛔出货中·全周期流出"
+   }
+  },
+  {
+   "code": "603970",
+   "name": "中农立华",
+   "fund": 3,
+   "chip": 1,
+   "related": 0,
+   "policy": 0,
+   "total": 4,
+   "level": "★ 弱共振",
+   "veto": "",
+   "chip_detail": "获利盘31%·集中度16.8",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "🌀回调洗盘·20日控盘正",
+   "fund_layers": {
+    "m1": -0.01,
+    "m5": 0.01,
+    "m10": 0.05,
+    "m20": 0.05,
+    "tag": "🌀回调洗盘·20日控盘正"
+   }
+  },
+  {
+   "code": "603979",
+   "name": "金诚信",
+   "fund": 1,
+   "chip": 3,
+   "related": 0,
+   "policy": 0,
+   "total": 4,
+   "level": "★ 弱共振",
+   "veto": "",
+   "chip_detail": "获利盘80%·集中度15.2",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": -0.01,
+    "m5": 0.02,
+    "m10": -0.67,
+    "m20": -1.76,
+    "tag": "⚖️中性"
    }
   },
   {
@@ -18146,28 +18312,6 @@
     "m10": -0.07,
     "m20": -0.05,
     "tag": "🌀出货完成·抛压枯竭"
-   }
-  },
-  {
-   "code": "001382",
-   "name": "新亚电缆",
-   "fund": 0,
-   "chip": 1,
-   "related": 2,
-   "policy": 0,
-   "total": 3,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "获利盘25%·集中度7.4(集中)",
-   "related_detail": "龙虎榜净买690万游资",
-   "bonus": "",
-   "fund_tag": "⚖️中性",
-   "fund_layers": {
-    "m1": 0.0,
-    "m5": -0.05,
-    "m10": -0.08,
-    "m20": -0.26,
-    "tag": "⚖️中性"
    }
   },
   {
@@ -25761,6 +25905,28 @@
    }
   },
   {
+   "code": "603012",
+   "name": "创力集团",
+   "fund": 0,
+   "chip": 3,
+   "related": 0,
+   "policy": 0,
+   "total": 3,
+   "level": "无共振",
+   "veto": "",
+   "chip_detail": "获利盘51%·集中度10.5(集中)",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.07,
+    "m5": -0.64,
+    "m10": -1.26,
+    "m20": -1.75,
+    "tag": "⚖️中性"
+   }
+  },
+  {
    "code": "603023",
    "name": "威帝股份",
    "fund": 1,
@@ -27543,28 +27709,6 @@
    }
   },
   {
-   "code": "603730",
-   "name": "岱美股份",
-   "fund": 0,
-   "chip": 1,
-   "related": 2,
-   "policy": 0,
-   "total": 3,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "获利盘33%·集中度28.5",
-   "related_detail": "龙虎榜净买433万游资",
-   "bonus": "",
-   "fund_tag": "⚖️中性",
-   "fund_layers": {
-    "m1": 0.0,
-    "m5": -0.45,
-    "m10": -1.49,
-    "m20": -2.05,
-    "tag": "⚖️中性"
-   }
-  },
-  {
    "code": "603733",
    "name": "仙鹤股份",
    "fund": 2,
@@ -27860,11 +28004,17 @@
    "total": 3,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
+   "chip_detail": "获利盘29%·集中度28.3",
+   "related_detail": "龙虎榜净卖5458万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "🌀回调洗盘·20日控盘正",
+   "fund_layers": {
+    "m1": -0.01,
+    "m5": 0.16,
+    "m10": 0.1,
+    "m20": 0.19,
+    "tag": "🌀回调洗盘·20日控盘正"
+   }
   },
   {
    "code": "603897",
@@ -27877,7 +28027,7 @@
    "level": "无共振",
    "veto": "",
    "chip_detail": "获利盘49%·集中度26.9",
-   "related_detail": "无交易行为",
+   "related_detail": "龙虎榜净卖4605万",
    "bonus": "",
    "fund_tag": "📈资金共振·控盘正",
    "fund_layers": {
@@ -27886,6 +28036,50 @@
     "m10": 2.06,
     "m20": 2.32,
     "tag": "📈资金共振·控盘正"
+   }
+  },
+  {
+   "code": "603898",
+   "name": "好莱客",
+   "fund": 1,
+   "chip": 0,
+   "related": 2,
+   "policy": 0,
+   "total": 3,
+   "level": "无共振",
+   "veto": "",
+   "chip_detail": "获利盘21%·集中度20.8",
+   "related_detail": "龙虎榜净买2336万游资",
+   "bonus": "",
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.01,
+    "m5": 0.04,
+    "m10": 0.07,
+    "m20": -0.17,
+    "tag": "⚖️中性"
+   }
+  },
+  {
+   "code": "603906",
+   "name": "龙蟠科技",
+   "fund": 0,
+   "chip": 1,
+   "related": 2,
+   "policy": 0,
+   "total": 3,
+   "level": "无共振",
+   "veto": "",
+   "chip_detail": "获利盘43%·集中度24.4",
+   "related_detail": "龙虎榜净买9008万游资",
+   "bonus": "",
+   "fund_tag": "🌀出货完成·抛压枯竭",
+   "fund_layers": {
+    "m1": -0.11,
+    "m5": -0.65,
+    "m10": -1.63,
+    "m20": -0.98,
+    "tag": "🌀出货完成·抛压枯竭"
    }
   },
   {
@@ -27901,8 +28095,14 @@
    "chip_detail": "获利盘51%·集中度21.6",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": -0.0,
+    "m5": 0.0,
+    "m10": 0.02,
+    "m20": -0.01,
+    "tag": "⚖️中性"
+   }
   },
   {
    "code": "603912",
@@ -27917,24 +28117,36 @@
    "chip_detail": "获利盘65%·集中度21.0",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "🌀回调洗盘·20日控盘正",
+   "fund_layers": {
+    "m1": -0.04,
+    "m5": 0.14,
+    "m10": 1.5,
+    "m20": 1.84,
+    "tag": "🌀回调洗盘·20日控盘正"
+   }
   },
   {
-   "code": "603916",
-   "name": "苏博特",
-   "fund": 3,
-   "chip": 0,
+   "code": "603917",
+   "name": "合力科技",
+   "fund": 0,
+   "chip": 3,
    "related": 0,
    "policy": 0,
    "total": 3,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘55%·集中度10.0(集中)",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "🌀回调洗盘·20日控盘正",
+   "fund_layers": {
+    "m1": -0.02,
+    "m5": -0.04,
+    "m10": -0.13,
+    "m20": 0.01,
+    "tag": "🌀回调洗盘·20日控盘正"
+   }
   },
   {
    "code": "603928",
@@ -27949,40 +28161,14 @@
    "chip_detail": "获利盘48%·集中度19.1",
    "related_detail": "龙虎榜净买3675万游资",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603936",
-   "name": "博敏电子",
-   "fund": 3,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 3,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603937",
-   "name": "丽岛新材",
-   "fund": 3,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 3,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.06,
+    "m5": -0.5,
+    "m10": -1.26,
+    "m20": 0.77,
+    "tag": "📈资金共振·控盘正"
+   }
   },
   {
    "code": "603938",
@@ -27997,24 +28183,14 @@
    "chip_detail": "获利盘38%·集中度32.9",
    "related_detail": "龙虎榜净卖7729万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603939",
-   "name": "益丰药房",
-   "fund": 3,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 3,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.04,
+    "m5": 1.19,
+    "m10": 1.02,
+    "m20": 0.17,
+    "tag": "📈资金共振·控盘正"
+   }
   },
   {
    "code": "603950",
@@ -28027,26 +28203,16 @@
    "level": "无共振",
    "veto": "",
    "chip_detail": "获利盘35%·集中度26.1",
-   "related_detail": "无交易行为",
+   "related_detail": "龙虎榜净卖6411万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603958",
-   "name": "哈森股份",
-   "fund": 3,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 3,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.21,
+    "m5": 0.75,
+    "m10": 2.0,
+    "m20": 4.03,
+    "tag": "📈资金共振·控盘正"
+   }
   },
   {
    "code": "603969",
@@ -28071,24 +28237,24 @@
    }
   },
   {
-   "code": "603970",
-   "name": "中农立华",
-   "fund": 3,
-   "chip": 0,
+   "code": "603976",
+   "name": "正川股份",
+   "fund": 0,
+   "chip": 3,
    "related": 0,
    "policy": 0,
    "total": 3,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘78%·集中度13.1(集中)",
    "related_detail": "无交易行为",
    "bonus": "",
    "fund_tag": "🌀回调洗盘·20日控盘正",
    "fund_layers": {
-    "m1": -0.01,
-    "m5": 0.01,
-    "m10": 0.05,
-    "m20": 0.05,
+    "m1": -0.02,
+    "m5": -0.2,
+    "m10": -0.63,
+    "m20": 0.28,
     "tag": "🌀回调洗盘·20日控盘正"
    }
   },
@@ -28851,7 +29017,7 @@
    "level": "无共振",
    "veto": "",
    "chip_detail": "获利盘38%·集中度25.6",
-   "related_detail": "龙虎榜净卖3710万",
+   "related_detail": "无交易行为",
    "bonus": "",
    "fund_tag": "🌀回调洗盘·20日控盘正",
    "fund_layers": {
@@ -36871,28 +37037,6 @@
    }
   },
   {
-   "code": "601519",
-   "name": "大智慧",
-   "fund": 0,
-   "chip": 0,
-   "related": 2,
-   "policy": 0,
-   "total": 2,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "获利盘21%·集中度23.9",
-   "related_detail": "龙虎榜净买5337万游资",
-   "bonus": "",
-   "fund_tag": "⚖️中性",
-   "fund_layers": {
-    "m1": 0.59,
-    "m5": -0.65,
-    "m10": -0.95,
-    "m20": -1.98,
-    "tag": "⚖️中性"
-   }
-  },
-  {
    "code": "601601",
    "name": "中国太保",
    "fund": 2,
@@ -37453,7 +37597,7 @@
    "level": "无共振",
    "veto": "",
    "chip_detail": "获利盘15%·集中度22.7",
-   "related_detail": "龙虎榜净卖3557万",
+   "related_detail": "无交易行为",
    "bonus": "",
    "fund_tag": "⚖️中性",
    "fund_layers": {
@@ -39037,10 +39181,16 @@
    "level": "无共振",
    "veto": "",
    "chip_detail": "获利盘17%·集中度20.6",
-   "related_detail": "无交易行为",
+   "related_detail": "龙虎榜净卖13922万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.02,
+    "m5": -2.11,
+    "m10": -1.22,
+    "m20": -3.57,
+    "tag": "⚖️中性"
+   }
   },
   {
    "code": "603896",
@@ -39055,8 +39205,36 @@
    "chip_detail": "获利盘31%·集中度22.8",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": -0.01,
+    "m5": 0.01,
+    "m10": -0.01,
+    "m20": -0.0,
+    "tag": "⚖️中性"
+   }
+  },
+  {
+   "code": "603909",
+   "name": "建发合诚",
+   "fund": 1,
+   "chip": 1,
+   "related": 0,
+   "policy": 0,
+   "total": 2,
+   "level": "无共振",
+   "veto": "",
+   "chip_detail": "获利盘39%·集中度23.7",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "🌀回调洗盘·20日控盘正",
+   "fund_layers": {
+    "m1": -0.01,
+    "m5": 0.02,
+    "m10": 0.04,
+    "m20": 0.03,
+    "tag": "🌀回调洗盘·20日控盘正"
+   }
   },
   {
    "code": "603920",
@@ -39071,8 +39249,14 @@
    "chip_detail": "获利盘47%·集中度33.3",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.64,
+    "m5": 0.73,
+    "m10": 4.29,
+    "m20": 5.86,
+    "tag": "📈资金共振·控盘正"
+   }
   },
   {
    "code": "603956",
@@ -39109,24 +39293,14 @@
    "chip_detail": "获利盘40%·集中度11.5(集中)",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603968",
-   "name": "醋化股份",
-   "fund": 2,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 2,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.03,
+    "m5": -0.01,
+    "m10": -0.09,
+    "m20": -0.15,
+    "tag": "⚖️中性"
+   }
   },
   {
    "code": "603980",
@@ -39141,8 +39315,14 @@
    "chip_detail": "获利盘40%·集中度10.3(集中)",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⛔出货中·全周期流出",
+   "fund_layers": {
+    "m1": -0.2,
+    "m5": -0.26,
+    "m10": -0.08,
+    "m20": -1.0,
+    "tag": "⛔出货中·全周期流出"
+   }
   },
   {
    "code": "603982",
@@ -39176,7 +39356,7 @@
    "total": 2,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘18%·集中度28.4",
    "related_detail": "龙虎榜净买734万游资",
    "bonus": "",
    "fund_tag": "⚖️中性",
@@ -39185,6 +39365,28 @@
     "m5": -0.14,
     "m10": -0.16,
     "m20": -0.28,
+    "tag": "⚖️中性"
+   }
+  },
+  {
+   "code": "603985",
+   "name": "恒润股份",
+   "fund": 1,
+   "chip": 1,
+   "related": 0,
+   "policy": 0,
+   "total": 2,
+   "level": "无共振",
+   "veto": "",
+   "chip_detail": "获利盘33%·集中度28.2",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": -0.06,
+    "m5": 0.09,
+    "m10": 0.24,
+    "m20": -0.43,
     "tag": "⚖️中性"
    }
   },
@@ -42221,6 +42423,28 @@
     "m5": -0.02,
     "m10": -0.05,
     "m20": -0.06,
+    "tag": "⚖️中性"
+   }
+  },
+  {
+   "code": "001382",
+   "name": "新亚电缆",
+   "fund": 0,
+   "chip": 1,
+   "related": 0,
+   "policy": 0,
+   "total": 1,
+   "level": "无共振",
+   "veto": "",
+   "chip_detail": "获利盘25%·集中度7.4(集中)",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.0,
+    "m5": -0.05,
+    "m10": -0.08,
+    "m20": -0.26,
     "tag": "⚖️中性"
    }
   },
@@ -45444,10 +45668,10 @@
    "related": 0,
    "policy": 0,
    "total": 1,
-   "level": "否决",
-   "veto": "⚠️ 反向否决(资金流出+关联方减持)",
+   "level": "无共振",
+   "veto": "",
    "chip_detail": "获利盘45%·集中度24.8",
-   "related_detail": "龙虎榜净卖13551万",
+   "related_detail": "无交易行为",
    "bonus": "",
    "fund_tag": "📈资金共振·控盘正",
    "fund_layers": {
@@ -51824,10 +52048,10 @@
    "related": 0,
    "policy": 0,
    "total": 1,
-   "level": "否决",
-   "veto": "⚠️ 反向否决(资金流出+关联方减持)",
+   "level": "无共振",
+   "veto": "",
    "chip_detail": "获利盘45%·集中度23.8",
-   "related_detail": "龙虎榜净卖1814万",
+   "related_detail": "无交易行为",
    "bonus": "",
    "fund_tag": "⚖️中性",
    "fund_layers": {
@@ -53181,6 +53405,28 @@
    }
   },
   {
+   "code": "603730",
+   "name": "岱美股份",
+   "fund": 0,
+   "chip": 1,
+   "related": 0,
+   "policy": 0,
+   "total": 1,
+   "level": "无共振",
+   "veto": "",
+   "chip_detail": "获利盘33%·集中度28.5",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.0,
+    "m5": -0.45,
+    "m10": -1.49,
+    "m20": -2.05,
+    "tag": "⚖️中性"
+   }
+  },
+  {
    "code": "603737",
    "name": "三棵树",
    "fund": 0,
@@ -53489,24 +53735,8 @@
    }
   },
   {
-   "code": "603898",
-   "name": "好莱客",
-   "fund": 1,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 1,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "获利盘21%·集中度20.8",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603906",
-   "name": "龙蟠科技",
+   "code": "603893",
+   "name": "瑞芯微",
    "fund": 0,
    "chip": 1,
    "related": 0,
@@ -53514,33 +53744,39 @@
    "total": 1,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "获利盘43%·集中度24.4",
+   "chip_detail": "获利盘9%·集中度10.9(集中)",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "🌀出货完成·抛压枯竭",
+   "fund_tag": "⚖️中性",
    "fund_layers": {
-    "m1": -0.11,
-    "m5": -0.65,
-    "m10": -1.63,
-    "m20": -0.98,
-    "tag": "🌀出货完成·抛压枯竭"
+    "m1": 0.42,
+    "m5": -14.8,
+    "m10": -16.92,
+    "m20": -17.27,
+    "tag": "⚖️中性"
    }
   },
   {
-   "code": "603909",
-   "name": "建发合诚",
-   "fund": 1,
-   "chip": 0,
+   "code": "603931",
+   "name": "格林达",
+   "fund": 0,
+   "chip": 1,
    "related": 0,
    "policy": 0,
    "total": 1,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
+   "level": "否决",
+   "veto": "⚠️ 反向否决(资金流出+关联方减持)",
+   "chip_detail": "获利盘31%·集中度32.4",
+   "related_detail": "龙虎榜净卖1727万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "🌀出货完成·抛压枯竭",
+   "fund_layers": {
+    "m1": -0.06,
+    "m5": -0.36,
+    "m10": -0.59,
+    "m20": -0.33,
+    "tag": "🌀出货完成·抛压枯竭"
+   }
   },
   {
    "code": "603978",
@@ -53555,45 +53791,13 @@
    "chip_detail": "获利盘35%·集中度29.5",
    "related_detail": "龙虎榜净卖1267万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603979",
-   "name": "金诚信",
-   "fund": 1,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 1,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603985",
-   "name": "恒润股份",
-   "fund": 1,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 1,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "⚖️中性",
+   "fund_tag": "🌀出货完成·抛压枯竭",
    "fund_layers": {
-    "m1": -0.06,
-    "m5": 0.09,
-    "m10": 0.24,
-    "m20": -0.43,
-    "tag": "⚖️中性"
+    "m1": -0.05,
+    "m5": -0.3,
+    "m10": -0.97,
+    "m20": -1.14,
+    "tag": "🌀出货完成·抛压枯竭"
    }
   },
   {
@@ -56530,10 +56734,10 @@
    "related": 0,
    "policy": 0,
    "total": 0,
-   "level": "否决",
-   "veto": "⚠️ 反向否决(资金流出+关联方减持)",
+   "level": "无共振",
+   "veto": "",
    "chip_detail": "获利盘12%·集中度18.5",
-   "related_detail": "龙虎榜净卖22780万",
+   "related_detail": "无交易行为",
    "bonus": "",
    "fund_tag": "📈资金共振·控盘正",
    "fund_layers": {
@@ -62903,6 +63107,28 @@
    }
   },
   {
+   "code": "601519",
+   "name": "大智慧",
+   "fund": 0,
+   "chip": 0,
+   "related": 0,
+   "policy": 0,
+   "total": 0,
+   "level": "无共振",
+   "veto": "",
+   "chip_detail": "获利盘21%·集中度23.9",
+   "related_detail": "无交易行为",
+   "bonus": "",
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.59,
+    "m5": -0.65,
+    "m10": -0.95,
+    "m20": -1.98,
+    "tag": "⚖️中性"
+   }
+  },
+  {
    "code": "601566",
    "name": "九牧王",
    "fund": 0,
@@ -65621,8 +65847,14 @@
    "chip_detail": "获利盘9%·集中度17.3",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.03,
+    "m5": -0.01,
+    "m10": 0.58,
+    "m20": 0.62,
+    "tag": "📈资金共振·控盘正"
+   }
   },
   {
    "code": "603887",
@@ -65637,8 +65869,14 @@
    "chip_detail": "获利盘20%·集中度28.3",
    "related_detail": "龙虎榜净卖9669万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⛔出货中·全周期流出",
+   "fund_layers": {
+    "m1": -0.11,
+    "m5": -3.01,
+    "m10": -1.01,
+    "m20": -1.47,
+    "tag": "⛔出货中·全周期流出"
+   }
   },
   {
    "code": "603888",
@@ -65653,24 +65891,14 @@
    "chip_detail": "获利盘22%·集中度18.7",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603893",
-   "name": "瑞芯微",
-   "fund": 0,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 0,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "🌀出货完成·抛压枯竭",
+   "fund_layers": {
+    "m1": -0.02,
+    "m5": -0.37,
+    "m10": -0.46,
+    "m20": -1.19,
+    "tag": "🌀出货完成·抛压枯竭"
+   }
   },
   {
    "code": "603899",
@@ -65682,7 +65910,7 @@
    "total": 0,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘17%·集中度17.8",
    "related_detail": "无交易行为",
    "bonus": "",
    "fund_tag": "⛔出货中·全周期流出",
@@ -65739,22 +65967,6 @@
    }
   },
   {
-   "code": "603917",
-   "name": "合力科技",
-   "fund": 0,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 0,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
    "code": "603918",
    "name": "金桥信息",
    "fund": 0,
@@ -65767,8 +65979,14 @@
    "chip_detail": "获利盘18%·集中度15.3",
    "related_detail": "龙虎榜净卖3565万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "📈资金共振·控盘正",
+   "fund_layers": {
+    "m1": 0.04,
+    "m5": -0.35,
+    "m10": -0.18,
+    "m20": 0.18,
+    "tag": "📈资金共振·控盘正"
+   }
   },
   {
    "code": "603919",
@@ -65780,11 +65998,17 @@
    "total": 0,
    "level": "否决",
    "veto": "⚠️ 反向否决(资金流出+关联方减持)",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘24%·集中度18.8",
    "related_detail": "龙虎榜净卖811万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "🌀回调洗盘·20日控盘正",
+   "fund_layers": {
+    "m1": -0.08,
+    "m5": -0.41,
+    "m10": -0.62,
+    "m20": 0.55,
+    "tag": "🌀回调洗盘·20日控盘正"
+   }
   },
   {
    "code": "603926",
@@ -65799,8 +66023,14 @@
    "chip_detail": "获利盘24%·集中度25.1",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "🌀回调洗盘·20日控盘正",
+   "fund_layers": {
+    "m1": -0.02,
+    "m5": -0.21,
+    "m10": -0.02,
+    "m20": 0.23,
+    "tag": "🌀回调洗盘·20日控盘正"
+   }
   },
   {
    "code": "603927",
@@ -65812,32 +66042,16 @@
    "total": 0,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘24%·集中度24.1",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603931",
-   "name": "格林达",
-   "fund": 0,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 0,
-   "level": "否决",
-   "veto": "⚠️ 反向否决(资金流出+关联方减持)",
-   "chip_detail": "无筹码数据",
-   "related_detail": "龙虎榜净卖1727万",
-   "bonus": "",
-   "fund_tag": "🌀出货完成·抛压枯竭",
+   "fund_tag": "⚖️中性",
    "fund_layers": {
-    "m1": -0.06,
-    "m5": -0.36,
-    "m10": -0.59,
-    "m20": -0.33,
-    "tag": "🌀出货完成·抛压枯竭"
+    "m1": 0.03,
+    "m5": -0.37,
+    "m10": -0.42,
+    "m20": -1.23,
+    "tag": "⚖️中性"
    }
   },
   {
@@ -65853,8 +66067,14 @@
    "chip_detail": "获利盘27%·集中度20.9",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⛔出货中·全周期流出",
+   "fund_layers": {
+    "m1": -0.03,
+    "m5": -0.11,
+    "m10": -0.27,
+    "m20": -0.59,
+    "tag": "⛔出货中·全周期流出"
+   }
   },
   {
    "code": "603948",
@@ -65866,11 +66086,17 @@
    "total": 0,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘20%·集中度19.7",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⚖️中性",
+   "fund_layers": {
+    "m1": 0.0,
+    "m5": -0.02,
+    "m10": -0.1,
+    "m20": -0.12,
+    "tag": "⚖️中性"
+   }
   },
   {
    "code": "603949",
@@ -65882,11 +66108,17 @@
    "total": 0,
    "level": "否决",
    "veto": "⚠️ 反向否决(资金流出+关联方减持)",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘28%·集中度21.2",
    "related_detail": "龙虎榜净卖1905万",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⛔出货中·全周期流出",
+   "fund_layers": {
+    "m1": -0.01,
+    "m5": -0.03,
+    "m10": -0.08,
+    "m20": -0.29,
+    "tag": "⛔出货中·全周期流出"
+   }
   },
   {
    "code": "603955",
@@ -65920,11 +66152,17 @@
    "total": 0,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘27%·集中度26.1",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
+   "fund_tag": "⛔出货中·全周期流出",
+   "fund_layers": {
+    "m1": -0.04,
+    "m5": -0.08,
+    "m10": -0.23,
+    "m20": -0.39,
+    "tag": "⛔出货中·全周期流出"
+   }
   },
   {
    "code": "603966",
@@ -65936,32 +66174,16 @@
    "total": 0,
    "level": "无共振",
    "veto": "",
-   "chip_detail": "无筹码数据",
+   "chip_detail": "获利盘13%·集中度17.7",
    "related_detail": "无交易行为",
    "bonus": "",
-   "fund_tag": "",
-   "fund_layers": {}
-  },
-  {
-   "code": "603976",
-   "name": "正川股份",
-   "fund": 0,
-   "chip": 0,
-   "related": 0,
-   "policy": 0,
-   "total": 0,
-   "level": "无共振",
-   "veto": "",
-   "chip_detail": "无筹码数据",
-   "related_detail": "无交易行为",
-   "bonus": "",
-   "fund_tag": "🌀回调洗盘·20日控盘正",
+   "fund_tag": "🌀出货完成·抛压枯竭",
    "fund_layers": {
-    "m1": -0.02,
-    "m5": -0.2,
-    "m10": -0.63,
-    "m20": 0.28,
-    "tag": "🌀回调洗盘·20日控盘正"
+    "m1": -0.01,
+    "m5": -0.14,
+    "m10": -0.15,
+    "m20": -0.29,
+    "tag": "🌀出货完成·抛压枯竭"
    }
   },
   {
