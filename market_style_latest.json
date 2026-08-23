@@ -1,14 +1,14 @@
 {
- "date": "2026-08-21",
+ "date": "2026-08-23",
  "data_date": "2026-08-21",
  "style": "情绪市",
  "icon": "🔥",
- "score": 25,
+ "score": 31,
  "score_detail": {
   "size_style": -7,
   "limitup_structure": 29,
   "volume_structure": 0,
-  "sector_fund": 3
+  "sector_fund": 9
  },
  "size_style": {
   "hs300_5d": -1.01,
@@ -38,20 +38,6 @@
  "sector_fund": {
   "sectors": [
    {
-    "name": "通信设备",
-    "zdf": "2.98",
-    "main_net5d": -170.4,
-    "retail_net": -88.9,
-    "tag": "游资型"
-   },
-   {
-    "name": "电子",
-    "zdf": "0.98",
-    "main_net5d": -800.8,
-    "retail_net": -92.8,
-    "tag": "游资型"
-   },
-   {
     "name": "贵金属",
     "zdf": "4.64",
     "main_net5d": 20.7,
@@ -59,26 +45,40 @@
     "tag": "机构型"
    },
    {
-    "name": "元件",
-    "zdf": "2.80",
-    "main_net5d": -264.2,
-    "retail_net": -46.8,
+    "name": "ST概念",
+    "zdf": "1.32",
+    "main_net5d": -27.5,
+    "retail_net": -0.1,
     "tag": "游资型"
    },
    {
-    "name": "工业金属",
-    "zdf": "2.42",
-    "main_net5d": 2.7,
-    "retail_net": -44.4,
-    "tag": "机构型"
+    "name": "通信设备",
+    "zdf": "2.98",
+    "main_net5d": -170.4,
+    "retail_net": -88.9,
+    "tag": "游资型"
+   },
+   {
+    "name": "半导体",
+    "zdf": "0.47",
+    "main_net5d": -392.1,
+    "retail_net": -9.5,
+    "tag": "游资型"
+   },
+   {
+    "name": "白酒Ⅱ",
+    "zdf": "-1.47",
+    "main_net5d": -34.8,
+    "retail_net": 8.6,
+    "tag": "游资型"
    }
   ]
  },
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 2,
-   "欧马模式": 5
+   "堆量模式": 6,
+   "欧马模式": 6
   },
   "leaders": {
    "堆量模式": 2
@@ -87,10 +87,11 @@
    "欧马模式": 1
   },
   "gpoints": {
+   "堆量模式": 2,
    "欧马模式": 1
   },
   "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
-  "total_scored": 7
+  "total_scored": 12
  },
  "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
 }
