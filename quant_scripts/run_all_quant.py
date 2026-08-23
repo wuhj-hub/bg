@@ -85,7 +85,8 @@ def run_shuangxian():
     # 确保 pools 目录存在
     (REPO_DIR / "pools").mkdir(exist_ok=True)
 
-    stdout, stderr = run_py("quant_scripts/run_shuangxian.py", cwd=str(REPO_DIR))
+    stdout, stderr = run_py(
+        "quant_scripts/run_shuangxian.py --pool panhou_lianghua.csv", cwd=str(REPO_DIR))
 
     # 双弦每日报告落盘（收编sx2：完整stdout→md，供上传知识库每日报告文件夹+推送）
     try:
