@@ -562,6 +562,15 @@ def run_daily(pool_path=None):
     # 分层管理（2026-08-24，方案3）：
     #   核心层 = score≥65（A级）→ 进月度股池
     #   观察层 = 50≤score<65（B级）→ 独立跟踪不入池
+    # 实时ST/退市兜底（清单快照可能漏掉后续戴帽股，如交大昂立→ST交昂）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from st_guard import filter_st
+        enriched, _st_dropped = filter_st(enriched)
+        if _st_dropped:
+            print(f"[ST过滤] 剔除 {len(_st_dropped)} 只ST/退市", flush=True)
+    except Exception as e:
+        print(f"[WARN] st_guard 校验失败: {e}", flush=True)
     resonance_list = []
     watch_list = []
     for r in enriched:
