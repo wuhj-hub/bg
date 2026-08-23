@@ -222,6 +222,16 @@ def main():
         time.sleep(1.2)
 
     results.sort(key=lambda r: -r["stars"])
+    # 实时ST/退市兜底（清单快照可能漏掉后续戴帽股，如交大昂立→ST交昂）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from st_guard import filter_st
+        results, st_dropped = filter_st(results)
+        if st_dropped:
+            names_str = ", ".join(d["name"] + "(" + d["code"] + ")" for d in st_dropped)
+            print(f"[ST过滤] 剔除 {len(st_dropped)} 只ST/退市: {names_str}", flush=True)
+    except Exception as e:
+        print(f"[WARN] st_guard 校验失败: {e}", flush=True)
     # 输出
     os.makedirs("/sandbox/workspace/outputs", exist_ok=True)
     md_path = f"/sandbox/workspace/outputs/一统天下建仓区股池_{date_str}.md"
