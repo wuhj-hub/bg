@@ -260,6 +260,80 @@ def month_gate(code):
     return "BLOCK"
 
 
+def load_market_env():
+    """加载大盘环境温度（L2宏观层，斯波朗迪：冲突时信逻辑）。
+    读 quant_results_latest.json 三系统温度（鱼身/猛兽/双弦），取均值。
+    返回 {temp, level, detail} 或 None（数据缺失不裁决）
+    """
+    for p in ("quant_results_latest.json", "outputs/quant_results_latest.json",
+              "../outputs/quant_results_latest.json",
+              "/sandbox/workspace/github_bg/outputs/quant_results_latest.json"):
+        try:
+            d = json.load(open(p, encoding="utf-8"))
+            temps = []
+            detail = {}
+            # 鱼身
+            fb = d.get("fishbody") or d.get("fish_body") or {}
+            if isinstance(fb, dict) and fb.get("market_temp") is not None:
+                t = fb["market_temp"]
+                if isinstance(t, dict):
+                    t = t.get("score") or t.get("temp")
+                if t is not None:
+                    temps.append(float(t))
+                    detail["鱼身"] = round(float(t), 1)
+            # 猛兽
+            bs = d.get("beast") or {}
+            if isinstance(bs, dict) and bs.get("safety_score") is not None:
+                temps.append(float(bs["safety_score"]))
+                detail["猛兽"] = round(float(bs["safety_score"]), 1)
+            # 双弦
+            sx = d.get("shuangxian") or {}
+            if isinstance(sx, dict) and sx.get("temperature") is not None:
+                temps.append(float(sx["temperature"]))
+                detail["双弦"] = round(float(sx["temperature"]), 1)
+            if temps:
+                temp = sum(temps) / len(temps)
+                level = ("冷市<40" if temp < 40 else "偏冷40-50" if temp < 50 else
+                         "中性50-60" if temp < 60 else "偏暖60-70" if temp < 70 else "过热≥70")
+                return {"temp": round(temp, 1), "level": level, "detail": detail}
+        except Exception:
+            continue
+    return None
+
+
+def apply_env_adjudication(ranked, env):
+    """宏观-技术冲突裁决（斯波朗迪L4：L2与L3冲突→信L2）。
+    冷市(<40)：所有信号降级一档；过热(≥70)：标注警戒。返回裁决日志行列表。
+    """
+    logs = []
+    if not env:
+        return logs
+    t = env["temp"]
+    for r in ranked:
+        if t < 40:
+            # 冷市：降级一档（★★★→★★→★→观察）
+            lv = r["level"]
+            if lv.startswith("★★★"):
+                r["level"] = "★★" + lv[3:] + "·冷市降级"
+            elif lv.startswith("★★"):
+                r["level"] = "★" + lv[2:] + "·冷市降级"
+            elif lv.startswith("★"):
+                r["level"] = "观察·冷市降级"
+            else:
+                r["level"] = lv + "·冷市降级"
+            r["env_note"] = "冷市降级"
+        elif t >= 70:
+            r["level"] = r["level"] + "·过热警戒"
+            r["env_note"] = "过热警戒"
+        else:
+            r["env_note"] = "正常"
+    logs.append(f"大盘温度 {t}（{env['level']}）→ " +
+                ("全部信号降级一档（信L2逻辑，冷市不追）" if t < 40 else
+                 "全部信号过热警戒（防高位接力）" if t >= 70 else
+                 "环境正常，信号按原级执行"))
+    return logs
+
+
 def main():
     top_n = 20
     argv = sys.argv[1:]
@@ -340,6 +414,12 @@ def main():
         if len(ranked) < before:
             print(f"[ST过滤] 剔除 {before - len(ranked)} 只非清单标的（ST/退市/创业板等）")
 
+    # 宏观-技术冲突裁决（斯波朗迪L2：大盘环境定权，冲突信逻辑）
+    env = load_market_env()
+    env_logs = apply_env_adjudication(ranked, env) if env else []
+    if env:
+        print(f"[环境裁决] 大盘温度 {env['temp']}（{env['level']}）→ {env_logs[0] if env_logs else '无调整'}")
+
     # 月线闸门过滤（TOP N）
     for r in ranked[:top_n]:
         r["month"] = month_gate(r["code"])
@@ -349,7 +429,7 @@ def main():
 
     # 信号级风控卡（《专业投机原理》L5：无止损不进场 + 账户风险2%→仓位）
     try:
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts"))
         from signal_risk_card import risk_card_batch
         _cards = risk_card_batch([{"code": r["code"]} for r in ranked[:top_n]])
         _rc = {c["code"]: c for c in _cards}
@@ -363,7 +443,8 @@ def main():
         print(f"[WARN] 风控卡计算失败: {e}")
 
     today = datetime.now().strftime("%Y-%m-%d")
-    js = {"date": today, "sources": {"四维": len(four), "鱼身": len(fish), "猛兽": len(beast),
+    js = {"date": today, "env": env, "env_logs": env_logs,
+          "sources": {"四维": len(four), "鱼身": len(fish), "猛兽": len(beast),
                                       "双弦": len(sx), "乾坤": len(qk), "武威": len(wuwei), "反转": len(reversal)},
           "counts": {"★★★": sum(1 for r in ranked if r["level"].startswith("★★★")),
                      "★★": sum(1 for r in ranked if r["level"].startswith("★★")),
@@ -378,6 +459,12 @@ def main():
          f"> 数据源：四维{len(four)}只 / 鱼身{len(fish)} / 猛兽Setup{len(beast)} / 双弦{len(sx)} / 乾坤{len(qk)} / 武威{len(wuwei)} / 反转{len(reversal)}",
          "> 仲裁权重：四维高置信+3｜猛兽Setup≥60+3/≥50+2｜乾坤A+2｜鱼身加油≥70+2｜伏击/RS_D/G点+1｜双弦共振+1｜四维否决-3",
          "> 分级：≥7 ★★★全信号共振(≤15%) / 5-6 ★★(≤10%) / 3-4 ★(≤5%) / <3 观察；月线BLOCK强制降级", ""]
+    if env:
+        L.append("## 🏛️ 大盘环境裁决（L2宏观 · 斯波朗迪：冲突信逻辑）")
+        L.append(f"- 大盘温度 **{env['temp']}**（{env['level']}）｜三系统：{' '.join(f'{k}={v}' for k, v in env.get('detail', {}).items())}")
+        for lg in env_logs:
+            L.append(f"- ⚖️ {lg}")
+        L.append("")
     L.append("## 仲裁结果 TOP{0}".format(min(top_n, len(ranked))))
     L.append("| 排名 | 代码 | 总分 | 分级 | 月线 | 信号来源 | 风控卡 |")
     L.append("|:----|:----|:----:|:----|:----:|:----|:----|")
