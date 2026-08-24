@@ -202,6 +202,17 @@ def main():
     # 排序：有信号优先，其次反转数值绝对值
     results.sort(key=lambda r: (0 if r["signals"] else 1, -abs(r["fz"])))
 
+    # 实时ST/退市兜底（清单快照可能漏掉后续戴帽股，如交大昂立→ST交昂）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from st_guard import filter_st
+        results, _st_dropped = filter_st(results)
+        if _st_dropped:
+            print(f"[ST过滤] 剔除 {len(_st_dropped)} 只ST/退市: "
+                  f"{', '.join(d['name'] + '(' + d['code'] + ')' for d in _st_dropped)}", flush=True)
+    except Exception as e:
+        print(f"[WARN] st_guard 校验失败: {e}", flush=True)
+
     print(f"| 代码 | 名称 | 日期 | 收盘 | 反转数值 | 2倍 | 前值 | MACD | 信号 |")
     print(f"|:----|:----|:----|:----:|:----:|:----:|:----:|:----:|:----|")
     shown = 0
