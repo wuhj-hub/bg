@@ -347,6 +347,21 @@ def main():
             r["level"] = "观察" + "·月线空头降级"
         time.sleep(0.2)
 
+    # 信号级风控卡（《专业投机原理》L5：无止损不进场 + 账户风险2%→仓位）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from signal_risk_card import risk_card_batch
+        _cards = risk_card_batch([{"code": r["code"]} for r in ranked[:top_n]])
+        _rc = {c["code"]: c for c in _cards}
+        for r in ranked[:top_n]:
+            r["risk"] = _rc.get(r["code"], {})
+        _ok = sum(1 for c in _cards if c.get("status", "").startswith("✅"))
+        _warn = sum(1 for c in _cards if c.get("status", "").startswith("⚠️"))
+        _no = sum(1 for c in _cards if c.get("status", "").startswith("⛔"))
+        print(f"[风控卡] TOP{len(_cards)}: ✅可执行{_ok} / ⚠️盈亏比不足{_warn} / ⛔无止损{_no}")
+    except Exception as e:
+        print(f"[WARN] 风控卡计算失败: {e}")
+
     today = datetime.now().strftime("%Y-%m-%d")
     js = {"date": today, "sources": {"四维": len(four), "鱼身": len(fish), "猛兽": len(beast),
                                       "双弦": len(sx), "乾坤": len(qk), "武威": len(wuwei), "反转": len(reversal)},
@@ -364,10 +379,19 @@ def main():
          "> 仲裁权重：四维高置信+3｜猛兽Setup≥60+3/≥50+2｜乾坤A+2｜鱼身加油≥70+2｜伏击/RS_D/G点+1｜双弦共振+1｜四维否决-3",
          "> 分级：≥7 ★★★全信号共振(≤15%) / 5-6 ★★(≤10%) / 3-4 ★(≤5%) / <3 观察；月线BLOCK强制降级", ""]
     L.append("## 仲裁结果 TOP{0}".format(min(top_n, len(ranked))))
-    L.append("| 排名 | 代码 | 总分 | 分级 | 月线 | 信号来源 |")
-    L.append("|:----|:----|:----:|:----|:----:|:----|")
+    L.append("| 排名 | 代码 | 总分 | 分级 | 月线 | 信号来源 | 风控卡 |")
+    L.append("|:----|:----|:----:|:----|:----:|:----|:----|")
     for i, r in enumerate(ranked[:top_n], 1):
-        L.append(f"| {i} | {r['code']} | **{r['pts']}** | {r['level']} | {r['month']} | {'；'.join(r['src'][:5])}{'…' if len(r['src']) > 5 else ''} |")
+        rk = r.get("risk", {})
+        if rk.get("status", "").startswith("✅"):
+            rk_txt = f"✅ {rk.get('rr','—')}x·仓位{rk.get('pos_pct','—')}%"
+        elif rk.get("status", "").startswith("⚠️"):
+            rk_txt = f"⚠️ 盈亏比{rk.get('rr','—')}"
+        elif rk.get("status", "").startswith("⛔"):
+            rk_txt = "⛔ 无止损"
+        else:
+            rk_txt = "—"
+        L.append(f"| {i} | {r['code']} | **{r['pts']}** | {r['level']} | {r['month']} | {'；'.join(r['src'][:5])}{'…' if len(r['src']) > 5 else ''} | {rk_txt} |")
     L.append("")
     L.append("## 分级分布")
     L.append(f"- ★★★ 全信号共振: {js['counts']['★★★']} | ★★ 多信号: {js['counts']['★★']} | ★ 双信号: {js['counts']['★']} | 观察: {js['counts']['观察']}")
