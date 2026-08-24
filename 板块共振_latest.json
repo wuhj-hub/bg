@@ -1,15 +1,67 @@
 {
- "date": "2026-08-23",
+ "date": "2026-08-24",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 46,
+ "pool_size": 50,
  "resonance_boards": [
   {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "zdf": 4.64,
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "zdf": 5.39,
+   "strength": 8,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "煤炭开采",
+   "code": "pt01801951",
+   "zdf": 2.17,
    "strength": 7,
    "factors": [
     "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "煤炭",
+   "code": "pt01801950",
+   "zdf": 2.35,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
+   "zdf": 1.38,
+   "strength": 6,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "保险Ⅱ",
+   "code": "pt01801194",
+   "zdf": 2.58,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "种植业",
+   "code": "pt01801016",
+   "zdf": 2.06,
+   "strength": 5,
+   "factors": [
     "进场",
     "吸筹"
    ]
@@ -17,10 +69,9 @@
   {
    "name": "工业金属",
    "code": "pt01801055",
-   "zdf": 2.42,
-   "strength": 7,
+   "zdf": 0.41,
+   "strength": 5,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -28,10 +79,9 @@
   {
    "name": "黄金概念",
    "code": "pt02003547",
-   "zdf": 2.33,
-   "strength": 7,
+   "zdf": 1.08,
+   "strength": 5,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -39,29 +89,27 @@
   {
    "name": "航运港口",
    "code": "pt01801992",
-   "zdf": 2.42,
-   "strength": 7,
+   "zdf": 0.08,
+   "strength": 5,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "石油石化",
-   "code": "pt01801960",
-   "zdf": 1.36,
-   "strength": 7,
+   "name": "有色金属",
+   "code": "pt01801050",
+   "zdf": 0.13,
+   "strength": 5,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "化学原料",
-   "code": "pt01801033",
-   "zdf": 0.62,
+   "name": "国有大型银行Ⅱ",
+   "code": "pt01801782",
+   "zdf": 1.28,
    "strength": 5,
    "factors": [
     "进场",
@@ -71,104 +119,158 @@
  ],
  "grab_top": [
   {
-   "name": "贵金属",
-   "code": "pt01801053",
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "value": 8
+  },
+  {
+   "name": "煤炭开采",
+   "code": "pt01801951",
    "value": 7
   },
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "value": 7
-  },
-  {
-   "name": "黄金概念",
-   "code": "pt02003547",
-   "value": 7
-  },
-  {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "value": 7
-  },
-  {
-   "name": "石油石化",
-   "code": "pt01801960",
+   "name": "煤炭",
+   "code": "pt01801950",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "value": 52.4
-  },
-  {
    "name": "黄金概念",
    "code": "pt02003547",
-   "value": 26.5
+   "value": 112.8
   },
   {
    "name": "贵金属",
    "code": "pt01801053",
-   "value": 20.7
+   "value": 50.9
   },
   {
-   "name": "化学原料",
-   "code": "pt01801033",
-   "value": 11.9
+   "name": "工业金属",
+   "code": "pt01801055",
+   "value": 40.3
+  },
+  {
+   "name": "种植业",
+   "code": "pt01801016",
+   "value": 18.4
   },
   {
    "name": "航运港口",
    "code": "pt01801992",
-   "value": 9.7
+   "value": 17.6
   },
   {
-   "name": "石油石化",
-   "code": "pt01801960",
-   "value": 2.6
+   "name": "化学原料",
+   "code": "pt01801033",
+   "value": 15.9
+  },
+  {
+   "name": "国有大型银行Ⅱ",
+   "code": "pt01801782",
+   "value": 12.3
+  },
+  {
+   "name": "有色金属",
+   "code": "pt01801050",
+   "value": 7.4
+  },
+  {
+   "name": "煤炭开采",
+   "code": "pt01801951",
+   "value": 7.1
+  },
+  {
+   "name": "煤炭",
+   "code": "pt01801950",
+   "value": 6.0
   }
  ],
  "absorption_top": [
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "value": 1.75
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "value": 3.85
   },
   {
    "name": "贵金属",
    "code": "pt01801053",
-   "value": 1.71
+   "value": 3.48
+  },
+  {
+   "name": "种植业",
+   "code": "pt01801016",
+   "value": 2.88
   },
   {
    "name": "航运港口",
    "code": "pt01801992",
-   "value": 1.56
-  },
-  {
-   "name": "化学原料",
-   "code": "pt01801033",
-   "value": 1.15
+   "value": 2.56
   },
   {
    "name": "黄金概念",
    "code": "pt02003547",
-   "value": 0.65
+   "value": 2.43
   },
   {
-   "name": "石油石化",
-   "code": "pt01801960",
-   "value": 0.26
+   "name": "国有大型银行Ⅱ",
+   "code": "pt01801782",
+   "value": 2.03
+  },
+  {
+   "name": "乘用车",
+   "code": "pt01801095",
+   "value": 1.59
+  },
+  {
+   "name": "化学原料",
+   "code": "pt01801033",
+   "value": 1.46
+  },
+  {
+   "name": "工业金属",
+   "code": "pt01801055",
+   "value": 1.24
+  },
+  {
+   "name": "煤炭开采",
+   "code": "pt01801951",
+   "value": 1.05
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "贵金属",
-   "stock": "湖南白银",
-   "code": "sz002716",
-   "zdf": "10.03",
-   "main1": 10.56,
-   "main5": -2.0
+   "board": "保险Ⅱ",
+   "stock": "中国平安",
+   "code": "sh601318",
+   "zdf": "2.94",
+   "main1": 0.69,
+   "main5": 2.43
+  },
+  {
+   "board": "焦炭Ⅱ",
+   "stock": "美锦能源",
+   "code": "sz000723",
+   "zdf": "9.89",
+   "main1": 3.1,
+   "main5": 1.92
+  },
+  {
+   "board": "种植业",
+   "stock": "登海种业",
+   "code": "sz002041",
+   "zdf": "10.04",
+   "main1": 1.58,
+   "main5": 1.05
+  },
+  {
+   "board": "煤炭开采",
+   "stock": "上海能源",
+   "code": "sh600508",
+   "zdf": "10.02",
+   "main1": 0.3,
+   "main5": 0.12
   }
  ]
 }
