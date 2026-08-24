@@ -291,6 +291,19 @@ def main():
             pool_src += f" + 当日主力信号{len(extend)}只(新增{len(new)})"
     print(f"跟踪标的: {len(pool)} 只（来源: {pool_src}）\n")
 
+    # 实时ST/退市兜底（池文件可能是旧名称，按代码校验，如交大昂立→ST交昂）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from st_guard import filter_st
+        _items = [{"code": c, "name": n} for c, n in pool]
+        _kept, _dropped = filter_st(_items)
+        pool = [(_k["code"], _k["name"]) for _k in _kept]
+        if _dropped:
+            print(f"[ST过滤] 剔除 {len(_dropped)} 只ST/退市: "
+                  f"{', '.join(d['name'] + '(' + d['code'] + ')' for d in _dropped)}\n", flush=True)
+    except Exception as e:
+        print(f"[WARN] st_guard 校验失败: {e}", flush=True)
+
     results = []
     with ThreadPoolExecutor(max_workers=8) as ex:
         futs = {ex.submit(track_stock, c, n): (c, n) for c, n in pool}
