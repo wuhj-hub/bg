@@ -97,6 +97,13 @@ jobs:
           cp outputs/rsv_strength_latest.json rsv_strength_latest.json 2>/dev/null || true
           echo "RSV: $(python3 -c "import json;d=json.load(open('outputs/rsv_strength_latest.json'));print('启动%d 持有%d 离场%d'%(len(d.get('launch',[])),len(d.get('hold',[])),len(d.get('exit',[]))))" 2>/dev/null || echo '无数据')"
 
+      # ─── 第二步.1.8：上证月线MACD死叉监控（Seaborg方法论，中期风险信号）───
+      - name: 月线MACD监控
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/monthly_macd_monitor.py
+          cp outputs/monthly_macd_latest.json monthly_macd_latest.json 2>/dev/null || true
+
       # ─── 第二步.2：分时强度分析（黑石minuteMacd启发：信号股分时MACD+封板+尾盘方向）───
       - name: 分时强度分析（信号股分时MACD）
         continue-on-error: true
@@ -325,7 +332,7 @@ jobs:
             python3 git_api_commit.py --msg "chore: update quant/fish_latest ($(date +%Y-%m-%d))" \
               quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
               market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json \
-              四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json yearline_breadth_latest.json 双弦观察池_latest.json 123_2b_latest.json rsv_strength_latest.json \
+              四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json yearline_breadth_latest.json 双弦观察池_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json \
               quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
               pools/pool_$(date +%Y-%m).json \
               all_mainboard.csv \
