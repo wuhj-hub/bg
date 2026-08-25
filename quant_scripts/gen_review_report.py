@@ -370,6 +370,17 @@ def read_yearline_breadth():
     return None
 
 
+def read_rsv_strength():
+    """读RSV均相对强度（rsv_strength_latest.json，腰缠万贯144日），失败返回None"""
+    for p in ("rsv_strength_latest.json", "outputs/rsv_strength_latest.json", "../outputs/rsv_strength_latest.json",
+              "/sandbox/workspace/github_bg/outputs/rsv_strength_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
 def read_sector_resonance():
     """读板块共振JSON（本地复算优先），失败返回None"""
     for p in ("outputs/板块共振_latest.json", "板块共振_latest.json", "../outputs/板块共振_latest.json"):
@@ -858,6 +869,20 @@ def gen_report(today_str):
                 near = stocks[:5]
                 nlist = "、".join(f"{s['name']}({s['code']}+{s['dist_pct']}%)" for s in near)
                 lines.append(f"→ 临界站上年线（距年线最近）：{nlist}")
+        # RSV均相对强度（腰缠万贯144日：启动/持有/离场）
+        rsv = read_rsv_strength()
+        if rsv:
+            launch = rsv.get("launch", [])
+            hold = rsv.get("hold", [])
+            exit_sig = rsv.get("exit", [])
+            lines.append("")
+            lines.append(f"**RSV相对强度**（腰缠万贯144日·基准深综指）：启动 **{len(launch)}** / 持有 **{len(hold)}** / 离场 **{len(exit_sig)}**")
+            if launch:
+                lnames = "、".join(f"{r['name'] or r['code']}({r['rsv_week']})" for r in launch[:5])
+                lines.append(f"→ 🟢 启动候选（周RSV突破50/日线<20拐头）：{lnames}")
+            if exit_sig:
+                enames = "、".join(f"{r['name'] or r['code']}({r['rsv_week']})" for r in exit_sig[:5])
+                lines.append(f"→ 🔴 离场信号（周RSV破70/日线>80拐头）：{enames}")
             # 量价时空四维检查（2026-08-12落地，源自OPPO笔记）
             try:
                 lines.append("")
