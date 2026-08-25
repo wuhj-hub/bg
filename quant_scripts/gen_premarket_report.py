@@ -337,6 +337,10 @@ def gen_report(today_str):
         n_exit = len(rsv.get("exit", []))
         rsv_icon = "🟢" if n_launch > 0 else "🟡" if n_hold > 0 else "🔴" if n_exit > 0 else "⚪"
         lines.append(f"| 📊 RSV强度 | 启动{n_launch} / 持有{n_hold} / 离场{n_exit} {rsv_icon} |")
+    # 上证月线MACD（Seaborg方法论：死叉临界/已死叉=中期风险信号）
+    mm = read_monthly_macd()
+    if mm:
+        lines.append(f"| 📉 月线MACD | 柱{mm.get('hist','—')}（DIF {mm.get('dif','—')} / DEA {mm.get('dea','—')}）{mm.get('status','')} |")
     
     # ②.5.1 曾星智+双弦双体系市场定性（8大指数月线）
     zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
@@ -568,6 +572,17 @@ def read_rsv_strength():
     """读RSV均相对强度（rsv_strength_latest.json，腰缠万贯144日），失败返回None"""
     for p in ("rsv_strength_latest.json", "outputs/rsv_strength_latest.json", "../outputs/rsv_strength_latest.json",
               "/sandbox/workspace/github_bg/outputs/rsv_strength_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def read_monthly_macd():
+    """读上证月线MACD监控（monthly_macd_latest.json，Seaborg方法论），失败返回None"""
+    for p in ("monthly_macd_latest.json", "outputs/monthly_macd_latest.json", "../outputs/monthly_macd_latest.json",
+              "/sandbox/workspace/github_bg/outputs/monthly_macd_latest.json"):
         try:
             return json.load(open(p, encoding="utf-8"))
         except Exception:
