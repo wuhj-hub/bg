@@ -329,6 +329,14 @@ def gen_report(today_str):
         yl_icon = {"bull": "🟢", "mixed": "🟡", "bear": "🟠", "deep_bear": "🔴"}.get(yl_level, "")
         yl_label = {"bull": "牛市结构", "mixed": "结构分化", "bear": "熊市结构", "deep_bear": "深度熊市"}.get(yl_level, yl_level)
         lines.append(f"| 📈 年线广度 | 站上年线 **{yl.get('above','—')}/{yl.get('total','—')}**（{yl.get('ratio_pct','—')}%）{yl_icon} {yl_label} |")
+    # RSV均相对强度（腰缠万贯144日：启动/持有/离场）
+    rsv = read_rsv_strength()
+    if rsv:
+        n_launch = len(rsv.get("launch", []))
+        n_hold = len(rsv.get("hold", []))
+        n_exit = len(rsv.get("exit", []))
+        rsv_icon = "🟢" if n_launch > 0 else "🟡" if n_hold > 0 else "🔴" if n_exit > 0 else "⚪"
+        lines.append(f"| 📊 RSV强度 | 启动{n_launch} / 持有{n_hold} / 离场{n_exit} {rsv_icon} |")
     
     # ②.5.1 曾星智+双弦双体系市场定性（8大指数月线）
     zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
@@ -549,6 +557,17 @@ def read_yearline_breadth():
     for p in ("yearline_breadth_latest.json", "outputs/yearline_breadth_latest.json", "../outputs/yearline_breadth_latest.json",
               "/sandbox/workspace/github_bg/outputs/yearline_breadth_latest.json",
               "/sandbox/workspace/yearline/outputs/yearline_breadth_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def read_rsv_strength():
+    """读RSV均相对强度（rsv_strength_latest.json，腰缠万贯144日），失败返回None"""
+    for p in ("rsv_strength_latest.json", "outputs/rsv_strength_latest.json", "../outputs/rsv_strength_latest.json",
+              "/sandbox/workspace/github_bg/outputs/rsv_strength_latest.json"):
         try:
             return json.load(open(p, encoding="utf-8"))
         except Exception:
