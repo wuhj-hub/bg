@@ -117,12 +117,72 @@ def market_regime(beast_score=None, sx_temp=None, gate_open=None):
     return "震荡", "标准档：信号正常，仓位上限50%"
 
 # ═══════ ④ 离场计分卡 ═══════
+def macd_series(closes, fast=12, slow=26, signal=9):
+    """完整MACD序列（EMA递推），返回 (dif, dea, hist)"""
+    def ema(vals, n):
+        k = 2 / (n + 1)
+        e = vals[0]
+        out = [e]
+        for v in vals[1:]:
+            e = v * k + e * (1 - k)
+            out.append(e)
+        return out
+    if len(closes) < slow + signal + 2:
+        return [], [], []
+    e12 = ema(closes, fast)
+    e26 = ema(closes, slow)
+    dif = [a - b for a, b in zip(e12, e26)]
+    dea = ema(dif, signal)
+    hist = [2 * (d - e) for d, e in zip(dif, dea)]
+    return dif, dea, hist
+
+
+def macd_sell_patterns(dif, dea, rows):
+    """MACD细化卖出形态（趋势小哥方法论·2026-08-26新增）
+    返回 [(名称, 说明)]：
+      拒绝金叉：死叉状态下DIF曾接近DEA后重新回落（多头反扑失败）
+      双死叉  ：近40根出现≥2次死叉（空头两次占优）
+      顶背离  ：价格创新高但DIF未创新高（动能衰竭）
+    """
+    pats = []
+    if len(dif) < 30 or len(rows) < 30:
+        return pats
+    # ── 拒绝金叉 ──
+    if dif[-1] < dea[-1]:  # 当前死叉状态
+        recent = dif[-12:]
+        gaps = [dea[i] - dif[i] for i in range(len(dif) - 20, len(dif))]
+        if gaps:
+            min_gap = min(gaps)
+            # 近12根内 DIF 曾逼近 DEA（gap ≤ 近20根最小值的1.5倍）后又重新拉开
+            for i in range(max(0, len(dif) - 12), len(dif) - 2):
+                if (dea[i] - dif[i]) <= min_gap * 1.5 and dif[i + 2] < dif[i]:
+                    pats.append(("拒绝金叉", "DIF接近DEA后回落（多头反扑失败）"))
+                    break
+    # ── 双死叉（近40根≥2次死叉）──
+    n_cross = 0
+    for i in range(1, len(dif)):
+        if dif[i - 1] >= dea[i - 1] and dif[i] < dea[i]:
+            n_cross += 1
+    if n_cross >= 2:
+        pats.append(("双死叉", f"近{len(dif)}根出现{n_cross}次死叉（空头两次占优）"))
+    # ── 顶背离（价格新高但DIF未新高）──
+    if len(rows) >= 40:
+        cur_high = max(r["high"] for r in rows[-20:])
+        prev_high = max(r["high"] for r in rows[-40:-20])
+        cur_dif_high = max(dif[-20:])
+        prev_dif_high = max(dif[-40:-20])
+        if cur_high > prev_high and cur_dif_high < prev_dif_high:
+            pats.append(("顶背离", f"价格新高{cur_high:.2f}>前高{prev_high:.2f}但DIF未新高"))
+    return pats
+
+
 def exit_score(month_rows, day_rows, mult=2.0):
     """离场计分：≤-2 强制离场；-1 减仓；0 持有
     -2: 月线收盘<MA6（大周期破位）
     -2: 日线收盘<ATR止损线（强制）
     -1: 日线收盘<MA20（中期走弱）
-    -1: 日线MACD死叉（动能转弱）"""
+    -1: 日线MACD死叉（动能转弱）
+    -1: MACD细化卖出形态（拒绝金叉/双死叉/顶背离，趋势小哥·2026-08-26新增）"""
     score = 0
     reasons = []
     # 月线MA6
@@ -145,20 +205,16 @@ def exit_score(month_rows, day_rows, mult=2.0):
         if closes[-1] < ma20:
             score -= 1
             reasons.append("日线破MA20(-1)")
-    # 日线MACD死叉（简化: EMA12<EMA26 视为死叉状态）
+    # 日线MACD（完整序列：死叉 + 细化卖出形态）
     if len(day_rows) >= 30:
         closes = [r["last"] for r in day_rows]
-        ema12 = closes[-1]
-        ema26 = closes[-1]
-        k = 2 / 13
-        for c in closes[-30:]:
-            ema12 = c * k + ema12 * (1 - k)
-        k26 = 2 / 27
-        for c in closes[-30:]:
-            ema26 = c * k26 + ema26 * (1 - k26)
-        if ema12 < ema26:
+        dif, dea, hist = macd_series(closes)
+        if dif and dif[-1] < dea[-1]:
             score -= 1
             reasons.append("MACD死叉(-1)")
+        for pat_name, pat_desc in macd_sell_patterns(dif, dea, day_rows):
+            score -= 1
+            reasons.append(f"{pat_name}(-1)")
     # 判定
     if score <= -2:
         action = "🔴 强制离场"
