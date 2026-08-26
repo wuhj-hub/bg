@@ -44,8 +44,13 @@ jobs:
           pip install pandas numpy
 
       # ─── 第一步：生成主板清单 ───
-      - name: 生成沪深主板清单
-        run: python3 gen_mainboard.py
+      - name: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断）
+        continue-on-error: true
+        run: |
+          python3 gen_mainboard.py || echo "⚠️ gen_mainboard失败，回退仓库缓存"
+          if [ ! -s all_mainboard.csv ] && [ -f ../all_mainboard.csv ]; then cp ../all_mainboard.csv all_mainboard.csv; fi
+          if [ ! -s all_mainboard.csv ]; then echo "❌ 无主板清单可用"; exit 1; fi
+          echo "主板清单: $(wc -l < all_mainboard.csv) 行" 
 
       - name: IMA 凭证早期预检（失效立即微信告警，不阻断扫描）
         continue-on-error: true
@@ -359,6 +364,7 @@ jobs:
       # ─── 第四步：上传所有结果 ───
       - name: 上传全盘量化报告到全盘量化文件夹
         if: always()  # 防阻断：前置步骤失败仍执行
+        timeout-minutes: 15  # 防卡死（2026-08-26：upload_ima无超时曾挂起2.5h+）
         id: upload_main
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
