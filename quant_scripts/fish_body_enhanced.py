@@ -361,6 +361,32 @@ def detect_fish_patterns(tech, multi_score, resonance, kline_rows=None):
                 elif bv:
                     sig['tag'] = '有效突破'
                 signals.append(sig)
+
+    # 模式4: 高阳强势（强势体系并入·2026-08-26：近3日累计涨幅>8% + 放量 + 多头排列）
+    # 来源：《强势体系》"高阳快速推升"——不等待回落的突破追涨；止盈=趋势跟踪（MA20破位或MACD死叉）
+    if kline_rows and len(kline_rows) >= 5:
+        try:
+            k3 = [float(r["last"]) for r in kline_rows[:3]]  # 降序：最新在前
+            kvol = [float(r["volume"]) for r in kline_rows[:6]]
+            gain3 = (k3[0] / k3[-1] - 1) * 100 if k3[-1] > 0 else 0
+            vol_ratio = kvol[0] / (sum(kvol[1:]) / 5) if sum(kvol[1:]) > 0 else 0
+        except (ValueError, IndexError, ZeroDivisionError):
+            gain3, vol_ratio = 0, 0
+        if ma20 and ma60 and ma20 > ma60 and gain3 >= 8:
+            ps = 0; pr = []
+            ps += 20; pr.append(f"MA20({ma20:.2f})>MA60({ma60:.2f})多头")
+            ps += 25; pr.append(f"近3日涨幅{gain3:.1f}%（高阳）")
+            if vol_ratio >= 1.5: ps += 15; pr.append(f"放量{vol_ratio:.1f}倍")
+            if close > ma5: ps += 15; pr.append(f"收盘{close}>MA5{ma5}")
+            if dif > dea and dif > 0: ps += 10; pr.append("MACD金叉0轴上")
+            fs = weight(ps)
+            if fs >= 55:
+                signals.append({'code': code, 'name': name, 'pattern': '高阳强势',
+                    'raw_score': ps, 'final_score': fs, 'multi_score': multi_score,
+                    'resonance': resonance.get('resonance', ''), 'price': close,
+                    'reasons': pr, 'stop_loss': f"{ma5*0.93:.2f}" if ma5 else "--",
+                    'target': f"{close*1.15:.2f}" if close else "--", 'mode': 4, 'tag': '高阳强势',
+                    'trend_exit': '趋势跟踪止盈：MA20破位或MACD死叉（不等回落）'})
     
     return signals, filtered
 
@@ -507,7 +533,7 @@ def main():
     if not all_sigs:
         print(f"\n  {c('当前无符合条件的融合信号',C.Y)}")
     else:
-        for mid,mname,mcol in [(1,'MACD空中加油',C.G),(2,'均线回踩支撑',C.C),(3,'箱体突破',C.Y)]:
+        for mid,mname,mcol in [(1,'MACD空中加油',C.G),(2,'均线回踩支撑',C.C),(3,'箱体突破',C.Y),(4,'高阳强势',C.R)]:
             ms=[s for s in all_sigs if s.get('mode')==mid]
             if not ms: continue
             print(f"\n{c('─'*40,mcol)}")
@@ -573,7 +599,7 @@ def main():
     
     # === 生成Markdown报告并上传到多维度知识库 ===
     try:
-        patterns={'1':'MACD空中加油','2':'均线回踩支撑','3':'箱体突破'}
+        patterns={'1':'MACD空中加油','2':'均线回踩支撑','3':'箱体突破','4':'高阳强势'}
         now=datetime.now()
         md=f"# 🐟 鱼身交易扫描报告\n\n"
         md+=f"**扫描时间**: {now.strftime('%Y-%m-%d %H:%M')}\n\n"
@@ -582,7 +608,7 @@ def main():
         md+=f"**信号数量**: {len(all_sigs)}个\n\n"
         md+="---\n\n"
         
-        for pid,pname in [('1','MACD空中加油'),('2','均线回踩支撑'),('3','箱体突破')]:
+        for pid,pname in [('1','MACD空中加油'),('2','均线回踩支撑'),('3','箱体突破'),('4','高阳强势')]:
             ps=[s for s in all_sigs if s.get('mode')==int(pid)]
             if not ps: continue
             md+=f"## {pname}\n\n"
@@ -636,7 +662,8 @@ def main():
     print(f"  扫描{len(pool)}只  信号{len(all_sigs)}个")
     print(f"  空中加油:{len([s for s in all_sigs if s.get('mode')==1])}个  "
           f"均线回踩:{len([s for s in all_sigs if s.get('mode')==2])}个  "
-          f"箱体突破:{len([s for s in all_sigs if s.get('mode')==3])}个")
+          f"箱体突破:{len([s for s in all_sigs if s.get('mode')==3])}个  "
+          f"高阳强势:{len([s for s in all_sigs if s.get('mode')==4])}个")
     print(f"{c('='*60,C.C)}")
 
 if __name__=='__main__':
