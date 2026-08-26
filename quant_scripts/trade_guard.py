@@ -176,13 +176,29 @@ def macd_sell_patterns(dif, dea, rows):
     return pats
 
 
-def exit_score(month_rows, day_rows, mult=2.0):
+# ═══════ ⑤ 市场见顶五维（《全球第一炒股笔录》·2026-08-26新增）═══════
+def load_top_signal(path=None):
+    """读取 outputs/top_signal_latest.json（top_signal.py 生成）
+    返回 (score, level, date)；缺失/异常返回 (None,None,None)"""
+    if path is None:
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "outputs", "top_signal_latest.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            d = json.load(f)
+        return d.get("score", 0), d.get("level", "未知"), d.get("date", "")
+    except Exception:
+        return None, None, None
+
+
+def exit_score(month_rows, day_rows, mult=2.0, market_top=None):
     """离场计分：≤-2 强制离场；-1 减仓；0 持有
     -2: 月线收盘<MA6（大周期破位）
     -2: 日线收盘<ATR止损线（强制）
     -1: 日线收盘<MA20（中期走弱）
     -1: 日线MACD死叉（动能转弱）
-    -1: MACD细化卖出形态（拒绝金叉/双死叉/顶背离，趋势小哥·2026-08-26新增）"""
+    -1: MACD细化卖出形态（拒绝金叉/双死叉/顶背离，趋势小哥·2026-08-26新增）
+    -1: 市场见顶五维≥3（《全球第一炒股笔录》·2026-08-26新增：触发≥3=顶部区域）"""
     score = 0
     reasons = []
     # 月线MA6
@@ -215,6 +231,10 @@ def exit_score(month_rows, day_rows, mult=2.0):
         for pat_name, pat_desc in macd_sell_patterns(dif, dea, day_rows):
             score -= 1
             reasons.append(f"{pat_name}(-1)")
+    # 市场见顶五维（≥3 顶部区域）
+    if market_top and market_top[0] is not None and market_top[0] >= 3:
+        score -= 1
+        reasons.append(f"市场见顶五维{market_top[0]}/5({market_top[1]})(-1)")
     # 判定
     if score <= -2:
         action = "🔴 强制离场"
@@ -222,17 +242,20 @@ def exit_score(month_rows, day_rows, mult=2.0):
         action = "🟡 减仓/收紧"
     else:
         action = "🟢 持有"
+    if market_top and market_top[0] is not None and market_top[0] >= 3 and score >= -1:
+        action += " ⚠️市场见顶"
     return score, action, reasons
 
-def check_stock(code):
-    """综合交易防护检查（P1主动止盈系统 2026-08-11）"""
+def check_stock(code, top_path=None):
+    """综合交易防护检查（P1主动止盈系统 2026-08-11 + 市场见顶五维 2026-08-26）"""
     day_rows = fetch_kline(code, "day", 40)
     month_rows = fetch_kline(code, "month", 15)
     if not day_rows or not month_rows:
         return {"code": code, "ok": False, "err": "K线获取失败"}
     cur = day_rows[-1]["last"]
     rr, target, stop, atr = calc_risk_reward(month_rows, day_rows)
-    escore, eaction, ereasons = exit_score(month_rows, day_rows)
+    top = load_top_signal(top_path)
+    escore, eaction, ereasons = exit_score(month_rows, day_rows, market_top=top)
     # P1 主动止盈（2026-08-11）：目标位分批兑现 + 移动止盈（2×ATR跟踪）
     tp = {}
     if target and cur < target:
@@ -252,19 +275,25 @@ def check_stock(code):
         "rr": round(rr, 2) if rr else None,
         "rr_pass": rr is not None and rr >= 2.0,
         "exit_score": escore, "exit_action": eaction, "exit_reasons": ereasons,
+        "market_top": {"score": top[0], "level": top[1], "date": top[2]} if top[0] is not None else None,
         "take_profit": tp, "trail_stop": trail,
     }
     return out
 
 if __name__ == "__main__":
+    top_path = None
+    if "--top-file" in sys.argv:
+        i = sys.argv.index("--top-file")
+        top_path = sys.argv[i + 1] if i + 1 < len(sys.argv) else None
     if len(sys.argv) >= 3 and sys.argv[1] == "--check":
-        r = check_stock(sys.argv[2])
+        r = check_stock(sys.argv[2], top_path)
         print(json.dumps(r, ensure_ascii=False, indent=1))
     elif len(sys.argv) >= 3 and sys.argv[1] == "--scan":
         for c in sys.argv[2].split(","):
-            r = check_stock(c.strip())
+            r = check_stock(c.strip(), top_path)
             if r["ok"]:
+                mt = f" 市场顶{r['market_top']['score']}分" if r.get("market_top") else ""
                 print(f"{r['code']} 现价{r['price']} ATR{r['atr']} 止损{r['stop']} 目标{r['target']} "
-                      f"盈亏比{r['rr']}{'✅' if r['rr_pass'] else '❌'} 离场{r['exit_score']}({r['exit_action']})")
+                      f"盈亏比{r['rr']}{'✅' if r['rr_pass'] else '❌'} 离场{r['exit_score']}({r['exit_action']}){mt}")
     else:
         print(__doc__)
