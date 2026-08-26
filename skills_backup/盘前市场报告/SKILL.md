@@ -104,6 +104,25 @@ python3 /sandbox/workspace/skills/猛兽体系/scripts/beast_screener.py > /sand
 > ⚠️ 非交易日跳过（无新K线数据）
 > ⚠️ 若用户急用报告且夜间数据尚未生成，跳过此步骤直接采集
 
+### Step 1.6：读取信号仲裁·今日操作清单（P0-1 统一出口 · 2026-08-26新增）
+
+盘前报告的"个股机会"章节直接引用 `signal_arbiter.py` 输出的 **今日操作清单**（唯一执行出口），不再各自引用分散信号：
+
+```bash
+# 从 GitHub 拉取最新信号仲裁结果（含操作清单 buy/watch/avoid）
+curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  "https://api.github.com/repos/wuhj-hub/bg/contents/信号仲裁_latest.json" | \
+  python3 -c "import sys,json,base64; d=json.load(sys.stdin); open('/tmp/信号仲裁_latest.json','wb').write(base64.b64decode(d['content']))"
+```
+
+**操作清单结构**（JSON `operations` 字段）：
+- `buy`（🟢 买入候选）：总分≥5（★★/★★★）+ 月线非BLOCK + 风控卡✅ → 报告标注仓位（≤pos_pct%）
+- `watch`（🟡 观察池）：总分≥3（★）
+- `avoid`（🔴 规避/卖出）：四维否决 / 月线BLOCK / RSV离场
+- 市场级：`market_top`（见顶五维≥3 → 全文标注顶部区域）、`market_width`（<25 弱势禁新仓）
+
+> ⚠️ 若拉取失败（workflow 未跑），回退：搜索知识库「报告」→「复盘报告」文件夹中当日 `信号仲裁_YYYY-MM-DD.md`
+
 ### Step 2：数据采集（并行执行）
 
 启动子代理并行采集以下数据：
@@ -156,6 +175,27 @@ npx -y westock-data-skillhub@1.0.3 kline sh000001,sz399106,sh000016,sh000300,sz3
 ```
 
 > 对应通达信代码：上证指数(999999)、深证综指(399106)、上证50(SH000016)、沪深300(000300)、中小综指(399101)、科创50(SH000688)、创业板指(399006)、中证500(000905)
+
+#### 2.5.1 年线广度（市场牛熊结构 · 中期）
+
+统计沪深主板「收盘价 ≥ MA250(年线)」的个股数量与占比，作为中期牛熊结构指标（季度级，与日频市场宽度互补）。方法论来源：V纪元《用这个指标判断市场牛熊》（2026-07-26）。
+
+```bash
+# ① 生成/刷新主板清单（qt.gtimg.cn，约2分钟；缓存后可跳过）
+python3 /sandbox/workspace/yearline/gen_mainboard.py
+# 输出：/sandbox/workspace/yearline/all_mainboard.csv（code,name，~3100只）
+
+# ② 全量扫描站上年线占比（westock technical 批量 ma.MA_250，~3100只 约5-10分钟）
+python3 /sandbox/workspace/yearline/yearline_breadth.py --list /sandbox/workspace/yearline/all_mainboard.csv
+# 输出：outputs/年线广度_{date}.md + yearline_breadth_latest.json
+
+# ③ 生成报告章节片段（盘前/复盘脚本嵌入用）
+python3 /sandbox/workspace/yearline/yearline_section.py --json /sandbox/workspace/yearline/outputs/yearline_breadth_latest.json
+```
+
+经验阈值（待积累校准）：>60% 牛市结构 / 40-60% 结构分化 / <40% 熊市结构 / <20% 深度熊。
+参考序列（全A口径，V纪元）：2026-04底2923 / 05底2166 / 06底1603 / 07底863（约16%）。
+⚠️ 结构性行情注意：AI硬件等科创权重拉升可能掩盖主板广度恶化，看主板口径为主、全A口径为辅。
 
 #### 2.6 投资日历与新股
 ```bash
