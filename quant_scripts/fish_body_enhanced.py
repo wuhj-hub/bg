@@ -78,7 +78,7 @@ def score_stock_multi(code):
     kline=parse_table(run(f"{WESTOCK_CMD} kline {code} --period day --limit 60 2>/dev/null"))
     tech=tech[0] if tech else {}
     fund=fund[0] if fund else {}
-    if not kline: return {"score":0,"detail":{}}
+    if not kline: return {"score":0,"detail":{},"kline":[]}
     closes=[float(r['last']) for r in kline]
     vols=[float(r['volume']) for r in kline]
     close=closes[0]
@@ -140,7 +140,7 @@ def score_stock_multi(code):
             elif vr>0.8: trs+=5
     scores['trend']=min(trs,30)
     total=sum(scores.values())
-    return {"score":min(100,max(0,int(total))),"detail":scores}
+    return {"score":min(100,max(0,int(total))),"detail":scores,"kline":kline}
 
 # === 模块C: 共振验证 ===
 def verify_resonance(code):
@@ -212,8 +212,74 @@ def detect_golden_breakout(code):
     return False
 
 
-def detect_fish_patterns(tech, multi_score, resonance):
+def box_breakout_valid(kline_rows):
+    """箱体突破有效性三条件（《全球第一炒股笔录》·2026-08-26新增）
+    ① 量能验证：突破日量 ≥ 箱体震荡均量×1.5（无量突破=诱多）
+    ② 回踩确认：突破后回踩不破箱顶（回落中枢内部=百分百诱多骗线）
+    ③ 位置验证：箱底乖离前20日均价 < 30%（高位箱体突破风险大）
+    kline_rows: westock kline 降序(最新在前)；返回 dict"""
+    if not kline_rows or len(kline_rows) < 45:
+        return {"valid": False, "reason": "K线不足45根", "checks": {}, "box": {}}
+    rows = sorted(kline_rows, key=lambda r: r["date"])  # 显式升序（不依赖输入顺序）
+    # ── 箱体识别：近40根（不含最近3根突破段），用收盘价区间（抗长影线干扰）──
+    box = rows[-43:-3]
+    if len(box) < 15:
+        return {"valid": False, "reason": "箱体样本不足", "checks": {}, "box": {}}
+    box_closes = [float(r["last"]) for r in box]
+    box_top = max(box_closes)
+    box_bot = min(box_closes)
+    box_h = (box_top - box_bot) / box_bot * 100 if box_bot else 0
+    if box_h > 40:
+        return {"valid": False, "reason": f"箱体过宽{box_h:.0f}%（非中枢）", "checks": {}, "box": {}}
+    box_avg_vol = sum(float(r["volume"]) for r in box) / len(box)
+    # ── 突破检测：最近3根内收盘突破箱顶 ──
+    brk_idx = None
+    for i in range(len(rows) - 3, len(rows)):
+        if float(rows[i]["last"]) > box_top * 1.005:
+            brk_idx = i
+            break
+    if brk_idx is None:
+        return {"valid": False, "reason": f"未突破箱顶{box_top:.2f}", "checks": {}, "box": {}}
+    brk = rows[brk_idx]
+    brk_vol = float(brk["volume"])
+    vol_ratio = brk_vol / box_avg_vol if box_avg_vol else 0
+    vol_ok = vol_ratio >= 1.5
+    # ── 位置验证：箱底相对"箱体形成之前"的均价乖离 < 30%
+    # （防止"从低位大涨后高位盘整再突破"的高位陷阱；数据不足时不判）
+    pre_start = max(0, len(rows) - 63)
+    pre_end = len(rows) - 43
+    if pre_end - pre_start >= 3:
+        pre_avg = sum(float(rows[i]["last"]) for i in range(pre_start, pre_end)) / (pre_end - pre_start)
+        pos_dev = (box_bot / pre_avg - 1) * 100 if pre_avg else 0
+    else:
+        pos_dev = 0
+    pos_ok = pos_dev < 30
+    # ── 回踩确认（以收盘价为准：收盘回落箱体内部=诱多骗线）──
+    after = rows[brk_idx + 1:]
+    if after:
+        min_close = min(float(r["last"]) for r in after)
+        pull_ok = min_close >= box_top * 0.99  # 1%容差
+        pullback = "hold" if pull_ok else "fail"
+    else:
+        pullback, pull_ok = "pending", True  # 突破日为最新，待回踩确认
+    valid = vol_ok and pos_ok and pull_ok
+    if not valid:
+        fails = []
+        if not vol_ok: fails.append(f"量能{vol_ratio:.1f}倍<1.5")
+        if not pos_ok: fails.append(f"箱底乖离{pos_dev:.0f}%过高")
+        if pullback == "fail": fails.append("回踩破箱顶(诱多)")
+        reason = "；".join(fails)
+    else:
+        reason = f"量{vol_ratio:.1f}倍/回踩{'守住' if pullback=='hold' else '待确认'}/位置{pos_dev:.0f}%"
+    return {"valid": valid, "reason": reason,
+            "checks": {"volume": vol_ok, "pullback": pull_ok, "position": pos_ok, "pullback_state": pullback},
+            "box": {"top": round(box_top, 2), "bottom": round(box_bot, 2), "height": round(box_h, 1),
+                    "break_date": brk["date"], "vol_ratio": round(vol_ratio, 2), "pos_dev": round(pos_dev, 1)}}
+
+
+def detect_fish_patterns(tech, multi_score, resonance, kline_rows=None):
     signals=[]
+    filtered=[]  # 箱体突破有效性过滤记录（2026-08-26新增）
     dif=sf(tech.get('macd.DIF',0)) or 0
     dea=sf(tech.get('macd.DEA',0)) or 0
     macd=sf(tech.get('macd.MACD',0)) or 0
@@ -267,22 +333,36 @@ def detect_fish_patterns(tech, multi_score, resonance):
                 'reasons':pr,'stop_loss':f"{ma20*0.95:.2f}" if ma20 else "--",
                 'target':f"{close*1.12:.2f}" if close else "--",'mode':2,'tag':''})
     
-    # 模式3: 箱体突破
+    # 模式3: 箱体突破（有效性三条件：《全球第一炒股笔录》量能/回踩/位置）
+    # 2026-08-26重构：先验证突破形态 → 有效+15分（真突破加分）；无效且评分够 → 剔除（诱多过滤）
     if ma20 and ma60 and ma20>ma60:
         ps=0; pr=[]
         ps+=20; pr.append(f"MA20({ma20:.2f})>MA60({ma60:.2f})")
         if dif>dea and dif>0: ps+=20; pr.append(f"MACD金叉(DIF={dif:.2f})")
         if kdj_j>50: ps+=10; pr.append(f"KDJ向上(J={kdj_j:.0f})")
         if close>ma5: ps+=15; pr.append(f"收盘{close}>MA5{ma5}")
+        bv = box_breakout_valid(kline_rows) if kline_rows else None
+        if bv and bv["valid"]:
+            ps += 15; pr.append(f"突破验证通过：{bv['reason']}")
         fs=weight(ps)
         if fs>=55:
-            signals.append({'code':code,'name':name,'pattern':'箱体突破',
-                'raw_score':ps,'final_score':fs,'multi_score':multi_score,
-                'resonance':resonance.get('resonance',''),'price':close,
-                'reasons':pr,'stop_loss':f"{ma5*0.93:.2f}" if ma5 else "--",
-                'target':f"{close*1.15:.2f}" if close else "--",'mode':3,'tag':''})
+            if bv and not bv["valid"]:
+                # 技术面达标但突破形态无效（无量/诱多回落/高位）→ 剔除
+                filtered.append(f"{code} {name} 箱体突破过滤：{bv['reason']}")
+            else:
+                sig = {'code':code,'name':name,'pattern':'箱体突破',
+                    'raw_score':ps,'final_score':fs,'multi_score':multi_score,
+                    'resonance':resonance.get('resonance',''),'price':close,
+                    'reasons':pr,'stop_loss':f"{ma5*0.93:.2f}" if ma5 else "--",
+                    'target':f"{close*1.15:.2f}" if close else "--",'mode':3,'tag':'',
+                    'breakout': bv or {}}
+                if bv and bv["checks"].get("pullback_state") == "pending":
+                    sig['tag'] = '突破待回踩确认'
+                elif bv:
+                    sig['tag'] = '有效突破'
+                signals.append(sig)
     
-    return signals
+    return signals, filtered
 
 # === 主流程 ===
 def is_valid_stock(code):
@@ -300,8 +380,8 @@ def is_valid_stock(code):
     return True
 
 def process_batch(batch):
-    """处理3只批次：批量technical + 逐只多维评分/共振/模式识别。返回 (signals, multis)"""
-    local_sigs, local_multis = [], []
+    """处理3只批次：批量technical + 逐只多维评分/共振/模式识别。返回 (signals, multis, filtered)"""
+    local_sigs, local_multis, local_filtered = [], [], []
     cs = ','.join(batch)
     tech_rows = parse_table(run(f"{WESTOCK_CMD} technical {cs} --group all 2>/dev/null"))
     for row in tech_rows:
@@ -314,14 +394,15 @@ def process_batch(batch):
         multi = score_stock_multi(code)
         local_multis.append({'code': code, 'name': name, 'score': multi['score']})
         res = verify_resonance(code)
-        sigs = detect_fish_patterns(row, multi['score'], res)
+        sigs, filt = detect_fish_patterns(row, multi['score'], res, multi.get('kline'))
+        local_filtered.extend(filt)
         for s in sigs:
             if s.get('mode') == 1 and s.get('final_score', 0) >= 55:
                 if detect_golden_breakout(code):
                     s['tag'] = '黄金起爆'
             s['resonance_detail'] = res
             local_sigs.append(s)
-    return local_sigs, local_multis
+    return local_sigs, local_multis, local_filtered
 
 
 def main():
@@ -380,16 +461,23 @@ def main():
     print(f"  股票池: {len(pool)}只")
     print(f"{c('─'*50,C.C)}")
     
-    all_sigs=[]; multis=[]
+    all_sigs=[]; multis=[]; all_filtered=[]
     from concurrent.futures import ThreadPoolExecutor
     batches=[pool[i:i+3] for i in range(0,len(pool),3)]
     print(f"  → 并发扫描 {len(batches)} 批 × 4 workers（优化超时问题）")
     with ThreadPoolExecutor(max_workers=4) as ex:
-        for sigs_b, multis_b in ex.map(process_batch, batches):
+        for sigs_b, multis_b, filt_b in ex.map(process_batch, batches):
             all_sigs.extend(sigs_b)
             multis.extend(multis_b)
+            all_filtered.extend(filt_b)
             if len(all_sigs) % 50 == 0 and all_sigs:
                 print(f"  ...已识别 {len(all_sigs)} 信号")
+    if all_filtered:
+        print(f"  🚫 箱体突破有效性过滤 {len(all_filtered)} 只（量能/回踩/位置三条件）：")
+        for f in all_filtered[:20]:
+            print(f"    - {f}")
+        if len(all_filtered) > 20:
+            print(f"    ...等 {len(all_filtered)-20} 条")
     
     if args.mode!='all':
         mm={'1':1,'2':2,'3':3}
@@ -466,6 +554,11 @@ def main():
             print(f"  {s['code']} {s['name']} {c(s['pattern'],sc)} "
                   f"最终{c(str(s['final_score'])+'分',sc)} "
                   f"(原始{s['raw_score']}+多维{s['multi_score']}+共振{res_sc})")
+            if s.get('tag'):
+                print(f"    🏷️ {s['tag']}")
+            if s.get('breakout'):
+                bx = s['breakout']
+                print(f"    📦 箱体[{bx['box'].get('top','?')}~{bx['box'].get('bottom','?')}] {bx['reason']}")
             for r in s['reasons']:
                 print(f"    {r}")
     
@@ -493,11 +586,12 @@ def main():
             ps=[s for s in all_sigs if s.get('mode')==int(pid)]
             if not ps: continue
             md+=f"## {pname}\n\n"
-            md+=f"| 代码 | 名称 | 综合评分 | 现价 | 止损 | 目标 | 共振 |\n"
-            md+=f"|------|------|:-------:|:----:|:----:|:----:|:----:|\n"
+            md+=f"| 代码 | 名称 | 综合评分 | 现价 | 止损 | 目标 | 共振 | 验证 |\n"
+            md+=f"|------|------|:-------:|:----:|:----:|:----:|:----:|:----:|\n"
             for s in sorted(ps,key=lambda x:x['final_score'],reverse=True):
                 res=s.get('resonance_detail',{}).get('resonance','--')
-                md+=f"| {s['code']} | {s['name']} | {s['final_score']}分 | {s['price']:.2f} | {s['stop_loss']} | {s['target']} | {res} |\n"
+                tag=s.get('tag','') or ('📦'+s['breakout']['reason'] if s.get('breakout') else '')
+                md+=f"| {s['code']} | {s['name']} | {s['final_score']}分 | {s['price']:.2f} | {s['stop_loss']} | {s['target']} | {res} | {tag} |\n"
         
         # 核心标的详情
         core=['sh603669','sh600400','sz002520']
