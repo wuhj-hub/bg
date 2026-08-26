@@ -159,6 +159,12 @@ def analyze(code, name="", bench_rows=None):
         # 日线启动：RSV<20 且拐头向上
         if rsv_avg < 20 and d1 and d1["up"]:
             sigs.append({"type": "日线启动", "desc": f"RSV均{rsv_avg}<20拐头向上（半年级别）"})
+        # 半启动：RSV<40 拐头向上 + 当日涨幅≥9%（涨停确认，2026-08-26金健米业案例补充）
+        if 20 <= rsv_avg < 40 and d1 and d1["up"] and len(day_rows) >= 2:
+            prev_close = day_rows[-2]["close"]
+            day_chg = (close - prev_close) / prev_close * 100 if prev_close > 0 else 0
+            if day_chg >= 9:
+                sigs.append({"type": "半启动", "desc": f"RSV均{rsv_avg}<40拐头+涨停{day_chg:.0f}%（启动确认）"})
         # 日线卖点：RSV>80 且拐头向下
         if rsv_avg > 80 and d1 and d1["down"]:
             sigs.append({"type": "日线卖点", "desc": f"RSV均{rsv_avg}>80拐头向下"})
@@ -173,7 +179,7 @@ def analyze(code, name="", bench_rows=None):
             sigs.append({"type": "月线估波正", "desc": "估波信号>0（月牛3确认）"})
 
         state = "持有" if (wrsv is not None and 70 <= wrsv <= 90) else \
-                "启动" if any(s["type"] in ("日线启动", "周线突破50") for s in sigs) else \
+                "启动" if any(s["type"] in ("日线启动", "半启动", "周线突破50") for s in sigs) else \
                 "离场" if any(s["type"] in ("日线卖点", "周线破70") for s in sigs) else "观察"
         return {
             "code": code, "name": name, "close": round(close, 2),
