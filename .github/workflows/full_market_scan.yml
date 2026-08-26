@@ -304,8 +304,8 @@ jobs:
         continue-on-error: true
         run: python3 quad_resonance.py --pool panhou_lianghua.csv --top 15
 
-      # ─── 第三步.5c：六套信号仲裁（四维/猛兽/鱼身/双弦/乾坤统一排序，依赖四维+三系统输出）───
-      - name: 六套信号仲裁（统一优先级排序）
+      # ─── 第三步.5c：全系统信号仲裁（统一出口：9信号源+操作清单+市场级信号，依赖四维+三系统输出）───
+      - name: 全系统信号仲裁（统一出口·今日操作清单）
         continue-on-error: true
         run: python3 signal_arbiter.py --top 20
 
