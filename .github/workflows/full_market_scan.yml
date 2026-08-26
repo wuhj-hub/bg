@@ -112,6 +112,15 @@ jobs:
           python3 quant_scripts/monthly_macd_monitor.py
           cp outputs/monthly_macd_latest.json monthly_macd_latest.json 2>/dev/null || true
 
+      # ─── 第二步.1.9：市场见顶五维监测（《全球第一炒股笔录》五维：量的背离/龙头崩塌/轮动散乱/恐慌抛售/情绪亢奋；≥3维=顶部区域）───
+      - name: 市场见顶五维监测（top_signal）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/top_signal.py --json > top_signal_latest.json || true
+          cp quant_scripts/outputs/top_signal_latest.json top_signal_latest.json 2>/dev/null || true
+          cp quant_scripts/outputs/board_top_latest.json board_top_latest.json 2>/dev/null || true
+          echo "见顶五维: $(python3 -c "import json;d=json.load(open('top_signal_latest.json'));print('总分'+str(d.get('score','?'))+' '+str(d.get('level','?')))" 2>/dev/null || echo '无数据')"
+
       # ─── 第二步.2：分时强度分析（黑石minuteMacd启发：信号股分时MACD+封板+尾盘方向）───
       - name: 分时强度分析（信号股分时MACD）
         continue-on-error: true
@@ -340,7 +349,7 @@ jobs:
             python3 git_api_commit.py --msg "chore: update quant/fish_latest ($(date +%Y-%m-%d))" \
               quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
               market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json \
-              四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json yearline_breadth_latest.json 双弦观察池_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json \
+              四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json yearline_breadth_latest.json 双弦观察池_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json top_signal_latest.json board_top_latest.json \
               quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
               pools/pool_$(date +%Y-%m).json \
               all_mainboard.csv \
