@@ -72,7 +72,7 @@ def send_ima(api_path, body_str):
         headers={"ima-openapi-clientid": cid, "ima-openapi-apikey": key, "Content-Type": "application/json"},
         method="POST",
     )
-    with urllib.request.urlopen(req) as r:
+    with urllib.request.urlopen(req, timeout=30) as r:
         return json.loads(r.read().decode("utf-8"))
 
 
