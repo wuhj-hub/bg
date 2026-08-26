@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: panhou-lianghua
-  cancel-in-progress: false
+  cancel-in-progress: true  # 2026-08-26：旧run挂死无法手动取消，改自动抢占
 
 jobs:
   scan:
