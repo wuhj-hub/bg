@@ -148,8 +148,11 @@ def nav_tracking(holdings, prices_by_code):
     if os.path.exists(NAV_HIST):
         for ln in open(NAV_HIST, encoding="utf-8"):
             p = ln.strip().split(",")
-            if len(p) >= 2:
-                hist.append((p[0], float(p[1])))
+            if len(p) >= 2 and p[0] != "date":  # 跳过表头
+                try:
+                    hist.append((p[0], float(p[1])))
+                except ValueError:
+                    continue
     # 去重（同日覆盖）
     hist = [(d, v) for d, v in hist if d != today]
     hist.append((today, round(nav_today, 4)))
