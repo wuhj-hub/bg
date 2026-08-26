@@ -41,10 +41,18 @@ def gen_candidates():
 
 
 def fetch_batch(batch):
+    """带重试的批量查询（2026-08-26：qt.gtimg.cn 限流防护）"""
     url = GTIMG + ",".join(batch)
-    req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=20) as r:
-        return r.read().decode("gbk", "replace")
+    last_err = None
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=20) as r:
+                return r.read().decode("gbk", "replace")
+        except Exception as e:
+            last_err = e
+            time.sleep(1.5 * (attempt + 1))
+    raise last_err
 
 
 def parse(raw):
@@ -87,7 +95,7 @@ def main():
                 out[wcode[2:]] = name         # 存纯数字 code
         except Exception as e:
             print(f"[WARN] batch {i} failed: {e}", file=sys.stderr)
-            time.sleep(1)
+        time.sleep(0.15)                      # 限速防限流（2026-08-26）
         if (i // BATCH) % 20 == 0:
             print(f"[INFO] progress {i}/{n}, found={len(out)}", file=sys.stderr)
     if len(out) < 100:
