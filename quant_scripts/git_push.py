@@ -8,21 +8,28 @@ import sys, os, json, base64, urllib.request, time
 
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
 
-def api(url, method="GET", data=None):
-    req = urllib.request.Request(url, method=method)
-    req.add_header("Authorization", f"token {TOKEN}")
-    req.add_header("Accept", "application/vnd.github+json")
-    body = json.dumps(data).encode() if data is not None else None
-    try:
-        with urllib.request.urlopen(req, body, timeout=60) as r:
-            return r.status, json.loads(r.read().decode() or "{}")
-    except urllib.error.HTTPError as e:
-        return e.code, json.loads(e.read().decode() or "{}")
+def api(url, method="GET", data=None, retries=5):
+    last_err = None
+    for attempt in range(retries):
+        req = urllib.request.Request(url, method=method)
+        req.add_header("Authorization", f"token {TOKEN}")
+        req.add_header("Accept", "application/vnd.github+json")
+        body = json.dumps(data).encode() if data is not None else None
+        try:
+            with urllib.request.urlopen(req, body, timeout=60) as r:
+                return r.status, json.loads(r.read().decode() or "{}")
+        except urllib.error.HTTPError as e:
+            return e.code, json.loads(e.read().decode() or "{}")
+        except Exception as e:
+            last_err = e
+            time.sleep(2 * (attempt + 1))
+    raise last_err
 
 def push(repo, branch, path, local_file, msg):
     content = open(local_file, "rb").read()
     b64 = base64.b64encode(content).decode()
-    url = f"https://api.github.com/repos/{repo}/contents/{path}"
+    url_path = urllib.parse.quote(path, safe="/")
+    url = f"https://api.github.com/repos/{repo}/contents/{url_path}"
     # 先查 sha（存在则更新）
     _, existing = api(url, "GET")
     sha = existing.get("sha") if isinstance(existing, dict) else None
