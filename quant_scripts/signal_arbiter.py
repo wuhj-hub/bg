@@ -568,6 +568,18 @@ def main():
             operations["watch"].append({"code": r["code"], "pts": r["pts"], "level": r["level"], "src": r["src"]})
         elif r["pts"] < 0 or r.get("month", "") == "BLOCK" or "否决" in "".join(r["src"]):
             operations["avoid"].append({"code": r["code"], "pts": r["pts"], "level": r["level"], "src": r["src"]})
+    # P1-1 顶部禁用规则（2026-08-26，P0-3长历史重验：大顶附近信号胜率14-47%）
+    # 见顶五维≥2（警戒）或市场宽度<25（弱势）→ 买入候选置空（禁开新仓）
+    lock_reasons = []
+    if mtop and mtop["score"] >= 2:
+        lock_reasons.append(f"见顶五维{mtop['score']}/5警戒")
+    if mwidth and mwidth.get("score", 50) < 25:
+        lock_reasons.append(f"市场宽度{mwidth.get('score')}弱势")
+    if lock_reasons:
+        operations["buy"] = []
+        operations["buy_locked"] = "；".join(lock_reasons)
+        if env_logs:
+            env_logs.append(f"🔒 顶部禁用：买入候选置空（{'；'.join(lock_reasons)}）")
     js = {"date": today, "env": env, "env_logs": env_logs, "operations": operations,
           "market_top": mtop, "market_width": mwidth,
           "sources": {"四维": len(four), "鱼身": len(fish), "猛兽": len(beast),
@@ -619,7 +631,9 @@ def main():
     L.append("")
     L.append("## 📋 今日操作清单（唯一执行出口）")
     L.append("### 🟢 买入候选（★★/★★★ 且 月线非空头 且 风控卡✅）")
-    if operations["buy"]:
+    if operations.get("buy_locked"):
+        L.append(f"- 🔒 **顶部禁用：买入候选已置空**（{operations['buy_locked']}）— 禁开新仓")
+    elif operations["buy"]:
         for r in operations["buy"]:
             L.append(f"- **{r['code']}** {r['pts']}分 {r['level']}｜仓位≤{r['pos_pct']}%｜{'；'.join(r['src'][:4])}")
     else:
