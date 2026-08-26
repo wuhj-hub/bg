@@ -349,7 +349,7 @@ jobs:
             python3 git_api_commit.py --msg "chore: update quant/fish_latest ($(date +%Y-%m-%d))" \
               quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
               market_style_latest.json mode_aggregate_latest.json 板块共振_latest.json qiankun_a_latest.json \
-              四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json yearline_breadth_latest.json 双弦观察池_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json top_signal_latest.json board_top_latest.json 组合风控_latest.json \
+              四维共振_latest.json 信号仲裁_latest.json 四维共振_chinext_kcb_latest.json yearline_breadth_latest.json 双弦观察池_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json top_signal_latest.json board_top_latest.json 组合风控_latest.json 执行纪律_latest.json \
               quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
               pools/pool_$(date +%Y-%m).json \
               all_mainboard.csv \
@@ -413,6 +413,14 @@ jobs:
           python3 quant_scripts/portfolio_risk.py --holdings quant_scripts/holdings.txt
           cp quant_scripts/outputs/组合风控_latest.json 组合风控_latest.json 2>/dev/null || true
           echo "组合风控: $(python3 -c "import json;d=json.load(open('组合风控_latest.json'));print('回撤'+str(d['nav']['drawdown'])+'% '+d['nav']['level'])" 2>/dev/null || echo '无数据')"
+
+      # ─── 第五.4.6步：实盘执行纪律（P1-3：操作清单vs实盘journal执行率；--add 人工记录）───
+      - name: 实盘执行纪律报告（trade_journal）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/trade_journal.py --report --days 30
+          cp quant_scripts/outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
+          echo "执行纪律: $(python3 -c "import json;d=json.load(open('执行纪律_latest.json'));print('买入'+str(d['buy_rate'])+'% 卖出'+str(d['sell_rate'])+'%')" 2>/dev/null || echo '无数据')"
 
       # ─── 第五.5步：自动生成复盘报告并上传（含③.5股池三阶漏斗状态引用 + 反转数值信号池）───
       - name: 自动生成复盘报告并上传
