@@ -442,6 +442,23 @@ def main():
     except Exception as e:
         print(f"[WARN] 风控卡计算失败: {e}")
 
+    # RSG 强势标注（2026-08-27：RSV体系周线RS偏离52周均线>50‰=强势侧；仅标注，不强制过滤）
+    try:
+        _rsg_map = {}
+        for _p in ("outputs/rsv_strength_latest.json", "rsv_strength_latest.json"):
+            if os.path.exists(_p):
+                _d = json.load(open(_p, encoding="utf-8"))
+                for _r in (_d.get("launch", []) + _d.get("hold", []) + _d.get("exit", [])):
+                    if _r.get("code"):
+                        _rsg_map[_r["code"]] = _r.get("rsg_dev")
+                break
+        for r in ranked[:top_n]:
+            r["rsg_dev"] = _rsg_map.get(r["code"])
+        _n = sum(1 for r in ranked[:top_n] if (r.get("rsg_dev") or 0) > 50)
+        print(f"[RSG标注] TOP{top_n}: {_n} 只在强势池(周RS偏离>50‰)")
+    except Exception as e:
+        print(f"[WARN] RSG标注失败: {e}")
+
     today = datetime.now().strftime("%Y-%m-%d")
     js = {"date": today, "env": env, "env_logs": env_logs,
           "sources": {"四维": len(four), "鱼身": len(fish), "猛兽": len(beast),
@@ -466,8 +483,8 @@ def main():
             L.append(f"- ⚖️ {lg}")
         L.append("")
     L.append("## 仲裁结果 TOP{0}".format(min(top_n, len(ranked))))
-    L.append("| 排名 | 代码 | 总分 | 分级 | 月线 | 信号来源 | 风控卡 |")
-    L.append("|:----|:----|:----:|:----|:----:|:----|:----|")
+    L.append("| 排名 | 代码 | 总分 | 分级 | 月线 | RSG | 信号来源 | 风控卡 |")
+    L.append("|:----|:----|:----:|:----|:----:|:----:|:----|:----|")
     for i, r in enumerate(ranked[:top_n], 1):
         rk = r.get("risk", {})
         if rk.get("status", "").startswith("✅"):
@@ -478,7 +495,9 @@ def main():
             rk_txt = "⛔ 无止损"
         else:
             rk_txt = "—"
-        L.append(f"| {i} | {r['code']} | **{r['pts']}** | {r['level']} | {r['month']} | {'；'.join(r['src'][:5])}{'…' if len(r['src']) > 5 else ''} | {rk_txt} |")
+        _rd = r.get("rsg_dev")
+        _rsg_txt = "🟢强势" if (_rd is not None and _rd > 50) else ("🟡偏离" if _rd is not None and _rd > 0 else "⚪弱势")
+        L.append(f"| {i} | {r['code']} | **{r['pts']}** | {r['level']} | {r['month']} | {_rsg_txt} | {'；'.join(r['src'][:5])}{'…' if len(r['src']) > 5 else ''} | {rk_txt} |")
     L.append("")
     L.append("## 分级分布")
     L.append(f"- ★★★ 全信号共振: {js['counts']['★★★']} | ★★ 多信号: {js['counts']['★★']} | ★ 双信号: {js['counts']['★']} | 观察: {js['counts']['观察']}")
