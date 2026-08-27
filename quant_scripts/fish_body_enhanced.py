@@ -390,6 +390,25 @@ def detect_fish_patterns(tech, multi_score, resonance, kline_rows=None):
     
     return signals, filtered
 
+# === RSG 强势标注（2026-08-27：RSV体系周线RS偏离52周均线>50‰=强势侧过滤） ===
+def load_rsg_map():
+    """读取 rsv_strength_latest.json 的 RSG 标注 → {code: {rsg_dev, rsg_strong}}；失败返回空"""
+    rsg = {}
+    for p in ("outputs/rsv_strength_latest.json", "rsv_strength_latest.json",
+              "quant_scripts/outputs/rsv_strength_latest.json"):
+        if os.path.exists(p):
+            try:
+                d = json.load(open(p, encoding="utf-8"))
+                for r in (d.get("launch", []) + d.get("hold", []) + d.get("exit", [])):
+                    if r.get("code"):
+                        rsg[r["code"]] = {"rsg_dev": r.get("rsg_dev"),
+                                          "rsg_strong": bool(r.get("rsg_strong"))}
+                break
+            except Exception:
+                continue
+    return rsg
+
+
 # === 主流程 ===
 def is_valid_stock(code):
     """过滤：非科创板、非创业板、非北交所、非ST"""
@@ -523,6 +542,18 @@ def main():
     except Exception as _e:
         print(f"  ⚠️ 月线确认模块不可用: {_e}")
     
+    # RSG 强势标注（2026-08-27：RSV体系周线RS偏离52周均线>5% → 强势侧过滤标注，仅标注不强制过滤）
+    try:
+        _rsg_map = load_rsg_map()
+        for s in all_sigs:
+            _r = _rsg_map.get(s['code'])
+            s['rsg_dev'] = _r['rsg_dev'] if _r else None
+            s['rsg_strong'] = _r['rsg_strong'] if _r else False
+        if _rsg_map:
+            print(f"  🟢 RSG强势标注: {len([s for s in all_sigs if s.get('rsg_strong')])}/{len(all_sigs)} 个信号处于强势池")
+    except Exception as _e:
+        print(f"  ⚠️ RSG标注不可用: {_e}")
+    
     all_sigs.sort(key=lambda x:x['final_score'],reverse=True)
     
     # 阶段3: 输出
@@ -612,12 +643,14 @@ def main():
             ps=[s for s in all_sigs if s.get('mode')==int(pid)]
             if not ps: continue
             md+=f"## {pname}\n\n"
-            md+=f"| 代码 | 名称 | 综合评分 | 现价 | 止损 | 目标 | 共振 | 验证 |\n"
-            md+=f"|------|------|:-------:|:----:|:----:|:----:|:----:|:----:|\n"
+            md+=f"| 代码 | 名称 | 综合评分 | 现价 | 止损 | 目标 | 共振 | RSG | 验证 |\n"
+            md+=f"|------|------|:-------:|:----:|:----:|:----:|:----:|:----:|:----:|\n"
             for s in sorted(ps,key=lambda x:x['final_score'],reverse=True):
                 res=s.get('resonance_detail',{}).get('resonance','--')
                 tag=s.get('tag','') or ('📦'+s['breakout']['reason'] if s.get('breakout') else '')
-                md+=f"| {s['code']} | {s['name']} | {s['final_score']}分 | {s['price']:.2f} | {s['stop_loss']} | {s['target']} | {res} | {tag} |\n"
+                _rd = s.get('rsg_dev')
+                rsg_txt = "🟢强势" if s.get('rsg_strong') else ("🟡偏离" if _rd is not None and _rd > 0 else "⚪弱势")
+                md+=f"| {s['code']} | {s['name']} | {s['final_score']}分 | {s['price']:.2f} | {s['stop_loss']} | {s['target']} | {res} | {rsg_txt} | {tag} |\n"
         
         # 核心标的详情
         core=['sh603669','sh600400','sz002520']
