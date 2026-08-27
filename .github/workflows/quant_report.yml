@@ -200,25 +200,6 @@ jobs:
             python3 quad_resonance.py --pool all_chinext_kcb.csv --top 20 --out-prefix 四维共振_chinext_kcb
           fi
 
-      # ─── 第三步.6：提交报告阶段产物（供次日盘前报告引用）───
-      - name: 提交报告产物到仓库（供盘前报告引用）
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          cp outputs/market_style_latest.json market_style_latest.json 2>/dev/null || true
-          cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
-          cp outputs/四维共振_latest.json 四维共振_latest.json 2>/dev/null || true
-          cp outputs/信号仲裁_latest.json 信号仲裁_latest.json 2>/dev/null || true
-          cp outputs/四维共振_chinext_kcb_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || true
-          cp outputs/组合风控_latest.json 组合风控_latest.json 2>/dev/null || true
-          cp outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
-          python3 git_api_commit.py --msg "chore: report results ($(date +%Y-%m-%d))" \
-            market_style_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json \
-            四维共振_chinext_kcb_latest.json 组合风控_latest.json 执行纪律_latest.json \
-            quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
-            pools/pool_$(date +%Y-%m).json || true
-
       # ─── 第五步：股池标的跟踪报告（三阶漏斗：月线反转→武威G1→v2.1质量否决）───
       # 先于复盘报告生成，供复盘③.5引用当日股池状态
       - name: 生成并上传股池标的跟踪报告（三阶漏斗）
@@ -254,6 +235,25 @@ jobs:
           python3 quant_scripts/trade_journal.py --report --days 30
           cp quant_scripts/outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
           echo "执行纪律: $(python3 -c "import json;d=json.load(open('执行纪律_latest.json'));print('买入'+str(d['buy_rate'])+'% 卖出'+str(d['sell_rate'])+'%')" 2>/dev/null || echo '无数据')"
+
+      # ─── 第三步.6：提交报告阶段产物（供次日盘前报告引用）───
+      - name: 提交报告产物到仓库（供盘前报告引用）
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          cp outputs/market_style_latest.json market_style_latest.json 2>/dev/null || true
+          cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
+          cp outputs/四维共振_latest.json 四维共振_latest.json 2>/dev/null || true
+          cp outputs/信号仲裁_latest.json 信号仲裁_latest.json 2>/dev/null || true
+          cp outputs/四维共振_chinext_kcb_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || true
+          cp outputs/组合风控_latest.json 组合风控_latest.json 2>/dev/null || true
+          cp outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
+          python3 git_api_commit.py --msg "chore: report results ($(date +%Y-%m-%d))" \
+            market_style_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json \
+            四维共振_chinext_kcb_latest.json 组合风控_latest.json 执行纪律_latest.json \
+            quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
+            pools/pool_$(date +%Y-%m).json || true
 
       # ─── 第五.5步：自动生成复盘报告并上传（含③.5股池三阶漏斗状态引用 + 反转数值信号池）───
       - name: 自动生成复盘报告并上传
