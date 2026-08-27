@@ -1,0 +1,238 @@
+name: 全盘量化扫描
+
+on:
+  schedule:
+    # 北京时间 15:30（UTC 7:30），交易日收盘后自动运行
+    - cron: "30 7 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write  # write for changelog auto-update
+
+concurrency:
+  # 2026-08-27：拆分自 full_market_scan.yml（旧run挂死无法取消，改新group规避）
+  group: panhou-scan
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300  # 5h，余量充足（优化后实际约2.5-3.5h）
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 沙箱路径兼容层：部分脚本硬编码 /sandbox/workspace（沙箱路径），GitHub runner 上不存在
+      # 通过软链接把 /sandbox/workspace 指向仓库根，无需逐个改脚本
+      - name: 沙箱路径兼容层（/sandbox/workspace → 仓库根）
+        run: |
+          sudo mkdir -p /sandbox
+          sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
+          ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪: /sandbox/workspace -> $GITHUB_WORKSPACE"
+
+      - name: Setup Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装 Python 依赖（pandas+numpy for 猛兽）
+        run: |
+          pip install pandas numpy
+
+      # ─── 第一步：生成主板清单 ───
+      - name: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断）
+        continue-on-error: true
+        run: |
+          python3 gen_mainboard.py || echo "⚠️ gen_mainboard失败，回退仓库缓存"
+          if [ ! -s all_mainboard.csv ] && [ -f ../all_mainboard.csv ]; then cp ../all_mainboard.csv all_mainboard.csv; fi
+          if [ ! -s all_mainboard.csv ]; then echo "❌ 无主板清单可用"; exit 1; fi
+          echo "主板清单: $(wc -l < all_mainboard.csv) 行"
+
+      - name: IMA 凭证早期预检（失效立即微信告警，不阻断扫描）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 ima_cred_check.py --probe || true
+
+      # ─── 预热westock包（避免扫描时每只股票首次调用下载开销）───
+      - name: 预热westock数据包
+        run: npx -y westock-data-skillhub@1.0.3 hot board --limit 3
+
+      # ─── 第二步：全量量化扫描 ───
+      - name: 全量量化扫描（盘后量化）
+        env:
+          SCAN_WORKERS: "16"
+        run: |
+          python3 full_market_dualdim.py all_mainboard.csv
+          # 归档资金快照（含资金行为四态phase，供按四态胜率跟踪）
+          cp panhou_lianghua.csv outputs/资金快照_$(date +%Y-%m-%d).csv || echo "归档失败(不影响扫描)"
+
+      # ─── 第二步.1：市场宽度指标（黑石marketChangeDist启发：全主板涨跌家数分布）───
+      - name: 市场宽度扫描（全主板涨跌家数分布）
+        run: python3 market_width.py all_mainboard.csv
+
+      # ─── 第二步.1.5：年线广度指标（V纪元方法论：站上年线个股占比=中期牛熊结构）───
+      - name: 年线广度扫描（站上年线个股占比）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/yearline_breadth.py --list all_mainboard.csv --batch 50
+          cp outputs/yearline_breadth_latest.json yearline_breadth_latest.json 2>/dev/null || true
+          echo "年线广度: $(python3 -c "import json;d=json.load(open('outputs/yearline_breadth_latest.json'));print(f\"{d['above']}/{d['total']}={d['ratio_pct']}%\" )" 2>/dev/null || echo '计算失败')"
+
+      # ─── 第二步.1.6a：断档分歧板块择时（龚夫财经：连续≥3日强度前五后首次跌出=买点）───
+      - name: 断档分歧板块择时信号
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/sector_divergence.py --save
+          python3 quant_scripts/sector_divergence.py
+          cp outputs/断档分歧_latest.json 断档分歧_latest.json 2>/dev/null || true
+
+      # ─── 第二步.1.6：123/2B/ABC反转扫描（斯波朗迪L3结构确认，panhou四态池驱动）───
+      - name: 123/2B/ABC反转信号扫描
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/scan_123_2b.py --pool panhou_lianghua.csv
+          cp outputs/123_2b_latest.json 123_2b_latest.json 2>/dev/null || true
+          echo "123/2B: $(python3 -c "import json;d=json.load(open('outputs/123_2b_latest.json'));print('买入%d 风险%d ABC%d'%(len(d.get('buy',[])),len(d.get('risk',[])),len(d.get('abc',[]))))" 2>/dev/null || echo '无信号')"
+
+      # ─── 第二步.1.7：RSV均相对强度扫描（腰缠万贯144日，启动/持有/离场）───
+      - name: RSV相对强度扫描
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/rsv_strength.py --pool panhou_lianghua.csv
+          cp outputs/rsv_strength_latest.json rsv_strength_latest.json 2>/dev/null || true
+          echo "RSV: $(python3 -c "import json;d=json.load(open('outputs/rsv_strength_latest.json'));print('启动%d 持有%d 离场%d'%(len(d.get('launch',[])),len(d.get('hold',[])),len(d.get('exit',[]))))" 2>/dev/null || echo '无数据')"
+
+      # ─── 第二步.1.8：上证月线MACD死叉监控（Seaborg方法论，中期风险信号）───
+      - name: 月线MACD监控
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/monthly_macd_monitor.py
+          cp outputs/monthly_macd_latest.json monthly_macd_latest.json 2>/dev/null || true
+
+      # ─── 第二步.1.9：市场见顶五维监测（《全球第一炒股笔录》五维；≥3维=顶部区域）───
+      - name: 市场见顶五维监测（top_signal）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/top_signal.py --json > top_signal_latest.json || true
+          cp quant_scripts/outputs/top_signal_latest.json top_signal_latest.json 2>/dev/null || true
+          cp quant_scripts/outputs/board_top_latest.json board_top_latest.json 2>/dev/null || true
+          echo "见顶五维: $(python3 -c "import json;d=json.load(open('top_signal_latest.json'));print('总分'+str(d.get('score','?'))+' '+str(d.get('level','?')))" 2>/dev/null || echo '无数据')"
+
+      # ─── 第二步.2：分时强度分析（黑石minuteMacd启发：信号股分时MACD+封板+尾盘方向）───
+      - name: 分时强度分析（信号股分时MACD）
+        continue-on-error: true
+        run: python3 minute_strength.py --limit 20
+
+      # ─── 第二步.3：板块资金共振（本地复算三维因子，盘前③.3引用；替代黑石外部API，自成一体）───
+      - name: 板块资金共振（本地复算·无外部依赖）
+        continue-on-error: true
+        run: python3 sector_resonance_local.py
+
+      # ─── 第二步.5：动态生成鱼身股票池 ───
+      - name: 动态生成鱼身股票池（近20日日均成交额排名前300）
+        run: python3 quant_scripts/gen_fish_pool.py
+
+      # ─── 第三步：三系统预运行 ───
+      - name: 量化系统预运行（双弦+鱼身+猛兽）
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+        run: python3 quant_scripts/run_all_quant.py
+
+      # ─── 第三步.4：上传三系统原始数据到知识库（供次日盘前报告引用，防止缺失）───
+      - name: 上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          # 鱼身JSON+报告（原内部上传因无凭证静默失败，改为workflow统一上传）
+          FISH_JSON=$(ls outputs/fish_body_enhanced_*.json 2>/dev/null | head -1)
+          FISH_MD=$(ls outputs/鱼身报告_*.md 2>/dev/null | head -1)
+          if [ -n "$FISH_JSON" ]; then
+            python3 upload_ima.py --file "$FISH_JSON" --name "$(basename $FISH_JSON)" || echo "鱼身JSON上传失败"
+          fi
+          if [ -n "$FISH_MD" ]; then
+            python3 upload_ima.py --file "$FISH_MD" --name "$(basename $FISH_MD)" || echo "鱼身报告上传失败"
+          fi
+          # 量化汇总JSON（盘前premarket_quant引用）
+          QJSON=$(ls outputs/quant_results_$(date +%Y-%m-%d).json 2>/dev/null | head -1)
+          if [ -n "$QJSON" ]; then
+            python3 upload_ima.py --file "$QJSON" --name "$(basename $QJSON)" || echo "量化汇总上传失败"
+          fi
+          # 猛兽原始输出
+          if [ -f "outputs/beast_results.txt" ]; then
+            python3 upload_ima.py --file "outputs/beast_results.txt" --name "beast_results_$(date +%Y-%m-%d).txt" || echo "猛兽输出上传失败"
+          fi
+
+      # ─── 第四步（原）：上传全盘量化报告到全盘量化文件夹（尽早传，用户先看到扫描结果）───
+      - name: 上传全盘量化报告到全盘量化文件夹
+        if: always()  # 防阻断：前置步骤失败仍执行
+        timeout-minutes: 15  # 防卡死（2026-08-26：upload_ima无超时曾挂起2.5h+）
+        id: upload_main
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          IMA_UPLOAD_OK=false
+          IMA_CRED_EXPIRED=false
+          for i in 1 2 3; do
+            if python3 upload_ima.py --file panhou_lianghua.md --name "全盘量化报告_$(date +%Y-%m-%d).md" 2>upload_err.log; then
+              IMA_UPLOAD_OK=true
+              # 凭证健康度标记：记录最近成功日期（供 guard 自检疑似过期判断）
+              python3 ima_cred_check.py --mark-ok || true
+              break
+            fi
+            if grep -Eq "401|skill auth failed|Unauthorized" upload_err.log; then
+              IMA_CRED_EXPIRED=true
+              echo "::error::ima credential expired (401) — 需重新生成并回填 GitHub secret"
+              break
+            fi
+            echo "upload attempt $i failed, retry after $((i*10))s"
+            sleep $((i*10))
+          done
+          echo "IMA_UPLOAD_OK=$IMA_UPLOAD_OK" >> "$GITHUB_ENV"
+          echo "IMA_CRED_EXPIRED=$IMA_CRED_EXPIRED" >> "$GITHUB_ENV"
+
+      # ─── 提交扫描产物到仓库（供盘前报告引用 + 盘后报告workflow读取）───
+      - name: 提交扫描产物到仓库（供盘前引用/报告workflow读取）
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          cp outputs/quant_results_$(date +%Y-%m-%d).json quant_results_latest.json 2>/dev/null || cp outputs/quant_results_latest.json quant_results_latest.json 2>/dev/null || true
+          # 鱼身JSON一并提交（盘前premarket_fishbody从GitHub拉取，防止知识库上传失败导致缺失）
+          cp outputs/fish_body_enhanced_*.json fish_body_latest.json 2>/dev/null || true
+          cp outputs/鱼身报告_*.md 鱼身报告_latest.md 2>/dev/null || true
+          # 市场宽度+双模式聚合JSON（盘前②.5/②.5.2从GitHub拉取）
+          cp outputs/market_width_latest.json market_width_latest.json 2>/dev/null || true
+          cp outputs/mode_aggregate_latest.json mode_aggregate_latest.json 2>/dev/null || true
+          # 年线广度（V纪元方法论：站上年线占比，盘前②.5.1从GitHub拉取）
+          cp outputs/yearline_breadth_latest.json yearline_breadth_latest.json 2>/dev/null || true
+          # 双弦观察层（50-64分独立跟踪，不入月池）
+          cp outputs/双弦观察池_latest.json 双弦观察池_latest.json 2>/dev/null || true
+          # 板块共振（本地复算）
+          cp outputs/板块共振_latest.json 板块共振_latest.json 2>/dev/null || true
+          if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
+            # 改用 Contents API 提交（git pull/push 浅克隆+并发冲突曾导致连续失败，API 绕开）
+            python3 git_api_commit.py --msg "chore: scan results ($(date +%Y-%m-%d))" \
+              quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
+              mode_aggregate_latest.json 板块共振_latest.json yearline_breadth_latest.json 双弦观察池_latest.json \
+              123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json \
+              top_signal_latest.json board_top_latest.json panhou_lianghua.csv \
+              all_mainboard.csv ima_cred_last_ok.json pools/pool_$(date +%Y-%m).json
+          fi
