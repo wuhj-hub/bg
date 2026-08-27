@@ -196,14 +196,18 @@ def analyze(code, name="", day_rows=None, week_rows=None, month_rows=None, bench
         if week_rows and len(week_rows) >= N + 5:
             wrsv, wdir = rsv_of(week_rows, "close")
         # RSG 强势标注（2026-08-27：RS相对52周均线偏离，>50‰=偏离>5%强势侧过滤）
+        # 周线按 ISO 周对齐（tdx/westock 周线标签差一天，如2026-06-19 vs 06-18）
         rsg_dev, rsg_strong = None, False
         if bench_week_rows and week_rows and len(week_rows) >= 60:
-            bmap_w = {r["date"]: r["close"] for r in bench_week_rows}
+            def _wk_key(d):
+                return datetime.strptime(d, "%Y-%m-%d").isocalendar()[:2]
+            bmap_w = {_wk_key(r["date"]): r["close"] for r in bench_week_rows}
             w_rs = []
             for r in week_rows:
-                if r["date"] in bmap_w and bmap_w[r["date"]] > 0:
-                    w_rs.append(r["close"] / bmap_w[r["date"]])
-            if len(w_rs) >= 53:
+                k = _wk_key(r["date"])
+                if k in bmap_w and bmap_w[k] > 0:
+                    w_rs.append(r["close"] / bmap_w[k])
+            if len(w_rs) >= 52:  # 52周均线需52根
                 rss52 = sum(w_rs[-52:]) / 52
                 if rss52 > 0:
                     rsg_dev = round((w_rs[-1] / rss52 - 1) * 1000, 1)
@@ -249,6 +253,29 @@ def analyze(code, name="", day_rows=None, week_rows=None, month_rows=None, bench
         return {"code": code, "name": name, "error": str(e)[:60]}
 
 
+def load_bench_880003():
+    """读 tdx 快照 bench_880003.json → (day_rows, week_rows, bench_name, ok)
+    快照由 ima 会话用 tdx 刷新，过期(>3天)自动降级 399106"""
+    for p in ("quant_scripts/bench_880003.json", "bench_880003.json",
+              "outputs/bench_880003.json", "../quant_scripts/bench_880003.json"):
+        if os.path.exists(p):
+            try:
+                d = json.load(open(p, encoding="utf-8"))
+                upd = datetime.strptime(d.get("updated", "2000-01-01"), "%Y-%m-%d")
+                if (datetime.now() - upd).days > 3:
+                    print(f"[WARN] 880003快照过期({d.get('updated')})，降级399106", file=sys.stderr)
+                    return [], [], "399106", False
+                def _fmt(rows):
+                    return [{"date": r["date"], "close": r["close"],
+                             "high": r.get("high", r["close"]), "low": r.get("low", r["close"])}
+                            for r in rows]
+                return _fmt(d.get("day", [])), _fmt(d.get("week", [])), "880003", True
+            except Exception as e:
+                print(f"[WARN] 880003快照解析失败: {e}，降级399106", file=sys.stderr)
+                return [], [], "399106", False
+    return [], [], "399106", False
+
+
 def load_pool(args):
     pool = []
     p = args.pool
@@ -291,6 +318,7 @@ def main():
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--outdir", default="outputs")
     ap.add_argument("--workers", type=int, default=8)
+    ap.add_argument("--bench", default="399106", help="基准: 399106(westock实时,默认) / 880003(tdx快照文件)")
     args = ap.parse_args()
 
     pool = load_pool(args)
@@ -310,21 +338,25 @@ def main():
     pool = [(c, n) for c, n in pool if c not in st_set]
     print(f"[INFO] ST过滤后: {len(pool)} 只", file=sys.stderr)
 
-    # 基准指数日线（一次拉取，全池共用；westock单股偶发返回空，重试3次）
-    bench_rows = []
-    for _i in range(3):
-        bench_rows = parse_kline(cli(["kline", BENCH, "--period", "day", "--limit", "160"]))
-        if len(bench_rows) >= 100:
-            break
-        time.sleep(2)
-    # 基准指数周线（RSG强势标注用；westock单股偶发返回空，重试3次）
-    bench_week_rows = []
-    for _i in range(3):
-        bench_week_rows = parse_kline(cli(["kline", BENCH, "--period", "week", "--limit", "100"]))
-        if len(bench_week_rows) >= 80:
-            break
-        time.sleep(2)
-    print(f"[INFO] 基准 {BENCH} 日线 {len(bench_rows)} 根 周线 {len(bench_week_rows)} 根", file=sys.stderr)
+    # 基准指数：--bench 880003 读 tdx 快照文件，否则 westock 实时拉 399106（单股偶发空，重试3次）
+    bench_rows, bench_week_rows, bench_name, bench_ok = [], [], BENCH, False
+    if args.bench == "880003":
+        bench_rows, bench_week_rows, bench_name, bench_ok = load_bench_880003()
+        if not bench_ok:
+            bench_name = BENCH
+    if not bench_ok:
+        for _i in range(3):
+            bench_rows = parse_kline(cli(["kline", BENCH, "--period", "day", "--limit", "160"]))
+            if len(bench_rows) >= 100:
+                break
+            time.sleep(2)
+        bench_week_rows = []
+        for _i in range(3):
+            bench_week_rows = parse_kline(cli(["kline", BENCH, "--period", "week", "--limit", "100"]))
+            if len(bench_week_rows) >= 80:
+                break
+            time.sleep(2)
+    print(f"[INFO] 基准 {bench_name} 日线 {len(bench_rows)} 根 周线 {len(bench_week_rows)} 根", file=sys.stderr)
 
     # ── 批量拉取日/周/月线 ──
     t0 = time.time()
@@ -370,7 +402,7 @@ def main():
 
     md = [f"# 📈 RSV均相对强度扫描 {date_str}", "",
           f"> 候选池 {len(pool)} 只｜检出 {len(results)} 只（启动 {len(launch)} / 持有 {len(hold)} / 离场 {len(exit_sig)}）",
-          "> 方法：腰缠万贯RSV均（144日价格+相对深综指）｜基准 sz399106",
+          "> 方法：腰缠万贯RSV均（144日价格+相对基准）｜基准 " + bench_name + "",
           "", "## 🟢 启动信号（日线<20拐头 / 周线突破50）", "",
           "| 代码 | 名称 | 现价 | 日RSV | 周RSV | 信号 |",
           "|:----|:----|:----:|:----:|:----:|:----|"]
