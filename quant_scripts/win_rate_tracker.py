@@ -14,7 +14,7 @@ win_rate_tracker.py —— 股池信号实盘胜率跟踪报告 v1.0
   python3 win_rate_tracker.py --min-days 5     # 仅统计信号后≥5日的样本
 """
 import subprocess, sys, os, re, csv, argparse, json
-from datetime import datetime
+from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
@@ -191,8 +191,26 @@ def main():
         show(title, ss)
     print()
 
+    # 周度胜率趋势（2026-08-28 P0#4：信号质量随时间稳定性 + 仲裁权重校准输入）
+    A("## 二、周度胜率趋势（近8周）\n")
+    A("> 信号质量稳定性观察：周胜率持续下滑→策略衰减预警；周胜率提升→信号源增强确认\n")
+    A("| 周起始(周一) | 信号数 | 胜率 | 平均收益 | 状态 |")
+    A("|:----|:---:|:----:|:----:|:----|")
+    _weeks = {}
+    for s in results:
+        _d = datetime.strptime(s["date"], "%Y-%m-%d")
+        _wk = (_d - timedelta(days=_d.weekday())).strftime("%Y-%m-%d")
+        _weeks.setdefault(_wk, []).append(s)
+    for _wk in sorted(_weeks.keys())[-8:]:
+        _ss = _weeks[_wk]
+        _rets = [s["ret"] for s in _ss]
+        _wr = sum(1 for r in _rets if r > 0) / len(_rets)
+        _tag = "🔥 强" if (len(_ss) >= 5 and _wr >= 0.6) else ("❄️ 弱" if _wr <= 0.3 else "—")
+        A(f"| {_wk} | {len(_ss)} | {_wr*100:.0f}% | {sum(_rets)/len(_rets):+.1f}% | {_tag} |")
+    A("")
+
     # 三阶漏斗验证（对照回测结论）
-    A("## 二、三阶漏斗实盘验证（对照回测）\n")
+    A("## 三、三阶漏斗实盘验证（对照回测）\n")
     A("| 指标 | 回测结论（2024-2026全量） | 实盘跟踪（当前累积） |")
     A("|:----|:------------------------|:------------------|")
     A("| 月线反转6月胜率 | ~54.8% | 见上表（累积中） |")
@@ -201,7 +219,7 @@ def main():
     A("\n> ⚠️ 实盘样本随每日运行累积，建议运行2-4周后再做结论性对比\n")
 
     # 当前持仓信号清单
-    A("## 三、当前有效信号清单\n")
+    A("## 四、当前有效信号清单\n")
     A("| 代码 | 名称 | 信号日 | 决策 | 信号后收益 | 持有天数 |")
     A("|:----|:----|:----|:----|:----:|:----:|")
     for s in sorted(results, key=lambda x: -x["ret"]):
