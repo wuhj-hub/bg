@@ -194,19 +194,8 @@ def score_stock(code: str, name: str, sector: str = "",
     # 获取资金流向数据
     fund_raw = cli(f"asfund {code}")
     
-    # 获取价格 from technical (轻量)
-    tech_raw = cli(f"technical {code} --group all")
-    price = 0
-    for row in parse_table(tech_raw):
-        for key in ["closePrice", "last", "收盘价", "最新"]:
-            if key in row and row[key]:
-                try:
-                    price = float(row[key])
-                    break
-                except: pass
-        if price > 0:
-            break
-    result["price"] = price
+    # 价格改由 kline 提供（2026-08-28提速：删除重复 technical 调用，每只 -1 次 npx）
+    result["price"] = 0
 
     # 资金维度 0-35 (双弦原有 · 保留)
     fund_score = 15
@@ -245,6 +234,10 @@ def score_stock(code: str, name: str, sector: str = "",
         beast = importlib.import_module("beast_screener")
         df = beast.parse_kline_df(code, 250)
         if not df.empty and len(df) >= 30:
+            try:
+                result["price"] = float(df["close"].iloc[-1])
+            except Exception:
+                pass
             # VAD中期动量评分 (0-15分)
             vad = beast.calc_vad(df, 14)
             vad_val = vad["vad"]
@@ -277,8 +270,8 @@ def score_stock(code: str, name: str, sector: str = "",
             elif ssv["ssv2"] > 0:
                 tech_score = min(35, tech_score + 1)
     except:
-        # 猛兽不可用时回退到原MACD/RSI
-        tech_rows = parse_table(tech_raw)
+        # 猛兽不可用时回退到原MACD/RSI（technical 调用已移除提速，回退仅保留结构）
+        tech_rows = []
         if tech_rows:
             row = tech_rows[0]
             dif_str = row.get("macd.DIF", row.get("DIF", ""))
@@ -482,7 +475,7 @@ def run_daily(pool_path=None):
         return score_stock(code, name, sname, sector_zdf, temp)
 
     scored = []
-    with ThreadPoolExecutor(max_workers=4) as ex:
+    with ThreadPoolExecutor(max_workers=8) as ex:
         for r in ex.map(_score, tasks):
             scored.append(r)
     scored.sort(key=lambda x: -x["total_score"])
