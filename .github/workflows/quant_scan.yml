@@ -79,6 +79,14 @@ jobs:
       - name: 市场宽度扫描（全主板涨跌家数分布）
         run: python3 market_width.py all_mainboard.csv
 
+      # ─── 第二步.1.4：市场情绪状态与次日预判（颜劼情绪周期转移矩阵，读market_width涨停数）───
+      - name: 市场情绪状态与次日预判（emotion_forecast）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/emotion_forecast.py
+          cp outputs/情绪预判_latest.json 情绪预判_latest.json 2>/dev/null || true
+          echo "情绪: $(python3 -c "import json;d=json.load(open('outputs/情绪预判_latest.json'));print(d['state']+'→明日'+str(d['next'])+'('+str(d['next_prob'])+'%)')" 2>/dev/null || echo '无数据')"
+
       # ─── 第二步.1.5：年线广度指标（V纪元方法论：站上年线个股占比=中期牛熊结构）───
       - name: 年线广度扫描（站上年线个股占比）
         continue-on-error: true
@@ -233,7 +241,7 @@ jobs:
               quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
               mode_aggregate_latest.json 板块共振_latest.json yearline_breadth_latest.json 双弦观察池_latest.json \
               123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json \
-              top_signal_latest.json board_top_latest.json panhou_lianghua.csv \
+              top_signal_latest.json board_top_latest.json 情绪预判_latest.json panhou_lianghua.csv \
               all_mainboard.csv ima_cred_last_ok.json pools/pool_$(date +%Y-%m).json
           fi
 
