@@ -193,6 +193,16 @@ def main():
         limitup = calc_limitup_live()
         src = "实时计算" if limitup is not None else "N/A"
     r = judge(limitup, today)
+    # JSON 落盘（2026-08-28：接入 workflow 提交/盘前报告引用）
+    if r:
+        try:
+            os.makedirs("outputs", exist_ok=True)
+            with open("outputs/情绪预判_latest.json", "w", encoding="utf-8") as _f:
+                json.dump({"date": today, "limitup": r["limitup"], "state": r["state"],
+                           "next": r["next"], "next_prob": r["next_prob"],
+                           "advice": r["advice"], "src": src}, _f, ensure_ascii=False, indent=1)
+        except Exception:
+            pass
     if "--inline" in sys.argv:
         if r:
             print(f"🎭情绪:{r['state']}(涨停{r['limitup']})→明日{r['next']}概率{r['next_prob']}%")
