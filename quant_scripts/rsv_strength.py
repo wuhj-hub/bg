@@ -172,8 +172,8 @@ def calc_estimator(month_rows):
     return wma[-1] > 0 if wma else None
 
 
-def analyze(code, name="", day_rows=None, week_rows=None, month_rows=None, bench_rows=None):
-    """单只分析（纯本地计算，无网络调用）：日线RSV + 周线RSV + 月线估波"""
+def analyze(code, name="", day_rows=None, week_rows=None, month_rows=None, bench_rows=None, bench_week_rows=None):
+    """单只分析（纯本地计算，无网络调用）：日线RSV + 周线RSV + 月线估波 + RSG强势标注"""
     try:
         if not day_rows or len(day_rows) < N + 10:
             return None
@@ -195,6 +195,19 @@ def analyze(code, name="", day_rows=None, week_rows=None, month_rows=None, bench
         wrsv, wdir = None, None
         if week_rows and len(week_rows) >= N + 5:
             wrsv, wdir = rsv_of(week_rows, "close")
+        # RSG 强势标注（2026-08-27：RS相对52周均线偏离，>50‰=偏离>5%强势侧过滤）
+        rsg_dev, rsg_strong = None, False
+        if bench_week_rows and week_rows and len(week_rows) >= 60:
+            bmap_w = {r["date"]: r["close"] for r in bench_week_rows}
+            w_rs = []
+            for r in week_rows:
+                if r["date"] in bmap_w and bmap_w[r["date"]] > 0:
+                    w_rs.append(r["close"] / bmap_w[r["date"]])
+            if len(w_rs) >= 53:
+                rss52 = sum(w_rs[-52:]) / 52
+                if rss52 > 0:
+                    rsg_dev = round((w_rs[-1] / rss52 - 1) * 1000, 1)
+                    rsg_strong = rsg_dev > 50
         # 月线估波
         est = calc_estimator(month_rows) if month_rows and len(month_rows) >= 25 else None
         close = day_rows[-1]["close"]
@@ -230,6 +243,7 @@ def analyze(code, name="", day_rows=None, week_rows=None, month_rows=None, bench
             "code": code, "name": name, "close": round(close, 2),
             "rsv_day": rsv_avg, "rsv_week": wrsv,
             "estimator": est, "state": state, "signals": sigs,
+            "rsg_dev": rsg_dev, "rsg_strong": rsg_strong,
         }
     except Exception as e:
         return {"code": code, "name": name, "error": str(e)[:60]}
@@ -296,9 +310,21 @@ def main():
     pool = [(c, n) for c, n in pool if c not in st_set]
     print(f"[INFO] ST过滤后: {len(pool)} 只", file=sys.stderr)
 
-    # 基准指数日线（一次拉取，全池共用）
-    bench_rows = parse_kline(cli(["kline", BENCH, "--period", "day", "--limit", "160"]))
-    print(f"[INFO] 基准 {BENCH} 日线 {len(bench_rows)} 根", file=sys.stderr)
+    # 基准指数日线（一次拉取，全池共用；westock单股偶发返回空，重试3次）
+    bench_rows = []
+    for _i in range(3):
+        bench_rows = parse_kline(cli(["kline", BENCH, "--period", "day", "--limit", "160"]))
+        if len(bench_rows) >= 100:
+            break
+        time.sleep(2)
+    # 基准指数周线（RSG强势标注用；westock单股偶发返回空，重试3次）
+    bench_week_rows = []
+    for _i in range(3):
+        bench_week_rows = parse_kline(cli(["kline", BENCH, "--period", "week", "--limit", "100"]))
+        if len(bench_week_rows) >= 80:
+            break
+        time.sleep(2)
+    print(f"[INFO] 基准 {BENCH} 日线 {len(bench_rows)} 根 周线 {len(bench_week_rows)} 根", file=sys.stderr)
 
     # ── 批量拉取日/周/月线 ──
     t0 = time.time()
@@ -323,7 +349,7 @@ def main():
     results = []
     for code, name in pool:
         r = analyze(code, name, fetched["day"].get(code), fetched["week"].get(code),
-                    fetched["month"].get(code), bench_rows)
+                    fetched["month"].get(code), bench_rows, bench_week_rows)
         if r:
             results.append(r)
 
@@ -333,8 +359,12 @@ def main():
     hold = [r for r in results if r.get("state") == "持有"]
     exit_sig = [r for r in results if r.get("state") == "离场" or any(s["type"] in ("日线卖点", "周线破70") for s in r.get("signals", []))]
 
+    # RSG 强势池（2026-08-27：RS相对52周均线偏离>5% = 强势侧过滤，供鱼身高阳/猛兽领先/仲裁右侧信号标注）
+    rsg_pool = [r for r in results if r.get("rsg_strong")]
+    rsg_pool.sort(key=lambda x: -(x.get("rsg_dev") or 0))
     js = {"date": date_str, "pool_size": len(pool), "analyzed": len(results),
-          "launch": launch, "hold": hold, "exit": exit_sig}
+          "launch": launch, "hold": hold, "exit": exit_sig,
+          "rsg_pool": [r["code"] for r in rsg_pool]}
     json_path = os.path.join(args.outdir, "rsv_strength_latest.json")
     open(json_path, "w", encoding="utf-8").write(json.dumps(js, ensure_ascii=False, indent=1))
 
@@ -356,7 +386,15 @@ def main():
     for r in exit_sig[:30]:
         sigs = "；".join(f"{s['type']}({s['desc']})" for s in r["signals"] if s["type"] in ("日线卖点", "周线破70"))
         md.append(f"| {r['code']} | {r['name']} | {r['close']} | {r['rsv_day']} | {r['rsv_week']} | {sigs} |")
-    md += ["", "> 说明：RSV均=(价格RSV1+相对深综指RSV2)/2，N=144；周线突破50=3年级别，70-90持有，破70离场；月线估波=ROC14+ROC11的WMA10>0"]
+    md += ["", "## 🟢 RSG强势池（周线RS偏离52周均线>5%，强势侧过滤）", "",
+           "> 用法：仅用于右侧/强势类信号（高阳强势/空中加油/箱体突破/猛兽领先股）标注；左侧低吸（武威G1/月线反转/RSV启动）不适用",
+           "", "| 代码 | 名称 | 现价 | RSG偏离 | 日RSV | 周RSV | 状态 |", "|:----|:----|:----:|:----:|:----:|:----:|:----|"]
+    for r in rsg_pool[:30]:
+        st = r.get("state", "")
+        md.append(f"| {r['code']} | {r['name']} | {r['close']} | {r.get('rsg_dev')}‰ | {r['rsv_day']} | {r['rsv_week']} | {st} |")
+    if not rsg_pool:
+        md.append("| — | 当前无 | — | — | — | — | 无 |")
+    md += ["", "> 说明：RSV均=(价格RSV1+相对深综指RSV2)/2，N=144；周线突破50=3年级别，70-90持有，破70离场；月线估波=ROC14+ROC11的WMA10>0；RSG=周线RS偏离52周均线(‰)，>50=强势"]
     md_path = os.path.join(args.outdir, f"rsv_strength_{date_str}.md")
     open(md_path, "w", encoding="utf-8").write("\n".join(md))
     print(f"[OK] {json_path}")
