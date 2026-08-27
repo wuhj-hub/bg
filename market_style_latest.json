@@ -1,87 +1,84 @@
 {
- "date": "2026-08-25",
- "data_date": "2026-08-25",
+ "date": "2026-08-27",
+ "data_date": "2026-08-27",
  "style": "情绪市",
  "icon": "🔥",
- "score": 43,
+ "score": 27,
  "score_detail": {
-  "size_style": -7,
-  "limitup_structure": 25,
-  "volume_structure": 15,
-  "sector_fund": 10
+  "size_style": 5,
+  "limitup_structure": 16,
+  "volume_structure": 0,
+  "sector_fund": 6
  },
  "size_style": {
-  "hs300_5d": -3.68,
-  "hs300_10d": -2.4,
-  "zz1000_5d": -5.27,
-  "zz1000_10d": -2.22,
-  "rel_5d": -1.59,
-  "rel_10d": 0.18,
-  "rel_20d": 7.52,
-  "zz500_5d": -5.7
+  "hs300_5d": 0.82,
+  "hs300_10d": -0.72,
+  "zz1000_5d": 1.89,
+  "zz1000_10d": 0.22,
+  "rel_5d": 1.07,
+  "rel_10d": 0.94,
+  "rel_20d": 10.29,
+  "zz500_5d": 1.22
  },
  "limitup_structure": {
-  "limitup": 61,
-  "strong": 165,
-  "width_score": 100,
-  "level": "🔥 强势（普涨格局）",
+  "limitup": 52,
+  "strong": 79,
+  "width_score": 56.8,
+  "level": "偏强（涨多跌少）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 5.4,
-  "zhaban_rate": 41.9,
-  "lianban": 9
+  "strong_ratio": 2.7,
+  "zhaban_rate": 40.2,
+  "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.327,
-  "small_big_ratio_5d": 1.179,
-  "vol_shift": "资金流向中小盘",
-  "small_vol_pulse": 93.98
+  "small_big_ratio_now": 1.185,
+  "small_big_ratio_5d": 1.223
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "通信设备",
-    "zdf": "-0.46",
-    "main_net5d": -402.9,
-    "retail_net": -23.4,
-    "tag": "游资型"
-   },
-   {
-    "name": "小家电",
-    "zdf": "8.02",
-    "main_net5d": -2.0,
-    "retail_net": -2.0,
-    "tag": "游资型"
-   },
-   {
     "name": "半导体",
-    "zdf": "-0.20",
-    "main_net5d": -708.9,
-    "retail_net": 18.1,
+    "zdf": "4.54",
+    "main_net5d": -267.4,
+    "retail_net": -180.0,
+    "tag": "游资型"
+   },
+   {
+    "name": "通信设备",
+    "zdf": "3.85",
+    "main_net5d": -17.6,
+    "retail_net": -104.1,
     "tag": "游资型"
    },
    {
     "name": "元件",
-    "zdf": "0.20",
-    "main_net5d": -309.1,
-    "retail_net": -20.7,
+    "zdf": "5.09",
+    "main_net5d": -6.5,
+    "retail_net": -128.7,
     "tag": "游资型"
+   },
+   {
+    "name": "证券Ⅱ",
+    "zdf": "1.07",
+    "main_net5d": 41.9,
+    "retail_net": -4.6,
+    "tag": "机构型"
    }
   ]
  },
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 13,
-   "欧马模式": 2
+   "堆量模式": 9,
+   "欧马模式": 6
   },
   "leaders": {
-   "堆量模式": 6
-  },
-  "pullbacks": {},
-  "gpoints": {
+   "堆量模式": 7,
    "欧马模式": 1
   },
+  "pullbacks": {},
+  "gpoints": {},
   "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
   "total_scored": 15
  },
