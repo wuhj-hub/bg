@@ -1,0 +1,376 @@
+name: 盘后报告生成
+
+on:
+  # 上游「全盘量化扫描」完成后自动触发（2026-08-27：拆分自 full_market_scan.yml，规避6h job上限）
+  workflow_run:
+    workflows: ["全盘量化扫描"]
+    types: [completed]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write  # write for changelog auto-update
+
+concurrency:
+  group: panhou-report
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180  # 3h，报告生成步骤充足
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 沙箱路径兼容层：部分脚本硬编码 /sandbox/workspace（沙箱路径），GitHub runner 上不存在
+      - name: 沙箱路径兼容层（/sandbox/workspace → 仓库根）
+        run: |
+          sudo mkdir -p /sandbox
+          sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
+          ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪: /sandbox/workspace -> $GITHUB_WORKSPACE"
+
+      - name: Setup Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装 Python 依赖（pandas+numpy for 猛兽）
+        run: |
+          pip install pandas numpy
+
+      # ─── 上游扫描结果检查：扫描workflow失败则不生成报告（避免基于旧数据误导）───
+      - name: 上游扫描结果检查（失败则告警退出）
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success'
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          echo "⚠️ 上游全盘量化扫描未成功（conclusion=${{ github.event.workflow_run.conclusion }}），跳过报告生成"
+          curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️扫描失败&content=上游全盘量化扫描未成功(conclusion=${{ github.event.workflow_run.conclusion }})，盘后报告未生成&template=txt" > /dev/null || true
+          exit 0
+
+      # ─── 第三步.4.5：猛兽本月股池同步（分层构建+剔除+月度累积，上传知识库「猛兽」本月股池）───
+      - name: 猛兽本月股池同步（主池/观察池分层 + 剔除不符合）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: 9wlJWgbFxvKhhxzobeMHSJ7_eaUmHutVQXMzeNxh4DM=
+          IMA_FOLDER_ID: folder_7483172363202542
+        run: |
+          python3 quant_scripts/monthly_pool_sync.py --date "$(date +%Y-%m-%d)"
+          F=$(ls outputs/猛兽本月股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "猛兽本月股池上传失败"
+          fi
+
+      # ─── 第三步.4.6：双弦每日报告+月度股池同步（收编sx2：上传知识库「双弦」+推送）───
+      - name: 双弦每日报告+月度股池同步（收编sx2单一出口）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: zw56pWsoAd18wp9A_2-_vFFAPbG51UZsuaGyvynm66g=
+          IMA_FOLDER_ID: folder_7484244066591607
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          # 每日报告 → 双弦KB「每日报告」文件夹（folder_7484244062400511）
+          RPT=$(ls outputs/shuangxian_v2_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$RPT" ]; then
+            IMA_FOLDER_ID=folder_7484244062400511 python3 upload_ima.py --file "$RPT" --name "$(basename $RPT)" || echo "双弦每日报告上传失败"
+            # PushPlus推送（复用push_report.py，PUSH_REPORT指向报告）
+            PUSH_REPORT="$RPT" python3 push_report.py || echo "双弦推送失败(非致命)"
+          fi
+          # 月度股池 → 双弦KB「月度股池」文件夹
+          python3 quant_scripts/dual_pool_sync.py --date "$(date +%Y-%m-%d)"
+          F=$(ls outputs/双弦本月股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            IMA_FOLDER_ID=folder_7484244066591607 python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "双弦本月股池上传失败"
+          fi
+
+      # ─── 第三步.4.7：才哥战法股池（王者倍量柱正版/旭日东升/凤凰归巢/瞒天过海，与双弦/猛兽同等股池）───
+      - name: 才哥战法股池扫描+跟踪（四战法独立股池）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          # 1. 四战法全市场扫描（约8-10分钟）+ 自动刷新 caige_pool.txt 为当日信号
+          python3 quant_scripts/caige_pool.py
+          # 2. 三阶漏斗跟踪（自定义文件名，避免与第五步主股池跟踪报告冲突）
+          python3 quant_scripts/pool_tracking_report.py --pool-file quant_scripts/caige_pool.txt --name "才哥战法股池跟踪" --out-file "才哥战法跟踪_$(date +%Y-%m-%d).md" --hide-rejected || echo "才哥跟踪报告生成失败(非致命)"
+          # 3. 上传股池报告+跟踪报告到盘后量化文件夹，并推送
+          F=$(ls outputs/才哥战法股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "才哥股池报告上传失败"
+          fi
+          T=$(ls outputs/才哥战法跟踪_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$T" ]; then
+            python3 upload_ima.py --file "$T" --name "$(basename $T)" || echo "才哥跟踪报告上传失败"
+            PUSH_REPORT="$T" python3 push_report.py || echo "才哥推送失败(非致命)"
+          fi
+
+      # ─── 第三步.4.8：一统天下多周期建仓区股池（周线闸门→日线建仓区→60分钟确认）───
+      - name: 一统天下建仓区股池扫描+跟踪（多周期共振）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          # 1. 多周期建仓区扫描（周线闸门→日线建仓区→60分钟确认）
+          python3 quant_scripts/yitong_screener.py
+          # 2. 三阶漏斗跟踪（复用股池跟踪框架，隐藏否决）
+          python3 quant_scripts/pool_tracking_report.py --pool-file quant_scripts/yitong_pool.txt --name "一统天下建仓区跟踪" --out-file "一统天下跟踪_$(date +%Y-%m-%d).md" --hide-rejected || echo "一统天下跟踪失败(非致命)"
+          # 3. 上传股池+跟踪报告，推送
+          F=$(ls outputs/一统天下建仓区股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "一统天下股池上传失败"
+          fi
+          T=$(ls outputs/一统天下跟踪_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$T" ]; then
+            python3 upload_ima.py --file "$T" --name "$(basename $T)" || echo "一统天下跟踪上传失败"
+            PUSH_REPORT="$T" python3 push_report.py || echo "一统天下推送失败(非致命)"
+          fi
+
+      # ─── 第三步.4.9：妖股发现与跟踪池（启动发现+6维跟踪+出货/分歧预警）───
+      - name: 妖股发现与跟踪池（启动入池+出货预警推送）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/yao_gu_pool.py
+          F=$(ls outputs/妖股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "妖股池上传失败(非致命)"
+            PUSH_REPORT="$F" python3 push_report.py || echo "妖股池推送失败(非致命)"
+          fi
+
+      # ─── 第三步.4.10：龙头定位（五维模板·总龙头/板块龙/中军/跟风梯队+见顶预警）───
+      - name: 龙头定位扫描（连板梯队+见顶五维预警）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/longtou.py
+          F=$(ls outputs/龙头定位_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "龙头定位上传失败(非致命)"
+            PUSH_REPORT="$F" python3 push_report.py || echo "龙头定位推送失败(非致命)"
+          fi
+
+      # ─── 第三步.5：市场风格轴（依赖市场宽度+猛兽双模式聚合，扫描workflow已提交数据）───
+      - name: 市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证）
+        continue-on-error: true
+        run: python3 market_style.py
+
+      # ─── 第三步.5b：四维共振评分（政策/资金/筹码/关联方，依赖扫描workflow提交的panhou_lianghua.csv）───
+      - name: 四维共振评分（政策/资金/筹码/关联方四维证据链）
+        continue-on-error: true
+        run: python3 quad_resonance.py --pool panhou_lianghua.csv --top 15
+
+      # ─── 第三步.5c：全系统信号仲裁（统一出口：9信号源+操作清单+市场级信号，依赖四维+三系统输出）───
+      - name: 全系统信号仲裁（统一出口·今日操作清单）
+        continue-on-error: true
+        run: python3 signal_arbiter.py --top 20
+
+      # ─── 第三步.5d：创业板/科创四维补充通道（代表性优化A·2026-08-11）───
+      - name: 创业板/科创四维补充扫描（代表性补充通道）
+        continue-on-error: true
+        run: |
+          python3 gen_mainboard.py --universe chinext_kcb
+          if [ -f all_chinext_kcb.csv ]; then
+            python3 quad_resonance.py --pool all_chinext_kcb.csv --top 20 --out-prefix 四维共振_chinext_kcb
+          fi
+
+      # ─── 第三步.6：提交报告阶段产物（供次日盘前报告引用）───
+      - name: 提交报告产物到仓库（供盘前报告引用）
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          cp outputs/market_style_latest.json market_style_latest.json 2>/dev/null || true
+          cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
+          cp outputs/四维共振_latest.json 四维共振_latest.json 2>/dev/null || true
+          cp outputs/信号仲裁_latest.json 信号仲裁_latest.json 2>/dev/null || true
+          cp outputs/四维共振_chinext_kcb_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || true
+          cp outputs/组合风控_latest.json 组合风控_latest.json 2>/dev/null || true
+          cp outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
+          python3 git_api_commit.py --msg "chore: report results ($(date +%Y-%m-%d))" \
+            market_style_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json \
+            四维共振_chinext_kcb_latest.json 组合风控_latest.json 执行纪律_latest.json \
+            quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
+            pools/pool_$(date +%Y-%m).json || true
+
+      # ─── 第五步：股池标的跟踪报告（三阶漏斗：月线反转→武威G1→v2.1质量否决）───
+      # 先于复盘报告生成，供复盘③.5引用当日股池状态
+      - name: 生成并上传股池标的跟踪报告（三阶漏斗）
+        if: always()  # 防阻断：前置步骤失败仍执行
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/pool_tracking_report.py --push --auto-extend --holdings-file holdings.txt \
+            || python3 quant_scripts/pool_tracking_report.py --date "$(date +%Y-%m-%d)" --auto-extend --holdings-file holdings.txt
+          if [ -f "outputs/股池标的跟踪报告_$(date +%Y-%m-%d).md" ]; then
+            python3 upload_ima.py --file "outputs/股池标的跟踪报告_$(date +%Y-%m-%d).md" --name "股池标的跟踪报告_$(date +%Y-%m-%d).md"
+          fi
+
+      # ─── 第五.4.5步：持仓组合风控（P1-2：行业集中度+相关性矩阵+回撤预警三档+离场计分）───
+      - name: 持仓组合风控（portfolio_risk）
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/portfolio_risk.py --holdings quant_scripts/holdings.txt
+          cp quant_scripts/outputs/组合风控_latest.json 组合风控_latest.json 2>/dev/null || true
+          echo "组合风控: $(python3 -c "import json;d=json.load(open('组合风控_latest.json'));print('回撤'+str(d['nav']['drawdown'])+'% '+d['nav']['level'])" 2>/dev/null || echo '无数据')"
+
+      # ─── 第五.4.6步：实盘执行纪律（P1-3：操作清单vs实盘journal执行率；--add 人工记录）───
+      - name: 实盘执行纪律报告（trade_journal）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/trade_journal.py --report --days 30
+          cp quant_scripts/outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
+          echo "执行纪律: $(python3 -c "import json;d=json.load(open('执行纪律_latest.json'));print('买入'+str(d['buy_rate'])+'% 卖出'+str(d['sell_rate'])+'%')" 2>/dev/null || echo '无数据')"
+
+      # ─── 第五.5步：自动生成复盘报告并上传（含③.5股池三阶漏斗状态引用 + 反转数值信号池）───
+      - name: 自动生成复盘报告并上传
+        if: always()  # 防阻断：前置步骤失败仍执行
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485234585035034
+        run: |
+          # 先运行反转数值周线扫描（≤10元），供复盘报告明日展望章节引用
+          python3 quant_scripts/reversal_funnel_screener.py --weeks 2 --max-price 10 || echo "反转数值扫描失败, 复盘继续"
+          python3 quant_scripts/gen_review_report.py
+          python3 quant_scripts/report_selfcheck.py --review "outputs/复盘报告_$(date +%Y-%m-%d).md" --today "$(date +%Y-%m-%d)" --alert || echo "自检发现问题(已推送报警), 不阻断流程"
+
+      # ─── 第五.6步：股池信号实盘胜率跟踪（每日累积，2-4周后可对比回测）───
+      - name: 股池信号实盘胜率跟踪
+        if: always()  # 防阻断：前置步骤失败仍执行
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          python3 quant_scripts/win_rate_tracker.py --min-days 3
+          if [ -f "outputs/股池信号胜率跟踪报告_$(date +%Y-%m-%d).md" ]; then
+            python3 upload_ima.py --file "outputs/股池信号胜率跟踪报告_$(date +%Y-%m-%d).md" --name "股池信号胜率跟踪报告_$(date +%Y-%m-%d).md"
+          fi
+
+      # ─── 第五.7步：纸面组合跟踪（信号→虚拟持仓→每日盈亏，按方法分组对比）───
+      - name: 纸面组合跟踪（选股方法对比）
+        if: always()  # 防阻断：前置步骤失败仍执行
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          if [ ! -f "outputs/paper_portfolio.json" ]; then
+            python3 quant_scripts/paper_tracker.py --init outputs/pool_signals_log.csv
+          fi
+          python3 quant_scripts/paper_tracker.py --update
+          python3 quant_scripts/paper_tracker.py --report
+          if [ -f "outputs/纸面组合跟踪报告_$(date +%Y-%m-%d).md" ]; then
+            python3 upload_ima.py --file "outputs/纸面组合跟踪报告_$(date +%Y-%m-%d).md" --name "纸面组合跟踪报告_$(date +%Y-%m-%d).md"
+          fi
+
+      # ─── 第五.8步：反转数值周线信号上传+推送（信号md已由复盘步骤生成）───
+      - name: 反转数值周线信号上传推送
+        if: always()  # 防阻断：前置步骤失败仍执行
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          if [ -f "outputs/反转数值周线信号_$(date +%Y-%m-%d).md" ]; then
+            python3 upload_ima.py --file "outputs/反转数值周线信号_$(date +%Y-%m-%d).md" --name "反转数值周线信号_$(date +%Y-%m-%d).md"
+            python3 quant_scripts/reversal_funnel_screener.py --push-only --file "outputs/反转数值周线信号_$(date +%Y-%m-%d).md" || true
+          fi
+
+      - name: 推送扫描结果到微信+邮件（完整版报告）
+        if: always()
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          PUSH_SERVICE: pushplus
+          FULL_REPORT_FILE: /home/runner/work/bg/bg/panhou_lianghua.md
+          RUN_NUMBER: ${{ github.run_number }}
+          MAIL_ENABLED: ${{ secrets.MAIL_ENABLED }}
+          MAIL_SMTP: ${{ secrets.MAIL_SMTP }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASS: ${{ secrets.MAIL_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: python3 push_notify.py
+
+      # ─── 第六步：运行成功 → 自动更新CHANGELOG版本记录（仅在有新commit时触发）───
+      - name: 自动更新版本记录到CHANGELOG
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 update_changelog.py
+
+      # ─── 第七步：体系自检（健康评分 + 市场状态检测 + 自动修复）───
+      - name: 体系自检 — 健康评分 / 市场状态 / 异常检测
+        if: always()  # 即使上传失败也执行自检
+        continue-on-error: true
+        run: |
+          echo "🔍 体系自检开始..."
+          python3 self_check.py --csv panhou_lianghua.csv --mainboard all_mainboard.csv --fix
+          echo "✅ 自检完成，结果写入 health_status.json"
+
+      - name: 推送自检报告到微信
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          if [ -f health_status.json ]; then
+            SCORE=$(python3 -c "import json; print(json.load(open('health_status.json'))['health_score'])")
+            GRADE=$(python3 -c "import json; print(json.load(open('health_status.json'))['health_grade'])")
+            REGIME=$(python3 -c "import json; print(json.load(open('health_status.json'))['market_regime'])")
+            ISSUES=$(python3 <<'PYEOF'
+            import json
+            d = json.load(open('health_status.json'))
+            all_i = []
+            for k, v in d.get('checks', {}).items():
+                if isinstance(v, dict):
+                    all_i.extend(v.get('issues', []))
+            print('; '.join(all_i[:3]) if all_i else '无')
+            PYEOF
+            )
+            MSG="🏥 体系自检报告 - $(date +%Y-%m-%d)\n\n健康评分: ${SCORE}/100 (${GRADE})\n市场状态: ${REGIME}\n问题摘要: ${ISSUES}"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=🏥体系自检&content=${MSG}&template=txt" > /dev/null
+          fi
