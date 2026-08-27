@@ -42,26 +42,43 @@ def get_json(url, retries=3):
             time.sleep(1.0 * (i + 1))
 
 
+def _calc_amount(node):
+    """从K线节点计算近RECENT日日均成交额(元)，无数据返回 0.0"""
+    kl = node.get("qfqday") or node.get("day") or []
+    tot, n = 0.0, 0
+    for k in kl:
+        if len(k) < 6:
+            continue
+        o, c, h, l, v = float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5])
+        avg = (o + h + l + c) / 4.0
+        tot += v * 100 * avg        # 手→股 × 均价 = 元
+        n += 1
+    return tot / n if n else 0.0
+
+
 def est_daily_amount(code):
     """返回 近RECENT日 日均估算成交额(元)。无数据返回 0.0。"""
     url = f"{KLINE}?param={code},day,,,{RECENT},qfq"
     try:
         d = get_json(url)
-        node = d.get("data", {}).get(code, {})
-        kl = node.get("qfqday") or node.get("day") or []
-        tot, n = 0.0, 0
-        for k in kl:
-            if len(k) < 6:
-                continue
-            o, c, h, l, v = float(k[1]), float(k[2]), float(k[3]), float(k[4]), float(k[5])
-            avg = (o + h + l + c) / 4.0
-            tot += v * 100 * avg        # 手→股 × 均价 = 元
-            n += 1
-        if n == 0:
-            return 0.0
-        return tot / n
+        return _calc_amount(d.get("data", {}).get(code, {}))
     except Exception:
         return 0.0
+
+
+def est_batch(codes):
+    """批量估算（2026-08-28提速：腾讯fqkline支持分号多股，50只/批）。
+    返回 {code: amt}；批量失败返回 None（调用方降级单股）"""
+    url = f"{KLINE}?param=" + ";".join(f"{c},day,,,{RECENT},qfq" for c in codes)
+    try:
+        d = get_json(url)
+        data = d.get("data", {}) or {}
+        out = {}
+        for c in codes:
+            out[c] = _calc_amount(data.get(c, {}))
+        return out
+    except Exception:
+        return None
 
 
 def main():
@@ -83,15 +100,25 @@ def main():
                 codes.append(("sh" if c[0] == "6" else "sz") + c)
     print(f"      主板 {len(codes)} 只")
 
-    print(f"[2/3] 估算近{RECENT}日日均成交额 ...")
-    scored = []
-    for i, code in enumerate(codes, 1):
-        amt = est_daily_amount(code)
-        scored.append((amt, code))
-        if i % 500 == 0:
-            print(f"      进度 {i}/{len(codes)}")
-        time.sleep(0.02)
-    scored.sort(reverse=True)
+    print(f"[2/3] 估算近{RECENT}日日均成交额（批量50只/批 × 8并发，2026-08-28提速）...")
+    from concurrent.futures import ThreadPoolExecutor
+    scored = {}
+    batches = [codes[i:i + 50] for i in range(0, len(codes), 50)]
+
+    def _batch(cs):
+        r = est_batch(cs)
+        if r is None:  # 批量失败 → 降级单股
+            return {c: est_daily_amount(c) for c in cs}
+        return r
+
+    done = 0
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        for r in ex.map(_batch, batches):
+            scored.update(r)
+            done += len(r)
+            if done % 1000 == 0:
+                print(f"      进度 {done}/{len(codes)}")
+    scored = sorted(((amt, c) for c, amt in scored.items()), reverse=True)
     top = scored[:TOP_N]
     core_codes = {c for c, _ in CORE}
 
