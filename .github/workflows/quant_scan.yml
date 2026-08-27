@@ -236,3 +236,26 @@ jobs:
               top_signal_latest.json board_top_latest.json panhou_lianghua.csv \
               all_mainboard.csv ima_cred_last_ok.json pools/pool_$(date +%Y-%m).json
           fi
+
+      # ─── 关键产物完整性检查（2026-08-28：任一关键步骤失败→微信告警明细）───
+      - name: 关键扫描产物检查（缺失即告警）
+        if: always()  # 无论成败都检查
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          MISSING=""
+          for f in panhou_lianghua.csv market_width_latest.json yearline_breadth_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 板块共振_latest.json; do
+            if [ ! -f "$f" ] && [ ! -f "outputs/$f" ]; then
+              MISSING="$MISSING $f"
+            fi
+          done
+          # 三系统产物（commit后复制为latest，检查实际产物）
+          if [ ! -f "quant_results_latest.json" ] && ! ls outputs/quant_results_*.json >/dev/null 2>&1; then MISSING="$MISSING quant_results"; fi
+          if [ ! -f "fish_body_latest.json" ] && ! ls outputs/fish_body_enhanced_*.json >/dev/null 2>&1; then MISSING="$MISSING fish_body"; fi
+          if [ -n "$MISSING" ]; then
+            echo "::warning::关键产物缺失:$MISSING"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️扫描部分缺失&content=全盘量化扫描完成但关键产物缺失:${MISSING}（查看workflow日志定位）&template=txt" > /dev/null || true
+          else
+            echo "✅ 关键产物完整（扫描链路9项全齐）"
+          fi
