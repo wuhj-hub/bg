@@ -242,6 +242,21 @@ def main():
         code, name, phase, precip = item
         full = ("sh" if code.startswith("6") else "sz") + code
         fs = score_fund(phase, precip)
+        # 性能优化（2026-08-27）：资金0分股票跳过筹码/关联方网络查询（chip/lhb/blocktrade），
+        # 仅保留 asfund 资金四层（调用量从 4次/只 降至 1次/只，全池耗时 1h16m → ~20m）。
+        # 资金0分时 total ≤ 0+0+0+policy(+中军1)，永远进不了 TOP 输出，语义不受影响。
+        if fs == 0:
+            fl = fund_layer_check(full)
+            bonus = ""
+            if full in zhongjun_map:
+                bonus = f"🎯板块中军({zhongjun_map[full]})"
+            total = fs + 0 + 0 + policy + (1 if bonus else 0)
+            level = "★★★ 必然级" if total >= 10 else "★★ 高置信" if total >= 7 else "★ 弱共振" if total >= 4 else "无共振"
+            return {"code": code, "name": name, "fund": fs, "chip": 0, "related": 0,
+                    "policy": policy, "total": total, "level": level, "veto": "",
+                    "chip_detail": "未查(资金0分)", "related_detail": "未查(资金0分)", "bonus": bonus,
+                    "fund_tag": (fl or {}).get("tag", ""),
+                    "fund_layers": (fl or {})}
         cs, cd = score_chip(full)
         rs, rd = score_related(full)
         fl = fund_layer_check(full)  # 四层资金验证（洗盘/出货标签）
@@ -266,7 +281,7 @@ def main():
                 "fund_layers": (fl or {})}
 
     results = []
-    with ThreadPoolExecutor(max_workers=4) as ex:
+    with ThreadPoolExecutor(max_workers=8) as ex:
         for r in ex.map(work, stocks):
             if r:
                 results.append(r)
