@@ -472,6 +472,33 @@ def main():
     json_path = os.path.join(OUT_DIR, "信号仲裁_latest.json")
     open(json_path, "w", encoding="utf-8").write(json.dumps(js, ensure_ascii=False, indent=1))
 
+    # 仲裁信号源日志累积（2026-08-28 P1：供月度权重校准——按信号源统计胜率）
+    # 字段: date,code,pts,level,src,rsg_dev；同(date,code)去重，仅累积不删除
+    try:
+        import csv as _csv
+        os.makedirs("logs", exist_ok=True)
+        log_path = "logs/arbiter_signals_log.csv"
+        new_rows = []
+        for r in ranked[:top_n]:
+            new_rows.append({"date": today, "code": r["code"], "pts": r["pts"],
+                             "level": r["level"], "src": "|".join(r["src"][:5]),
+                             "rsg_dev": r.get("rsg_dev", "")})
+        if os.path.exists(log_path):
+            with open(log_path, encoding="utf-8") as f:
+                seen = {(row["date"], row["code"]) for row in _csv.DictReader(f)}
+        else:
+            seen = set()
+        fresh = [row for row in new_rows if (row["date"], row["code"]) not in seen]
+        if fresh:
+            with open(log_path, "a", encoding="utf-8", newline="") as f:
+                w = _csv.DictWriter(f, fieldnames=["date", "code", "pts", "level", "src", "rsg_dev"])
+                if not os.path.exists(log_path) or os.path.getsize(log_path) == 0:
+                    w.writeheader()
+                w.writerows(fresh)
+            print(f"[日志] 仲裁信号累积 {len(fresh)} 条 → {log_path}")
+    except Exception as e:
+        print(f"[WARN] 仲裁日志写入失败: {e}")
+
     L = [f"# ⚖️ 六套信号仲裁 {today}", "",
          f"> 数据源：四维{len(four)}只 / 鱼身{len(fish)} / 猛兽Setup{len(beast)} / 双弦{len(sx)} / 乾坤{len(qk)} / 武威{len(wuwei)} / 反转{len(reversal)}",
          "> 仲裁权重：四维高置信+3｜猛兽Setup≥60+3/≥50+2｜乾坤A+2｜鱼身加油≥70+2｜伏击/RS_D/G点+1｜双弦共振+1｜四维否决-3",
