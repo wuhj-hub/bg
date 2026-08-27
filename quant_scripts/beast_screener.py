@@ -81,6 +81,25 @@ def is_not_st(name: str) -> bool:
     if not name: return False
     return not ('ST' in name or '*ST' in name)
 
+def load_rsg_map() -> dict:
+    """读取 RSV 扫描的 RSG 强势标注（2026-08-27：周线RS偏离52周均线>50‰=强势侧）
+    返回 {code: {rsg_dev, rsg_strong}}；失败返回空dict。仅供标注，不强制过滤。"""
+    rsg = {}
+    for p in ("outputs/rsv_strength_latest.json", "rsv_strength_latest.json",
+              "quant_scripts/outputs/rsv_strength_latest.json"):
+        if os.path.exists(p):
+            try:
+                d = json.load(open(p, encoding="utf-8"))
+                for r in (d.get("launch", []) + d.get("hold", []) + d.get("exit", [])):
+                    if r.get("code"):
+                        rsg[r["code"]] = {"rsg_dev": r.get("rsg_dev"),
+                                          "rsg_strong": bool(r.get("rsg_strong"))}
+                break
+            except Exception:
+                continue
+    return rsg
+
+
 def parse_kline_df(code: str, limit: int = 60) -> pd.DataFrame:
     """获取K线并解析为DataFrame (时间正序)"""
     raw = cli(f"kline {code} --period day --limit {limit}")
@@ -1786,8 +1805,9 @@ def main():
     print("🟢 二、领先股 — 强势突破信号 (Setup≥40 + 突破强 + RSVA高)")
     print("=" * 72)
     if leaders:
-        print(f"  {'代码':<11} {'名称':<7} {'总分':>4} {'突破':>4} {'RSVA':>5} {'孤狼':>6} {'近高点':>6}  模式  {'月线'}  {'评级'}")
-        print("  " + "-" * 78)
+        _rsg_map = load_rsg_map()
+        print(f"  {'代码':<11} {'名称':<7} {'总分':>4} {'突破':>4} {'RSVA':>5} {'孤狼':>6} {'近高点':>6}  模式  {'月线'}  {'RSG'}  {'评级'}")
+        print("  " + "-" * 86)
         for s in leaders:
             d = s["details"]
             lead_tag = f"+{d.get('lead_over_index',0):.0f}%" if d.get('lead_over_index',0) else ""
@@ -1806,6 +1826,9 @@ def main():
                 m_tag = "🔴空头"
             else:
                 m_tag = "—"
+            _rg = _rsg_map.get(s['code'], {})
+            _rd = _rg.get('rsg_dev')
+            rsg_txt = "🟢强势" if _rg.get('rsg_strong') else ("🟡偏离" if _rd is not None and _rd > 0 else "⚪弱势")
             print(f"  {s['code']:<11} {s['name']:<7} "
                   f"{s['setup_total']:>3}/{100:<2} "
                   f"{s['breakout_score']:>2}/{15:<2} "
@@ -1814,6 +1837,7 @@ def main():
                   f"{d.get('dist_from_high_pct',0):>4.1f}% "
                   f"{mode_tag:>4} "
                   f"{m_tag:>6} "
+                  f"{rsg_txt:>5} "
                   f"{level}{gap_mark}{gpoint_mark}")
     else:
         print(f"  ⚠️ 当前无符合条件的领先股")
