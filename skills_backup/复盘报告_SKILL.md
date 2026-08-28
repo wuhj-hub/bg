@@ -149,19 +149,6 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/hot_emotion.py --da
 
 > 若 tdx 数据不可用（接口异常/非交易日），标注占位，不影响报告完整性。
 
-#### 5.5 市场图表生成（新增·market_charts 情绪图+三系统温度图）
-
-收盘后运行市场图表生成器，产出月度情绪走势图与三系统温度图，随复盘报告上传知识库：
-
-```bash
-# 第一步：hot_emotion 已生成当日情绪数据（Step 5.4）
-# 第二步：追加当日三系统温度（从 quant_results 提取双弦/猛兽/鱼身温度）并生成图表
-python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_charts.py \
-  --append-temp {双弦温度} {猛兽评分} {鱼身温度} --date {date}
-```
-
-输出 `scripts/outputs/市场情绪走势_{YYYY-MM}.png` + `三系统温度走势_{YYYY-MM}.png`，嵌入复盘报告「⑤ 附图」或上传知识库。若无历史数据（首次运行），自动提示跳过。
-
 #### 5.5 年线广度复盘（市场牛熊结构 · 中期）
 
 读取当日年线广度指标（yearline_breadth.py），验证市场牛熊结构变化：
