@@ -131,7 +131,6 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/signal_verify.py
 - 猛兽领先股 vs 盘后量化信号交集
 
 #### 5.4 热点情绪复盘（新增·hot_emotion模块）
-
 收盘后用通达信 tdx_screener 涨停数据跑热点情绪模块，验证当日题材生态：
 
 ```bash
@@ -149,6 +148,35 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/hot_emotion.py --da
 **盘前验证应用**：与盘前报告②.5（昨日情绪温度）对照——盘前若提示"中性/谨慎接力"，当日实际连板高度或主线是否验证；将结论写入 Step 6 明日展望（情绪升温→题材接力空间打开 / 情绪降温→继续回避追高）。
 
 > 若 tdx 数据不可用（接口异常/非交易日），标注占位，不影响报告完整性。
+
+#### 5.5 市场图表生成（新增·market_charts 情绪图+三系统温度图）
+
+收盘后运行市场图表生成器，产出月度情绪走势图与三系统温度图，随复盘报告上传知识库：
+
+```bash
+# 第一步：hot_emotion 已生成当日情绪数据（Step 5.4）
+# 第二步：追加当日三系统温度（从 quant_results 提取双弦/猛兽/鱼身温度）并生成图表
+python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_charts.py \
+  --append-temp {双弦温度} {猛兽评分} {鱼身温度} --date {date}
+```
+
+输出 `scripts/outputs/市场情绪走势_{YYYY-MM}.png` + `三系统温度走势_{YYYY-MM}.png`，嵌入复盘报告「⑤ 附图」或上传知识库。若无历史数据（首次运行），自动提示跳过。
+
+#### 5.5 年线广度复盘（市场牛熊结构 · 中期）
+
+读取当日年线广度指标（yearline_breadth.py），验证市场牛熊结构变化：
+
+```bash
+# 读取当日结构化数据（盘前/独立任务已生成）
+python3 /sandbox/workspace/yearline/yearline_section.py --json /sandbox/workspace/yearline/outputs/yearline_breadth_latest.json
+```
+
+复盘要点：
+- **结构对比**：今日站上年线占比 vs 历史序列（2026-04底2923/05底2166/06底1603/07底863，全A口径），判断广度趋势（恶化/企稳/修复）
+- **临界标的**：距年线最近的前5只（突破=广度修复信号 / 跌破=结构恶化信号），关注其后续走向
+- **结构验证**：与盘前/复盘的市场宽度（日频温度）、大盘温度计交叉验证——"温度回升但年线广度持续低位"= 超跌反弹性质（非反转）
+
+> 若 yearline_breadth_latest.json 缺失（未运行），标注占位，不影响报告完整性。
 
 ### Step 6：明日展望
 
