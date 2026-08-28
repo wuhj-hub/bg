@@ -1,0 +1,13 @@
+{
+ "date": "2026-08-28",
+ "days": 30,
+ "buy_rate": 0,
+ "sell_rate": 0,
+ "buy_candidates": 0,
+ "buy_done": 0,
+ "sell_candidates": 0,
+ "sell_done": 0,
+ "missed_buy": [],
+ "missed_sell": [],
+ "journal_count": 0
+}
