@@ -1,14 +1,14 @@
 {
  "date": "2026-08-28",
  "data_date": "2026-08-28",
- "style": "情绪市",
- "icon": "🔥",
- "score": 31,
+ "style": "均衡市",
+ "icon": "⚖️",
+ "score": 22,
  "score_detail": {
   "size_style": 5,
   "limitup_structure": 16,
-  "volume_structure": 7,
-  "sector_fund": 3
+  "volume_structure": 0,
+  "sector_fund": 1
  },
  "size_style": {
   "hs300_5d": -0.21,
@@ -33,31 +33,30 @@
  },
  "volume_structure": {
   "small_big_ratio_now": 1.326,
-  "small_big_ratio_5d": 1.219,
-  "small_vol_pulse": 105.15
+  "small_big_ratio_5d": 1.219
  },
  "sector_fund": {
   "sectors": [
-   {
-    "name": "昨日连板",
-    "zdf": "5.06",
-    "main_net5d": -14.1,
-    "retail_net": 10.3,
-    "tag": "游资型"
-   },
-   {
-    "name": "软件开发",
-    "zdf": "0.60",
-    "main_net5d": 18.8,
-    "retail_net": -22.5,
-    "tag": "机构型"
-   },
    {
     "name": "房地产开发",
     "zdf": "0.66",
     "main_net5d": -1.1,
     "retail_net": 1.4,
     "tag": "游资型"
+   },
+   {
+    "name": "房地产开发概念",
+    "zdf": "1.43",
+    "main_net5d": 1.4,
+    "retail_net": 1.2,
+    "tag": "混合"
+   },
+   {
+    "name": "种植业",
+    "zdf": "2.16",
+    "main_net5d": 9.7,
+    "retail_net": -3.0,
+    "tag": "机构型"
    },
    {
     "name": "基础化工",
@@ -67,10 +66,10 @@
     "tag": "机构型"
    },
    {
-    "name": "化学制药",
-    "zdf": "-0.73",
-    "main_net5d": -35.8,
-    "retail_net": 9.9,
+    "name": "昨日连板",
+    "zdf": "5.06",
+    "main_net5d": -14.1,
+    "retail_net": 10.3,
     "tag": "游资型"
    }
   ]
@@ -78,19 +77,19 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 11,
-   "欧马模式": 4
+   "堆量模式": 6,
+   "欧马模式": 7
   },
   "leaders": {
-   "堆量模式": 8,
+   "堆量模式": 5,
+   "欧马模式": 2
+  },
+  "pullbacks": {
    "欧马模式": 1
   },
-  "pullbacks": {},
-  "gpoints": {
-   "堆量模式": 1
-  },
-  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
-  "total_scored": 15
+  "gpoints": {},
+  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
+  "total_scored": 13
  },
- "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
+ "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
 }
