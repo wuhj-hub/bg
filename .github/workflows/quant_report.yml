@@ -39,9 +39,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: 安装 Python 依赖（pandas+numpy for 猛兽）
+      - name: 安装 Python 依赖（pandas+numpy+matplotlib）
         run: |
-          pip install pandas numpy
+          pip install pandas numpy matplotlib
 
       # ─── 上游扫描结果检查：扫描workflow失败则不生成报告（避免基于旧数据误导）───
       - name: 上游扫描结果检查（失败则告警退出）
@@ -269,6 +269,17 @@ jobs:
           python3 quant_scripts/reversal_funnel_screener.py --weeks 2 --max-price 10 || echo "反转数值扫描失败, 复盘继续"
           python3 quant_scripts/gen_review_report.py
           python3 quant_scripts/report_selfcheck.py --review "outputs/复盘报告_$(date +%Y-%m-%d).md" --today "$(date +%Y-%m-%d)" --alert || echo "自检发现问题(已推送报警), 不阻断流程"
+          # 市场图表生成（情绪图+三系统温度图，温度从 quant_results 自动提取）
+          if [ -f "outputs/quant_results_$(date +%Y-%m-%d).json" ] || [ -f "quant_results_latest.json" ]; then
+            python3 skills_backup/盘前市场报告/scripts/market_charts.py --from-quant --date "$(date +%Y-%m-%d)" --hist-dir outputs/ || echo "图表生成失败, 不阻断复盘"
+            # 上传两张图到知识库「复盘报告」文件夹
+            for CHART in 市场情绪走势 三系统温度走势; do
+              F="outputs/${CHART}_$(date +%Y-%m).png"
+              if [ -f "$F" ]; then
+                python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "图表上传失败(非致命)"
+              fi
+            done
+          fi
 
       # ─── 第五.6步：股池信号实盘胜率跟踪（每日累积，2-4周后可对比回测）───
       - name: 股池信号实盘胜率跟踪
