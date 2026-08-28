@@ -104,25 +104,6 @@ python3 /sandbox/workspace/skills/猛兽体系/scripts/beast_screener.py > /sand
 > ⚠️ 非交易日跳过（无新K线数据）
 > ⚠️ 若用户急用报告且夜间数据尚未生成，跳过此步骤直接采集
 
-### Step 1.6：读取信号仲裁·今日操作清单（P0-1 统一出口 · 2026-08-26新增）
-
-盘前报告的"个股机会"章节直接引用 `signal_arbiter.py` 输出的 **今日操作清单**（唯一执行出口），不再各自引用分散信号：
-
-```bash
-# 从 GitHub 拉取最新信号仲裁结果（含操作清单 buy/watch/avoid）
-curl -s -H "Authorization: token $GITHUB_TOKEN" \
-  "https://api.github.com/repos/wuhj-hub/bg/contents/信号仲裁_latest.json" | \
-  python3 -c "import sys,json,base64; d=json.load(sys.stdin); open('/tmp/信号仲裁_latest.json','wb').write(base64.b64decode(d['content']))"
-```
-
-**操作清单结构**（JSON `operations` 字段）：
-- `buy`（🟢 买入候选）：总分≥5（★★/★★★）+ 月线非BLOCK + 风控卡✅ → 报告标注仓位（≤pos_pct%）
-- `watch`（🟡 观察池）：总分≥3（★）
-- `avoid`（🔴 规避/卖出）：四维否决 / 月线BLOCK / RSV离场
-- 市场级：`market_top`（见顶五维≥3 → 全文标注顶部区域）、`market_width`（<25 弱势禁新仓）
-
-> ⚠️ 若拉取失败（workflow 未跑），回退：搜索知识库「报告」→「复盘报告」文件夹中当日 `信号仲裁_YYYY-MM-DD.md`
-
 ### Step 2：数据采集（并行执行）
 
 启动子代理并行采集以下数据：
@@ -333,6 +314,24 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/hot_emotion.py --da
 **自动化降级**：GitHub Actions/无 tdx 环境用 westock 批量K线自算（无题材/封单明细）：`python3 hot_emotion.py --date {date} --westock --kline-file {westock_kline_output.txt}`。
 
 若 tdx 数据不可用（接口异常/非交易日），自动提示占位，不影响报告完整性。
+
+#### 2.14 市场图表生成（新增·market_charts 情绪图+三系统温度图）
+
+收盘后自动生成两张可视化图（固化于 2026-08-28，供报告引用/知识库上传）：
+
+```bash
+# 追加当日三系统温度（盘前从 quant_results 提取双弦/猛兽/鱼身温度）后生成图表
+python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_charts.py \
+  --append-temp {双弦温度} {猛兽评分} {鱼身温度} --date {date}
+# 或仅重新生成（数据已累积）
+python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_charts.py
+```
+
+输出（`scripts/outputs/`）：
+- `市场情绪走势_{YYYY-MM}.png` — 情绪温度折线 + 涨停家数柱 + 连板标注 + 等级带（数据源 hot_emotion_history.json，每日 hot_emotion 自动累积）
+- `三系统温度走势_{YYYY-MM}.png` — 双弦/猛兽/鱼身温度折线 + 冷暖等级带（数据源 system_temp_history.json，--append-temp 追加）
+
+每日运行 hot_emotion.py 后调用本脚本即可自动积累曲线；图表可嵌入盘前报告或上传知识库。数据不足时自动提示跳过，不影响报告完整性。
 
 ### Step 3：智能提醒分析
 
