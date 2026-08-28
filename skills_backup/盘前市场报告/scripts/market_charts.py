@@ -198,17 +198,73 @@ def plot_system():
     return out
 
 
+def extract_from_quant(date):
+    """从 quant_results_{date}.json 提取三系统温度（workflow 自动模式）"""
+    import re
+    path = os.path.join(OUT_DIR, f'quant_results_{date}.json')
+    if not os.path.exists(path):
+        # 仓库根（workflow cwd）
+        path = f'quant_results_{date}.json'
+    if not os.path.exists(path):
+        print(f'⚠️ 未找到 quant_results_{date}.json，跳过温度提取')
+        return None
+    try:
+        with open(path, encoding='utf-8') as f:
+            q = json.load(f)
+    except Exception as e:
+        print(f'⚠️ quant_results 解析失败: {e}')
+        return None
+
+    # 猛兽：从 stdout 正则解析 "安全评分: XX.X/100"
+    beast = None
+    bs_out = q.get('beast', {}).get('stdout', '') or ''
+    m = re.search(r'安全评分:\s*(\d+\.?\d*)/100', bs_out)
+    if m:
+        beast = float(m.group(1))
+
+    # 鱼身：market_temp.temp
+    fish = q.get('fishbody', {}).get('market_temp', {}).get('temp')
+
+    # 双弦：stdout 温度计（多种格式兜底）
+    sx = None
+    sx_out = q.get('shuangxian', {}).get('stdout', '') or ''
+    m = re.search(r'温度(?:计)?[:：]\s*(\d+\.?\d*)/100', sx_out)
+    if not m:
+        m = re.search(r'大盘温度(?:计)?[:：]?\s*(\d+\.?\d*)', sx_out)
+    if not m:
+        m = re.search(r'温度计:\s*(\d+\.?\d*)/100', sx_out)
+    if m:
+        sx = float(m.group(1))
+
+    print(f'📊 提取 {date}: 双弦{sx} 猛兽{beast} 鱼身{fish}')
+    return sx, beast, fish
+
+
 def main():
+    global OUT_DIR, EMOTION_HIST, TEMP_HIST
     ap = argparse.ArgumentParser(description='市场图表生成器（情绪图+三系统温度图）')
     ap.add_argument('--append-temp', nargs=3, type=float, metavar=('双弦', '猛兽', '鱼身'),
                     help='追加当日三系统温度到历史（如 --append-temp 49 49.5 45）')
+    ap.add_argument('--from-quant', action='store_true',
+                    help='从 outputs/quant_results_{date}.json 自动提取温度并追加（workflow 模式）')
+    ap.add_argument('--hist-dir', default=None, help='历史文件目录（默认 scripts/outputs）')
     ap.add_argument('--date', default=datetime.now().strftime('%Y-%m-%d'), help='日期 YYYY-MM-DD')
     args = ap.parse_args()
 
+    if args.hist_dir:
+        os.makedirs(args.hist_dir, exist_ok=True)
+        OUT_DIR = args.hist_dir
+        EMOTION_HIST = os.path.join(OUT_DIR, "hot_emotion_history.json")
+        TEMP_HIST = os.path.join(OUT_DIR, "system_temp_history.json")
     os.makedirs(OUT_DIR, exist_ok=True)
 
     if args.append_temp:
         append_temp(args.append_temp[0], args.append_temp[1], args.append_temp[2], args.date)
+
+    if args.from_quant:
+        temps = extract_from_quant(args.date)
+        if temps and any(t is not None for t in temps):
+            append_temp(temps[0], temps[1], temps[2], args.date)
 
     plot_emotion()
     plot_system()
