@@ -1,6 +1,6 @@
 {
   "market_temp": {
-    "temp": 50,
+    "temp": 45,
     "level": "中性",
     "idx": "3952.18"
   },
@@ -82,7 +82,7 @@
       "price": 40.13,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.81)>=DEA(0.74)金叉",
+        "DIF(0.80)>=DEA(0.74)金叉",
         "MACD柱0.130刚翻红加油成功",
         "收盘40.13>MA538.52",
         "KDJ_J=50未超买"
@@ -343,7 +343,7 @@
       "price": 13.91,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.40)>=DEA(0.34)金叉",
+        "DIF(0.39)>=DEA(0.34)金叉",
         "MACD柱0.100刚翻红加油成功",
         "收盘13.91>MA513.5",
         "MA20>MA60多头排列"
@@ -537,7 +537,7 @@
       "reasons": [
         "DIF/DEA在0轴上方",
         "DIF(0.34)>=DEA(0.25)金叉",
-        "MACD柱0.18>0但已走高",
+        "MACD柱0.19>0但已走高",
         "收盘18.77>MA517.95",
         "MA20>MA60多头排列",
         "KDJ_J=75未超买"
@@ -600,7 +600,7 @@
       "resonance": "共振向上",
       "price": 20.91,
       "reasons": [
-        "MA20(16.03)>MA60(15.29)多头",
+        "MA20(16.03)>MA60(15.28)多头",
         "近3日涨幅21.0%（高阳）",
         "放量9.6倍",
         "收盘20.91>MA517.73",
@@ -1042,7 +1042,7 @@
       "reasons": [
         "DIF/DEA在0轴上方",
         "DIF(0.07)>=DEA(0.03)金叉",
-        "MACD柱0.090刚翻红加油成功",
+        "MACD柱0.080刚翻红加油成功",
         "收盘11.02>MA510.97"
       ],
       "stop_loss": "10.42",
@@ -1249,7 +1249,7 @@
       "resonance": "共振向上",
       "price": 20.91,
       "reasons": [
-        "MA20(16.03)>MA60(15.29)",
+        "MA20(16.03)>MA60(15.28)",
         "MACD金叉(DIF=0.93)",
         "KDJ向上(J=106)",
         "收盘20.91>MA517.73",
@@ -1566,38 +1566,6 @@
       "rsg_strong": false
     },
     {
-      "code": "sz002966",
-      "name": "苏州银行",
-      "pattern": "均线回踩支撑",
-      "raw_score": 75,
-      "final_score": 70,
-      "multi_score": 68,
-      "resonance": "共振向上",
-      "price": 8.72,
-      "reasons": [
-        "MA20(8.50)>MA60(7.99)多头",
-        "MACD在0轴上方",
-        "在MA10附近(偏离0.9%)",
-        "收盘8.72>MA58.7",
-        "站在布林中轨上方"
-      ],
-      "stop_loss": "8.07",
-      "target": "9.77",
-      "mode": 2,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向上",
-        "stock": "个股强势",
-        "resonance": "共振向上",
-        "score": 100
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
       "code": "sz002918",
       "name": "蒙娜丽莎",
       "pattern": "MACD空中加油",
@@ -1735,7 +1703,7 @@
       "price": 20.05,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.55)>=DEA(0.48)金叉",
+        "DIF(0.54)>=DEA(0.48)金叉",
         "MACD柱0.130刚翻红加油成功",
         "收盘20.05>MA519.82",
         "MA20>MA60多头排列"
@@ -1966,38 +1934,6 @@
       "rsg_strong": true
     },
     {
-      "code": "sz002966",
-      "name": "苏州银行",
-      "pattern": "MACD空中加油",
-      "raw_score": 70,
-      "final_score": 65,
-      "multi_score": 68,
-      "resonance": "共振向上",
-      "price": 8.72,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.18)>=DEA(0.17)金叉",
-        "收盘8.72>MA58.7",
-        "MA20>MA60多头排列",
-        "KDJ_J=66未超买"
-      ],
-      "stop_loss": "8.26",
-      "target": "10.03",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向上",
-        "stock": "个股强势",
-        "resonance": "共振向上",
-        "score": 100
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
       "code": "sz003015",
       "name": "日久光电",
       "pattern": "均线回踩支撑",
@@ -2026,6 +1962,38 @@
       "month_trend": "空头",
       "month_gate": "BLOCK",
       "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002966",
+      "name": "苏州银行",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 64,
+      "multi_score": 62,
+      "resonance": "部分共振",
+      "price": 8.72,
+      "reasons": [
+        "MA20(8.50)>MA60(7.99)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离0.9%)",
+        "收盘8.72>MA58.7",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "8.07",
+      "target": "9.77",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向上",
+        "stock": "个股中性",
+        "resonance": "部分共振",
+        "score": 70
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": null,
       "rsg_strong": false
     },
@@ -2231,7 +2199,7 @@
       "resonance": "部分共振",
       "price": 8.71,
       "reasons": [
-        "MA20(8.34)>MA60(7.95)多头",
+        "MA20(8.34)>MA60(7.94)多头",
         "MACD在0轴上方",
         "在MA10附近(偏离1.6%)",
         "收盘8.71>MA58.64",
@@ -2539,6 +2507,38 @@
       "month_gate": "WARN",
       "month_reversal": null,
       "rsg_dev": -2.4,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002966",
+      "name": "苏州银行",
+      "pattern": "MACD空中加油",
+      "raw_score": 70,
+      "final_score": 60,
+      "multi_score": 62,
+      "resonance": "部分共振",
+      "price": 8.72,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.18)>=DEA(0.18)金叉",
+        "收盘8.72>MA58.7",
+        "MA20>MA60多头排列",
+        "KDJ_J=66未超买"
+      ],
+      "stop_loss": "8.26",
+      "target": "10.03",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向上",
+        "stock": "个股中性",
+        "resonance": "部分共振",
+        "score": 70
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": null,
       "rsg_strong": false
     },
     {
