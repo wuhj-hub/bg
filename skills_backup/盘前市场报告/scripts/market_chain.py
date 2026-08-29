@@ -190,7 +190,72 @@ def render_beast(beast_file):
     return "\n".join(L)
 
 
-def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, beast_file=None):
+def parse_quant_extra(q):
+    """从 quant_results_{date}.json 解析双弦+鱼身快照数据"""
+    out = {}
+    # 双弦
+    sx = q.get("shuangxian", {})
+    sx_out = sx.get("stdout", "") or ""
+    temp = None
+    for pat in [r'温度计[:：]?\s*(\d+\.?\d*)/100', r'大盘温度[:：]?\s*(\d+\.?\d*)/100',
+                r'温度[:：]\s*(\d+\.?\d*)/100']:
+        m = re.search(pat, sx_out)
+        if m:
+            temp = float(m.group(1))
+            break
+    out['sx_temp'] = temp
+    pd = sx.get("pool_data", {}) or {}
+    if isinstance(pd, dict):
+        out['sx_total'] = pd.get("total_count")
+        entries = pd.get("entries", []) or []
+        res = sum(1 for e in entries if isinstance(e, dict) and e.get("signal_type") == "共振")
+        dip = sum(1 for e in entries if isinstance(e, dict) and e.get("signal_type") == "低吸")
+        out['sx_res'] = res or None
+        out['sx_dip'] = dip or None
+        if entries:
+            top = []
+            for e in entries[:3]:
+                if isinstance(e, dict):
+                    top.append((e.get("code", ""), e.get("score", "")))
+            out['sx_top'] = top
+    # 鱼身
+    fb = q.get("fishbody", {})
+    mt = fb.get("market_temp", {}) or {}
+    out['fish_temp'] = mt.get("temp")
+    out['fish_level'] = mt.get("level")
+    out['fish_signal'] = fb.get("signal_count")
+    return out
+
+
+def render_shuangxian(info):
+    L = ["### 🔗 双弦体系快照（方向+股池）"]
+    if 'sx_temp' in info and info['sx_temp'] is not None:
+        L.append(f"- 🧭 **大盘温度**：{info['sx_temp']:.0f}/100")
+    if 'sx_total' in info and info['sx_total'] is not None:
+        res = info.get('sx_res', 0) or 0
+        dip = info.get('sx_dip', 0) or 0
+        L.append(f"- 💰 **月度股池**：共 {info['sx_total']} 只（共振 {res} / 低吸 {dip}）")
+    if info.get('sx_top'):
+        top_txt = "、".join(f"{c}({s}分)" for c, s in info['sx_top'] if c)
+        L.append(f"- ⭐ **核心标的**：{top_txt}")
+    if len(L) > 1:
+        return "\n".join(L)
+    return "- 🔗 **双弦**：数据缺失"
+
+
+def render_fishbody(info):
+    L = ["### 🐟 鱼身体系快照（开关+信号）"]
+    if 'fish_temp' in info and info['fish_temp'] is not None:
+        L.append(f"- 🌡️ **大盘温度**：{info['fish_temp']:.0f}/100"
+                 + (f"（{info.get('fish_level','')}）" if info.get('fish_level') else ""))
+    if 'fish_signal' in info and info['fish_signal'] is not None:
+        L.append(f"- 📡 **交易信号**：{info['fish_signal']} 个（空中加油/均线回踩/箱体突破）")
+    if len(L) > 1:
+        return "\n".join(L)
+    return "- 🐟 **鱼身**：数据缺失"
+
+
+def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, beast_file=None, quant_file=None):
     L = []
     # 行情类型（中线）
     rtype, pos, tactic = regime_type(sx, beast, fish, width)
@@ -229,6 +294,16 @@ def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, 
     # 猛兽体系快照（附在曾星智快照之后）
     if beast_file:
         L.append("\n" + render_beast(beast_file))
+    # 双弦 + 鱼身快照（读 quant_results）
+    if quant_file and os.path.exists(quant_file):
+        try:
+            with open(quant_file, encoding="utf-8") as f:
+                q = json.load(f)
+            extra = parse_quant_extra(q)
+            L.append("\n" + render_shuangxian(extra))
+            L.append("\n" + render_fishbody(extra))
+        except Exception as e:
+            L.append(f"\n⚠️ quant_results 解析失败: {e}")
     return "\n".join(L)
 
 
@@ -243,9 +318,10 @@ def main():
     ap.add_argument("--month-gate", help="月线闸门状态（多头/纠缠/空头）")
     ap.add_argument("--reversal", type=int, help="月线反转信号数")
     ap.add_argument("--beast-file", help="beast_results 文件路径（猛兽快照）")
+    ap.add_argument("--quant-file", help="quant_results_{date}.json 路径（双弦+鱼身快照）")
     args = ap.parse_args()
     print(render(args.date, args.sx, args.beast, args.fish, args.width, args.style,
-                 args.month_gate, args.reversal, args.beast_file))
+                 args.month_gate, args.reversal, args.beast_file, args.quant_file))
 
 
 if __name__ == "__main__":
