@@ -341,7 +341,8 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_charts.py
 python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_chain.py \
   --date {date} --sx {双弦温度} --beast {猛兽评分} --fish {鱼身温度} \
   [--width {宽度分}] [--style {情绪市/指数市}] \
-  [--month-gate {多头/纠缠/空头}] [--reversal {月线反转数}]
+  [--month-gate {多头/纠缠/空头}] [--reversal {月线反转数}] \
+  [--beast-file {beast_results_{date}.txt路径}]
 ```
 
 输出（Markdown 片段，供盘前②.6 引用）：
@@ -349,6 +350,7 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_chain.py \
 - **🐂 中线**：三类行情矩阵（牛市中继≥55且宽度≥60→60-100%；边界50-70%；震荡反弹40-55→30-50%；熊市反弹<40→≤20%）+ 领涨指数（四指数5/10/20日涨幅排名）+ 领涨板块（hot board TOP3）
 - **🐺 短线**：情绪温度/等级 + 连板家数/最高板（读 hot_emotion_latest.json）+ 连板<3 顶背离风险提示
 - **操作映射**：三系统均值 + 宽度 + 风格 → 策略一句话
+- **🐅 猛兽体系快照**（--beast-file，2026-08-29 新增）：三层漏斗全景——🛡️大盘安全评分 + 📊板块RSR TOP3 + ⭐个股信号（领先/回调/G点/伏击/RS_D）+ 🔄主导模式（堆量/欧马，含计数）+ 📅月线闸门（PASS/WARN/BLOCK/反转）→ 操作映射（堆量→主扫堆量/G1低吸；欧马→主扫欧马/乾坤金股）
 
 数据不足时自动提示跳过，不影响报告完整性。
 
