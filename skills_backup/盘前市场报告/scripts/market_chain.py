@@ -116,7 +116,81 @@ def load_emotion():
     return None
 
 
-def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None):
+def parse_beast(text):
+    """解析 beast_results_{date}.txt → 猛兽快照数据（容错正则）"""
+    info = {}
+    m = re.search(r'安全评分:\s*([\d.]+)/100', text)
+    if m:
+        info['score'] = float(m.group(1))
+    m = re.search(r'市场状态[:：]?\s*(\S+)', text)
+    if m:
+        info['state'] = m.group(1)
+    # RSR TOP（两种格式兼容）
+    boards = re.findall(r'\d+\.\s*(\S+?)\s*([+-][\d.]+)%[（(]领涨[:：]?\s*(\S+?)\s*([\d.]+)?', text)
+    info['rsr'] = [(b[0], float(b[1]), b[2]) for b in boards[:3]]
+    # 信号计数
+    for key, pat in [('gpoint', r'G点信号[:：]?\s*(\d+)'), ('fuji', r'伏击线低吸[:：]?\s*(\d+)'),
+                     ('rsd', r'RS_D背离[:：]?\s*(\d+)'), ('leaders', r'领先股:\s*(\d+)'),
+                     ('pullbacks', r'回调股:\s*(\d+)')]:
+        mm = re.search(pat, text)
+        if mm:
+            info[key] = int(mm.group(1))
+    # 双模式
+    m = re.search(r'主导模式[:：]?\s*(\S+)', text)
+    if m:
+        info['mode'] = m.group(1)
+    m = re.search(r'堆量模式\s*(\d+)[,，\s]+欧马模式\s*(\d+)', text)
+    if m:
+        info['mode_cnt'] = (int(m.group(1)), int(m.group(2)))
+    # 月线闸门
+    m = re.search(r'PASS\s*(\d+)\s*/\s*WARN\s*(\d+)\s*/\s*BLOCK\s*(\d+)', text)
+    if m:
+        info['gate'] = (int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    m = re.search(r'反转信号\s*(\d+)', text)
+    if m:
+        info['reversal'] = int(m.group(1))
+    return info
+
+
+def render_beast(beast_file):
+    """猛兽体系快照（三层漏斗：大盘→板块→个股+双模式+月线闸门）"""
+    if not os.path.exists(beast_file):
+        return "- 🐅 **猛兽**：数据缺失（未找到 beast_results）"
+    with open(beast_file, encoding="utf-8", errors="replace") as f:
+        info = parse_beast(f.read())
+    L = ["### 🐅 猛兽体系快照（三层漏斗：大盘→板块→个股）"]
+    # 大盘层
+    if 'score' in info:
+        L.append(f"- 🛡️ **大盘**：安全评分 **{info['score']}/100**"
+                 + (f"（{info.get('state','')}）" if 'state' in info else ""))
+    # 板块层
+    if info.get('rsr'):
+        rsr_txt = "、".join(f"{n}({c:+.1f}%)" for n, c, _ in info['rsr'])
+        L.append(f"- 📊 **板块 RSR**：{rsr_txt}")
+    # 个股层
+    sigs = []
+    if 'gpoint' in info: sigs.append(f"G点{info['gpoint']}")
+    if 'fuji' in info: sigs.append(f"伏击线{info['fuji']}")
+    if 'rsd' in info: sigs.append(f"RS_D{info['rsd']}")
+    L.append(f"- ⭐ **个股信号**：领先股 {info.get('leaders','—')} 只 / 回调股 {info.get('pullbacks','—')} 只"
+             + (f" ｜ {' ｜ '.join(sigs)}" if sigs else ""))
+    # 双模式
+    if 'mode' in info:
+        cnt = f"（堆量{info['mode_cnt'][0]}/欧马{info['mode_cnt'][1]}）" if 'mode_cnt' in info else ""
+        L.append(f"- 🔄 **主导模式**：{info['mode']}{cnt}")
+    # 月线闸门
+    if 'gate' in info:
+        p, w, b = info['gate']
+        L.append(f"- 📅 **月线闸门**：PASS {p} / WARN {w} / BLOCK {b}"
+                 + (f"，反转 {info['reversal']} 只" if 'reversal' in info else ""))
+    # 操作映射
+    mode_map = {"堆量模式": "主扫堆量/G1低吸（情绪+资金溢出小盘）", "欧马模式": "主扫欧马/乾坤金股（产业+业绩中大盘）"}
+    if 'mode' in info:
+        L.append(f"> **操作映射**：{mode_map.get(info['mode'], '按猛兽信号纪律')}")
+    return "\n".join(L)
+
+
+def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, beast_file=None):
     L = []
     # 行情类型（中线）
     rtype, pos, tactic = regime_type(sx, beast, fish, width)
@@ -152,6 +226,9 @@ def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None):
     L.append(f"\n> **操作映射**：{tactic} ｜ 三系统均值 {((sx or 0)+(beast or 0)+(fish or 0))/3:.0f}"
              f"（双弦{sx}/猛兽{beast}/鱼身{fish}）" + (f"｜ 宽度 {width}" if width else "") +
              (f"｜ 风格 {style}" if style else "") + "\n")
+    # 猛兽体系快照（附在曾星智快照之后）
+    if beast_file:
+        L.append("\n" + render_beast(beast_file))
     return "\n".join(L)
 
 
@@ -165,9 +242,10 @@ def main():
     ap.add_argument("--style", help="市场风格（情绪市/指数市/均衡）")
     ap.add_argument("--month-gate", help="月线闸门状态（多头/纠缠/空头）")
     ap.add_argument("--reversal", type=int, help="月线反转信号数")
+    ap.add_argument("--beast-file", help="beast_results 文件路径（猛兽快照）")
     args = ap.parse_args()
     print(render(args.date, args.sx, args.beast, args.fish, args.width, args.style,
-                 args.month_gate, args.reversal))
+                 args.month_gate, args.reversal, args.beast_file))
 
 
 if __name__ == "__main__":
