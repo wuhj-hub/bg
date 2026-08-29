@@ -305,7 +305,75 @@ def render_wuwei(beast_file):
     return "\n".join(L)
 
 
-def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, beast_file=None, quant_file=None, wuwei_file=None):
+def render_qiankun(qk_file):
+    """👑 乾坤A级金股快照（资金强攻+业绩共振）"""
+    if not os.path.exists(qk_file):
+        return "- 👑 **乾坤**：数据缺失（未找到 qiankun_a_latest.json）"
+    try:
+        with open(qk_file, encoding="utf-8") as f:
+            d = json.load(f)
+    except Exception as e:
+        return f"- 👑 **乾坤**：解析失败（{e}）"
+    stocks = d.get("stocks", []) or []
+    L = ["### 👑 乾坤A级金股快照（资金强攻+业绩共振）"]
+    L.append(f"- 📅 数据日期：{d.get('date', '—')} ｜ A级 **{len(stocks)}** 只")
+    for s in stocks[:5]:
+        name = s.get("name", "—")
+        score = s.get("score", "—")
+        sig = s.get("sig", "")
+        L.append(f"- 🎯 {name}（{s.get('code','')}）：评分{score} {sig}")
+    return "\n".join(L)
+
+
+def render_hotspot(emo_file):
+    """🔥 热点情绪快照（情绪温度+连板+主线+退潮预警）"""
+    if not os.path.exists(emo_file):
+        return "- 🔥 **热点**：数据缺失（先跑 hot_emotion）"
+    try:
+        with open(emo_file, encoding="utf-8") as f:
+            d = json.load(f)
+    except Exception as e:
+        return f"- 🔥 **热点**：解析失败（{e}）"
+    L = ["### 🔥 热点情绪快照（题材生态）"]
+    sc = d.get("score", {})
+    if isinstance(sc, dict):
+        L.append(f"- 🌡️ 情绪温度：**{sc.get('score')}/100（{sc.get('level')}）**"
+                 f"｜ 涨停 {d.get('total','—')} ｜ 连板 {d.get('lianban_cnt','—')} ｜ 最高 {d.get('max_lb','—')}板")
+    pers = d.get("persistence", []) or []
+    if pers:
+        top3 = [p for p in pers if p.get("kind") in ("强主线", "持续主线", "一日游⚠️")][:3] or pers[:3]
+        txt = "、".join(f"{p['tag']}({p['kind']})" for p in top3)
+        L.append(f"- 🎯 主线判定：{txt}")
+    alerts = d.get("alerts", []) or []
+    if alerts:
+        for a in alerts[:2]:
+            L.append(f"- ⚠️ {a}")
+    return "\n".join(L)
+
+
+def render_qiangshi(qs_file):
+    """⚡ 强势体系快照（突破买入+MA20止盈操作体系）"""
+    if not os.path.exists(qs_file):
+        return "- ⚡ **强势**：无每日输出（操作体系），可传 backtest_result.json 展示回测"
+    try:
+        with open(qs_file, encoding="utf-8") as f:
+            d = json.load(f)
+    except Exception as e:
+        return f"- ⚡ **强势**：解析失败（{e}）"
+    summary = d.get("summary", {}) or {}
+    L = ["### ⚡ 强势体系快照（突破买入+趋势止盈）"]
+    total = summary.get("total", "—")
+    win = summary.get("win", "—")
+    total_ops = summary.get("total_ops", summary.get("operable_loose", "—"))
+    win_rate = summary.get("win_rate", "—")
+    if win_rate == "—" and isinstance(win, (int, float)) and isinstance(total, (int, float)) and total:
+        win_rate = f"{win/total*100:.1f}%"
+    L.append(f"- 📊 回测（池{total}只）：胜率 {win_rate}")
+    L.append("- 📋 规则：日线突破/空中加油/高阳买入 ｜ MA20破位+MACD死叉止盈 ｜ 月熊/震荡不追涨")
+    return "\n".join(L)
+
+
+def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, beast_file=None, quant_file=None, wuwei_file=None, qiankun_file=None, emotion_file=None, qiangshi_file=None):
     L = []
     # 行情类型（中线）
     rtype, pos, tactic = regime_type(sx, beast, fish, width)
@@ -357,6 +425,13 @@ def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, 
     # 武威快照（读武威精选池 md）
     if wuwei_file:
         L.append("\n" + render_wuwei(wuwei_file))
+    # 乾坤/热点/强势快照
+    if qiankun_file:
+        L.append("\n" + render_qiankun(qiankun_file))
+    if emotion_file:
+        L.append("\n" + render_hotspot(emotion_file))
+    if qiangshi_file:
+        L.append("\n" + render_qiangshi(qiangshi_file))
     return "\n".join(L)
 
 
@@ -373,9 +448,19 @@ def main():
     ap.add_argument("--beast-file", help="beast_results 文件路径（猛兽快照）")
     ap.add_argument("--quant-file", help="quant_results_{date}.json 路径（双弦+鱼身快照）")
     ap.add_argument("--wuwei-file", help="武威精选池 md 路径（ww_period_YYYYMM_v21.md）")
+    ap.add_argument("--qiankun-file", help="qiankun_a_latest.json 路径（乾坤快照）")
+    ap.add_argument("--emotion-file", default=None, help="hot_emotion_latest.json 路径（热点快照，默认自动找）")
+    ap.add_argument("--qiangshi-file", help="强势体系 backtest_result.json 路径（强势快照）")
     args = ap.parse_args()
+    if args.emotion_file is None:
+        for p in ["outputs/hot_emotion_latest.json",
+                  "/sandbox/workspace/skills/盘前市场报告/scripts/outputs/hot_emotion_latest.json"]:
+            if os.path.exists(p):
+                args.emotion_file = p
+                break
     print(render(args.date, args.sx, args.beast, args.fish, args.width, args.style,
-                 args.month_gate, args.reversal, args.beast_file, args.quant_file, args.wuwei_file))
+                 args.month_gate, args.reversal, args.beast_file, args.quant_file, args.wuwei_file,
+                 args.qiankun_file, args.emotion_file, args.qiangshi_file))
 
 
 if __name__ == "__main__":
