@@ -43,6 +43,53 @@ def cli(cmd: str) -> str:
     except Exception as e:
         return f""
 
+# ============ 批量预取缓存（2026-08-29 根治 TIMEOUT）============
+_KLINE_CACHE = {}
+
+
+def prefetch_kline(codes, limit=250):
+    """批量预取 kline 到缓存：50只/批，缓存 DataFrame（close/high/low/open/volume）"""
+    import pandas as pd
+    clean = [c for c in codes if re.match(r'^(sh|sz)\d{6}$', c)]
+    for i in range(0, len(clean), 50):
+        batch = clean[i:i + 50]
+        raw = cli(f"kline {','.join(batch)} --period day --limit {limit} --fq qfq")
+        if not raw:
+            continue
+        rows = {}
+        for ln in raw.split("\n"):
+            m = re.match(r'\| (sh\d{6}|sz\d{6}) \| (\d{4}-\d{2}-\d{2}) \| (\S+) \| (\S+) \| (\S+) \| (\S+) \| (\S+)', ln)
+            if m:
+                code, date, o, c, h, l, v = m.groups()
+                rows.setdefault(code, []).append((date, float(o), float(c), float(h), float(l), float(v)))
+        for code, lst in rows.items():
+            lst.sort(key=lambda x: x[0])
+            df = pd.DataFrame(lst, columns=["date", "open", "close", "high", "low", "volume"])
+            _KLINE_CACHE[code] = df
+    print(f"[OK] kline 批量预取完成: {len(_KLINE_CACHE)} 只（{len(clean)} 请求分 {max(1, (len(clean)+49)//50)} 批）")
+
+
+def parse_kline_df(code: str, limit: int = 60) -> pd.DataFrame:
+    """kline DataFrame：优先批量缓存，未命中再逐只拉取"""
+    import pandas as pd
+    if code in _KLINE_CACHE:
+        return _KLINE_CACHE[code]
+    try:
+        import importlib
+        beast = importlib.import_module("beast_screener")
+        return beast.parse_kline_df(code, limit)
+    except Exception:
+        raw = cli(f"kline {code} --period day --limit {limit} --fq qfq")
+        rows = []
+        for ln in raw.split("\n"):
+            m = re.match(r'\| (sh\d{6}|sz\d{6}) \| (\d{4}-\d{2}-\d{2}) \| (\S+) \| (\S+) \| (\S+) \| (\S+) \| (\S+)', ln)
+            if m:
+                code2, date, o, c, h, l, v = m.groups()
+                rows.append((date, float(o), float(c), float(h), float(l), float(v)))
+        rows.sort(key=lambda x: x[0])
+        return pd.DataFrame(rows, columns=["date", "open", "close", "high", "low", "volume"])
+
+
 def parse_table(md: str) -> list[dict]:
     """解析Markdown表格为dict列表"""
     lines = [l.strip() for l in md.split('\n') if l.strip()]
@@ -232,7 +279,7 @@ def score_stock(code: str, name: str, sector: str = "",
     try:
         import importlib
         beast = importlib.import_module("beast_screener")
-        df = beast.parse_kline_df(code, 250)
+        df = parse_kline_df(code, 250)
         if not df.empty and len(df) >= 30:
             try:
                 result["price"] = float(df["close"].iloc[-1])
@@ -344,7 +391,7 @@ def enrich_with_beast_signals(stocks: list[dict]) -> list[dict]:
     for s in stocks:
         code = s["code"]
         # 走猛兽K线获取
-        df = beast.parse_kline_df(code, 250)
+        df = parse_kline_df(code, 250)
         if df.empty or len(df) < 30:
             s["beast_tags"] = []
             enriched.append(s)
@@ -473,6 +520,12 @@ def run_daily(pool_path=None):
                     sector_zdf = s['zdf']
                     break
         return score_stock(code, name, sname, sector_zdf, temp)
+
+    # 批量预取 kline（根治 TIMEOUT：400只逐次npx → 8批）
+    try:
+        prefetch_kline([t[0] for t in tasks], 250)
+    except Exception as e:
+        print(f"  ⚠️ kline 预取失败: {e}")
 
     scored = []
     with ThreadPoolExecutor(max_workers=8) as ex:
