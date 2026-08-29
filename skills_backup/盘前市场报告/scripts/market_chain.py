@@ -255,7 +255,57 @@ def render_fishbody(info):
     return "- 🐟 **鱼身**：数据缺失"
 
 
-def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, beast_file=None, quant_file=None):
+def parse_wuwei(text):
+    """解析武威精选池 md（ww_period_YYYYMM_v21.md）"""
+    info = {}
+    m = re.search(r'全市场月线扫描\s*\*?\*?(\d+)\*?\*?\s*只\s*→\s*月线有效\s*\*?\*?(\d+)\*?\*?', text)
+    if m:
+        info['scan'] = int(m.group(1))
+        info['valid'] = int(m.group(2))
+    for key, pat in [('heavy', r'重仓（★[^）]*）[：:]\s*\*?\*?(\d+)\*?\*?'),
+                     ('light', r'轻仓（[^）]*）[：:]\s*\*?\*?(\d+)\*?\*?'),
+                     ('veto', r'否决（[^）]*）[：:]\s*\*?\*?(\d+)\*?\*?')]:
+        mm = re.search(pat, text)
+        if mm:
+            info[key] = int(mm.group(1))
+    # 重仓池标的（二、重仓精选池表格）
+    heavy_stocks = []
+    in_heavy = False
+    for line in text.split('\n'):
+        if '重仓精选池' in line:
+            in_heavy = True
+            continue
+        if in_heavy:
+            if line.startswith('## '):
+                break
+            m = re.match(r'\| (sh|sz)\d{6} \| ([^|]+) \| (双阴|一阴) \| ([\d.]+) \| [^|]+ \| ([^|]+) \| [^|]+ \| (\d+) \|', line)
+            if m:
+                heavy_stocks.append((m.group(1) + m.group(2) if False else line.split('|')[1].strip(),
+                                     line.split('|')[2].strip(), line.split('|')[3].strip(),
+                                     line.split('|')[4].strip(), line.split('|')[8].strip()))
+    info['heavy_stocks'] = heavy_stocks
+    return info
+
+
+def render_wuwei(beast_file):
+    """武威量价快照（月线G1 双阴/一阴低吸）"""
+    if not os.path.exists(beast_file):
+        return "- 🐲 **武威**：数据缺失（未找到武威精选池，每月1日 wuwei-monthly 更新）"
+    with open(beast_file, encoding="utf-8", errors="replace") as f:
+        info = parse_wuwei(f.read())
+    L = ["### 🐲 武威量价快照（月线G1 · 双阴/一阴低吸）"]
+    if 'scan' in info:
+        L.append(f"- 📥 **G1 初筛**：{info['scan']} 只 → 月线有效 {info['valid']} 只")
+    if 'heavy' in info:
+        L.append(f"- ⭐ **重仓**：{info['heavy']}（双阴+深支撑+盈利+评分≥75）｜ 轻仓 {info.get('light', 0)} ｜ 否决 {info.get('veto', 0)}")
+    if info.get('heavy_stocks'):
+        for code, name, sig, support, score in info['heavy_stocks']:
+            L.append(f"- 🎯 {name}（{code}）：{sig} 支撑{support}% 评分{score}")
+    L.append("- 📋 **纪律**：MA20 破位止盈 ｜ 硬止损 ｜ 优先双阴信号")
+    return "\n".join(L)
+
+
+def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, beast_file=None, quant_file=None, wuwei_file=None):
     L = []
     # 行情类型（中线）
     rtype, pos, tactic = regime_type(sx, beast, fish, width)
@@ -304,6 +354,9 @@ def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None, 
             L.append("\n" + render_fishbody(extra))
         except Exception as e:
             L.append(f"\n⚠️ quant_results 解析失败: {e}")
+    # 武威快照（读武威精选池 md）
+    if wuwei_file:
+        L.append("\n" + render_wuwei(wuwei_file))
     return "\n".join(L)
 
 
@@ -319,9 +372,10 @@ def main():
     ap.add_argument("--reversal", type=int, help="月线反转信号数")
     ap.add_argument("--beast-file", help="beast_results 文件路径（猛兽快照）")
     ap.add_argument("--quant-file", help="quant_results_{date}.json 路径（双弦+鱼身快照）")
+    ap.add_argument("--wuwei-file", help="武威精选池 md 路径（ww_period_YYYYMM_v21.md）")
     args = ap.parse_args()
     print(render(args.date, args.sx, args.beast, args.fish, args.width, args.style,
-                 args.month_gate, args.reversal, args.beast_file, args.quant_file))
+                 args.month_gate, args.reversal, args.beast_file, args.quant_file, args.wuwei_file))
 
 
 if __name__ == "__main__":
