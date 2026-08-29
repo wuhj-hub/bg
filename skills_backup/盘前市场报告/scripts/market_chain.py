@@ -97,44 +97,77 @@ def regime_type(sx, beast, fish, width=None):
     return "🐻 熊市反弹（长期力量向下）", "≤20%或空仓", "回避为主，仅超跌反弹快进快出"
 
 
-def render(date, sx, beast, fish, width, style):
+def load_emotion():
+    """读 hot_emotion_latest.json（情绪温度/连板/最高板）
+    结构: {score: {score: 48, level: "中性", ...}, lianban_cnt: 4, max_lb: 5, ...}
+    """
+    for path in ["outputs/hot_emotion_latest.json",
+                 "/sandbox/workspace/skills/盘前市场报告/scripts/outputs/hot_emotion_latest.json"]:
+        if os.path.exists(path):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    d = json.load(f)
+                sc = d.get("score", {})
+                if isinstance(sc, dict):
+                    return (sc.get("score"), sc.get("level"),
+                            d.get("lianban_cnt"), d.get("max_lb"))
+            except Exception:
+                continue
+    return None
+
+
+def render(date, sx, beast, fish, width, style, month_gate=None, reversal=None):
     L = []
-    # 行情类型
+    # 行情类型（中线）
     rtype, pos, tactic = regime_type(sx, beast, fish, width)
-    L.append(f"### 🧭 行情类型（曾星智三类矩阵）\n")
-    L.append(f"> **{rtype}** ｜ 建议仓位 {pos} ｜ 策略：{tactic}\n")
-    L.append(f"> 依据：三系统均值 {((sx or 0)+(beast or 0)+(fish or 0))/3:.0f}"
-             f"（双弦{sx}/猛兽{beast}/鱼身{fish}）" + (f"｜ 宽度 {width}" if width else "") +
-             (f"｜ 风格 {style}" if style else "") + "\n")
-    # 领涨指数
+    L.append("### 🧭 曾星智三系统快照（长线/中线/短线）\n")
+    # 🐢 长线：月线闸门 + 月线反转
+    if month_gate:
+        L.append(f"- 🐢 **长线**：月线闸门 **{month_gate}**" +
+                 (f"，月线反转 {reversal} 只" if reversal is not None else "") + "\n")
+    else:
+        L.append("- 🐢 **长线**：月线闸门（待传 --month-gate）\n")
+    # 🐂 中线：行情类型 + 领涨链条
+    L.append(f"- 🐂 **中线**：**{rtype}**（建议仓位 {pos}）\n")
     idx_data = fetch_kline(INDICES)
     if idx_data:
         ranks = leading_index(idx_data)
-        L.append("**领涨指数传导**：")
-        for name, r5, r10, r20, avg in ranks[:3]:
-            L.append(f"- {name}：5日{r5:+.1f}% / 10日{r10:+.1f}% / 20日{r20:+.1f}%")
         leader = ranks[0][0] if ranks else "—"
-        L.append(f"  → **领涨指数：{leader}**（传导方向：{leader} 强则做多其权重板块）\n")
-    # 领涨板块与个股
+        L.append(f"  → 领涨指数：**{leader}**（5日{ranks[0][1]:+.1f}% 最强）\n")
     boards = fetch_hot_board()
     if boards:
-        L.append("**领涨行业/概念（hot board TOP）**：")
-        for name, chg in boards[:5]:
-            L.append(f"- {name}：{chg:+.2f}%")
-        L.append("")
+        bnames = "、".join(f"{n}({c:+.1f}%)" for n, c in boards[:3])
+        L.append(f"  → 领涨板块：{bnames}\n")
+    # 🐺 短线：热点情绪 + 连板 + 顶背离预警
+    emo = load_emotion()
+    if emo:
+        score, level, lb, maxlb = emo
+        L.append(f"- 🐺 **短线**：情绪温度 **{score}/100（{level}）**，连板 {lb} 只/最高 {maxlb} 板\n")
+        # 顶背离预警：连板高度骤降（前日高今低）→ 简化为连板<3 且涨停多时提示
+        if lb is not None and lb < 3:
+            L.append(f"  → ⚠️ 连板高度不足（{lb}只）→ 短线接力风险，防顶背离\n")
+    else:
+        L.append("- 🐺 **短线**：情绪温度（先跑 hot_emotion）\n")
+    # 策略总括
+    L.append(f"\n> **操作映射**：{tactic} ｜ 三系统均值 {((sx or 0)+(beast or 0)+(fish or 0))/3:.0f}"
+             f"（双弦{sx}/猛兽{beast}/鱼身{fish}）" + (f"｜ 宽度 {width}" if width else "") +
+             (f"｜ 风格 {style}" if style else "") + "\n")
     return "\n".join(L)
 
 
 def main():
-    ap = argparse.ArgumentParser(description="领涨链条+行情矩阵（曾星智落地）")
+    ap = argparse.ArgumentParser(description="曾星智三系统快照（长线/中线/短线）")
     ap.add_argument("--date", default=datetime.now().strftime("%Y-%m-%d"))
     ap.add_argument("--sx", type=float, help="双弦温度")
     ap.add_argument("--beast", type=float, help="猛兽安全评分")
     ap.add_argument("--fish", type=float, help="鱼身温度")
     ap.add_argument("--width", type=float, help="市场宽度分")
     ap.add_argument("--style", help="市场风格（情绪市/指数市/均衡）")
+    ap.add_argument("--month-gate", help="月线闸门状态（多头/纠缠/空头）")
+    ap.add_argument("--reversal", type=int, help="月线反转信号数")
     args = ap.parse_args()
-    print(render(args.date, args.sx, args.beast, args.fish, args.width, args.style))
+    print(render(args.date, args.sx, args.beast, args.fish, args.width, args.style,
+                 args.month_gate, args.reversal))
 
 
 if __name__ == "__main__":
