@@ -365,7 +365,14 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_chain.py \
 
 #### 2.16 量学扫描快照（黑马王子《股市天经》三部曲·2026-08-30 新增）
 
-量学模块与曾星智月线闸门同级：**曾星智定方向，量学定量价**。数据源为全盘量化 workflow 第二步.1.10 的 `outputs/liangxue_latest.json`（GitHub 提交 `liangxue_latest.json` 供盘前拉取）。
+量学模块与曾星智月线闸门同级：**曾星智定方向，量学定量价**。
+
+> **⚠️ 周期框架分工（重要）**：
+> - **曾星智 = 月线框架**：月线 MA6/MA12 定中期方向（多头/纠缠/空头），只解决"方向对不对"
+> - **量学 = 日线量价框架 + 分时框架**（非月线）：量柱/量线信号基于日线 K 线，量波验证基于分时——黑马王子三部曲"量柱选股（日线）→量线选价（日线）→量波选时（分时）"，主战场不在月线
+> - **分工衔接**：月线闸门做**方向过滤**（只做多头趋势里的量学信号），量学做**买点触发**（趋势内的量价精确买点）；月线空头 ∩ 量学PASS = 下跌趋势中的反弹信号（谨慎/放弃）。8/30 实测 114 只量学PASS 仅 2 只过月线多头闸门——不懂分工会被信号淹没
+
+数据源为全盘量化 workflow 第二步.1.10 的 `outputs/liangxue_latest.json`（GitHub 提交 `liangxue_latest.json` 供盘前拉取）。
 
 ```bash
 python3 /sandbox/workspace/skills/盘前市场报告/scripts/premarket_liangxue.py \
