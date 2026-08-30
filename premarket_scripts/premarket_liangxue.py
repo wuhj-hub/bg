@@ -46,6 +46,9 @@ def render(d):
     lines.append(f"> 来源：《量柱擒涨停》《量线捉涨停》《量波逮涨停》 | 扫描 {d.get('total', 0)} 只 | "
                  f"📗PASS={d.get('pass_count', 0)} ⚠️WARN={d.get('warn_count', 0)} ⛔BLOCK={d.get('block_count', 0)}")
     lines.append("")
+    lines.append("> 🏛️ **框架分工**：曾星智=月线定方向（只做多头趋势）｜量学=日线量价定买点+分时验证（非月线）→ "
+                 "月线空头下的量学信号视为反弹需谨慎（联合池 `liangxue_month_join_latest.json` 自动过滤）")
+    lines.append("")
 
     signals = d.get("signals", [])
     passes = [s for s in signals if s.get("level") == "PASS"]
