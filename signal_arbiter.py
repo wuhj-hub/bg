@@ -235,6 +235,32 @@ def load_reversal():
     return out
 
 
+def load_liangxue():
+    """量学扫描信号（黑马王子三部曲·2026-08-30接入）：
+    读 outputs/liangxue_latest.json，PASS(≥85)标的。
+    返回 {code: {score, has_mid}} —— 100分(黄金柱+倍量+多共振)+3 / 85-99分+2"""
+    import glob
+    files = sorted(glob.glob("outputs/liangxue_latest.json"))
+    if not files:
+        return {}
+    try:
+        d = json.load(open(files[-1], encoding="utf-8"))
+    except Exception:
+        return {}
+    out = {}
+    for s in d.get("signals", []):
+        if s.get("level") != "PASS" or not s.get("ok"):
+            continue
+        code = norm_cn(s.get("code", ""))
+        if not code:
+            continue
+        sig_types = [x.get("type", "") for x in s.get("signals", [])]
+        has_mid = any("中继" in t for t in sig_types)
+        out[code] = {"score": s.get("score", 0), "has_mid": has_mid,
+                     "name": s.get("name", ""), "sigs": sig_types}
+    return out
+
+
 def month_gate(code):
     """月线闸门：PASS(收盘>MA6>MA12) / WARN(收盘>MA6但MA6<MA12) / BLOCK(收盘<MA6)"""
     txt = run(["kline", code, "--period", "month", "--limit", "12"])
@@ -348,7 +374,8 @@ def main():
     qk = load_qiankun()
     wuwei = load_wuwei()
     reversal = load_reversal()
-    print(f"[INFO] 信号源: 四维{len(four)} 鱼身{len(fish)} 猛兽{len(beast)} 双弦{len(sx)} 乾坤{len(qk)} 武威{len(wuwei)} 反转{len(reversal)}", flush=True)
+    lx = load_liangxue()  # 量学（黑马王子，2026-08-30接入）
+    print(f"[INFO] 信号源: 四维{len(four)} 鱼身{len(fish)} 猛兽{len(beast)} 双弦{len(sx)} 乾坤{len(qk)} 武威{len(wuwei)} 反转{len(reversal)} 量学{len(lx)}", flush=True)
 
     # 汇总打分
     scores = {}
@@ -390,6 +417,13 @@ def main():
     for code, pts in reversal.items():  # 反转数值周线（2026-08-11接入）
         scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
         scores[code]["src"].append(f"反转数值(+{pts})")
+    for code, info in lx.items():  # 量学（黑马王子·2026-08-30接入）：100分+3/85-99+2，中继黄金柱+1
+        pts = 3 if info["score"] >= 100 else 2
+        if info.get("has_mid"):
+            pts += 1  # 中继黄金柱（最安全买点）加成
+        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
+        sig_note = "黄金柱·中继" if info.get("has_mid") else (f"量学{info['score']}分")
+        scores[code]["src"].append(f"量学({sig_note})+{pts}")
 
     # 分级
     ranked = []
