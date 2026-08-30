@@ -4,7 +4,7 @@
 git_push.py —— GitHub Contents API 推送工具（替代被沙箱清理的 git_api_commit.py）
 用法：python3 git_push.py <repo> <branch> <path> <local_file> ["commit message"]
 """
-import sys, os, json, base64, urllib.request, time
+import sys, os, json, base64, urllib.request, urllib.parse, time
 
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
 
