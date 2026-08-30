@@ -25,6 +25,7 @@ hot_emotion.py — 热点情绪模块（连板梯队 + 板块持续性 + 退潮�
 import argparse
 import json
 import os
+import re
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime
@@ -177,6 +178,29 @@ def build_stats(rows, total_hint=None):
                 seen_tags.add(t)
         for t in seen_tags:
             lianban_tags[t] += 1
+    # 题材龙头（曾星智"热点概念龙头"法落地）：每个题材内 连板最高→封单最大→首板时间最早 为龙头
+    def leader_key(r):
+        fengdan = 0.0
+        fd = str(r.get("fengdan") or "").strip()
+        m = re.match(r"([\d.]+)(亿|万)?", fd)
+        if m:
+            fengdan = float(m.group(1))
+            if m.group(2) == "亿":
+                fengdan *= 1e8
+            elif m.group(2) == "万":
+                fengdan *= 1e4
+        ft = str(r.get("first_time") or "")
+        return (-r["lianban"], -fengdan, ft)
+    tag_leaders = {}
+    for r in rows:
+        seen_tags = set()
+        for tag in r["reason"].replace("，", ".").replace(" ", "").split("."):
+            t = norm_tag(tag.strip())
+            if len(t) >= 2 and t not in ("活跃小盘非融", "微小盘股", "扣非亏损", "预计扭亏", "业绩预亏", "预计转亏"):
+                if t not in seen_tags:
+                    seen_tags.add(t)
+                    if t not in tag_leaders or leader_key(r) < leader_key(tag_leaders[t]):
+                        tag_leaders[t] = r
     return {
         "total": total,
         "shouban": shouban,
@@ -186,6 +210,7 @@ def build_stats(rows, total_hint=None):
         "lianban_rows": lianban_rows,
         "tags": tag_counter.most_common(15),
         "lianban_tags": lianban_tags.most_common(10),
+        "tag_leaders": tag_leaders,
     }
 
 
@@ -371,9 +396,16 @@ def render_md(date, stats, score, persistence, alerts, sample_note=""):
     # 主线判定（板块持续性）
     L.append("**主线判定**（涨停多+连板多=强主线；连续上榜=持续主线；涨停多+连板少=一日游）：")
     if persistence:
+        leaders = stats.get("tag_leaders", {})
         for p in persistence:
             seq = f"连续{p['streak']}日" if p["streak"] >= 1 else "新上榜"
-            L.append(f"- {p['tag']}：涨停{p['zt']}只/连板{p['lianban']}只 → **{p['kind']}**（{seq}，近5日{p['appear_5d']}次）")
+            ld = leaders.get(p["tag"])
+            ld_txt = ""
+            if ld:
+                lb_txt = f"{ld['lianban']}板" if ld["lianban"] >= 2 else "首板"
+                bxt = ld.get("banxing", "").replace("(涨停)", "")
+                ld_txt = f" ｜ 🐲龙头：**{ld['name']}**（{lb_txt}{('·' + bxt) if bxt else ''}）"
+            L.append(f"- {p['tag']}：涨停{p['zt']}只/连板{p['lianban']}只 → **{p['kind']}**（{seq}，近5日{p['appear_5d']}次）{ld_txt}")
     else:
         L.append("- 无显著题材")
     L.append("")
@@ -467,6 +499,10 @@ def main():
         "by_lb": stats["by_lb"],
         "score": score, "persistence": persistence_now, "alerts": alerts,
         "lianban_rows": stats["lianban_rows"],
+        "leaders": {t: {"code": r["code"], "name": r["name"], "lianban": r["lianban"],
+                        "ji_ji_ban": r["ji_ji_ban"], "banxing": r["banxing"],
+                        "first_time": r["first_time"], "fengdan": r["fengdan"]}
+                    for t, r in stats["tag_leaders"].items()},
     }
     with open(os.path.join(args.outdir, f"hot_emotion_latest.json"), "w", encoding="utf-8") as f:
         json.dump(latest, f, ensure_ascii=False, indent=1)
