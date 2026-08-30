@@ -237,15 +237,10 @@ def load_reversal():
 
 def load_liangxue():
     """量学扫描信号（黑马王子三部曲·2026-08-30接入）：
-    读 outputs/liangxue_latest.json，PASS(≥85)标的。
+    读 liangxue_latest.json（outputs/ 或仓库根），PASS(≥85)标的。
     返回 {code: {score, has_mid}} —— 100分(黄金柱+倍量+多共振)+3 / 85-99分+2"""
-    import glob
-    files = sorted(glob.glob("outputs/liangxue_latest.json"))
-    if not files:
-        return {}
-    try:
-        d = json.load(open(files[-1], encoding="utf-8"))
-    except Exception:
+    d = load_json(["outputs/liangxue_latest.json", "liangxue_latest.json"])
+    if not d:
         return {}
     out = {}
     for s in d.get("signals", []):
