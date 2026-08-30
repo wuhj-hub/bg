@@ -112,6 +112,11 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/signal_verify.py
 - 领先股今日表现
 - 安全评分实际走势
 
+#### 4.4 量学系统（黑马王子《股市天经》三部曲·2026-08-30 新增）
+- 盘前量学 PASS 信号（liangxue_latest.json）今日表现：黄金柱+倍量柱共振标的涨跌幅
+- 量学评分与次日实际走势的对应关系（验证"倍量启动+三日价涨量缩+回踩不破柱底=买点"口诀）
+- 与曾星智月线闸门叠加效果：量学PASS∩月线多头 vs 单独量学PASS 的胜率对比
+
 ### Step 5：盘后量化深度分析
 
 基于今日收盘的全量资金扫描数据：
@@ -129,6 +134,7 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/signal_verify.py
 - 双弦股池 vs 盘后量化信号交集
 - 鱼身标的 vs 盘后量化信号交集
 - 猛兽领先股 vs 盘后量化信号交集
+- 量学PASS（黑马王子） vs 盘后量化信号交集（黄金柱标的的资金/换手确认）
 
 #### 5.4 热点情绪复盘（新增·hot_emotion模块）
 收盘后用通达信 tdx_screener 涨停数据跑热点情绪模块，验证当日题材生态：
