@@ -135,6 +135,14 @@ jobs:
           cp quant_scripts/outputs/board_top_latest.json board_top_latest.json 2>/dev/null || true
           echo "见顶五维: $(python3 -c "import json;d=json.load(open('top_signal_latest.json'));print('总分'+str(d.get('score','?'))+' '+str(d.get('level','?')))" 2>/dev/null || echo '无数据')"
 
+      # ─── 第二步.1.10：量学扫描（黑马王子《股市天经》三部曲：倍量柱/黄金柱/低量柱/平量柱）───
+      - name: 量学扫描（黑马王子体系，与曾星智月线闸门同级）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/liangxue_screener.py --pool panhou_lianghua.csv
+          cp outputs/liangxue_latest.json liangxue_latest.json 2>/dev/null || true
+          echo "量学: $(python3 -c "import json;d=json.load(open('outputs/liangxue_latest.json'));print('PASS%d WARN%d BLOCK%d'%(d['pass_count'],d['warn_count'],d['block_count']))" 2>/dev/null || echo '无数据')"
+
       # ─── 第二步.2：分时强度分析（黑石minuteMacd启发：信号股分时MACD+封板+尾盘方向）───
       - name: 分时强度分析（信号股分时MACD）
         continue-on-error: true
@@ -242,7 +250,8 @@ jobs:
               mode_aggregate_latest.json 板块共振_latest.json yearline_breadth_latest.json 双弦观察池_latest.json \
               123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json \
               top_signal_latest.json board_top_latest.json 情绪预判_latest.json panhou_lianghua.csv \
-              all_mainboard.csv ima_cred_last_ok.json pools/pool_$(date +%Y-%m).json
+              all_mainboard.csv ima_cred_last_ok.json liangxue_latest.json \
+              pools/pool_$(date +%Y-%m).json
           fi
 
       # ─── 关键产物完整性检查（2026-08-28：任一关键步骤失败→微信告警明细）───
@@ -253,7 +262,7 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           MISSING=""
-          for f in panhou_lianghua.csv market_width_latest.json yearline_breadth_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 板块共振_latest.json; do
+          for f in panhou_lianghua.csv market_width_latest.json yearline_breadth_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 板块共振_latest.json liangxue_latest.json; do
             if [ ! -f "$f" ] && [ ! -f "outputs/$f" ]; then
               MISSING="$MISSING $f"
             fi
