@@ -143,6 +143,22 @@ jobs:
           cp outputs/liangxue_latest.json liangxue_latest.json 2>/dev/null || true
           echo "量学: $(python3 -c "import json;d=json.load(open('outputs/liangxue_latest.json'));print('PASS%d WARN%d BLOCK%d'%(d['pass_count'],d['warn_count'],d['block_count']))" 2>/dev/null || echo '无数据')"
 
+      # ─── 第二步.1.10b：量学×曾星智月线闸门联合（月线定方向+量学定买点·趋势量价双确认）───
+      - name: 量学×月线联合输出（月线多头∩量学PASS）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/liangxue_month_join.py
+          cp outputs/liangxue_month_join_latest.json liangxue_month_join_latest.json 2>/dev/null || true
+          echo "联合: $(python3 -c "import json;d=json.load(open('outputs/liangxue_month_join_latest.json'));print('月线多头%d 空头%d'%(d['join_count'],d['block_count']))" 2>/dev/null || echo '无数据')"
+
+      # ─── 第二步.1.10c：量学PASS分时量波验证（量波卷·人线为王/4G为皇，TOP20）───
+      - name: 量学PASS分时量波验证（人线偏离检测）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/liangxue_minute_check.py --top 20
+          cp outputs/liangxue_minute_check_latest.json liangxue_minute_check_latest.json 2>/dev/null || true
+          echo "分时: $(python3 -c "import json;d=json.load(open('outputs/liangxue_minute_check_latest.json'));print('检查%d只'%d['total'])" 2>/dev/null || echo '无数据')"
+
       # ─── 第二步.2：分时强度分析（黑石minuteMacd启发：信号股分时MACD+封板+尾盘方向）───
       - name: 分时强度分析（信号股分时MACD）
         continue-on-error: true
@@ -251,6 +267,7 @@ jobs:
               123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json \
               top_signal_latest.json board_top_latest.json 情绪预判_latest.json panhou_lianghua.csv \
               all_mainboard.csv ima_cred_last_ok.json liangxue_latest.json \
+              liangxue_month_join_latest.json liangxue_minute_check_latest.json \
               pools/pool_$(date +%Y-%m).json
           fi
 
@@ -262,7 +279,7 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           MISSING=""
-          for f in panhou_lianghua.csv market_width_latest.json yearline_breadth_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 板块共振_latest.json liangxue_latest.json; do
+          for f in panhou_lianghua.csv market_width_latest.json yearline_breadth_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 板块共振_latest.json liangxue_latest.json liangxue_month_join_latest.json; do
             if [ ! -f "$f" ] && [ ! -f "outputs/$f" ]; then
               MISSING="$MISSING $f"
             fi
