@@ -341,8 +341,15 @@ def render_hotspot(emo_file):
                  f"｜ 涨停 {d.get('total','—')} ｜ 连板 {d.get('lianban_cnt','—')} ｜ 最高 {d.get('max_lb','—')}板")
     pers = d.get("persistence", []) or []
     if pers:
+        leaders = d.get("leaders", {}) or {}
         top3 = [p for p in pers if p.get("kind") in ("强主线", "持续主线", "一日游⚠️")][:3] or pers[:3]
-        txt = "、".join(f"{p['tag']}({p['kind']})" for p in top3)
+        items = []
+        for p in top3:
+            ld = leaders.get(p["tag"], {})
+            nm = ld.get("name", "")
+            lb = ld.get("lianban", 0)
+            items.append(f"{p['tag']}({p['kind']})" + (f"→{nm}{lb}板" if nm and lb else ""))
+        txt = "、".join(items)
         L.append(f"- 🎯 主线判定：{txt}")
     alerts = d.get("alerts", []) or []
     if alerts:
