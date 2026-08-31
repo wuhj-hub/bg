@@ -44,6 +44,28 @@ description: "每个交易日开盘前自动生成全市场盘前分析报告，
 
 ---
 
+## ⚠️ 维护注意事项（2026-09-01 固化·双弦两轮崩溃修复）
+
+### 双弦系统崩溃史（教训固化，防复发）
+
+**① NameError: pd 未定义（8/29-8/31，双弦连续静默崩溃 3 天）**
+- 根因：`parse_kline_df(code) -> pd.DataFrame` 的**返回注解在函数定义时求值**，而 `import pandas as pd` 写在函数体内（调用时才执行）→ 模块加载即崩
+- 铁律：**函数返回注解引用 pandas/numpy 时，import 必须在模块级**（注解求值早于函数调用）
+- 隐蔽性：workflow 显示 success（run_py 把子进程失败当 WARN 不阻断）→ **假绿**，双弦无产出但没人发现
+
+**② KeyError: 'amount'（run #5 暴露第二层）**
+- 根因：猛兽 v3.0 公式（VAD/OVS/SSV/RS_D/伏击线）依赖 `df['amount']` 成交额列，但双弦 kline 解析只保留 6 列（date/open/close/high/low/volume），漏了第 8 列 amount
+- 铁律：**被 import 模块依赖的 DataFrame 列，调用方解析时必须完整提供**（westock 批量列序：symbol|date|open|last|high|low|volume|amount|exchange）
+- 已修复：prefetch_kline + parse_kline_df 两处正则补 amount 捕获，columns 加 "amount"
+
+### 数据异常检查清单（盘前/复盘引用数据时）
+1. **先查 `quant_results_latest.json` 的 `shuangxian.stderr`**——双弦是否静默崩溃（空 stderr=正常）
+2. **`*_latest.json` 文件大小**：0B=空跑/缺失；>500KB 用 GitHub API `size` 字段确认（Contents API 读取大文件会 IncompleteRead 误判 404/0B）
+3. **周六/周日补跑**：run 的 date 字段=运行日，行情数据=最近交易日（如周六跑出 8/28 数据，正常）
+4. 小 JSON（情绪预判 215B / 月线MACD 568B / top_signal 735B）是正常大小，非空跑
+
+---
+
 ## 固定自选股池（申万一级行业龙头）
 
 文件路径：`./references/watchlist.csv`
