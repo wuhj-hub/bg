@@ -1,12 +1,23 @@
 {
- "date": "2026-08-29",
+ "date": "2026-08-31",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 49,
+ "pool_size": 51,
  "resonance_boards": [
   {
-   "name": "化学原料",
-   "code": "pt01801033",
-   "zdf": 2.42,
+   "name": "房地产服务",
+   "code": "pt01801183",
+   "zdf": 2.45,
+   "strength": 8,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "zdf": 5.26,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -15,9 +26,9 @@
    ]
   },
   {
-   "name": "化学制品",
-   "code": "pt01801034",
-   "zdf": 2.1,
+   "name": "广告营销",
+   "code": "pt01801765",
+   "zdf": 3.32,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -26,9 +37,9 @@
    ]
   },
   {
-   "name": "基础化工",
-   "code": "pt01801030",
-   "zdf": 1.66,
+   "name": "爱奇艺概念",
+   "code": "pt02031384",
+   "zdf": 7.71,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -37,9 +48,9 @@
    ]
   },
   {
-   "name": "种植业",
-   "code": "pt01801016",
-   "zdf": 2.16,
+   "name": "消费电子",
+   "code": "pt01801085",
+   "zdf": 2.17,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -48,9 +59,9 @@
    ]
   },
   {
-   "name": "农化制品",
-   "code": "pt01801038",
-   "zdf": 1.85,
+   "name": "IT服务Ⅱ",
+   "code": "pt01801103",
+   "zdf": 2.84,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -59,9 +70,9 @@
    ]
   },
   {
-   "name": "一般零售",
-   "code": "pt01801203",
-   "zdf": 1.59,
+   "name": "计算机设备",
+   "code": "pt01801101",
+   "zdf": 2.82,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -70,9 +81,9 @@
    ]
   },
   {
-   "name": "农林牧渔",
-   "code": "pt01801010",
-   "zdf": 1.66,
+   "name": "传媒",
+   "code": "pt01801760",
+   "zdf": 3.8,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -81,9 +92,9 @@
    ]
   },
   {
-   "name": "能源金属",
-   "code": "pt01801056",
-   "zdf": 1.25,
+   "name": "PCB概念",
+   "code": "pt02101284",
+   "zdf": 2.46,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -92,9 +103,9 @@
    ]
   },
   {
-   "name": "旅游及景区",
-   "code": "pt01801993",
-   "zdf": 1.73,
+   "name": "通用设备",
+   "code": "pt01801072",
+   "zdf": 2.8,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -103,29 +114,20 @@
    ]
   },
   {
-   "name": "软件开发",
-   "code": "pt01801104",
-   "zdf": 0.6,
-   "strength": 5,
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "zdf": 2.3,
+   "strength": 7,
    "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "zdf": 0.85,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "塑料",
-   "code": "pt01801036",
-   "zdf": 0.25,
+   "name": "元件",
+   "code": "pt01801083",
+   "zdf": 2.52,
    "strength": 5,
    "factors": [
     "进场",
@@ -135,164 +137,160 @@
  ],
  "grab_top": [
   {
-   "name": "化学原料",
-   "code": "pt01801033",
+   "name": "房地产服务",
+   "code": "pt01801183",
+   "value": 8
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
    "value": 7
   },
   {
-   "name": "化学制品",
-   "code": "pt01801034",
+   "name": "广告营销",
+   "code": "pt01801765",
    "value": 7
   },
   {
-   "name": "基础化工",
-   "code": "pt01801030",
+   "name": "爱奇艺概念",
+   "code": "pt02031384",
    "value": 7
   },
   {
-   "name": "种植业",
-   "code": "pt01801016",
+   "name": "消费电子",
+   "code": "pt01801085",
    "value": 7
   },
   {
-   "name": "农化制品",
-   "code": "pt01801038",
+   "name": "IT服务Ⅱ",
+   "code": "pt01801103",
    "value": 7
   },
   {
-   "name": "一般零售",
-   "code": "pt01801203",
+   "name": "计算机设备",
+   "code": "pt01801101",
    "value": 7
   },
   {
-   "name": "农林牧渔",
-   "code": "pt01801010",
+   "name": "传媒",
+   "code": "pt01801760",
    "value": 7
   },
   {
-   "name": "能源金属",
-   "code": "pt01801056",
+   "name": "PCB概念",
+   "code": "pt02101284",
    "value": 7
   },
   {
-   "name": "旅游及景区",
-   "code": "pt01801993",
+   "name": "通用设备",
+   "code": "pt01801072",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "value": 72.7
+   "name": "PCB概念",
+   "code": "pt02101284",
+   "value": 101.8
   },
   {
-   "name": "软件开发",
-   "code": "pt01801104",
-   "value": 41.0
+   "name": "消费电子",
+   "code": "pt01801085",
+   "value": 77.6
   },
   {
-   "name": "基础化工",
-   "code": "pt01801030",
-   "value": 35.5
+   "name": "元件",
+   "code": "pt01801083",
+   "value": 64.2
   },
   {
-   "name": "塑料",
-   "code": "pt01801036",
-   "value": 20.2
+   "name": "计算机设备",
+   "code": "pt01801101",
+   "value": 37.4
   },
   {
-   "name": "化学原料",
-   "code": "pt01801033",
-   "value": 13.9
+   "name": "IT服务Ⅱ",
+   "code": "pt01801103",
+   "value": 33.4
   },
   {
-   "name": "农林牧渔",
-   "code": "pt01801010",
-   "value": 13.4
+   "name": "通用设备",
+   "code": "pt01801072",
+   "value": 5.9
   },
   {
-   "name": "种植业",
-   "code": "pt01801016",
-   "value": 9.7
+   "name": "广告营销",
+   "code": "pt01801765",
+   "value": 5.7
   },
   {
-   "name": "化学制品",
-   "code": "pt01801034",
-   "value": 9.4
+   "name": "传媒",
+   "code": "pt01801760",
+   "value": 3.4
   },
   {
-   "name": "农化制品",
-   "code": "pt01801038",
-   "value": 4.2
+   "name": "房地产",
+   "code": "pt01801180",
+   "value": 3.0
   },
   {
-   "name": "能源金属",
-   "code": "pt01801056",
-   "value": 3.6
+   "name": "房地产服务",
+   "code": "pt01801183",
+   "value": 3.0
   }
  ],
  "absorption_top": [
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "value": 1.94
+   "name": "房地产服务",
+   "code": "pt01801183",
+   "value": 3.23
   },
   {
-   "name": "软件开发",
-   "code": "pt01801104",
-   "value": 1.78
+   "name": "计算机设备",
+   "code": "pt01801101",
+   "value": 2.63
   },
   {
-   "name": "塑料",
-   "code": "pt01801036",
-   "value": 1.58
+   "name": "消费电子",
+   "code": "pt01801085",
+   "value": 2.02
   },
   {
-   "name": "种植业",
-   "code": "pt01801016",
-   "value": 1.56
+   "name": "IT服务Ⅱ",
+   "code": "pt01801103",
+   "value": 1.61
   },
   {
-   "name": "化学原料",
-   "code": "pt01801033",
-   "value": 1.19
+   "name": "元件",
+   "code": "pt01801083",
+   "value": 1.02
   },
   {
-   "name": "旅游及景区",
-   "code": "pt01801993",
-   "value": 1.05
+   "name": "广告营销",
+   "code": "pt01801765",
+   "value": 0.85
   },
   {
-   "name": "农林牧渔",
-   "code": "pt01801010",
+   "name": "PCB概念",
+   "code": "pt02101284",
    "value": 0.79
   },
   {
-   "name": "一般零售",
-   "code": "pt01801203",
-   "value": 0.63
+   "name": "爱奇艺概念",
+   "code": "pt02031384",
+   "value": 0.36
   },
   {
-   "name": "基础化工",
-   "code": "pt01801030",
-   "value": 0.55
+   "name": "房地产",
+   "code": "pt01801180",
+   "value": 0.29
   },
   {
-   "name": "农化制品",
-   "code": "pt01801038",
-   "value": 0.42
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 0.21
   }
  ],
  "control_top": [],
- "zhongjun_candidates": [
-  {
-   "board": "化学原料",
-   "stock": "雪天盐业",
-   "code": "sh600929",
-   "zdf": "10.02",
-   "main1": 0.64,
-   "main5": 0.27
-  }
- ]
+ "zhongjun_candidates": []
 }
