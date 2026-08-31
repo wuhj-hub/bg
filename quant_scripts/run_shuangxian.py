@@ -49,7 +49,8 @@ _KLINE_CACHE = {}
 
 
 def prefetch_kline(codes, limit=250):
-    """批量预取 kline 到缓存：50只/批，缓存 DataFrame（close/high/low/open/volume）"""
+    """批量预取 kline 到缓存：50只/批，缓存 DataFrame（close/high/low/open/volume/amount）
+    2026-08-31修复: 补 amount 列（猛兽v3.0 VAD/OVS/SSV/RS_D 公式依赖 df['amount']）"""
     import pandas as pd
     clean = [c for c in codes if re.match(r'^(sh|sz)\d{6}$', c)]
     for i in range(0, len(clean), 50):
@@ -58,20 +59,22 @@ def prefetch_kline(codes, limit=250):
         if not raw:
             continue
         rows = {}
+        # 批量列序: symbol|date|open|last|high|low|volume|amount|exchange
         for ln in raw.split("\n"):
-            m = re.match(r'\| (sh\d{6}|sz\d{6}) \| (\d{4}-\d{2}-\d{2}) \| (\S+) \| (\S+) \| (\S+) \| (\S+) \| (\S+)', ln)
+            m = re.match(r'\| (sh\d{6}|sz\d{6}) \| (\d{4}-\d{2}-\d{2}) \| (\S+) \| (\S+) \| (\S+) \| (\S+) \| (\S+) \| (\S+)', ln)
             if m:
-                code, date, o, c, h, l, v = m.groups()
-                rows.setdefault(code, []).append((date, float(o), float(c), float(h), float(l), float(v)))
+                code, date, o, c, h, l, v, amt = m.groups()
+                rows.setdefault(code, []).append((date, float(o), float(c), float(h), float(l), float(v), float(amt)))
         for code, lst in rows.items():
             lst.sort(key=lambda x: x[0])
-            df = pd.DataFrame(lst, columns=["date", "open", "close", "high", "low", "volume"])
+            df = pd.DataFrame(lst, columns=["date", "open", "close", "high", "low", "volume", "amount"])
             _KLINE_CACHE[code] = df
     print(f"[OK] kline 批量预取完成: {len(_KLINE_CACHE)} 只（{len(clean)} 请求分 {max(1, (len(clean)+49)//50)} 批）")
 
 
 def parse_kline_df(code: str, limit: int = 60) -> pd.DataFrame:
-    """kline DataFrame：优先批量缓存，未命中再逐只拉取"""
+    """kline DataFrame：优先批量缓存，未命中再逐只拉取
+    2026-08-31修复: amount 列（猛兽公式依赖）"""
     import pandas as pd
     if code in _KLINE_CACHE:
         return _KLINE_CACHE[code]
@@ -82,13 +85,14 @@ def parse_kline_df(code: str, limit: int = 60) -> pd.DataFrame:
     except Exception:
         raw = cli(f"kline {code} --period day --limit {limit} --fq qfq")
         rows = []
+        # 单股列序: date|open|last|high|low|volume|amount|exchange
         for ln in raw.split("\n"):
-            m = re.match(r'\| (sh\d{6}|sz\d{6}) \| (\d{4}-\d{2}-\d{2}) \| (\S+) \| (\S+) \| (\S+) \| (\S+) \| (\S+)', ln)
+            m = re.match(r'\| (\d{4}-\d{2}-\d{2}) \| (\S+) \| (\S+) \| (\S+) \| (\S+) \| (\S+) \| (\S+)', ln)
             if m:
-                code2, date, o, c, h, l, v = m.groups()
-                rows.append((date, float(o), float(c), float(h), float(l), float(v)))
+                date, o, c, h, l, v, amt = m.groups()
+                rows.append((date, float(o), float(c), float(h), float(l), float(v), float(amt)))
         rows.sort(key=lambda x: x[0])
-        return pd.DataFrame(rows, columns=["date", "open", "close", "high", "low", "volume"])
+        return pd.DataFrame(rows, columns=["date", "open", "close", "high", "low", "volume", "amount"])
 
 
 def parse_table(md: str) -> list[dict]:
