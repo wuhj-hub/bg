@@ -1,7 +1,7 @@
 {
  "date": "2026-08-31",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 49,
+ "pool_size": 46,
  "resonance_boards": [
   {
    "name": "出版",
@@ -18,6 +18,17 @@
    "name": "广告营销",
    "code": "pt01801765",
    "zdf": 3.32,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "装修装饰Ⅱ",
+   "code": "pt01801722",
+   "zdf": 3.07,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -59,17 +70,6 @@
    ]
   },
   {
-   "name": "计算机设备",
-   "code": "pt01801101",
-   "zdf": 2.82,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
    "name": "传媒",
    "code": "pt01801760",
    "zdf": 3.8,
@@ -100,6 +100,16 @@
     "抢筹",
     "进场",
     "吸筹"
+   ]
+  },
+  {
+   "name": "计算机设备",
+   "code": "",
+   "zdf": 2.82,
+   "strength": 5,
+   "factors": [
+    "抢筹",
+    "进场"
    ]
   },
   {
@@ -135,6 +145,11 @@
    "value": 7
   },
   {
+   "name": "装修装饰Ⅱ",
+   "code": "pt01801722",
+   "value": 7
+  },
+  {
    "name": "爱奇艺概念",
    "code": "pt02031384",
    "value": 7
@@ -147,11 +162,6 @@
   {
    "name": "IT服务Ⅱ",
    "code": "pt01801103",
-   "value": 7
-  },
-  {
-   "name": "计算机设备",
-   "code": "pt01801101",
    "value": 7
   },
   {
@@ -168,6 +178,11 @@
    "name": "通用设备",
    "code": "pt01801072",
    "value": 7
+  },
+  {
+   "name": "计算机设备",
+   "code": "",
+   "value": 5
   }
  ],
  "entry_top": [
@@ -183,7 +198,7 @@
   },
   {
    "name": "计算机设备",
-   "code": "pt01801101",
+   "code": "",
    "value": 37.4
   },
   {
@@ -217,17 +232,12 @@
    "value": 3.0
   },
   {
-   "name": "爱奇艺概念",
-   "code": "pt02031384",
-   "value": 0.8
+   "name": "装修装饰Ⅱ",
+   "code": "pt01801722",
+   "value": 1.1
   }
  ],
  "absorption_top": [
-  {
-   "name": "计算机设备",
-   "code": "pt01801101",
-   "value": 2.63
-  },
   {
    "name": "消费电子",
    "code": "pt01801085",
@@ -247,6 +257,11 @@
    "name": "广告营销",
    "code": "pt01801765",
    "value": 0.85
+  },
+  {
+   "name": "装修装饰Ⅱ",
+   "code": "pt01801722",
+   "value": 0.39
   },
   {
    "name": "爱奇艺概念",
@@ -275,5 +290,14 @@
   }
  ],
  "control_top": [],
- "zhongjun_candidates": []
+ "zhongjun_candidates": [
+  {
+   "board": "装修装饰Ⅱ",
+   "stock": "金 螳 螂",
+   "code": "sz002081",
+   "zdf": "10.00",
+   "main1": 4.37,
+   "main5": 1.73
+  }
+ ]
 }
