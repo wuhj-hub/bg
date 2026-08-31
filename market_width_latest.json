@@ -2,12 +2,12 @@
  "date": "2026-08-31",
  "total": 3124,
  "valid": 3050,
- "up": 1561,
- "down": 1386,
- "flat": 103,
- "strong": 172,
+ "up": 1563,
+ "down": 1387,
+ "flat": 100,
+ "strong": 174,
  "weak": 63,
- "limitup": 79,
+ "limitup": 80,
  "limitdown": 11,
  "up_pct": 51.2,
  "score": 81.2,
@@ -128,6 +128,11 @@
   {
    "code": "600722",
    "name": "金牛化工",
+   "pct": 10.02
+  },
+  {
+   "code": "600929",
+   "name": "雪天盐业",
    "pct": 10.02
   },
   {
@@ -525,6 +530,11 @@
   {
    "code": "600722",
    "name": "金牛化工",
+   "pct": 10.02
+  },
+  {
+   "code": "600929",
+   "name": "雪天盐业",
    "pct": 10.02
   },
   {
@@ -1258,6 +1268,11 @@
    "pct": 5.21
   },
   {
+   "code": "002274",
+   "name": "华昌化工",
+   "pct": 5.2
+  },
+  {
    "code": "600405",
    "name": "动力源",
    "pct": 5.19
@@ -1324,9 +1339,9 @@
   }
  ],
  "limitup_stats": {
-  "touched": 129,
+  "touched": 130,
   "zhaban": 50,
-  "zhaban_rate": 38.8,
+  "zhaban_rate": 38.5,
   "lianban": 18,
   "lianban3": 8,
   "max_lianban": 6,
