@@ -683,7 +683,7 @@
       "month_trend": "纠缠",
       "month_gate": "WARN",
       "month_reversal": null,
-      "rsg_dev": null,
+      "rsg_dev": 15.5,
       "rsg_strong": false
     },
     {
@@ -2553,7 +2553,7 @@
       "month_trend": "纠缠",
       "month_gate": "WARN",
       "month_reversal": null,
-      "rsg_dev": null,
+      "rsg_dev": -53.8,
       "rsg_strong": false
     },
     {
@@ -2746,7 +2746,7 @@
       "month_trend": "纠缠",
       "month_gate": "WARN",
       "month_reversal": null,
-      "rsg_dev": null,
+      "rsg_dev": 15.5,
       "rsg_strong": false
     },
     {
@@ -3032,7 +3032,7 @@
       "month_trend": "纠缠",
       "month_gate": "WARN",
       "month_reversal": null,
-      "rsg_dev": null,
+      "rsg_dev": -53.8,
       "rsg_strong": false
     }
   ]
