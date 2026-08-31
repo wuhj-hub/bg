@@ -3,12 +3,12 @@
  "data_date": "2026-08-31",
  "style": "情绪市",
  "icon": "🔥",
- "score": 30,
+ "score": 28,
  "score_detail": {
   "size_style": 17,
   "limitup_structure": 16,
-  "volume_structure": -1,
-  "sector_fund": -2
+  "volume_structure": -8,
+  "sector_fund": 3
  },
  "size_style": {
   "hs300_5d": 1.36,
@@ -34,18 +34,10 @@
  "volume_structure": {
   "small_big_ratio_now": 1.073,
   "small_big_ratio_5d": 1.228,
-  "vol_shift": "资金回流大盘",
-  "small_vol_pulse": 109.64
+  "vol_shift": "资金回流大盘"
  },
  "sector_fund": {
   "sectors": [
-   {
-    "name": "证券Ⅱ",
-    "zdf": "0.17",
-    "main_net5d": 39.1,
-    "retail_net": 3.4,
-    "tag": "混合"
-   },
    {
     "name": "消费电子",
     "zdf": "2.17",
@@ -54,36 +46,38 @@
     "tag": "机构型"
    },
    {
-    "name": "昨日涨停",
-    "zdf": "0.71",
-    "main_net5d": -80.7,
-    "retail_net": 17.2,
+    "name": "地下管网",
+    "zdf": "0.54",
+    "main_net5d": -3.6,
+    "retail_net": 4.6,
     "tag": "游资型"
    },
    {
-    "name": "元件",
-    "zdf": "2.52",
-    "main_net5d": 64.2,
-    "retail_net": -15.1,
-    "tag": "机构型"
+    "name": "影视院线",
+    "zdf": "7.02",
+    "main_net5d": -2.3,
+    "retail_net": -14.0,
+    "tag": "游资型"
    }
   ]
  },
  "mode_cross": {
-  "dominant": "堆量模式",
+  "dominant": "欧马模式",
   "all": {
    "堆量模式": 11,
    "欧马模式": 4
   },
   "leaders": {
-   "堆量模式": 8,
+   "堆量模式": 10,
    "欧马模式": 3
   },
-  "pullbacks": {},
+  "pullbacks": {
+   "堆量模式": 1
+  },
   "gpoints": {
    "堆量模式": 1
   },
-  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
+  "verdict": "⚠️ 背离（风格轴与猛兽信号偏好不一致，注意结构分化）",
   "total_scored": 15
  },
  "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
