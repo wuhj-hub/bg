@@ -11,6 +11,7 @@ from datetime import datetime, date
 from pathlib import Path
 import csv as _csv
 from concurrent.futures import ThreadPoolExecutor
+import pandas as pd  # 2026-08-31修复: parse_kline_df返回注解`-> pd.DataFrame`在定义时求值，函数体内import晚于注解求值→NameError，必须模块级导入
 
 # ============================================================
 # 路径配置
