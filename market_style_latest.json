@@ -47,18 +47,18 @@
     "tag": "混合"
    },
    {
-    "name": "半导体",
-    "zdf": "1.85",
-    "main_net5d": -149.5,
-    "retail_net": 17.0,
-    "tag": "游资型"
-   },
-   {
     "name": "消费电子",
     "zdf": "2.17",
     "main_net5d": 19.8,
     "retail_net": -24.6,
     "tag": "机构型"
+   },
+   {
+    "name": "昨日涨停",
+    "zdf": "0.71",
+    "main_net5d": -80.7,
+    "retail_net": 17.2,
+    "tag": "游资型"
    },
    {
     "name": "元件",
