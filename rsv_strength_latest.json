@@ -1,6 +1,6 @@
 {
  "date": "2026-08-31",
- "pool_size": 3039,
+ "pool_size": 3038,
  "analyzed": 3032,
  "launch": [
   {
@@ -105,24 +105,24 @@
    "rsg_strong": false
   },
   {
-   "code": "sz000035",
-   "name": "中国天楹",
-   "close": 4.8,
-   "rsv_day": 14.1,
-   "rsv_week": 28.1,
+   "code": "sz000045",
+   "name": "深纺织Ａ",
+   "close": 11.11,
+   "rsv_day": 40.2,
+   "rsv_week": 53.7,
    "estimator": true,
    "state": "启动",
    "signals": [
     {
-     "type": "日线启动",
-     "desc": "RSV均14.1<20拐头向上（半年级别）"
+     "type": "周线突破50",
+     "desc": "周RSV53.7突破50（3年级别）"
     },
     {
      "type": "月线估波正",
      "desc": "估波信号>0（月牛3确认）"
     }
    ],
-   "rsg_dev": -146.9,
+   "rsg_dev": -53.1,
    "rsg_strong": false
   },
   {
@@ -143,24 +143,24 @@
    "rsg_strong": false
   },
   {
-   "code": "sz000045",
-   "name": "深纺织Ａ",
-   "close": 11.11,
-   "rsv_day": 40.2,
-   "rsv_week": 53.7,
+   "code": "sz000035",
+   "name": "中国天楹",
+   "close": 4.8,
+   "rsv_day": 14.1,
+   "rsv_week": 28.1,
    "estimator": true,
    "state": "启动",
    "signals": [
     {
-     "type": "周线突破50",
-     "desc": "周RSV53.7突破50（3年级别）"
+     "type": "日线启动",
+     "desc": "RSV均14.1<20拐头向上（半年级别）"
     },
     {
      "type": "月线估波正",
      "desc": "估波信号>0（月牛3确认）"
     }
    ],
-   "rsg_dev": -53.1,
+   "rsg_dev": -146.9,
    "rsg_strong": false
   },
   {
@@ -362,23 +362,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz000513",
-   "name": "丽珠集团",
-   "close": 26.41,
-   "rsv_day": 7.2,
-   "rsv_week": 0.0,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均7.2<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -187.3,
-   "rsg_strong": false
-  },
-  {
    "code": "sz000507",
    "name": "珠海港",
    "close": 5.09,
@@ -393,6 +376,23 @@
     }
    ],
    "rsg_dev": -15.0,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz000513",
+   "name": "丽珠集团",
+   "close": 26.41,
+   "rsv_day": 7.2,
+   "rsv_week": 0.0,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均7.2<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -187.3,
    "rsg_strong": false
   },
   {
@@ -605,17 +605,17 @@
    "code": "sz000635",
    "name": "英 力 特",
    "close": 6.56,
-   "rsv_day": 19.8,
+   "rsv_day": 19.9,
    "rsv_week": 19.7,
    "estimator": false,
    "state": "启动",
    "signals": [
     {
      "type": "日线启动",
-     "desc": "RSV均19.8<20拐头向上（半年级别）"
+     "desc": "RSV均19.9<20拐头向上（半年级别）"
     }
    ],
-   "rsg_dev": -189.2,
+   "rsg_dev": -189.3,
    "rsg_strong": false
   },
   {
@@ -838,27 +838,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz000778",
-   "name": "新兴铸管",
-   "close": 3.68,
-   "rsv_day": 14.1,
-   "rsv_week": 32.9,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均14.1<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -98.6,
-   "rsg_strong": false
-  },
-  {
    "code": "sz000777",
    "name": "中核科技",
    "close": 17.23,
@@ -877,6 +856,27 @@
     }
    ],
    "rsg_dev": -165.3,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz000778",
+   "name": "新兴铸管",
+   "close": 3.68,
+   "rsv_day": 14.1,
+   "rsv_week": 32.9,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均14.1<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -98.6,
    "rsg_strong": false
   },
   {
@@ -994,27 +994,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz000892",
-   "name": "欢瑞世纪",
-   "close": 4.3,
-   "rsv_day": 19.6,
-   "rsv_week": 31.5,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均19.6<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -247.4,
-   "rsg_strong": false
-  },
-  {
    "code": "sz000902",
    "name": "新洋丰",
    "close": 14.3,
@@ -1033,6 +1012,27 @@
     }
    ],
    "rsg_dev": -12.4,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz000892",
+   "name": "欢瑞世纪",
+   "close": 4.3,
+   "rsv_day": 19.6,
+   "rsv_week": 31.5,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均19.6<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -247.4,
    "rsg_strong": false
   },
   {
@@ -1453,27 +1453,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz001332",
-   "name": "锡装股份",
-   "close": 28.48,
-   "rsv_day": 4.2,
-   "rsv_week": 41.0,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均4.2<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -261.0,
-   "rsg_strong": false
-  },
-  {
    "code": "sz001333",
    "name": "光华股份",
    "close": 20.85,
@@ -1492,6 +1471,27 @@
     }
    ],
    "rsg_dev": -70.0,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz001332",
+   "name": "锡装股份",
+   "close": 28.48,
+   "rsv_day": 4.2,
+   "rsv_week": 41.0,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均4.2<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -261.0,
    "rsg_strong": false
   },
   {
@@ -1651,6 +1651,23 @@
    "rsg_strong": true
   },
   {
+   "code": "sz002006",
+   "name": "精工科技",
+   "close": 13.56,
+   "rsv_day": 10.8,
+   "rsv_week": 29.8,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均10.8<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -249.4,
+   "rsg_strong": false
+  },
+  {
    "code": "sz002009",
    "name": "天奇股份",
    "close": 16.61,
@@ -1669,23 +1686,6 @@
     }
    ],
    "rsg_dev": -186.8,
-   "rsg_strong": false
-  },
-  {
-   "code": "sz002006",
-   "name": "精工科技",
-   "close": 13.56,
-   "rsv_day": 10.8,
-   "rsv_week": 29.8,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均10.8<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -249.4,
    "rsg_strong": false
   },
   {
@@ -1900,27 +1900,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002077",
-   "name": "大港股份",
-   "close": 12.69,
-   "rsv_day": 12.1,
-   "rsv_week": 23.5,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均12.1<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -194.6,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002078",
    "name": "太阳纸业",
    "close": 14.91,
@@ -1939,6 +1918,27 @@
     }
    ],
    "rsg_dev": 40.9,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002077",
+   "name": "大港股份",
+   "close": 12.69,
+   "rsv_day": 12.1,
+   "rsv_week": 23.5,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均12.1<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -194.6,
    "rsg_strong": false
   },
   {
@@ -2153,27 +2153,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002135",
-   "name": "东南网架",
-   "close": 6.71,
-   "rsv_day": 38.5,
-   "rsv_week": 55.1,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV55.1突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 141.4,
-   "rsg_strong": true
-  },
-  {
    "code": "sz002131",
    "name": "利欧股份",
    "close": 4.75,
@@ -2214,6 +2193,27 @@
    ],
    "rsg_dev": 31.4,
    "rsg_strong": false
+  },
+  {
+   "code": "sz002135",
+   "name": "东南网架",
+   "close": 6.71,
+   "rsv_day": 38.5,
+   "rsv_week": 55.1,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV55.1突破50（3年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 141.4,
+   "rsg_strong": true
   },
   {
    "code": "sz002139",
@@ -2401,27 +2401,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002171",
-   "name": "楚江新材",
-   "close": 10.17,
-   "rsv_day": 16.6,
-   "rsv_week": 48.9,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均16.6<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -113.6,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002163",
    "name": "海南发展",
    "close": 8.55,
@@ -2461,6 +2440,27 @@
     }
    ],
    "rsg_dev": 14.2,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002171",
+   "name": "楚江新材",
+   "close": 10.17,
+   "rsv_day": 16.6,
+   "rsv_week": 48.9,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均16.6<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -113.6,
    "rsg_strong": false
   },
   {
@@ -2611,6 +2611,23 @@
    "rsg_strong": false
   },
   {
+   "code": "sz002215",
+   "name": "诺 普 信",
+   "close": 10.26,
+   "rsv_day": 64.2,
+   "rsv_week": 62.2,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV62.2突破50（3年级别）"
+    }
+   ],
+   "rsg_dev": -6.8,
+   "rsg_strong": false
+  },
+  {
    "code": "sz002209",
    "name": "达 意 隆",
    "close": 13.7,
@@ -2629,40 +2646,6 @@
     }
    ],
    "rsg_dev": -24.8,
-   "rsg_strong": false
-  },
-  {
-   "code": "sz002215",
-   "name": "诺 普 信",
-   "close": 10.26,
-   "rsv_day": 64.2,
-   "rsv_week": 62.2,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV62.2突破50（3年级别）"
-    }
-   ],
-   "rsg_dev": -6.8,
-   "rsg_strong": false
-  },
-  {
-   "code": "sz002225",
-   "name": "濮耐股份",
-   "close": 3.7,
-   "rsv_day": 9.2,
-   "rsv_week": 19.5,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均9.2<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -277.8,
    "rsg_strong": false
   },
   {
@@ -2687,6 +2670,23 @@
    "rsg_strong": false
   },
   {
+   "code": "sz002225",
+   "name": "濮耐股份",
+   "close": 3.7,
+   "rsv_day": 9.2,
+   "rsv_week": 19.5,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均9.2<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -277.8,
+   "rsg_strong": false
+  },
+  {
    "code": "sz002221",
    "name": "东华能源",
    "close": 5.91,
@@ -2701,6 +2701,27 @@
     }
    ],
    "rsg_dev": -208.5,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002240",
+   "name": "盛新锂能",
+   "close": 32.62,
+   "rsv_day": 17.7,
+   "rsv_week": 44.2,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均17.7<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -57.9,
    "rsg_strong": false
   },
   {
@@ -2739,27 +2760,6 @@
     }
    ],
    "rsg_dev": 48.1,
-   "rsg_strong": false
-  },
-  {
-   "code": "sz002240",
-   "name": "盛新锂能",
-   "close": 32.62,
-   "rsv_day": 17.7,
-   "rsv_week": 44.2,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均17.7<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -57.9,
    "rsg_strong": false
   },
   {
@@ -2826,23 +2826,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002267",
-   "name": "陕天然气",
-   "close": 7.3,
-   "rsv_day": 43.1,
-   "rsv_week": 58.0,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV58.0突破50（3年级别）"
-    }
-   ],
-   "rsg_dev": -20.6,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002259",
    "name": "升达林业",
    "close": 4.3,
@@ -2882,6 +2865,23 @@
     }
    ],
    "rsg_dev": -160.4,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002267",
+   "name": "陕天然气",
+   "close": 7.3,
+   "rsv_day": 43.1,
+   "rsv_week": 58.0,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV58.0突破50（3年级别）"
+    }
+   ],
+   "rsg_dev": -20.6,
    "rsg_strong": false
   },
   {
@@ -2926,7 +2926,7 @@
    "code": "sz002274",
    "name": "华昌化工",
    "close": 6.47,
-   "rsv_day": 81.8,
+   "rsv_day": 84.8,
    "rsv_week": 55.8,
    "estimator": false,
    "state": "启动",
@@ -2936,7 +2936,7 @@
      "desc": "周RSV55.8突破50（3年级别）"
     }
    ],
-   "rsg_dev": 93.0,
+   "rsg_dev": 97.8,
    "rsg_strong": true
   },
   {
@@ -3075,27 +3075,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002320",
-   "name": "海峡股份",
-   "close": 6.62,
-   "rsv_day": 15.5,
-   "rsv_week": 19.1,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均15.5<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -293.8,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002318",
    "name": "久立特材",
    "close": 20.23,
@@ -3114,6 +3093,27 @@
     }
    ],
    "rsg_dev": -190.2,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002320",
+   "name": "海峡股份",
+   "close": 6.62,
+   "rsv_day": 15.5,
+   "rsv_week": 19.1,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均15.5<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -293.8,
    "rsg_strong": false
   },
   {
@@ -3163,27 +3163,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002338",
-   "name": "奥普光电",
-   "close": 43.42,
-   "rsv_day": 18.4,
-   "rsv_week": 50.3,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均18.4<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -169.5,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002339",
    "name": "积成电子",
    "close": 7.49,
@@ -3202,6 +3181,27 @@
     }
    ],
    "rsg_dev": -144.9,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002338",
+   "name": "奥普光电",
+   "close": 43.42,
+   "rsv_day": 18.4,
+   "rsv_week": 50.3,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均18.4<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -169.5,
    "rsg_strong": false
   },
   {
@@ -3243,27 +3243,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002357",
-   "name": "富临运业",
-   "close": 11.28,
-   "rsv_day": 41.1,
-   "rsv_week": 57.2,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV57.2突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 27.7,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002361",
    "name": "神剑股份",
    "close": 10.56,
@@ -3282,6 +3261,27 @@
     }
    ],
    "rsg_dev": -85.1,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002357",
+   "name": "富临运业",
+   "close": 11.28,
+   "rsv_day": 41.1,
+   "rsv_week": 57.2,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV57.2突破50（3年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 27.7,
    "rsg_strong": false
   },
   {
@@ -3340,23 +3340,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002389",
-   "name": "航天彩虹",
-   "close": 18.37,
-   "rsv_day": 16.8,
-   "rsv_week": 38.5,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均16.8<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -131.8,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002380",
    "name": "科远智慧",
    "close": 29.03,
@@ -3375,6 +3358,23 @@
     }
    ],
    "rsg_dev": -51.2,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002389",
+   "name": "航天彩虹",
+   "close": 18.37,
+   "rsv_day": 16.8,
+   "rsv_week": 38.5,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均16.8<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -131.8,
    "rsg_strong": false
   },
   {
@@ -3542,6 +3542,23 @@
    "rsg_strong": false
   },
   {
+   "code": "sz002434",
+   "name": "万里扬",
+   "close": 5.8,
+   "rsv_day": 10.2,
+   "rsv_week": 21.5,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均10.2<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -274.2,
+   "rsg_strong": false
+  },
+  {
    "code": "sz002426",
    "name": "胜利精密",
    "close": 2.76,
@@ -3560,23 +3577,6 @@
     }
    ],
    "rsg_dev": -209.6,
-   "rsg_strong": false
-  },
-  {
-   "code": "sz002434",
-   "name": "万里扬",
-   "close": 5.8,
-   "rsv_day": 10.2,
-   "rsv_week": 21.5,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均10.2<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -274.2,
    "rsg_strong": false
   },
   {
@@ -3622,27 +3622,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz002457",
-   "name": "青龙管业",
-   "close": 11.33,
-   "rsv_day": 27.9,
-   "rsv_week": 53.1,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV53.1突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -4.8,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002465",
    "name": "海格通信",
    "close": 10.2,
@@ -3664,6 +3643,27 @@
    "rsg_strong": false
   },
   {
+   "code": "sz002457",
+   "name": "青龙管业",
+   "close": 11.33,
+   "rsv_day": 27.9,
+   "rsv_week": 53.1,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV53.1突破50（3年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -4.8,
+   "rsg_strong": false
+  },
+  {
    "code": "sz002467",
    "name": "二六三",
    "close": 4.71,
@@ -3678,27 +3678,6 @@
     }
    ],
    "rsg_dev": -220.6,
-   "rsg_strong": false
-  },
-  {
-   "code": "sz002460",
-   "name": "赣锋锂业",
-   "close": 53.89,
-   "rsv_day": 15.4,
-   "rsv_week": 45.3,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均15.4<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -158.8,
    "rsg_strong": false
   },
   {
@@ -3720,6 +3699,27 @@
     }
    ],
    "rsg_dev": -5.1,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002460",
+   "name": "赣锋锂业",
+   "close": 53.89,
+   "rsv_day": 15.4,
+   "rsv_week": 45.3,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均15.4<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -158.8,
    "rsg_strong": false
   },
   {
@@ -3803,27 +3803,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002496",
-   "name": "辉丰股份",
-   "close": 2.17,
-   "rsv_day": 54.0,
-   "rsv_week": 53.1,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV53.1突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 131.9,
-   "rsg_strong": true
-  },
-  {
    "code": "sz002497",
    "name": "雅化集团",
    "close": 19.18,
@@ -3845,6 +3824,27 @@
    "rsg_strong": false
   },
   {
+   "code": "sz002496",
+   "name": "辉丰股份",
+   "close": 2.17,
+   "rsv_day": 54.0,
+   "rsv_week": 53.1,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV53.1突破50（3年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 131.9,
+   "rsg_strong": true
+  },
+  {
    "code": "sz002523",
    "name": "天桥起重",
    "close": 3.53,
@@ -3863,6 +3863,27 @@
     }
    ],
    "rsg_dev": -76.3,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002519",
+   "name": "银河电子",
+   "close": 5.66,
+   "rsv_day": 14.1,
+   "rsv_week": 26.3,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均14.1<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -122.0,
    "rsg_strong": false
   },
   {
@@ -3901,27 +3922,6 @@
     }
    ],
    "rsg_dev": -198.1,
-   "rsg_strong": false
-  },
-  {
-   "code": "sz002519",
-   "name": "银河电子",
-   "close": 5.66,
-   "rsv_day": 14.1,
-   "rsv_week": 26.3,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均14.1<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -122.0,
    "rsg_strong": false
   },
   {
@@ -4026,27 +4026,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002565",
-   "name": "顺灏股份",
-   "close": 8.64,
-   "rsv_day": 2.8,
-   "rsv_week": 31.7,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均2.8<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -302.9,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002564",
    "name": "天沃科技",
    "close": 4.52,
@@ -4065,6 +4044,27 @@
     }
    ],
    "rsg_dev": -325.9,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002565",
+   "name": "顺灏股份",
+   "close": 8.64,
+   "rsv_day": 2.8,
+   "rsv_week": 31.7,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均2.8<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -302.9,
    "rsg_strong": false
   },
   {
@@ -4165,23 +4165,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002613",
-   "name": "北玻股份",
-   "close": 3.49,
-   "rsv_day": 19.6,
-   "rsv_week": 25.0,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均19.6<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -91.2,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002624",
    "name": "完美世界",
    "close": 10.94,
@@ -4200,6 +4183,23 @@
     }
    ],
    "rsg_dev": -287.7,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002613",
+   "name": "北玻股份",
+   "close": 3.49,
+   "rsv_day": 19.6,
+   "rsv_week": 25.0,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均19.6<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -91.2,
    "rsg_strong": false
   },
   {
@@ -4607,6 +4607,27 @@
    "rsg_strong": false
   },
   {
+   "code": "sz002769",
+   "name": "普路通",
+   "close": 7.14,
+   "rsv_day": 18.2,
+   "rsv_week": 29.9,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均18.2<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -237.0,
+   "rsg_strong": false
+  },
+  {
    "code": "sz002757",
    "name": "南兴股份",
    "close": 17.48,
@@ -4625,27 +4646,6 @@
     }
    ],
    "rsg_dev": -89.3,
-   "rsg_strong": false
-  },
-  {
-   "code": "sz002760",
-   "name": "凤形股份",
-   "close": 19.1,
-   "rsv_day": 43.9,
-   "rsv_week": 52.6,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV52.6突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -67.8,
    "rsg_strong": false
   },
   {
@@ -4670,24 +4670,24 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002769",
-   "name": "普路通",
-   "close": 7.14,
-   "rsv_day": 18.2,
-   "rsv_week": 29.9,
+   "code": "sz002760",
+   "name": "凤形股份",
+   "close": 19.1,
+   "rsv_day": 43.9,
+   "rsv_week": 52.6,
    "estimator": true,
    "state": "启动",
    "signals": [
     {
-     "type": "日线启动",
-     "desc": "RSV均18.2<20拐头向上（半年级别）"
+     "type": "周线突破50",
+     "desc": "周RSV52.6突破50（3年级别）"
     },
     {
      "type": "月线估波正",
      "desc": "估波信号>0（月牛3确认）"
     }
    ],
-   "rsg_dev": -237.0,
+   "rsg_dev": -67.8,
    "rsg_strong": false
   },
   {
@@ -4923,27 +4923,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002868",
-   "name": "绿康生化",
-   "close": 22.2,
-   "rsv_day": 7.4,
-   "rsv_week": 34.4,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均7.4<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -293.7,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002866",
    "name": "传艺科技",
    "close": 15.06,
@@ -4962,6 +4941,27 @@
     }
    ],
    "rsg_dev": -190.2,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002868",
+   "name": "绿康生化",
+   "close": 22.2,
+   "rsv_day": 7.4,
+   "rsv_week": 34.4,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均7.4<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -293.7,
    "rsg_strong": false
   },
   {
@@ -5108,27 +5108,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002910",
-   "name": "庄园牧场",
-   "close": 10.2,
-   "rsv_day": 46.3,
-   "rsv_week": 56.3,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV56.3突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -37.8,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002911",
    "name": "佛燃能源",
    "close": 11.33,
@@ -5147,6 +5126,27 @@
     }
    ],
    "rsg_dev": -49.0,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002910",
+   "name": "庄园牧场",
+   "close": 10.2,
+   "rsv_day": 46.3,
+   "rsv_week": 56.3,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV56.3突破50（3年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -37.8,
    "rsg_strong": false
   },
   {
@@ -5335,27 +5335,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002960",
-   "name": "青鸟智控",
-   "close": 8.7,
-   "rsv_day": 49.2,
-   "rsv_week": 58.4,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV58.4突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -40.9,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002962",
    "name": "五方光电",
    "close": 13.2,
@@ -5377,6 +5356,27 @@
    "rsg_strong": false
   },
   {
+   "code": "sz002960",
+   "name": "青鸟智控",
+   "close": 8.7,
+   "rsv_day": 49.2,
+   "rsv_week": 58.4,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV58.4突破50（3年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -40.9,
+   "rsg_strong": false
+  },
+  {
    "code": "sz002965",
    "name": "祥鑫科技",
    "close": 31.52,
@@ -5391,27 +5391,6 @@
     }
    ],
    "rsg_dev": -150.6,
-   "rsg_strong": false
-  },
-  {
-   "code": "sz002969",
-   "name": "嘉美包装",
-   "close": 12.49,
-   "rsv_day": 8.7,
-   "rsv_week": 35.9,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均8.7<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -51.5,
    "rsg_strong": false
   },
   {
@@ -5436,6 +5415,27 @@
    "rsg_strong": false
   },
   {
+   "code": "sz002969",
+   "name": "嘉美包装",
+   "close": 12.49,
+   "rsv_day": 8.7,
+   "rsv_week": 35.9,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均8.7<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -51.5,
+   "rsg_strong": false
+  },
+  {
    "code": "sz002978",
    "name": "安宁股份",
    "close": 26.95,
@@ -5451,6 +5451,44 @@
    ],
    "rsg_dev": -126.4,
    "rsg_strong": false
+  },
+  {
+   "code": "sz002992",
+   "name": "宝明科技",
+   "close": 34.38,
+   "rsv_day": 8.8,
+   "rsv_week": 5.5,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均8.8<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -277.5,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002986",
+   "name": "宇新股份",
+   "close": 14.25,
+   "rsv_day": 54.7,
+   "rsv_week": 61.2,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV61.2突破50（3年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 161.7,
+   "rsg_strong": true
   },
   {
    "code": "sz002983",
@@ -5495,44 +5533,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002986",
-   "name": "宇新股份",
-   "close": 14.25,
-   "rsv_day": 54.7,
-   "rsv_week": 61.2,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV61.2突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 161.7,
-   "rsg_strong": true
-  },
-  {
-   "code": "sz002992",
-   "name": "宝明科技",
-   "close": 34.38,
-   "rsv_day": 8.8,
-   "rsv_week": 5.5,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均8.8<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -277.5,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002993",
    "name": "奥海科技",
    "close": 38.87,
@@ -5554,27 +5554,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002999",
-   "name": "天禾股份",
-   "close": 6.47,
-   "rsv_day": 56.2,
-   "rsv_week": 58.2,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV58.2突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -14.3,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002995",
    "name": "天地在线",
    "close": 17.92,
@@ -5593,6 +5572,27 @@
     }
    ],
    "rsg_dev": -94.0,
+   "rsg_strong": false
+  },
+  {
+   "code": "sz002999",
+   "name": "天禾股份",
+   "close": 6.47,
+   "rsv_day": 56.2,
+   "rsv_week": 58.2,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV58.2突破50（3年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -14.3,
    "rsg_strong": false
   },
   {
@@ -5917,27 +5917,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh600111",
-   "name": "北方稀土",
-   "close": 40.62,
-   "rsv_day": 11.2,
-   "rsv_week": 53.2,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均11.2<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -143.1,
-   "rsg_strong": false
-  },
-  {
    "code": "sh600113",
    "name": "浙江东日",
    "close": 30.06,
@@ -5956,6 +5935,27 @@
     }
    ],
    "rsg_dev": -361.7,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh600111",
+   "name": "北方稀土",
+   "close": 40.62,
+   "rsv_day": 11.2,
+   "rsv_week": 53.2,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均11.2<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -143.1,
    "rsg_strong": false
   },
   {
@@ -6022,27 +6022,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sh600135",
-   "name": "乐凯胶片",
-   "close": 7.56,
-   "rsv_day": 17.6,
-   "rsv_week": 42.3,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均17.6<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -126.8,
-   "rsg_strong": false
-  },
-  {
    "code": "sh600141",
    "name": "兴发集团",
    "close": 31.23,
@@ -6061,6 +6040,27 @@
     }
    ],
    "rsg_dev": -35.8,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh600135",
+   "name": "乐凯胶片",
+   "close": 7.56,
+   "rsv_day": 17.6,
+   "rsv_week": 42.3,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均17.6<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -126.8,
    "rsg_strong": false
   },
   {
@@ -6106,27 +6106,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh600150",
-   "name": "中国船舶",
-   "close": 34.08,
-   "rsv_day": 41.3,
-   "rsv_week": 52.7,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV52.7突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -12.5,
-   "rsg_strong": false
-  },
-  {
    "code": "sh600151",
    "name": "航天机电",
    "close": 10.0,
@@ -6145,6 +6124,27 @@
     }
    ],
    "rsg_dev": -170.3,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh600150",
+   "name": "中国船舶",
+   "close": 34.08,
+   "rsv_day": 41.3,
+   "rsv_week": 52.7,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "周线突破50",
+     "desc": "周RSV52.7突破50（3年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -12.5,
    "rsg_strong": false
   },
   {
@@ -7780,23 +7780,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh600733",
-   "name": "北汽蓝谷",
-   "close": 5.08,
-   "rsv_day": 17.0,
-   "rsv_week": 15.8,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均17.0<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -273.8,
-   "rsg_strong": false
-  },
-  {
    "code": "sh600732",
    "name": "爱旭股份",
    "close": 11.54,
@@ -7815,6 +7798,23 @@
     }
    ],
    "rsg_dev": -164.6,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh600733",
+   "name": "北汽蓝谷",
+   "close": 5.08,
+   "rsv_day": 17.0,
+   "rsv_week": 15.8,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均17.0<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -273.8,
    "rsg_strong": false
   },
   {
@@ -7915,27 +7915,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh600783",
-   "name": "鲁信创投",
-   "close": 16.08,
-   "rsv_day": 15.1,
-   "rsv_week": 30.4,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均15.1<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -139.1,
-   "rsg_strong": false
-  },
-  {
    "code": "sh600785",
    "name": "新华百货",
    "close": 11.51,
@@ -7955,6 +7934,27 @@
    ],
    "rsg_dev": 66.0,
    "rsg_strong": true
+  },
+  {
+   "code": "sh600783",
+   "name": "鲁信创投",
+   "close": 16.08,
+   "rsv_day": 15.1,
+   "rsv_week": 30.4,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均15.1<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -139.1,
+   "rsg_strong": false
   },
   {
    "code": "sh600803",
@@ -8062,23 +8062,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh600843",
-   "name": "上工申贝",
-   "close": 7.16,
-   "rsv_day": 16.5,
-   "rsv_week": 27.0,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均16.5<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -275.7,
-   "rsg_strong": false
-  },
-  {
    "code": "sh600850",
    "name": "电科数字",
    "close": 14.68,
@@ -8115,6 +8098,23 @@
    ],
    "rsg_dev": 222.9,
    "rsg_strong": true
+  },
+  {
+   "code": "sh600843",
+   "name": "上工申贝",
+   "close": 7.16,
+   "rsv_day": 16.5,
+   "rsv_week": 27.0,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均16.5<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -275.7,
+   "rsg_strong": false
   },
   {
    "code": "sh600855",
@@ -8155,27 +8155,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh600869",
-   "name": "远东股份",
-   "close": 19.08,
-   "rsv_day": 32.2,
-   "rsv_week": 51.2,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "周线突破50",
-     "desc": "周RSV51.2突破50（3年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 363.3,
-   "rsg_strong": true
-  },
-  {
    "code": "sh600862",
    "name": "中航高科",
    "close": 17.94,
@@ -8214,25 +8193,25 @@
    "rsg_strong": false
   },
   {
-   "code": "sh600877",
-   "name": "电科芯片",
-   "close": 12.38,
-   "rsv_day": 5.4,
-   "rsv_week": 19.5,
+   "code": "sh600869",
+   "name": "远东股份",
+   "close": 19.08,
+   "rsv_day": 32.2,
+   "rsv_week": 51.2,
    "estimator": true,
    "state": "启动",
    "signals": [
     {
-     "type": "日线启动",
-     "desc": "RSV均5.4<20拐头向上（半年级别）"
+     "type": "周线突破50",
+     "desc": "周RSV51.2突破50（3年级别）"
     },
     {
      "type": "月线估波正",
      "desc": "估波信号>0（月牛3确认）"
     }
    ],
-   "rsg_dev": -194.3,
-   "rsg_strong": false
+   "rsg_dev": 363.3,
+   "rsg_strong": true
   },
   {
    "code": "sh600868",
@@ -8253,6 +8232,27 @@
     }
    ],
    "rsg_dev": -117.0,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh600877",
+   "name": "电科芯片",
+   "close": 12.38,
+   "rsv_day": 5.4,
+   "rsv_week": 19.5,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均5.4<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -194.3,
    "rsg_strong": false
   },
   {
@@ -8277,6 +8277,23 @@
    "rsg_strong": false
   },
   {
+   "code": "sh600894",
+   "name": "广日股份",
+   "close": 7.34,
+   "rsv_day": 9.8,
+   "rsv_week": 38.2,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均9.8<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -147.6,
+   "rsg_strong": false
+  },
+  {
    "code": "sh600895",
    "name": "张江高科",
    "close": 30.26,
@@ -8295,23 +8312,6 @@
     }
    ],
    "rsg_dev": -196.8,
-   "rsg_strong": false
-  },
-  {
-   "code": "sh600894",
-   "name": "广日股份",
-   "close": 7.34,
-   "rsv_day": 9.8,
-   "rsv_week": 38.2,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均9.8<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -147.6,
    "rsg_strong": false
   },
   {
@@ -8360,7 +8360,7 @@
    "code": "sh600929",
    "name": "雪天盐业",
    "close": 6.04,
-   "rsv_day": 64.4,
+   "rsv_day": 65.2,
    "rsv_week": 55.4,
    "estimator": true,
    "state": "启动",
@@ -8374,8 +8374,8 @@
      "desc": "估波信号>0（月牛3确认）"
     }
    ],
-   "rsg_dev": 49.8,
-   "rsg_strong": false
+   "rsg_dev": 56.9,
+   "rsg_strong": true
   },
   {
    "code": "sh600955",
@@ -8979,23 +8979,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh601727",
-   "name": "上海电气",
-   "close": 6.65,
-   "rsv_day": 11.1,
-   "rsv_week": 35.3,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均11.1<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -180.9,
-   "rsg_strong": false
-  },
-  {
    "code": "sh601698",
    "name": "中国卫通",
    "close": 24.4,
@@ -9017,20 +9000,20 @@
    "rsg_strong": false
   },
   {
-   "code": "sh601789",
-   "name": "宁波建工",
-   "close": 4.31,
-   "rsv_day": 16.6,
-   "rsv_week": 30.8,
+   "code": "sh601727",
+   "name": "上海电气",
+   "close": 6.65,
+   "rsv_day": 11.1,
+   "rsv_week": 35.3,
    "estimator": false,
    "state": "启动",
    "signals": [
     {
      "type": "日线启动",
-     "desc": "RSV均16.6<20拐头向上（半年级别）"
+     "desc": "RSV均11.1<20拐头向上（半年级别）"
     }
    ],
-   "rsg_dev": -148.2,
+   "rsg_dev": -180.9,
    "rsg_strong": false
   },
   {
@@ -9052,6 +9035,23 @@
     }
    ],
    "rsg_dev": -93.5,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh601789",
+   "name": "宁波建工",
+   "close": 4.31,
+   "rsv_day": 16.6,
+   "rsv_week": 30.8,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均16.6<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -148.2,
    "rsg_strong": false
   },
   {
@@ -9476,23 +9476,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh603072",
-   "name": "天和磁材",
-   "close": 32.31,
-   "rsv_day": 10.6,
-   "rsv_week": null,
-   "estimator": null,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均10.6<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -187.4,
-   "rsg_strong": false
-  },
-  {
    "code": "sh603073",
    "name": "彩蝶实业",
    "close": 17.16,
@@ -9511,6 +9494,23 @@
     }
    ],
    "rsg_dev": -50.1,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh603072",
+   "name": "天和磁材",
+   "close": 32.31,
+   "rsv_day": 10.6,
+   "rsv_week": null,
+   "estimator": null,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均10.6<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -187.4,
    "rsg_strong": false
   },
   {
@@ -10057,6 +10057,27 @@
    "rsg_strong": false
   },
   {
+   "code": "sh603200",
+   "name": "上海洗霸",
+   "close": 42.34,
+   "rsv_day": 18.8,
+   "rsv_week": 30.8,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均18.8<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -347.3,
+   "rsg_strong": false
+  },
+  {
    "code": "sh603209",
    "name": "兴通股份",
    "close": 14.28,
@@ -10092,27 +10113,6 @@
     }
    ],
    "rsg_dev": -51.7,
-   "rsg_strong": false
-  },
-  {
-   "code": "sh603200",
-   "name": "上海洗霸",
-   "close": 42.34,
-   "rsv_day": 18.8,
-   "rsv_week": 30.8,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均18.8<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -347.3,
    "rsg_strong": false
   },
   {
@@ -10196,23 +10196,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh603248",
-   "name": "锡华科技",
-   "close": 18.02,
-   "rsv_day": 4.2,
-   "rsv_week": null,
-   "estimator": null,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均4.2<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": null,
-   "rsg_strong": false
-  },
-  {
    "code": "sh603239",
    "name": "浙江仙通",
    "close": 14.44,
@@ -10231,6 +10214,23 @@
     }
    ],
    "rsg_dev": -248.7,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh603248",
+   "name": "锡华科技",
+   "close": 18.02,
+   "rsv_day": 4.2,
+   "rsv_week": null,
+   "estimator": null,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均4.2<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": null,
    "rsg_strong": false
   },
   {
@@ -10415,27 +10415,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh603308",
-   "name": "应流股份",
-   "close": 44.28,
-   "rsv_day": 4.1,
-   "rsv_week": 48.1,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均4.1<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -118.5,
-   "rsg_strong": false
-  },
-  {
    "code": "sh603309",
    "name": "维力医疗",
    "close": 11.4,
@@ -10454,6 +10433,27 @@
     }
    ],
    "rsg_dev": -123.0,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh603308",
+   "name": "应流股份",
+   "close": 44.28,
+   "rsv_day": 4.1,
+   "rsv_week": 48.1,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均4.1<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -118.5,
    "rsg_strong": false
   },
   {
@@ -10478,27 +10478,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh603316",
-   "name": "诚邦股份",
-   "close": 14.08,
-   "rsv_day": 14.9,
-   "rsv_week": 45.5,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均14.9<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -69.3,
-   "rsg_strong": false
-  },
-  {
    "code": "sh603315",
    "name": "福鞍股份",
    "close": 12.18,
@@ -10517,6 +10496,27 @@
     }
    ],
    "rsg_dev": -159.5,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh603316",
+   "name": "诚邦股份",
+   "close": 14.08,
+   "rsv_day": 14.9,
+   "rsv_week": 45.5,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均14.9<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -69.3,
    "rsg_strong": false
   },
   {
@@ -10596,6 +10596,27 @@
    "rsg_strong": false
   },
   {
+   "code": "sh603324",
+   "name": "盛剑科技",
+   "close": 27.3,
+   "rsv_day": 14.9,
+   "rsv_week": 28.9,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均14.9<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -6.8,
+   "rsg_strong": false
+  },
+  {
    "code": "sh603326",
    "name": "我乐家居",
    "close": 7.47,
@@ -10635,27 +10656,6 @@
     }
    ],
    "rsg_dev": -30.4,
-   "rsg_strong": false
-  },
-  {
-   "code": "sh603324",
-   "name": "盛剑科技",
-   "close": 27.3,
-   "rsv_day": 14.9,
-   "rsv_week": 28.9,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均14.9<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -6.8,
    "rsg_strong": false
   },
   {
@@ -10811,27 +10811,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh603505",
-   "name": "金石资源",
-   "close": 16.05,
-   "rsv_day": 10.8,
-   "rsv_week": 12.6,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均10.8<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -114.2,
-   "rsg_strong": false
-  },
-  {
    "code": "sh603516",
    "name": "淳中科技",
    "close": 95.5,
@@ -10853,24 +10832,24 @@
    "rsg_strong": false
   },
   {
-   "code": "sh603507",
-   "name": "振江股份",
-   "close": 23.4,
-   "rsv_day": 17.0,
-   "rsv_week": 48.7,
+   "code": "sh603505",
+   "name": "金石资源",
+   "close": 16.05,
+   "rsv_day": 10.8,
+   "rsv_week": 12.6,
    "estimator": true,
    "state": "启动",
    "signals": [
     {
      "type": "日线启动",
-     "desc": "RSV均17.0<20拐头向上（半年级别）"
+     "desc": "RSV均10.8<20拐头向上（半年级别）"
     },
     {
      "type": "月线估波正",
      "desc": "估波信号>0（月牛3确认）"
     }
    ],
-   "rsg_dev": -23.3,
+   "rsg_dev": -114.2,
    "rsg_strong": false
   },
   {
@@ -10895,6 +10874,44 @@
    "rsg_strong": false
   },
   {
+   "code": "sh603507",
+   "name": "振江股份",
+   "close": 23.4,
+   "rsv_day": 17.0,
+   "rsv_week": 48.7,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均17.0<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -23.3,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh603535",
+   "name": "嘉诚国际",
+   "close": 6.4,
+   "rsv_day": 18.9,
+   "rsv_week": 9.8,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均18.9<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -284.6,
+   "rsg_strong": false
+  },
+  {
    "code": "sh603533",
    "name": "掌阅科技",
    "close": 22.59,
@@ -10916,20 +10933,24 @@
    "rsg_strong": false
   },
   {
-   "code": "sh603535",
-   "name": "嘉诚国际",
-   "close": 6.4,
-   "rsv_day": 18.9,
-   "rsv_week": 9.8,
-   "estimator": false,
+   "code": "sh603601",
+   "name": "再升科技",
+   "close": 9.17,
+   "rsv_day": 8.8,
+   "rsv_week": 35.8,
+   "estimator": true,
    "state": "启动",
    "signals": [
     {
      "type": "日线启动",
-     "desc": "RSV均18.9<20拐头向上（半年级别）"
+     "desc": "RSV均8.8<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
     }
    ],
-   "rsg_dev": -284.6,
+   "rsg_dev": -92.0,
    "rsg_strong": false
   },
   {
@@ -10992,27 +11013,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh603601",
-   "name": "再升科技",
-   "close": 9.17,
-   "rsv_day": 8.8,
-   "rsv_week": 35.8,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均8.8<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -92.0,
-   "rsg_strong": false
-  },
-  {
    "code": "sh603616",
    "name": "韩建河山",
    "close": 5.69,
@@ -11072,6 +11072,23 @@
    "rsg_strong": false
   },
   {
+   "code": "sh603636",
+   "name": "南威软件",
+   "close": 7.1,
+   "rsv_day": 16.8,
+   "rsv_week": 8.5,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均16.8<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -303.7,
+   "rsg_strong": false
+  },
+  {
    "code": "sh603638",
    "name": "艾迪精密",
    "close": 19.01,
@@ -11090,23 +11107,6 @@
     }
    ],
    "rsg_dev": -66.7,
-   "rsg_strong": false
-  },
-  {
-   "code": "sh603636",
-   "name": "南威软件",
-   "close": 7.1,
-   "rsv_day": 16.8,
-   "rsv_week": 8.5,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均16.8<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -303.7,
    "rsg_strong": false
   },
   {
@@ -11152,23 +11152,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh603668",
-   "name": "天马科技",
-   "close": 10.8,
-   "rsv_day": 17.1,
-   "rsv_week": 9.0,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均17.1<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -202.1,
-   "rsg_strong": false
-  },
-  {
    "code": "sh603667",
    "name": "五洲新春",
    "close": 52.2,
@@ -11187,6 +11170,23 @@
     }
    ],
    "rsg_dev": -127.4,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh603668",
+   "name": "天马科技",
+   "close": 10.8,
+   "rsv_day": 17.1,
+   "rsv_week": 9.0,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均17.1<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -202.1,
    "rsg_strong": false
   },
   {
@@ -11422,23 +11422,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sh603863",
-   "name": "松炀资源",
-   "close": 12.95,
-   "rsv_day": 17.4,
-   "rsv_week": 3.7,
-   "estimator": false,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均17.4<20拐头向上（半年级别）"
-    }
-   ],
-   "rsg_dev": -277.4,
-   "rsg_strong": false
-  },
-  {
    "code": "sh603856",
    "name": "东宏股份",
    "close": 11.67,
@@ -11457,6 +11440,23 @@
     }
    ],
    "rsg_dev": -42.8,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh603863",
+   "name": "松炀资源",
+   "close": 12.95,
+   "rsv_day": 17.4,
+   "rsv_week": 3.7,
+   "estimator": false,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均17.4<20拐头向上（半年级别）"
+    }
+   ],
+   "rsg_dev": -277.4,
    "rsg_strong": false
   },
   {
@@ -11763,27 +11763,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh605123",
-   "name": "派克新材",
-   "close": 80.59,
-   "rsv_day": 13.2,
-   "rsv_week": 48.3,
-   "estimator": true,
-   "state": "启动",
-   "signals": [
-    {
-     "type": "日线启动",
-     "desc": "RSV均13.2<20拐头向上（半年级别）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -94.5,
-   "rsg_strong": false
-  },
-  {
    "code": "sh605118",
    "name": "力鼎光电",
    "close": 32.82,
@@ -11806,6 +11785,27 @@
     }
    ],
    "rsg_dev": -19.0,
+   "rsg_strong": false
+  },
+  {
+   "code": "sh605123",
+   "name": "派克新材",
+   "close": 80.59,
+   "rsv_day": 13.2,
+   "rsv_week": 48.3,
+   "estimator": true,
+   "state": "启动",
+   "signals": [
+    {
+     "type": "日线启动",
+     "desc": "RSV均13.2<20拐头向上（半年级别）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -94.5,
    "rsg_strong": false
   },
   {
@@ -12122,6 +12122,27 @@
  ],
  "hold": [
   {
+   "code": "sz000001",
+   "name": "平安银行",
+   "close": 11.72,
+   "rsv_day": 87.7,
+   "rsv_week": 88.3,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "日线卖点",
+     "desc": "RSV均87.7>80拐头向下"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 88.0,
+   "rsg_strong": true
+  },
+  {
    "code": "sz000019",
    "name": "深粮控股",
    "close": 7.2,
@@ -12165,27 +12186,6 @@
     }
    ],
    "rsg_dev": 618.9,
-   "rsg_strong": true
-  },
-  {
-   "code": "sz000001",
-   "name": "平安银行",
-   "close": 11.72,
-   "rsv_day": 87.7,
-   "rsv_week": 88.3,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "日线卖点",
-     "desc": "RSV均87.7>80拐头向下"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 88.0,
    "rsg_strong": true
   },
   {
@@ -12600,23 +12600,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz000739",
-   "name": "普洛药业",
-   "close": 21.68,
-   "rsv_day": 79.9,
-   "rsv_week": 86.9,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 263.9,
-   "rsg_strong": true
-  },
-  {
    "code": "sz000737",
    "name": "北方铜业",
    "close": 15.19,
@@ -12631,6 +12614,23 @@
     }
    ],
    "rsg_dev": 56.6,
+   "rsg_strong": true
+  },
+  {
+   "code": "sz000739",
+   "name": "普洛药业",
+   "close": 21.68,
+   "rsv_day": 79.9,
+   "rsv_week": 86.9,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 263.9,
    "rsg_strong": true
   },
   {
@@ -12855,23 +12855,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz001226",
-   "name": "拓山重工",
-   "close": 48.45,
-   "rsv_day": 70.2,
-   "rsv_week": 83.5,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 108.9,
-   "rsg_strong": true
-  },
-  {
    "code": "sz001228",
    "name": "永泰运",
    "close": 29.21,
@@ -12886,6 +12869,23 @@
     }
    ],
    "rsg_dev": 60.6,
+   "rsg_strong": true
+  },
+  {
+   "code": "sz001226",
+   "name": "拓山重工",
+   "close": 48.45,
+   "rsv_day": 70.2,
+   "rsv_week": 83.5,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 108.9,
    "rsg_strong": true
   },
   {
@@ -12957,23 +12957,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz001301",
-   "name": "尚太科技",
-   "close": 58.25,
-   "rsv_day": 53.5,
-   "rsv_week": 75.3,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 23.0,
-   "rsg_strong": false
-  },
-  {
    "code": "sz001288",
    "name": "运机集团",
    "close": 29.42,
@@ -12991,11 +12974,11 @@
    "rsg_strong": false
   },
   {
-   "code": "sz001337",
-   "name": "四川黄金",
-   "close": 53.5,
-   "rsv_day": 54.5,
-   "rsv_week": 73.4,
+   "code": "sz001301",
+   "name": "尚太科技",
+   "close": 58.25,
+   "rsv_day": 53.5,
+   "rsv_week": 75.3,
    "estimator": true,
    "state": "持有",
    "signals": [
@@ -13004,8 +12987,8 @@
      "desc": "估波信号>0（月牛3确认）"
     }
    ],
-   "rsg_dev": 362.7,
-   "rsg_strong": true
+   "rsg_dev": 23.0,
+   "rsg_strong": false
   },
   {
    "code": "sz001339",
@@ -13022,6 +13005,23 @@
     }
    ],
    "rsg_dev": 423.9,
+   "rsg_strong": true
+  },
+  {
+   "code": "sz001337",
+   "name": "四川黄金",
+   "close": 53.5,
+   "rsv_day": 54.5,
+   "rsv_week": 73.4,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 362.7,
    "rsg_strong": true
   },
   {
@@ -13267,23 +13267,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002245",
-   "name": "蔚蓝锂芯",
-   "close": 17.57,
-   "rsv_day": 61.9,
-   "rsv_week": 81.3,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 251.4,
-   "rsg_strong": true
-  },
-  {
    "code": "sz002246",
    "name": "北化股份",
    "close": 20.41,
@@ -13299,6 +13282,23 @@
    ],
    "rsg_dev": 8.1,
    "rsg_strong": false
+  },
+  {
+   "code": "sz002245",
+   "name": "蔚蓝锂芯",
+   "close": 17.57,
+   "rsv_day": 61.9,
+   "rsv_week": 81.3,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 251.4,
+   "rsg_strong": true
   },
   {
    "code": "sz002250",
@@ -13318,23 +13318,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz002266",
-   "name": "浙富控股",
-   "close": 4.89,
-   "rsv_day": 55.4,
-   "rsv_week": 76.2,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 89.0,
-   "rsg_strong": true
-  },
-  {
    "code": "sz002258",
    "name": "利尔化学",
    "close": 14.67,
@@ -13349,6 +13332,23 @@
     }
    ],
    "rsg_dev": 89.1,
+   "rsg_strong": true
+  },
+  {
+   "code": "sz002266",
+   "name": "浙富控股",
+   "close": 4.89,
+   "rsv_day": 55.4,
+   "rsv_week": 76.2,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 89.0,
    "rsg_strong": true
   },
   {
@@ -13420,23 +13420,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz002353",
-   "name": "杰瑞股份",
-   "close": 130.26,
-   "rsv_day": 56.5,
-   "rsv_week": 76.0,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 316.9,
-   "rsg_strong": true
-  },
-  {
    "code": "sz002350",
    "name": "北京科锐",
    "close": 14.99,
@@ -13468,6 +13451,23 @@
     }
    ],
    "rsg_dev": 180.7,
+   "rsg_strong": true
+  },
+  {
+   "code": "sz002353",
+   "name": "杰瑞股份",
+   "close": 130.26,
+   "rsv_day": 56.5,
+   "rsv_week": 76.0,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 316.9,
    "rsg_strong": true
   },
   {
@@ -13624,23 +13624,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz002452",
-   "name": "长高电气",
-   "close": 11.61,
-   "rsv_day": 54.2,
-   "rsv_week": 84.0,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 199.4,
-   "rsg_strong": true
-  },
-  {
    "code": "sz002458",
    "name": "益生股份",
    "close": 8.99,
@@ -13655,6 +13638,23 @@
     }
    ],
    "rsg_dev": 215.9,
+   "rsg_strong": true
+  },
+  {
+   "code": "sz002452",
+   "name": "长高电气",
+   "close": 11.61,
+   "rsv_day": 54.2,
+   "rsv_week": 84.0,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 199.4,
    "rsg_strong": true
   },
   {
@@ -13981,23 +13981,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz002762",
-   "name": "金发拉比",
-   "close": 9.44,
-   "rsv_day": 74.0,
-   "rsv_week": 83.8,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 199.2,
-   "rsg_strong": true
-  },
-  {
    "code": "sz002763",
    "name": "汇洁股份",
    "close": 7.69,
@@ -14012,6 +13995,23 @@
     }
    ],
    "rsg_dev": 103.0,
+   "rsg_strong": true
+  },
+  {
+   "code": "sz002762",
+   "name": "金发拉比",
+   "close": 9.44,
+   "rsv_day": 74.0,
+   "rsv_week": 83.8,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 199.2,
    "rsg_strong": true
   },
   {
@@ -14185,23 +14185,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz002850",
-   "name": "科达利",
-   "close": 176.88,
-   "rsv_day": 44.7,
-   "rsv_week": 71.2,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 40.9,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002842",
    "name": "翔鹭钨业",
    "close": 38.91,
@@ -14217,6 +14200,23 @@
    ],
    "rsg_dev": 505.2,
    "rsg_strong": true
+  },
+  {
+   "code": "sz002850",
+   "name": "科达利",
+   "close": 176.88,
+   "rsv_day": 44.7,
+   "rsv_week": 71.2,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 40.9,
+   "rsg_strong": false
   },
   {
    "code": "sz002871",
@@ -14308,23 +14308,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz002916",
-   "name": "深南电路",
-   "close": 369.08,
-   "rsv_day": 69.8,
-   "rsv_week": 79.7,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 356.5,
-   "rsg_strong": true
-  },
-  {
    "code": "sz002925",
    "name": "盈趣科技",
    "close": 23.43,
@@ -14339,6 +14322,23 @@
     }
    ],
    "rsg_dev": 176.3,
+   "rsg_strong": true
+  },
+  {
+   "code": "sz002916",
+   "name": "深南电路",
+   "close": 369.08,
+   "rsv_day": 69.8,
+   "rsv_week": 79.7,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 356.5,
    "rsg_strong": true
   },
   {
@@ -14431,23 +14431,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sz002979",
-   "name": "雷赛智能",
-   "close": 57.15,
-   "rsv_day": 63.0,
-   "rsv_week": 78.6,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 234.7,
-   "rsg_strong": true
-  },
-  {
    "code": "sz002980",
    "name": "华盛昌",
    "close": 101.3,
@@ -14462,6 +14445,23 @@
     }
    ],
    "rsg_dev": 892.7,
+   "rsg_strong": true
+  },
+  {
+   "code": "sz002979",
+   "name": "雷赛智能",
+   "close": 57.15,
+   "rsv_day": 63.0,
+   "rsv_week": 78.6,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 234.7,
    "rsg_strong": true
   },
   {
@@ -14872,23 +14872,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sh600267",
-   "name": "海正药业",
-   "close": 11.94,
-   "rsv_day": 55.9,
-   "rsv_week": 70.4,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 134.1,
-   "rsg_strong": true
-  },
-  {
    "code": "sh600256",
    "name": "广汇能源",
    "close": 6.76,
@@ -14907,6 +14890,23 @@
     }
    ],
    "rsg_dev": 217.4,
+   "rsg_strong": true
+  },
+  {
+   "code": "sh600267",
+   "name": "海正药业",
+   "close": 11.94,
+   "rsv_day": 55.9,
+   "rsv_week": 70.4,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 134.1,
    "rsg_strong": true
   },
   {
@@ -15312,23 +15312,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sh600601",
-   "name": "方正科技",
-   "close": 12.79,
-   "rsv_day": 69.2,
-   "rsv_week": 82.0,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 114.6,
-   "rsg_strong": true
-  },
-  {
    "code": "sh600613",
    "name": "神奇制药",
    "close": 11.16,
@@ -15351,6 +15334,23 @@
     }
    ],
    "rsg_dev": 818.6,
+   "rsg_strong": true
+  },
+  {
+   "code": "sh600601",
+   "name": "方正科技",
+   "close": 12.79,
+   "rsv_day": 69.2,
+   "rsv_week": 82.0,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 114.6,
    "rsg_strong": true
   },
   {
@@ -15629,18 +15629,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh600900",
-   "name": "长江电力",
-   "close": 28.09,
-   "rsv_day": 64.9,
-   "rsv_week": 89.2,
-   "estimator": false,
-   "state": "持有",
-   "signals": [],
-   "rsg_dev": 64.6,
-   "rsg_strong": true
-  },
-  {
    "code": "sh600908",
    "name": "无锡银行",
    "close": 5.57,
@@ -15656,6 +15644,18 @@
    ],
    "rsg_dev": 2.4,
    "rsg_strong": false
+  },
+  {
+   "code": "sh600900",
+   "name": "长江电力",
+   "close": 28.09,
+   "rsv_day": 64.9,
+   "rsv_week": 89.2,
+   "estimator": false,
+   "state": "持有",
+   "signals": [],
+   "rsg_dev": 64.6,
+   "rsg_strong": true
   },
   {
    "code": "sh600938",
@@ -15777,23 +15777,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sh601001",
-   "name": "晋控煤业",
-   "close": 18.28,
-   "rsv_day": 62.8,
-   "rsv_week": 73.2,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 176.4,
-   "rsg_strong": true
-  },
-  {
    "code": "sh601002",
    "name": "晋亿实业",
    "close": 5.61,
@@ -15808,6 +15791,23 @@
     }
    ],
    "rsg_dev": 89.2,
+   "rsg_strong": true
+  },
+  {
+   "code": "sh601001",
+   "name": "晋控煤业",
+   "close": 18.28,
+   "rsv_day": 62.8,
+   "rsv_week": 73.2,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 176.4,
    "rsg_strong": true
   },
   {
@@ -15879,23 +15879,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sh601128",
-   "name": "常熟银行",
-   "close": 6.19,
-   "rsv_day": 50.0,
-   "rsv_week": 75.5,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -9.6,
-   "rsg_strong": false
-  },
-  {
    "code": "sh601156",
    "name": "东航物流",
    "close": 19.04,
@@ -15911,6 +15894,23 @@
    ],
    "rsg_dev": 170.7,
    "rsg_strong": true
+  },
+  {
+   "code": "sh601128",
+   "name": "常熟银行",
+   "close": 6.19,
+   "rsv_day": 50.0,
+   "rsv_week": 75.5,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -9.6,
+   "rsg_strong": false
   },
   {
    "code": "sh601138",
@@ -15947,23 +15947,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sh601187",
-   "name": "厦门银行",
-   "close": 7.35,
-   "rsv_day": 53.0,
-   "rsv_week": 86.6,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 49.9,
-   "rsg_strong": false
-  },
-  {
    "code": "sh601199",
    "name": "江南水务",
    "close": 6.04,
@@ -15981,11 +15964,11 @@
    "rsg_strong": true
   },
   {
-   "code": "sh601298",
-   "name": "青岛港",
-   "close": 9.15,
-   "rsv_day": 79.8,
-   "rsv_week": 84.5,
+   "code": "sh601187",
+   "name": "厦门银行",
+   "close": 7.35,
+   "rsv_day": 53.0,
+   "rsv_week": 86.6,
    "estimator": true,
    "state": "持有",
    "signals": [
@@ -15994,8 +15977,8 @@
      "desc": "估波信号>0（月牛3确认）"
     }
    ],
-   "rsg_dev": 87.8,
-   "rsg_strong": true
+   "rsg_dev": 49.9,
+   "rsg_strong": false
   },
   {
    "code": "sh601229",
@@ -16013,6 +15996,23 @@
    ],
    "rsg_dev": 31.3,
    "rsg_strong": false
+  },
+  {
+   "code": "sh601298",
+   "name": "青岛港",
+   "close": 9.15,
+   "rsv_day": 79.8,
+   "rsv_week": 84.5,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 87.8,
+   "rsg_strong": true
   },
   {
    "code": "sh601288",
@@ -16095,23 +16095,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sh601677",
-   "name": "明泰铝业",
-   "close": 16.99,
-   "rsv_day": 65.2,
-   "rsv_week": 80.8,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 103.8,
-   "rsg_strong": true
-  },
-  {
    "code": "sh601678",
    "name": "滨化股份",
    "close": 6.66,
@@ -16129,6 +16112,23 @@
    "rsg_strong": true
   },
   {
+   "code": "sh601677",
+   "name": "明泰铝业",
+   "close": 16.99,
+   "rsv_day": 65.2,
+   "rsv_week": 80.8,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 103.8,
+   "rsg_strong": true
+  },
+  {
    "code": "sh601857",
    "name": "中国石油",
    "close": 11.42,
@@ -16143,6 +16143,23 @@
     }
    ],
    "rsg_dev": 145.7,
+   "rsg_strong": true
+  },
+  {
+   "code": "sh601869",
+   "name": "长飞光纤",
+   "close": 418.57,
+   "rsv_day": 69.5,
+   "rsv_week": 76.2,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 756.2,
    "rsg_strong": true
   },
   {
@@ -16181,23 +16198,6 @@
     }
    ],
    "rsg_dev": 56.0,
-   "rsg_strong": true
-  },
-  {
-   "code": "sh601869",
-   "name": "长飞光纤",
-   "close": 418.57,
-   "rsv_day": 69.5,
-   "rsv_week": 76.2,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 756.2,
    "rsg_strong": true
   },
   {
@@ -16422,23 +16422,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sh603139",
-   "name": "康惠股份",
-   "close": 38.09,
-   "rsv_day": 77.2,
-   "rsv_week": 79.6,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 349.8,
-   "rsg_strong": true
-  },
-  {
    "code": "sh603159",
    "name": "上海亚虹",
    "close": 24.4,
@@ -16454,6 +16437,23 @@
    ],
    "rsg_dev": 22.8,
    "rsg_strong": false
+  },
+  {
+   "code": "sh603139",
+   "name": "康惠股份",
+   "close": 38.09,
+   "rsv_day": 77.2,
+   "rsv_week": 79.6,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 349.8,
+   "rsg_strong": true
   },
   {
    "code": "sh603165",
@@ -16638,23 +16638,6 @@
    "rsg_strong": true
   },
   {
-   "code": "sh603339",
-   "name": "四方科技",
-   "close": 14.98,
-   "rsv_day": 80.8,
-   "rsv_week": 85.1,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 128.4,
-   "rsg_strong": true
-  },
-  {
    "code": "sh603356",
    "name": "华菱精工",
    "close": 17.21,
@@ -16669,6 +16652,23 @@
     }
    ],
    "rsg_dev": 76.7,
+   "rsg_strong": true
+  },
+  {
+   "code": "sh603339",
+   "name": "四方科技",
+   "close": 14.98,
+   "rsv_day": 80.8,
+   "rsv_week": 85.1,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 128.4,
    "rsg_strong": true
   },
   {
@@ -17222,6 +17222,27 @@
  ],
  "exit": [
   {
+   "code": "sz000001",
+   "name": "平安银行",
+   "close": 11.72,
+   "rsv_day": 87.7,
+   "rsv_week": 88.3,
+   "estimator": true,
+   "state": "持有",
+   "signals": [
+    {
+     "type": "日线卖点",
+     "desc": "RSV均87.7>80拐头向下"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": 88.0,
+   "rsg_strong": true
+  },
+  {
    "code": "sz000017",
    "name": "深中华A",
    "close": 11.21,
@@ -17244,27 +17265,6 @@
     }
    ],
    "rsg_dev": 618.9,
-   "rsg_strong": true
-  },
-  {
-   "code": "sz000001",
-   "name": "平安银行",
-   "close": 11.72,
-   "rsv_day": 87.7,
-   "rsv_week": 88.3,
-   "estimator": true,
-   "state": "持有",
-   "signals": [
-    {
-     "type": "日线卖点",
-     "desc": "RSV均87.7>80拐头向下"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": 88.0,
    "rsg_strong": true
   },
   {
@@ -17478,27 +17478,6 @@
    "rsg_strong": false
   },
   {
-   "code": "sz002005",
-   "name": "德豪润达",
-   "close": 2.45,
-   "rsv_day": 37.9,
-   "rsv_week": 69.4,
-   "estimator": true,
-   "state": "离场",
-   "signals": [
-    {
-     "type": "周线破70",
-     "desc": "周RSV69.4跌破70（离场）"
-    },
-    {
-     "type": "月线估波正",
-     "desc": "估波信号>0（月牛3确认）"
-    }
-   ],
-   "rsg_dev": -64.8,
-   "rsg_strong": false
-  },
-  {
    "code": "sz002003",
    "name": "伟星股份",
    "close": 11.99,
@@ -17518,6 +17497,27 @@
    ],
    "rsg_dev": 226.3,
    "rsg_strong": true
+  },
+  {
+   "code": "sz002005",
+   "name": "德豪润达",
+   "close": 2.45,
+   "rsv_day": 37.9,
+   "rsv_week": 69.4,
+   "estimator": true,
+   "state": "离场",
+   "signals": [
+    {
+     "type": "周线破70",
+     "desc": "周RSV69.4跌破70（离场）"
+    },
+    {
+     "type": "月线估波正",
+     "desc": "估波信号>0（月牛3确认）"
+    }
+   ],
+   "rsg_dev": -64.8,
+   "rsg_strong": false
   },
   {
    "code": "sz002216",
@@ -19281,6 +19281,7 @@
   "sh603038",
   "sh603387",
   "sz002921",
+  "sz002274",
   "sz000598",
   "sh600549",
   "sh605318",
@@ -19295,7 +19296,6 @@
   "sh600743",
   "sh600322",
   "sh603183",
-  "sz002274",
   "sz000070",
   "sh600313",
   "sz002155",
@@ -19430,6 +19430,7 @@
   "sz003013",
   "sh600547",
   "sh603871",
+  "sh600929",
   "sz001400",
   "sh603776",
   "sz000737",
