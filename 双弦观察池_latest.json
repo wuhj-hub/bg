@@ -1,218 +1,29 @@
 {
- "date": "2026-08-31",
- "count": 164,
+ "date": "2026-09-01",
+ "count": 120,
  "entries": [
   {
-   "code": "sz002520",
-   "name": "日发精机",
-   "price": 6.52,
-   "score": 64,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000972",
-   "name": "中基健康",
-   "price": 3.83,
-   "score": 64,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002012",
-   "name": "凯恩股份",
-   "price": 7.26,
-   "score": 64,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000931",
-   "name": "中关村",
-   "price": 4.94,
+   "code": "sz000166",
+   "name": "申万宏源",
+   "price": 4.58,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
   },
   {
-   "code": "sz002638",
-   "name": "勤上股份",
-   "price": 4.68,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sh600028",
-   "name": "中国石化",
-   "price": 5.46,
+   "code": "sz000430",
+   "name": "张家界",
+   "price": 7.14,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000912",
-   "name": "泸天化",
-   "price": 4.64,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002057",
-   "name": "中钢天源",
-   "price": 8.98,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000061",
-   "name": "农产品",
-   "price": 6.23,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]"
   },
   {
    "code": "sz000655",
    "name": "金岭矿业",
-   "price": 7.32,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000856",
-   "name": "冀东装备",
-   "price": 8.88,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002742",
-   "name": "冀衡医药",
-   "price": 5.62,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100 [堆量模式]"
-  },
-  {
-   "code": "sz002420",
-   "name": "毅昌科技",
-   "price": 6.25,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002005",
-   "name": "德豪润达",
-   "price": 2.45,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002807",
-   "name": "江阴银行",
-   "price": 4.06,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000530",
-   "name": "冰山冷热",
-   "price": 5.21,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sh600252",
-   "name": "中恒集团",
-   "price": 2.31,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002426",
-   "name": "胜利精密",
-   "price": 2.76,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000008",
-   "name": "神州高铁",
-   "price": 2.53,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002163",
-   "name": "海南发展",
-   "price": 8.55,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz000166",
-   "name": "申万宏源",
-   "price": 4.57,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000561",
-   "name": "烽火电子",
-   "price": 7.84,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz000573",
-   "name": "粤宏远Ａ",
-   "price": 3.87,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000589",
-   "name": "贵州轮胎",
-   "price": 4.42,
+   "price": 7.46,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -221,7 +32,7 @@
   {
    "code": "sz000683",
    "name": "博源化工",
-   "price": 6.23,
+   "price": 6.31,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -230,25 +41,34 @@
   {
    "code": "sz000686",
    "name": "东北证券",
-   "price": 8.14,
+   "price": 8.21,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000718",
-   "name": "苏宁环球",
-   "price": 2.0,
+   "code": "sz000701",
+   "name": "厦门信达",
+   "price": 5.22,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000796",
-   "name": "凯撒旅业",
-   "price": 4.29,
+   "code": "sz000727",
+   "name": "冠捷科技",
+   "price": 2.35,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000750",
+   "name": "国海证券",
+   "price": 3.87,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -257,25 +77,61 @@
   {
    "code": "sz000797",
    "name": "中国武夷",
-   "price": 2.52,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000825",
-   "name": "太钢不锈",
-   "price": 3.53,
+   "price": 2.57,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000876",
-   "name": "新希望",
-   "price": 7.1,
+   "code": "sz000812",
+   "name": "陕西金叶",
+   "price": 3.87,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000856",
+   "name": "冀东装备",
+   "price": 8.92,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000919",
+   "name": "金陵药业",
+   "price": 6.86,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz001236",
+   "name": "弘业期货",
+   "price": 8.35,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002033",
+   "name": "丽江股份",
+   "price": 9.13,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
+  },
+  {
+   "code": "sz002040",
+   "name": "南京港",
+   "price": 8.95,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -284,7 +140,7 @@
   {
    "code": "sz002054",
    "name": "德美化工",
-   "price": 7.43,
+   "price": 7.49,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -293,106 +149,133 @@
   {
    "code": "sz002059",
    "name": "云南旅游",
-   "price": 4.69,
+   "price": 4.77,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002062",
-   "name": "宏润建设",
-   "price": 8.2,
+   "code": "sz002086",
+   "name": "东方海洋",
+   "price": 2.21,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+  },
+  {
+   "code": "sz002108",
+   "name": "沧州明珠",
+   "price": 4.48,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002069",
-   "name": "獐子岛",
-   "price": 3.73,
+   "code": "sz002132",
+   "name": "恒星科技",
+   "price": 4.51,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002111",
-   "name": "威海广泰",
-   "price": 9.85,
+   "code": "sz002141",
+   "name": "贤丰控股",
+   "price": 6.94,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: SSV>100 [堆量模式]"
   },
   {
    "code": "sz002157",
    "name": "正邦科技",
-   "price": 3.02,
+   "price": 3.07,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002176",
-   "name": "江特电机",
-   "price": 9.25,
+   "code": "sz002166",
+   "name": "莱茵生物",
+   "price": 6.93,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002221",
-   "name": "东华能源",
-   "price": 5.91,
+   "code": "sz002177",
+   "name": "御银股份",
+   "price": 6.18,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002238",
-   "name": "天威视讯",
-   "price": 6.71,
+   "code": "sz002188",
+   "name": "中天服务",
+   "price": 5.79,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002247",
-   "name": "聚力文化",
-   "price": 2.5,
+   "code": "sz002187",
+   "name": "广百股份",
+   "price": 5.78,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
    "code": "sz002264",
    "name": "新华都",
-   "price": 6.79,
+   "price": 6.98,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+  },
+  {
+   "code": "sz002278",
+   "name": "神开股份",
+   "price": 8.38,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+  },
+  {
+   "code": "sz002296",
+   "name": "辉煌科技",
+   "price": 9.27,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002284",
-   "name": "亚太股份",
-   "price": 9.96,
+   "code": "sz002321",
+   "name": "华英农业",
+   "price": 2.17,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002347",
-   "name": "泰尔股份",
-   "price": 6.28,
+   "code": "sz002330",
+   "name": "得利斯",
+   "price": 4.23,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -401,7 +284,16 @@
   {
    "code": "sz002355",
    "name": "兴民智通",
-   "price": 4.93,
+   "price": 5.06,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002363",
+   "name": "隆基机械",
+   "price": 6.99,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -410,16 +302,7 @@
   {
    "code": "sz002372",
    "name": "伟星新材",
-   "price": 8.77,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002376",
-   "name": "新北洋",
-   "price": 6.8,
+   "price": 8.87,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -428,97 +311,151 @@
   {
    "code": "sz002391",
    "name": "长青股份",
-   "price": 5.41,
+   "price": 5.52,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002400",
-   "name": "省广集团",
-   "price": 6.69,
+   "code": "sz002392",
+   "name": "北京利尔",
+   "price": 8.05,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002419",
+   "name": "天虹股份",
+   "price": 4.78,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002420",
+   "name": "毅昌科技",
+   "price": 6.34,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002426",
+   "name": "胜利精密",
+   "price": 2.82,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
    "code": "sz002441",
    "name": "众业达",
-   "price": 8.23,
+   "price": 8.42,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002478",
-   "name": "常宝股份",
-   "price": 6.91,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002500",
-   "name": "山西证券",
-   "price": 5.44,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002519",
-   "name": "银河电子",
-   "price": 5.66,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002551",
-   "name": "尚荣医疗",
-   "price": 3.36,
+   "code": "sz002506",
+   "name": "协鑫集成",
+   "price": 2.71,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
   },
   {
-   "code": "sz002556",
-   "name": "辉隆股份",
-   "price": 5.34,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002591",
-   "name": "恒大高新",
-   "price": 6.61,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002696",
-   "name": "百洋股份",
-   "price": 6.62,
+   "code": "sz002523",
+   "name": "天桥起重",
+   "price": 3.64,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002790",
-   "name": "瑞尔特",
-   "price": 6.36,
+   "code": "sz002537",
+   "name": "海联金汇",
+   "price": 6.39,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+  },
+  {
+   "code": "sz002551",
+   "name": "尚荣医疗",
+   "price": 3.41,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+  },
+  {
+   "code": "sz002563",
+   "name": "森马服饰",
+   "price": 5.99,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002593",
+   "name": "日上集团",
+   "price": 4.63,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002640",
+   "name": "跨境通",
+   "price": 3.51,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002686",
+   "name": "亿利达",
+   "price": 6.91,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
+  },
+  {
+   "code": "sz002697",
+   "name": "红旗连锁",
+   "price": 4.77,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002702",
+   "name": "海欣食品",
+   "price": 5.32,
+   "score": 63,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
+  },
+  {
+   "code": "sz002752",
+   "name": "昇兴股份",
+   "price": 6.18,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -527,7 +464,7 @@
   {
    "code": "sz002797",
    "name": "第一创业",
-   "price": 6.62,
+   "price": 6.66,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
@@ -536,70 +473,178 @@
   {
    "code": "sz002798",
    "name": "帝欧水华",
-   "price": 6.03,
+   "price": 6.35,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002809",
-   "name": "红墙股份",
-   "price": 8.9,
-   "score": 63,
+   "code": "sz001322",
+   "name": "箭牌家居",
+   "price": 6.77,
+   "score": 62,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000983",
-   "name": "山西焦煤",
-   "price": 7.42,
-   "score": 61,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz000906",
-   "name": "浙商中拓",
-   "price": 5.75,
-   "score": 61,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002470",
-   "name": "金正大",
-   "price": 2.11,
-   "score": 61,
+   "code": "sz002515",
+   "name": "金字火腿",
+   "price": 8.02,
+   "score": 62,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
   },
   {
-   "code": "sz002673",
-   "name": "西部证券",
-   "price": 6.94,
+   "code": "sz002688",
+   "name": "金河生物",
+   "price": 5.43,
+   "score": 62,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000567",
+   "name": "海德股份",
+   "price": 7.09,
+   "score": 61,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002042",
+   "name": "华孚时尚",
+   "price": 4.08,
    "score": 61,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002313",
-   "name": "日海智能",
-   "price": 8.78,
+   "code": "sz002425",
+   "name": "凯撒文化",
+   "price": 3.6,
+   "score": 61,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz000035",
+   "name": "中国天楹",
+   "price": 4.87,
    "score": 59,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002686",
-   "name": "亿利达",
-   "price": 6.8,
+   "code": "sz000421",
+   "name": "南京公用",
+   "price": 5.85,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000501",
+   "name": "武商集团",
+   "price": 7.42,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000572",
+   "name": "海马汽车",
+   "price": 3.97,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000607",
+   "name": "华媒控股",
+   "price": 3.93,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000619",
+   "name": "海螺新材",
+   "price": 5.14,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000633",
+   "name": "合金投资",
+   "price": 5.57,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000716",
+   "name": "黑芝麻",
+   "price": 5.91,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz000925",
+   "name": "众合科技",
+   "price": 9.15,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz000932",
+   "name": "华菱钢铁",
+   "price": 3.69,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
+  },
+  {
+   "code": "sz002097",
+   "name": "山河智能",
+   "price": 7.43,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002117",
+   "name": "东港股份",
+   "price": 8.45,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002140",
+   "name": "东华科技",
+   "price": 9.25,
    "score": 59,
    "resonance_label": "中性",
    "sector": "",
@@ -608,323 +653,8 @@
   {
    "code": "sz002186",
    "name": "全聚德",
-   "price": 9.62,
+   "price": 9.83,
    "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002383",
-   "name": "合众思壮",
-   "price": 7.21,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002188",
-   "name": "中天服务",
-   "price": 5.68,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002596",
-   "name": "海南瑞泽",
-   "price": 3.33,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000897",
-   "name": "津滨发展",
-   "price": 1.85,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sh600117",
-   "name": "西宁特钢",
-   "price": 2.32,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000507",
-   "name": "珠海港",
-   "price": 5.09,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000785",
-   "name": "居然智家",
-   "price": 2.28,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
-  },
-  {
-   "code": "sz000812",
-   "name": "陕西金叶",
-   "price": 3.71,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000850",
-   "name": "华茂股份",
-   "price": 4.31,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
-  },
-  {
-   "code": "sz002307",
-   "name": "北新路桥",
-   "price": 3.06,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002314",
-   "name": "南山控股",
-   "price": 2.21,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002330",
-   "name": "得利斯",
-   "price": 4.14,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002419",
-   "name": "天虹股份",
-   "price": 4.66,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
-  },
-  {
-   "code": "sz002700",
-   "name": "万憬能源",
-   "price": 6.53,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002825",
-   "name": "纳尔股份",
-   "price": 9.32,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000723",
-   "name": "美锦能源",
-   "price": 3.9,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002385",
-   "name": "大北农",
-   "price": 3.28,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002045",
-   "name": "国光电器",
-   "price": 9.24,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002449",
-   "name": "国星光电",
-   "price": 6.66,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002469",
-   "name": "三维化学",
-   "price": 6.55,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
-  },
-  {
-   "code": "sz002455",
-   "name": "百川股份",
-   "price": 7.99,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002094",
-   "name": "青岛金王",
-   "price": 5.55,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002427",
-   "name": "尤夫股份",
-   "price": 5.02,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002073",
-   "name": "软控股份",
-   "price": 5.98,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002324",
-   "name": "普利特",
-   "price": 9.41,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002578",
-   "name": "闽发铝业",
-   "price": 4.12,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000637",
-   "name": "茂化实华",
-   "price": 4.26,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002339",
-   "name": "积成电子",
-   "price": 7.49,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz000663",
-   "name": "永安林业",
-   "price": 6.04,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000570",
-   "name": "苏常柴Ａ",
-   "price": 5.23,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002926",
-   "name": "华西证券",
-   "price": 8.61,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002663",
-   "name": "普邦股份",
-   "price": 1.74,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002676",
-   "name": "顺威股份",
-   "price": 5.28,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002622",
-   "name": "皓宸医疗",
-   "price": 2.7,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz000563",
-   "name": "陕国投Ａ",
-   "price": 3.03,
-   "score": 58,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
@@ -932,232 +662,259 @@
   {
    "code": "sz002210",
    "name": "飞马国际",
-   "price": 2.31,
-   "score": 58,
+   "price": 2.36,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000592",
-   "name": "平潭发展",
-   "price": 6.7,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002795",
-   "name": "永和智控",
-   "price": 7.23,
-   "score": 58,
+   "code": "sz002397",
+   "name": "梦洁股份",
+   "price": 3.76,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000523",
-   "name": "红棉股份",
-   "price": 3.37,
-   "score": 56,
+   "code": "sz002492",
+   "name": "恒基达鑫",
+   "price": 6.06,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002042",
-   "name": "华孚时尚",
-   "price": 4.04,
-   "score": 56,
+   "code": "sz002510",
+   "name": "天汽模",
+   "price": 5.72,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000428",
-   "name": "华天酒店",
-   "price": 4.49,
-   "score": 56,
+   "code": "sz002516",
+   "name": "旷达科技",
+   "price": 5.51,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000816",
-   "name": "智慧农业",
-   "price": 2.94,
-   "score": 56,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002331",
-   "name": "皖通科技",
-   "price": 7.25,
-   "score": 56,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002373",
-   "name": "千方科技",
-   "price": 8.02,
-   "score": 56,
+   "code": "sz002550",
+   "name": "千红制药",
+   "price": 6.73,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
   },
   {
-   "code": "sz002712",
-   "name": "思美传媒",
-   "price": 4.99,
-   "score": 55,
+   "code": "sz002566",
+   "name": "益盛药业",
+   "price": 7.2,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000529",
-   "name": "广弘控股",
-   "price": 5.06,
-   "score": 55,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
-  },
-  {
-   "code": "sz000619",
-   "name": "海螺新材",
-   "price": 5.06,
-   "score": 55,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002148",
-   "name": "北纬科技",
-   "price": 6.43,
-   "score": 55,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002349",
-   "name": "精华制药",
-   "price": 7.6,
-   "score": 54,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000620",
-   "name": "盈新发展",
-   "price": 3.24,
-   "score": 54,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000633",
-   "name": "合金投资",
-   "price": 5.47,
-   "score": 54,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
-  },
-  {
-   "code": "sz002666",
-   "name": "德联集团",
-   "price": 4.28,
-   "score": 54,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
   },
   {
    "code": "sz002570",
    "name": "贝因美",
-   "price": 4.58,
-   "score": 54,
+   "price": 4.76,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002296",
-   "name": "辉煌科技",
-   "price": 9.07,
-   "score": 54,
+   "code": "sz002616",
+   "name": "长青集团",
+   "price": 4.96,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002016",
-   "name": "世荣兆业",
-   "price": 4.71,
-   "score": 54,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000421",
-   "name": "南京公用",
-   "price": 5.82,
-   "score": 54,
+   "code": "sz002661",
+   "name": "克明食品",
+   "price": 8.18,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002587",
-   "name": "奥拓电子",
-   "price": 5.63,
-   "score": 54,
+   "code": "sz002795",
+   "name": "永和智控",
+   "price": 7.4,
+   "score": 59,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002079",
-   "name": "苏州固锝",
-   "price": 9.41,
-   "score": 54,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002103",
-   "name": "广博股份",
-   "price": 6.9,
-   "score": 54,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002291",
-   "name": "遥望科技",
-   "price": 5.46,
-   "score": 54,
+   "code": "sz000514",
+   "name": "渝开发",
+   "price": 4.23,
+   "score": 58,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
   },
   {
-   "code": "sz002129",
-   "name": "TCL中环",
-   "price": 9.51,
+   "code": "sz000565",
+   "name": "渝三峡Ａ",
+   "price": 6.5,
+   "score": 58,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz000965",
+   "name": "天保基建",
+   "price": 3.44,
+   "score": 58,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002036",
+   "name": "联创电子",
+   "price": 7.29,
+   "score": 58,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002212",
+   "name": "天融信",
+   "price": 6.82,
+   "score": 58,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002181",
+   "name": "粤传媒",
+   "price": 9.58,
+   "score": 57,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002259",
+   "name": "升达林业",
+   "price": 4.34,
+   "score": 57,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000428",
+   "name": "华天酒店",
+   "price": 4.59,
+   "score": 56,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: SSV>100 | RS_D背离 | 伏击线 [欧马模式]"
+  },
+  {
+   "code": "sz000989",
+   "name": "九芝堂",
+   "price": 9.19,
+   "score": 56,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz000058",
+   "name": "深赛格",
+   "price": 7.13,
+   "score": 55,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002004",
+   "name": "华邦健康",
+   "price": 4.58,
+   "score": 55,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002495",
+   "name": "佳隆股份",
+   "price": 2.47,
+   "score": 55,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002641",
+   "name": "公元股份",
+   "price": 4.01,
+   "score": 55,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
+  },
+  {
+   "code": "sz002666",
+   "name": "德联集团",
+   "price": 4.3,
+   "score": 55,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002589",
+   "name": "瑞康医药",
+   "price": 3.5,
+   "score": 54,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]"
+  },
+  {
+   "code": "sz000503",
+   "name": "国新健康",
+   "price": 7.38,
+   "score": 53,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]"
+  },
+  {
+   "code": "sz000545",
+   "name": "金浦钛业",
+   "price": 2.37,
+   "score": 53,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz000548",
+   "name": "湖南投资",
+   "price": 4.64,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
@@ -1170,309 +927,156 @@
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000926",
-   "name": "福星股份",
-   "price": 2.21,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 [欧马模式]"
-  },
-  {
-   "code": "sz000565",
-   "name": "渝三峡Ａ",
-   "price": 6.48,
+   "code": "sz000635",
+   "name": "英力特",
+   "price": 7.22,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sz000998",
-   "name": "隆平高科",
-   "price": 9.06,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz003035",
-   "name": "南网能源",
-   "price": 5.65,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
-  },
-  {
-   "code": "sz002387",
-   "name": "维信诺",
-   "price": 7.27,
+   "code": "sz000753",
+   "name": "漳州发展",
+   "price": 4.97,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002506",
-   "name": "协鑫集成",
-   "price": 2.65,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: RS_D背离 [欧马模式]"
-  },
-  {
-   "code": "sz002381",
-   "name": "双箭股份",
-   "price": 5.64,
+   "code": "sz000910",
+   "name": "大亚圣象",
+   "price": 5.53,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002481",
-   "name": "双塔食品",
-   "price": 4.26,
+   "code": "sz002016",
+   "name": "世荣兆业",
+   "price": 4.72,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002263",
-   "name": "大东南",
-   "price": 3.21,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002877",
-   "name": "智能自控",
-   "price": 7.51,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
-  },
-  {
-   "code": "sz002356",
-   "name": "鹏飞绿能",
-   "price": 2.8,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
-  },
-  {
-   "code": "sz000679",
-   "name": "大连友谊",
-   "price": 6.37,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sh600282",
-   "name": "南钢股份",
-   "price": 4.7,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
-  },
-  {
-   "code": "sh600019",
-   "name": "宝钢股份",
-   "price": 5.82,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
-  },
-  {
-   "code": "sz000035",
-   "name": "中国天楹",
-   "price": 4.8,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000557",
-   "name": "西部创业",
-   "price": 3.72,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000761",
-   "name": "本钢板材",
-   "price": 2.35,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
-  },
-  {
-   "code": "sz000929",
-   "name": "兰州黄河",
-   "price": 9.35,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002033",
-   "name": "丽江股份",
-   "price": 9.08,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
   },
   {
    "code": "sz002116",
    "name": "中国海诚",
-   "price": 7.24,
+   "price": 7.32,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002616",
-   "name": "长青集团",
-   "price": 4.87,
+   "code": "sz002226",
+   "name": "江南化工",
+   "price": 5.32,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002641",
-   "name": "公元股份",
-   "price": 3.98,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000517",
-   "name": "荣安地产",
-   "price": 2.21,
-   "score": 51,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100 [欧马模式]"
-  },
-  {
-   "code": "sz002334",
-   "name": "英威腾",
-   "price": 6.79,
+   "code": "sz000031",
+   "name": "大悦城",
+   "price": 2.27,
    "score": 51,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002609",
-   "name": "捷顺科技",
-   "price": 7.91,
+   "code": "sz000425",
+   "name": "徐工机械",
+   "price": 8.24,
    "score": 51,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz000705",
-   "name": "浙江震元",
-   "price": 7.2,
-   "score": 50,
+   "code": "sz000544",
+   "name": "中原环保",
+   "price": 7.4,
+   "score": 51,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz001299",
-   "name": "美能能源",
-   "price": 10.0,
-   "score": 50,
+   "code": "sz000980",
+   "name": "众泰汽车",
+   "price": 1.74,
+   "score": 51,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002817",
-   "name": "黄山胶囊",
-   "price": 6.81,
-   "score": 50,
+   "code": "sz002029",
+   "name": "七匹狼",
+   "price": 9.31,
+   "score": 51,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]"
   },
   {
-   "code": "sz002561",
-   "name": "徐家汇",
-   "price": 6.96,
-   "score": 50,
+   "code": "sz002061",
+   "name": "浙江交科",
+   "price": 3.52,
+   "score": 51,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
+  },
+  {
+   "code": "sz002131",
+   "name": "利欧股份",
+   "price": 5.1,
+   "score": 51,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002375",
+   "name": "亚厦股份",
+   "price": 3.95,
+   "score": 51,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002543",
+   "name": "万和电气",
+   "price": 7.29,
+   "score": 51,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002489",
-   "name": "浙江永强",
-   "price": 2.82,
-   "score": 50,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
-  },
-  {
-   "code": "sz000753",
-   "name": "漳州发展",
-   "price": 4.87,
-   "score": 50,
+   "code": "sz002662",
+   "name": "峰璟股份",
+   "price": 3.32,
+   "score": 51,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002224",
-   "name": "三力士",
-   "price": 3.73,
-   "score": 50,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz000726",
-   "name": "鲁泰Ａ",
-   "price": 5.98,
-   "score": 50,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
-  },
-  {
-   "code": "sz002259",
-   "name": "升达林业",
-   "price": 4.3,
+   "code": "sz002519",
+   "name": "银河电子",
+   "price": 5.69,
    "score": 50,
    "resonance_label": "中性",
    "sector": "",
