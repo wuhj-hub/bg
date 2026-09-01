@@ -38,18 +38,44 @@ def load_quant_latest():
                 return None
     return None
 
+
+def parse_quant_temps(quant):
+    """从 quant_results 解析三系统温度（兼容结构化字段 + stdout 文本，2026-09-02修复）
+    返回 (fish_temp, beast_score, sx_temp, sx_air)
+      fish: fishbody.market_temp.score|temp
+      beast: beast.safety_score 或 stdout '安全评分: X/100'
+      sx: shuangxian.temperature 或 stdout '温度: X/100'；air_count
+    """
+    if not quant:
+        return None, None, None, None
+    fish = quant.get("fishbody") or quant.get("fish_body") or {}
+    beast = quant.get("beast") or {}
+    sx = quant.get("shuangxian") or {}
+    # 鱼身
+    ft_v = None
+    ft = fish.get("market_temp") or {}
+    if isinstance(ft, dict):
+        ft_v = ft.get("score") if ft.get("score") is not None else ft.get("temp")
+    # 猛兽
+    bs = beast.get("safety_score") if isinstance(beast, dict) else None
+    if bs is None:
+        m = re.search(r"安全评分[:：]\s*([\d.]+)/100", str(beast.get("stdout", "")))
+        if m:
+            bs = float(m.group(1))
+    # 双弦
+    tl = sx.get("temperature") if isinstance(sx, dict) else None
+    sx_air = sx.get("air_count") if isinstance(sx, dict) else None
+    if tl is None:
+        m = re.search(r"温度[:：]\s*(\d+)/100", str(sx.get("stdout", "")))
+        if m:
+            tl = float(m.group(1))
+    return ft_v, bs, tl, sx_air
+
 def build_judgment(idx_rows, sectors, quant):
     """基于三系统+指数+板块生成结构化预判（供复盘报告真实验证）
     A3风格轴硬接线（2026-08-10）：仓位=基准(三系统) + 风格分修正(±10%) + 温度修正(沸点-10%)，clamp 10%~70%"""
-    fish = (quant.get("fish_body") or {}) if quant else {}
-    beast = (quant.get("beast") or {}) if quant else {}
-    sx = (quant.get("shuangxian") or {}) if quant else {}
-    ft = fish.get("market_temp") or {}
-    ft_v = ft.get("score") if isinstance(ft, dict) else None
-    bs = beast.get("safety_score") if isinstance(beast, dict) else None
-    sx_air = sx.get("air_count") if isinstance(sx, dict) else None  # 空头指数数量
-    tl = sx.get("temperature") if isinstance(sx, dict) else None
-
+    ft_v, bs, tl, sx_air = parse_quant_temps(quant)
+    ft_v2 = ft_v
     # 基准仓位（三系统综合）
     bearish = 0
     if sx_air is not None and sx_air >= 5:
@@ -299,18 +325,12 @@ def gen_report(today_str):
     
     # ②.5 三系统信号快照（引用昨日盘后量化）
     lines.append("\n### 三系统信号快照（{0}盘后）\n".format(yesterday))
-    fish = (quant.get("fish_body") or {}) if quant else {}
-    beast = (quant.get("beast") or {}) if quant else {}
-    sx = (quant.get("shuangxian") or {}) if quant else {}
-    ft = fish.get("market_temp") or {}
-    ft_v = ft.get("score") if isinstance(ft, dict) else None
-    bs = beast.get("safety_score") if isinstance(beast, dict) else None
-    sx_air = sx.get("air_count") if isinstance(sx, dict) else None
+    ft_v, bs, tl, sx_air = parse_quant_temps(quant)
     lines.append("| 系统 | 信号 |")
     lines.append("|:----|:----|")
     lines.append(f"| 🌡️ 鱼身温度 | {ft_v}/100" if ft_v is not None else "| 🌡️ 鱼身温度 | ⏳ 待量化运行 |")
     lines.append(f"| 🛡️ 猛兽安全评分 | {bs}/100" if bs is not None else "| 🛡️ 猛兽安全评分 | ⏳ 待量化运行 |")
-    lines.append(f"| 🧭 双弦 | 空头{sx_air}/8" if sx_air is not None else "| 🧭 双弦 | ⏳ 待量化运行 |")
+    lines.append(f"| 🧭 双弦 | 温度{tl}/100·空头{sx_air}/8" if tl is not None else f"| 🧭 双弦 | 空头{sx_air}/8" if sx_air is not None else "| 🧭 双弦 | ⏳ 待量化运行 |")
     # 资金行为四态（读昨日全盘量化 panhou_lianghua.md 一.5章节）
     ph = read_fund_phase()
     if ph:
