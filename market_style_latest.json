@@ -1,24 +1,24 @@
 {
- "date": "2026-09-01",
- "data_date": "2026-09-01",
+ "date": "2026-09-02",
+ "data_date": "2026-09-02",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 16,
+ "score": 19,
  "score_detail": {
-  "size_style": 5,
+  "size_style": 0,
   "limitup_structure": 16,
   "volume_structure": 0,
-  "sector_fund": -5
+  "sector_fund": 3
  },
  "size_style": {
-  "hs300_5d": 1.31,
-  "hs300_10d": -2.42,
-  "zz1000_5d": 2.18,
-  "zz1000_10d": -3.2,
-  "rel_5d": 0.87,
-  "rel_10d": -0.78,
-  "rel_20d": 5.43,
-  "zz500_5d": 1.91
+  "hs300_5d": -0.93,
+  "hs300_10d": -0.89,
+  "zz1000_5d": 0.52,
+  "zz1000_10d": 0.88,
+  "rel_5d": 1.45,
+  "rel_10d": 1.77,
+  "rel_20d": 3.58,
+  "zz500_5d": -0.53
  },
  "limitup_structure": {
   "limitup": 52,
@@ -32,45 +32,31 @@
   "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.196,
-  "small_big_ratio_5d": 1.211
+  "small_big_ratio_now": 1.161,
+  "small_big_ratio_5d": 1.188
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "种植业",
-    "zdf": "7.19",
-    "main_net5d": 6.0,
-    "retail_net": -17.7,
+    "name": "地面兵装Ⅱ",
+    "zdf": "6.48",
+    "main_net5d": 4.3,
+    "retail_net": -12.8,
     "tag": "机构型"
    },
    {
-    "name": "一般零售",
-    "zdf": "3.87",
-    "main_net5d": 3.5,
-    "retail_net": -15.0,
-    "tag": "机构型"
-   },
-   {
-    "name": "电力",
-    "zdf": "0.99",
-    "main_net5d": -27.7,
-    "retail_net": -14.4,
+    "name": "贵金属",
+    "zdf": "-0.03",
+    "main_net5d": -37.2,
+    "retail_net": 11.5,
     "tag": "游资型"
    },
    {
-    "name": "消费电子",
-    "zdf": "-2.07",
-    "main_net5d": 77.6,
-    "retail_net": 28.2,
-    "tag": "混合"
-   },
-   {
-    "name": "证券Ⅱ",
-    "zdf": "0.61",
-    "main_net5d": 41.5,
-    "retail_net": -11.8,
-    "tag": "机构型"
+    "name": "电网设备",
+    "zdf": "-0.45",
+    "main_net5d": -24.4,
+    "retail_net": -14.2,
+    "tag": "游资型"
    }
   ]
  },
@@ -81,15 +67,13 @@
    "欧马模式": 2
   },
   "leaders": {
-   "堆量模式": 10,
-   "欧马模式": 2
+   "堆量模式": 8,
+   "欧马模式": 1
   },
   "pullbacks": {
    "堆量模式": 3
   },
-  "gpoints": {
-   "堆量模式": 1
-  },
+  "gpoints": {},
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
