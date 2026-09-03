@@ -69,22 +69,28 @@ def main():
             if r["code"] not in ("404", "000") or r["size"] not in ("0", "?"):
                 results.append(r)
 
-    # v4: 深度验证 /limitup 页是否内嵌涨停数据（股票代码/名称/连板特征）
+    # v5: 从 _nuxt JS chunk 提取真实 API 端点（SSR壳内数据由异步API拉取）
     try:
         r = subprocess.run(["curl", "-s", "--max-time", "15", "-o", "/tmp/kpl_limitup.html",
                             "-A", UA, "http://www.kpl.com.cn/limitup"],
                            capture_output=True, text=True, timeout=20)
         body = open("/tmp/kpl_limitup.html", encoding="utf-8", errors="ignore").read()
-        codes = sorted(set(re.findall(r"(?:sh|sz)(\d{6})", body)))[:30]
-        nuxt = re.findall(r"window\.__NUXT__\s*=\s*(\{.*?\});?\s*</script>", body, re.S)
-        names_zt = re.findall(r"[\u4e00-\u9fff]{2,6}?股|[\u4e00-\u9fff]{2,6}?", body[:500])
-        results.append({"limitup_page_size": len(body),
-                        "shsz_codes_found": len(codes), "code_samples": codes[:10],
-                        "has_nuxt_data": bool(nuxt), "nuxt_len": len(nuxt[0]) if nuxt else 0,
-                        "has_zhangting": body.count("涨停"), "has_lianguan": body.count("连板"),
-                        "has_board_theme": body.count("题材") + body.count("板块")})
+        js_files = sorted(set(re.findall(r'src="([^"]*?_nuxt/[a-f0-9]+\.js)"', body)))[:8]
+        results.append({"nuxt_js_count": len(js_files), "js_samples": js_files[:5]})
+        api_hits = []
+        for js in js_files[:4]:
+            js_url = "http://www.kpl.com.cn" + (js if js.startswith("/") else "/" + js)
+            rj = subprocess.run(["curl", "-s", "--max-time", "12", "-A", UA, js_url],
+                                capture_output=True, text=True, timeout=18)
+            jsc = rj.stdout
+            hits = sorted(set(re.findall(r'https?://[a-zA-Z0-9._-]+(?:/[a-zA-Z0-9_./{}$-]*)?', jsc)))
+            hits2 = sorted(set(re.findall(r'/[a-zA-Z][a-zA-Z0-9_/.-]*(?:list|detail|data|info|rank|index)[a-zA-Z0-9_/.-]*', jsc)))
+            if hits or hits2:
+                api_hits.append({"js": js.split("/")[-1], "size": len(jsc),
+                                 "urls": hits[:12], "paths": hits2[:12]})
+        results.append({"api_discovery": api_hits})
     except Exception as e:
-        results.append({"limitup_probe_err": str(e)[:120]})
+        results.append({"api_discovery_err": str(e)[:120]})
 
     print(json.dumps(results, ensure_ascii=False, indent=1))
 
