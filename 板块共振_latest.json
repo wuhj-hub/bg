@@ -1,23 +1,12 @@
 {
  "date": "2026-09-03",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 53,
+ "pool_size": 43,
  "resonance_boards": [
   {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "zdf": 0.4,
-   "strength": 8,
-   "factors": [
-    "进场",
-    "吸筹",
-    "控盘"
-   ]
-  },
-  {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
-   "zdf": 3.41,
+   "name": "培育钻石",
+   "code": "pt02231435",
+   "zdf": 4.18,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -26,9 +15,9 @@
    ]
   },
   {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "zdf": 1.48,
+   "name": "通用设备",
+   "code": "pt01801072",
+   "zdf": 1.28,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -39,7 +28,7 @@
   {
    "name": "游戏Ⅱ",
    "code": "pt01801764",
-   "zdf": 1.04,
+   "zdf": 1.31,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -50,7 +39,7 @@
   {
    "name": "一般零售",
    "code": "pt01801203",
-   "zdf": 0.69,
+   "zdf": 0.09,
    "strength": 5,
    "factors": [
     "进场",
@@ -60,7 +49,7 @@
   {
    "name": "汽车零部件",
    "code": "pt01801093",
-   "zdf": 0.63,
+   "zdf": 0.75,
    "strength": 5,
    "factors": [
     "进场",
@@ -68,39 +57,9 @@
    ]
   },
   {
-   "name": "软件开发",
-   "code": "pt01801104",
-   "zdf": 0.26,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "通用设备",
-   "code": "pt01801072",
-   "zdf": 0.67,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "商贸零售",
-   "code": "pt01801200",
-   "zdf": 0.61,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "传媒",
-   "code": "pt01801760",
-   "zdf": 0.17,
+   "name": "种植业",
+   "code": "pt01801016",
+   "zdf": 0.38,
    "strength": 5,
    "factors": [
     "进场",
@@ -110,13 +69,13 @@
  ],
  "grab_top": [
   {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
+   "name": "培育钻石",
+   "code": "pt02231435",
    "value": 7
   },
   {
-   "name": "影视院线",
-   "code": "pt01801766",
+   "name": "通用设备",
+   "code": "pt01801072",
    "value": 7
   },
   {
@@ -127,14 +86,9 @@
  ],
  "entry_top": [
   {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "value": 30.4
-  },
-  {
-   "name": "传媒",
-   "code": "pt01801760",
-   "value": 27.4
+   "name": "农林牧渔",
+   "code": "pt01801010",
+   "value": 16.3
   },
   {
    "name": "汽车零部件",
@@ -142,14 +96,9 @@
    "value": 14.9
   },
   {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
-   "value": 12.3
-  },
-  {
    "name": "通用设备",
    "code": "pt01801072",
-   "value": 11.8
+   "value": 10.2
   },
   {
    "name": "商贸零售",
@@ -167,9 +116,9 @@
    "value": 6.2
   },
   {
-   "name": "软件开发",
-   "code": "pt01801104",
-   "value": 4.6
+   "name": "培育钻石",
+   "code": "pt02231435",
+   "value": 5.0
   },
   {
    "name": "游戏Ⅱ",
@@ -179,71 +128,55 @@
  ],
  "absorption_top": [
   {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "value": 3.34
-  },
-  {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
-   "value": 2.22
-  },
-  {
    "name": "一般零售",
    "code": "pt01801203",
-   "value": 1.5
+   "value": 1.4
   },
   {
    "name": "商贸零售",
    "code": "pt01801200",
-   "value": 0.98
+   "value": 0.91
   },
   {
-   "name": "传媒",
-   "code": "pt01801760",
-   "value": 0.92
+   "name": "农林牧渔",
+   "code": "pt01801010",
+   "value": 0.8
   },
   {
    "name": "种植业",
    "code": "pt01801016",
-   "value": 0.82
+   "value": 0.79
+  },
+  {
+   "name": "培育钻石",
+   "code": "pt02231435",
+   "value": 0.71
   },
   {
    "name": "汽车零部件",
    "code": "pt01801093",
-   "value": 0.59
-  },
-  {
-   "name": "通用设备",
-   "code": "pt01801072",
-   "value": 0.33
+   "value": 0.55
   },
   {
    "name": "游戏Ⅱ",
    "code": "pt01801764",
-   "value": 0.32
+   "value": 0.3
   },
   {
-   "name": "影视院线",
-   "code": "pt01801766",
+   "name": "通用设备",
+   "code": "pt01801072",
    "value": 0.27
   }
  ],
- "control_top": [
-  {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "value": 3.34
-  }
- ],
+ "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "保险Ⅱ",
-   "stock": "中国太保",
-   "code": "sh601601",
-   "zdf": "4.78",
-   "main1": 2.48,
-   "main5": 0.04
+   "board": "培育钻石",
+   "stock": "恒盛能源",
+   "code": "sh605580",
+   "zdf": "10.02",
+   "main1": 0.54,
+   "main5": 0.19
   }
  ]
 }
