@@ -90,12 +90,12 @@ def regime_type(sx, beast, fish, width=None):
     """
     vals = [v for v in (sx, beast, fish) if v is not None]
     avg = sum(vals) / len(vals) if vals else 50
-    if avg >= 55 and (width is None or width >= 60):
+    if avg >= 55 and width is not None and width >= 60:
         return "🐂 牛市中继（长期力量向上，可积极）", "60-100%", "主扫强势股/领涨龙头，回调低吸", \
             "武威G1双阴(64-77%)+强势突破+月线龙头长持"
     if avg >= 55:
-        return "🐂 牛市中继·边界（偏暖）", "50-70%", "谨慎乐观，等回踩确认", \
-            "武威G1低吸+乾坤金股"
+        return "🐂 牛市中继·边界（偏暖，需宽度≥60确认）", "50-70%", "谨慎乐观，等回踩确认", \
+            "武威G1低吸+乾坤金股（确认宽度≥60再升级进攻）"
     if avg >= 40:
         return "⚖️ 震荡反弹（力量冲突）", "30-50%", "精选领涨股，快进快出", \
             "月线反转/超跌(81%)+武威G1低吸+下单背离(B)"
