@@ -1,24 +1,24 @@
 {
- "date": "2026-09-02",
- "data_date": "2026-09-02",
- "style": "均衡市",
- "icon": "⚖️",
- "score": 19,
+ "date": "2026-09-03",
+ "data_date": "2026-09-03",
+ "style": "情绪市",
+ "icon": "🔥",
+ "score": 30,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 16,
-  "volume_structure": 0,
-  "sector_fund": 3
+  "volume_structure": 7,
+  "sector_fund": 7
  },
  "size_style": {
-  "hs300_5d": -0.93,
-  "hs300_10d": -0.89,
-  "zz1000_5d": 0.52,
-  "zz1000_10d": 0.88,
-  "rel_5d": 1.45,
-  "rel_10d": 1.77,
-  "rel_20d": 3.58,
-  "zz500_5d": -0.53
+  "hs300_5d": -1.28,
+  "hs300_10d": -0.47,
+  "zz1000_5d": -1.6,
+  "zz1000_10d": 0.25,
+  "rel_5d": -0.32,
+  "rel_10d": 0.73,
+  "rel_20d": 2.77,
+  "zz500_5d": -2.31
  },
  "limitup_structure": {
   "limitup": 52,
@@ -32,50 +32,65 @@
   "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.161,
-  "small_big_ratio_5d": 1.188
+  "small_big_ratio_now": 1.202,
+  "small_big_ratio_5d": 1.181,
+  "small_vol_pulse": 56.08
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "地面兵装Ⅱ",
-    "zdf": "6.48",
-    "main_net5d": 4.3,
-    "retail_net": -12.8,
+    "name": "证券Ⅱ",
+    "zdf": "1.27",
+    "main_net5d": -31.2,
+    "retail_net": -19.3,
+    "tag": "游资型"
+   },
+   {
+    "name": "一般零售",
+    "zdf": "0.48",
+    "main_net5d": 9.7,
+    "retail_net": -3.2,
     "tag": "机构型"
    },
    {
-    "name": "贵金属",
-    "zdf": "-0.03",
-    "main_net5d": -37.2,
-    "retail_net": 11.5,
+    "name": "半导体",
+    "zdf": "-0.10",
+    "main_net5d": -167.5,
+    "retail_net": 30.6,
     "tag": "游资型"
    },
    {
-    "name": "电网设备",
-    "zdf": "-0.45",
-    "main_net5d": -24.4,
-    "retail_net": -14.2,
+    "name": "通信设备",
+    "zdf": "-0.11",
+    "main_net5d": -66.0,
+    "retail_net": 34.3,
     "tag": "游资型"
+   },
+   {
+    "name": "元件",
+    "zdf": "0.04",
+    "main_net5d": 4.7,
+    "retail_net": 17.2,
+    "tag": "混合"
    }
   ]
  },
  "mode_cross": {
-  "dominant": "堆量模式",
+  "dominant": "欧马模式",
   "all": {
-   "堆量模式": 13,
-   "欧马模式": 2
+   "堆量模式": 10,
+   "欧马模式": 5
   },
   "leaders": {
-   "堆量模式": 8,
+   "堆量模式": 3,
+   "欧马模式": 4
+  },
+  "pullbacks": {},
+  "gpoints": {
    "欧马模式": 1
   },
-  "pullbacks": {
-   "堆量模式": 3
-  },
-  "gpoints": {},
-  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
+  "verdict": "⚠️ 背离（风格轴与猛兽信号偏好不一致，注意结构分化）",
   "total_scored": 15
  },
- "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
+ "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
 }
