@@ -184,6 +184,7 @@ jobs:
       # ─── 第三步.5b：四维共振评分（政策/资金/筹码/关联方，依赖扫描workflow提交的panhou_lianghua.csv）───
       - name: 四维共振评分（政策/资金/筹码/关联方四维证据链）
         continue-on-error: true
+        timeout-minutes: 45  # 2026-09-03: quad_resonance曾跑55min+拖死job, 超时后continue-on-error继续后续步骤
         run: python3 quad_resonance.py --pool panhou_lianghua.csv --top 15
 
       # ─── 第三步.5c：全系统信号仲裁（统一出口：9信号源+操作清单+市场级信号，依赖四维+三系统输出）───
