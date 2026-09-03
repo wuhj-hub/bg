@@ -104,15 +104,24 @@ def parse_tdx_json(data):
     return rows
 
 
-def parse_westock_kline(csv_text):
+def parse_westock_kline(csv_text, end_date=None):
     """westock 批量 kline 自算涨停/连板（--westock 模式）。
     输入: kline 批量输出文本（列序: symbol,date,open,last,high,low,...）
+    end_date: 若指定(YYYY-MM-DD)，丢弃该日之后的K线，用于回溯补历史数据（连板终点=end_date）
     输出: list[dict]（无题材/板型字段，lianban 通过连续涨停日推算）
     """
     rows = []
     by_code = defaultdict(list)
     for line in csv_text.strip().splitlines():
-        parts = line.split()
+        line = line.strip()
+        if not line:
+            continue
+        # 兼容两种格式：npx 批量输出为 markdown 管道表(| sz000001 | date |...)，
+        # 也可能为纯空格分隔。统一按 '|' 优先解析，fallback 空格。
+        if line.startswith("|"):
+            parts = [p.strip() for p in line.strip("|").split("|")]
+        else:
+            parts = line.split()
         if len(parts) < 6:
             continue
         sym, date, open_, last, high, low = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]
@@ -120,6 +129,8 @@ def parse_westock_kline(csv_text):
             continue
         if not (date.replace("-", "").isdigit()):
             continue
+        if end_date and date > end_date:
+            continue  # 回溯补数据：只看 end_date 及之前
         try:
             close = float(last)
             prev = None
@@ -426,6 +437,7 @@ def main():
     ap.add_argument("--input", action="append", help="tdx_screener 导出的 JSON 文件路径（可多个，自动合并去重）")
     ap.add_argument("--westock", action="store_true", help="westock 批量K线自算模式（降级）")
     ap.add_argument("--kline-file", help="westock 模式：kline 批量输出文本文件")
+    ap.add_argument("--end-date", help="westock 回溯模式：只统计该日期(含)之前的K线（补历史用）")
     ap.add_argument("--outdir", default=OUT_DIR, help="输出目录")
     args = ap.parse_args()
 
@@ -438,7 +450,7 @@ def main():
             print("错误：--westock 模式需要 --kline-file（westock kline 批量输出）", file=sys.stderr)
             sys.exit(1)
         with open(args.kline_file, "r", encoding="utf-8") as f:
-            rows = parse_westock_kline(f.read())
+            rows = parse_westock_kline(f.read(), end_date=args.end_date)
         total_hint = len(rows)
         sample_note = "数据源=westock批量K线自算（无题材/封单明细）"
     else:
