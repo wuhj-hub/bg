@@ -1,30 +1,29 @@
 {
- "date": "2026-09-02",
- "total": 51,
- "lianban_cnt": 14,
+ "date": "2026-09-03",
+ "total": 42,
+ "lianban_cnt": 9,
  "max_lb": 5,
- "shouban": 37,
+ "shouban": 33,
  "by_lb": {
   "5": 1,
   "4": 2,
-  "3": 4,
-  "2": 7,
-  "1": 37
+  "2": 6,
+  "1": 33
  },
  "score": {
-  "score": 71,
-  "level": "亢奋",
+  "score": 66,
+  "level": "活跃",
   "parts": {
    "涨停家数": 8,
    "连板高度": 28,
-   "连板占比": 35
+   "连板占比": 30
   }
  },
  "persistence": [],
  "alerts": [],
  "lianban_rows": [
   {
-   "code": "sh600540",
+   "code": "sh601086",
    "name": "",
    "price": "",
    "chg": "",
@@ -37,64 +36,12 @@
    "fengdan": ""
   },
   {
-   "code": "sz003005",
-   "name": "",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": ""
-  },
-  {
-   "code": "sh601086",
-   "name": "",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": ""
-  },
-  {
-   "code": "sz000892",
-   "name": "",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": ""
-  },
-  {
    "code": "sz002909",
    "name": "",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": ""
-  },
-  {
-   "code": "sh600892",
-   "name": "",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -106,8 +53,8 @@
    "name": "",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -115,7 +62,7 @@
    "fengdan": ""
   },
   {
-   "code": "sz000635",
+   "code": "sz002059",
    "name": "",
    "price": "",
    "chg": "",
@@ -128,7 +75,7 @@
    "fengdan": ""
   },
   {
-   "code": "sz002104",
+   "code": "sz002297",
    "name": "",
    "price": "",
    "chg": "",
@@ -141,7 +88,7 @@
    "fengdan": ""
   },
   {
-   "code": "sh600828",
+   "code": "sz002300",
    "name": "",
    "price": "",
    "chg": "",
@@ -154,7 +101,7 @@
    "fengdan": ""
   },
   {
-   "code": "sh600830",
+   "code": "sz002708",
    "name": "",
    "price": "",
    "chg": "",
@@ -167,7 +114,7 @@
    "fengdan": ""
   },
   {
-   "code": "sh600967",
+   "code": "sh600657",
    "name": "",
    "price": "",
    "chg": "",
@@ -180,20 +127,7 @@
    "fengdan": ""
   },
   {
-   "code": "sh601566",
-   "name": "",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": ""
-  },
-  {
-   "code": "sh603207",
+   "code": "sh603270",
    "name": "",
    "price": "",
    "chg": "",
