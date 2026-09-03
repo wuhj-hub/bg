@@ -290,10 +290,11 @@ def emotion_score(stats):
 
 # ---------- 历史累积 / 板块持续性 / 退潮预警 ----------
 
-def load_history():
-    if os.path.exists(HISTORY_FILE):
+def load_history(history_file=None):
+    path = history_file or HISTORY_FILE
+    if os.path.exists(path):
         try:
-            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            with open(path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except (json.JSONDecodeError, OSError):
             return {}
@@ -439,6 +440,7 @@ def main():
     ap.add_argument("--kline-file", help="westock 模式：kline 批量输出文本文件")
     ap.add_argument("--end-date", help="westock 回溯模式：只统计该日期(含)之前的K线（补历史用）")
     ap.add_argument("--outdir", default=OUT_DIR, help="输出目录")
+    ap.add_argument("--history-file", help="历史累积JSON路径（默认 outdir/hot_emotion_history.json）")
     args = ap.parse_args()
 
     os.makedirs(args.outdir, exist_ok=True)
@@ -486,7 +488,8 @@ def main():
     score = emotion_score(stats)
 
     # 3. 历史累积 + 板块持续性 + 退潮预警
-    history = load_history()
+    history_file = args.history_file or os.path.join(args.outdir, "hot_emotion_history.json")
+    history = load_history(history_file)
     persistence_now = build_persistence(date, stats, history)
     alerts = build_alerts(date, stats, history, persistence_now)
 
@@ -499,7 +502,7 @@ def main():
         "level": score["level"],
         "themes": {p["tag"]: {"heat": p["heat"], "zt": p["zt"]} for p in persistence_now},
     }
-    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+    with open(history_file, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=1)
 
     # 5. 输出
