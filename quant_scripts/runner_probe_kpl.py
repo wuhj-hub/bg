@@ -150,6 +150,37 @@ def main():
     except Exception as e:
         results.append({"api_discovery_err": str(e)[:120]})
 
+    # v8: 全量 _nuxt chunk axios 调用路径挖掘（开盘啦真实数据API端点）
+    try:
+        r = subprocess.run(["curl", "-s", "--max-time", "15", "-A", UA,
+                            "http://www.kpl.com.cn/limitup"], capture_output=True, text=True, timeout=20)
+        html_all = r.stdout
+        all_js = sorted(set(re.findall(r'src="([^"]*?_nuxt/[a-f0-9]+\.js)"', html_all)))
+        results.append({"total_chunks": len(all_js)})
+        found = []
+        for jsu in all_js:
+            jurl = jsu if jsu.startswith("http") else "http://www.kpl.com.cn" + (jsu if jsu.startswith("/") else "/" + jsu)
+            try:
+                rj = subprocess.run(["curl", "-s", "--max-time", "8", "-A", UA, jurl],
+                                    capture_output=True, text=True, timeout=12)
+                txt = rj.stdout
+            except Exception:
+                continue
+            # axios.$get("...") / .get("...") / url:"..." 里的路径
+            calls = re.findall(r'\.(?:get|post|put|delete)\(\s*[\"\x27]([^\"\x27]{2,80})[\"\x27]', txt)
+            urls = re.findall(r'[\"\x27](https?://[a-zA-Z0-9._/-]{5,90})[\"\x27]', txt)
+            apis = re.findall(r'[\"\x27](/[a-zA-Z][a-zA-Z0-9_./-]{3,80})[\"\x27]', txt)
+            hit = []
+            for c in calls + urls + apis:
+                if any(k in c.lower() for k in ("plate", "limit", "theme", "bankuai", "zhangting", "lianban", "api/", "signal", "block", "rank", "trend", "board")):
+                    hit.append(c)
+            if hit:
+                found.append({"chunk": jsu.split("/")[-1], "size": len(txt),
+                              "hits": sorted(set(hit))[:15]})
+        results.append({"axios_api_hits": found})
+    except Exception as e:
+        results.append({"axios_probe_err": str(e)[:100]})
+
     print(json.dumps(results, ensure_ascii=False, indent=1))
 
 
