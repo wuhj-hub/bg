@@ -78,7 +78,7 @@ def main():
         js_files = sorted(set(re.findall(r'src="([^"]*?_nuxt/[a-f0-9]+\.js)"', body)))[:8]
         results.append({"nuxt_js_count": len(js_files), "js_samples": js_files[:5]})
         api_hits = []
-        for js in js_files[:4]:
+        for js in js_files[:10]:
             js_url = "http://www.kpl.com.cn" + (js if js.startswith("/") else "/" + js)
             rj = subprocess.run(["curl", "-s", "--max-time", "12", "-A", UA, js_url],
                                 capture_output=True, text=True, timeout=18)
@@ -118,6 +118,35 @@ def main():
                 rr = fetch(f"http://{host}{p}")
                 if rr["code"] not in ("404", "000") or rr["size"] not in ("0", "?"):
                     results.append({"zhugepan_path": p, **rr})
+            # v7: swagger/openapi 暴露探测（自建API常开）
+            for p in ("/swagger-ui.html", "/swagger-ui/index.html", "/v2/api-docs", "/v3/api-docs",
+                      "/doc.html", "/openapi.json", "/actuator", "/api-docs", "/swagger-resources"):
+                rr = fetch(f"http://{host}{p}")
+                if rr["code"] not in ("404", "000") or rr["size"] not in ("0", "?") or "json" in rr.get("type", ""):
+                    results.append({"zhugepan_swagger": p, **rr})
+            # chunk 深度路径挖掘（axios调用/URL拼接线索）
+            try:
+                big_js = []
+                r_js = subprocess.run(["curl", "-s", "--max-time", "15", "-A", UA,
+                                       "http://www.kpl.com.cn/limitup"], capture_output=True, text=True, timeout=20)
+                html = r_js.stdout
+                all_js = sorted(set(re.findall(r'src="([^"]*?_nuxt/[a-f0-9]+\.js)"', html)))[:16]
+                all_js = [j if j.startswith("http") else "http://www.kpl.com.cn" + (j if j.startswith("/") else "/" + j) for j in all_js]
+                for jsu in all_js[:10]:
+                    rr2 = subprocess.run(["curl", "-s", "--max-time", "10", "-A", UA, jsu],
+                                         capture_output=True, text=True, timeout=15)
+                    txt = rr2.stdout
+                    big_js.append((jsu.split("/")[-1], len(txt), txt))
+                big_js.sort(key=lambda x: -x[1])
+                allpaths = []
+                for nm, sz, txt in big_js[:6]:
+                    paths = sorted(set(re.findall(r'/(?:api/)?[a-z][a-z0-9_]*(?:/|$)(?:[a-z][a-z0-9_]*)?(?:list|detail|rank|plate|limit|theme|block|signal|data|info|query|search|index|get)[a-zA-Z0-9_/]*', txt)))
+                    paths = [x for x in paths if len(x) > 4 and "http" not in x][:40]
+                    if paths:
+                        allpaths.append({"js": nm, "sz": sz, "paths": paths})
+                results.append({"chunk_api_paths": allpaths})
+            except Exception as e:
+                results.append({"chunk_api_err": str(e)[:100]})
     except Exception as e:
         results.append({"api_discovery_err": str(e)[:120]})
 
