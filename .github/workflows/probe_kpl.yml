@@ -1,0 +1,18 @@
+name: probe_kpl
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 开盘啦数据源可达性探测（外网runner验证沙箱不可达域名）
+        run: |
+          python3 quant_scripts/runner_probe_kpl.py
