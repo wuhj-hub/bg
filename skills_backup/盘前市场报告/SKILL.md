@@ -333,6 +333,15 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/hot_emotion.py --da
 **回溯补历史**：`--end-date {YYYY-MM-DD}` 只统计该日(含)之前的K线，连板终点=end_date——漏跑日期无需重拉数据，同一 kline 文件跑多次即可（9/1、9/2 已用此法补齐）。
 ⚠️ **westock 模式已修复（2026-09-03）**：npx 批量输出为 markdown 管道表（`| sz000001 | date |...`），parse_westock_kline 原先按空格 split 导致全部过滤、--westock 从未真正工作；已兼容 '|' 分隔（真实校验：新赛5板/国芳4板与实况一致）。
 
+> 🔄 **每日自动链路（2026-09-03 固化，quant_scan.yml 第二步.1.3b）**：hot_emotion 已接入 GitHub quant_scan.yml——每日 15:30 盘后自动跑 `fetch_hot_kline.py(42s) → hot_emotion.py --westock`，产物提交到仓库根（hot_emotion_latest.json/history/当日md）。**ima 生成盘前报告前必须先同步**：
+> ```bash
+> python3 skills/盘前市场报告/scripts/sync_hot_emotion.py --check-date {昨日交易日}
+> # exit 0 = GitHub 有昨日数据，直接用；exit 1 = 缺 → 本地降级补跑：
+> # python3 skills/盘前市场报告/scripts/fetch_hot_kline.py --limit 25 --out /tmp/kh.txt
+> # python3 skills/盘前市场报告/scripts/hot_emotion.py --date {昨日} --westock --kline-file /tmp/kh.txt --end-date {昨日}
+> ```
+> 同步脚本候选路径：仓库根（workflow 最新）→ skills_backup 备份（兜底）。
+
 若 tdx 数据不可用（接口异常/非交易日），自动提示占位，不影响报告完整性。
 
 #### 2.14 市场图表生成（新增·market_charts 情绪图+三系统温度图）
