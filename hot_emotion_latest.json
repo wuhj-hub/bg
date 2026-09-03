@@ -1,23 +1,22 @@
 {
  "date": "2026-09-03",
- "total": 34,
- "lianban_cnt": 10,
+ "total": 42,
+ "lianban_cnt": 9,
  "max_lb": 5,
- "shouban": 24,
+ "shouban": 33,
  "by_lb": {
   "5": 1,
-  "4": 3,
-  "3": 1,
-  "2": 5,
-  "1": 24
+  "4": 2,
+  "2": 6,
+  "1": 33
  },
  "score": {
-  "score": 68,
+  "score": 66,
   "level": "活跃",
   "parts": {
-   "涨停家数": 5,
+   "涨停家数": 8,
    "连板高度": 28,
-   "连板占比": 35
+   "连板占比": 30
   }
  },
  "persistence": [],
@@ -30,19 +29,6 @@
    "chg": "",
    "lianban": 5,
    "ji_ji_ban": "5天5板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": ""
-  },
-  {
-   "code": "sz000892",
-   "name": "",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -76,12 +62,12 @@
    "fengdan": ""
   },
   {
-   "code": "sh600830",
+   "code": "sz002059",
    "name": "",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -89,7 +75,7 @@
    "fengdan": ""
   },
   {
-   "code": "sz002059",
+   "code": "sz002297",
    "name": "",
    "price": "",
    "chg": "",
