@@ -17,6 +17,17 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: 同花顺板块页结构验证（行业列表+成分页）
+        run: |
+          echo "=== 同花顺行业列表页(前600字节GBK) ==="
+          curl -s --max-time 10 "https://q.10jqka.com.cn/thshy/" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -H "Referer: https://q.10jqka.com.cn/" | iconv -f gbk -t utf-8 2>/dev/null | head -c 600
+          echo ""
+          echo "=== 成分页探测(取一个行业代码881101) ==="
+          curl -s --max-time 10 "https://q.10jqka.com.cn/thshy/detail/code/881101/" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -H "Referer: https://q.10jqka.com.cn/thshy/" | iconv -f gbk -t utf-8 2>/dev/null | head -c 800
+          echo ""
+          echo "=== 概念板块列表 ==="
+          curl -s --max-time 10 "https://q.10jqka.com.cn/gn/" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" | iconv -f gbk -t utf-8 2>/dev/null | head -c 300
+
       - name: 腾讯ifzq板块接口参数调试
         run: |
           for U in \
