@@ -1,84 +1,71 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""开盘啦(KaiplanLa)数据源可达性探测 — 在 GitHub runner（外网正常）执行。
-探测：域名解析/连通性/页面结构/API线索，输出结构化结论供人工判断。
+"""开盘啦(KaiplanLa)数据源探测 第二轮 — kpl.com.cn 深度探测（runner执行）。
+第一轮结论：kaiplanla.cn 域名全局失效；kpl.com.cn 解析OK(47.96.43.186 阿里云)。
+本轮：连通性 + 页面结构 + API/板块龙头接口线索。
 用法: python3 runner_probe_kpl.py
 """
 import json
 import re
 import socket
-import ssl
 import subprocess
-import sys
 
-DOMAINS = [
-    "kaiplanla.cn", "www.kaiplanla.cn", "app.kaiplanla.cn",
-    "api.kaiplanla.cn", "m.kaiplanla.cn", "stock.kaiplanla.cn",
-    "kpl.com.cn", "www.kpl.com.cn",
-]
-
-# 可能的网页入口路径（开盘啦特色页面：涨停/题材库/情绪）
-PAGES = ["/", "/zt", "/bankuai", "/plate", "/market", "/api/", "/api/plate/list",
-         "/api/v1/plate", "/plate/list", "/home", "/limitup"]
-
+DOMAINS = ["kpl.com.cn", "www.kpl.com.cn", "api.kpl.com.cn", "app.kpl.com.cn", "m.kpl.com.cn"]
+# 开盘啦特色页/接口候选路径（涨停梯队/题材库/情绪/竞价）
+PAGES = ["/", "/limitup", "/zt", "/bankuai", "/plate", "/theme", "/market",
+         "/api/", "/api/plate", "/api/v1/", "/api/v1/plate/list", "/api/limitup/list",
+         "/api/bankuai/list", "/v1/plate/list", "/qingxu", "/sign/", "/login"]
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 
 
-def probe(host, path):
-    """curl 探测单路径, 返回 (code, content_type, body_head, redirect)"""
-    url = f"https://{host}{path}" if host not in ("kaiplanla.cn",) else f"http://{host}{path}"
+def fetch(url, follow=True):
+    r = subprocess.run(
+        ["curl", "-s", "-L" if follow else "", "--max-time", "10", "-o", "/tmp/kpl_b.html", "-w",
+         "%{http_code}|%{content_type}|%{url_effective}|%{size_download}|%{time_total}",
+         "-A", UA, url],
+        capture_output=True, text=True, timeout=18)
+    meta = r.stdout.strip().split("|")
+    out = {"url": url, "code": meta[0] if meta else "?", "type": meta[1] if len(meta) > 1 else "?",
+           "final": meta[2] if len(meta) > 2 else url, "size": meta[3] if len(meta) > 3 else "?",
+           "time": meta[4] if len(meta) > 4 else "?"}
     try:
-        r = subprocess.run(
-            ["curl", "-sL", "--max-time", "12", "-o", "/tmp/kpl_body.html", "-w",
-             "%{http_code}|%{content_type}|%{url_effective}|%{size_download}",
-             "-A", UA, url],
-            capture_output=True, text=True, timeout=20)
-        meta = r.stdout.strip().split("|")
-        code = meta[0] if meta else "?"
-        ctype = meta[1] if len(meta) > 1 else "?"
-        final_url = meta[2] if len(meta) > 2 else url
-        size = meta[3] if len(meta) > 3 else "?"
-        head = ""
-        try:
-            head = open("/tmp/kpl_body.html", encoding="utf-8", errors="ignore").read()[:400].replace("\n", " ")
-        except OSError:
-            pass
-        return {"url": url, "code": code, "type": ctype, "final": final_url, "size": size, "head": head}
-    except Exception as e:
-        return {"url": url, "err": str(e)[:120]}
+        out["head"] = open("/tmp/kpl_b.html", encoding="utf-8", errors="ignore").read()[:250].replace("\n", " ")
+    except OSError:
+        out["head"] = ""
+    return out
 
 
 def main():
     results = []
-    # DNS 解析检查
+    # 连通性
     for host in DOMAINS:
         try:
-            infos = socket.getaddrinfo(host, 443, proto=socket.IPPROTO_TCP)
-            results.append({"dns": host, "ips": sorted({i[4][0] for i in infos})})
+            infos = socket.getaddrinfo(host, 443)
+            ips = sorted({i[4][0] for i in infos})
+            r = fetch(f"https://{host}/")
+            results.append({"host": host, "ips": ips, **r})
         except Exception as e:
-            results.append({"dns": host, "err": str(e)[:80]})
+            results.append({"host": host, "err": str(e)[:80]})
 
-    # 网页入口探测（先确认主站可达, 再探页面）
-    for host in DOMAINS[:3]:
-        r = probe(host, "/")
-        results.append(r)
-        if str(r.get("code", "")).startswith("2") or str(r.get("code", "")).startswith("3"):
-            # 抓 HTML 中 API 线索
-            try:
-                body = open("/tmp/kpl_body.html", encoding="utf-8", errors="ignore").read()
-                apis = sorted(set(re.findall(r'["\'](/[a-zA-Z0-9_\-/]{3,60}(?:api|Api|API)[a-zA-Z0-9_\-/?=&.]*)["\']', body)))[:10]
-                nxt = sorted(set(re.findall(r'["\'](/_next/static/[^"\']+)["\']', body)))[:5]
-                if apis:
-                    results.append({"api_hints": apis})
-                if nxt:
-                    results.append({"next_assets": nxt})
-            except Exception:
-                pass
-            # 探常见路径
-            for p in PAGES[1:]:
-                r2 = probe(host, p)
-                if str(r2.get("code", "")) != "404":
-                    results.append(r2)
+    # 深度：对可达域名探页面 + 提取线索
+    for host in ("www.kpl.com.cn", "kpl.com.cn"):
+        try:
+            body = open("/tmp/kpl_b.html", encoding="utf-8", errors="ignore").read()
+        except OSError:
+            continue
+        if not body:
+            continue
+        apis = sorted(set(re.findall(r'["\']([^"\']*(?:api|Api|API)[^"\']*)["\']', body)))[:15]
+        nxt = sorted(set(re.findall(r'["\'](/_next/[^"\']+)["\']', body)))[:6]
+        scripts = sorted(set(re.findall(r'src="([^"]+\.js)"', body)))[:10]
+        if apis: results.append({"host": host, "api_hints": apis})
+        if nxt: results.append({"host": host, "next_assets": nxt})
+        if scripts: results.append({"host": host, "scripts": scripts})
+        # 页面路径
+        for p in PAGES[1:]:
+            r = fetch(f"https://{host}{p}")
+            if r["code"] not in ("404", "000") or r["size"] not in ("0", "?"):
+                results.append(r)
 
     print(json.dumps(results, ensure_ascii=False, indent=1))
 
