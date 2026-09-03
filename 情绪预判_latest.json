@@ -1,9 +1,9 @@
 {
  "date": "2026-09-03",
- "limitup": 50,
- "state": "中性",
- "next": "偏强",
- "next_prob": 48,
- "advice": "蓄水池，48%转偏强→低吸潜伏窗口",
- "src": "market_width(2026-09-02)"
+ "limitup": 34,
+ "state": "偏弱",
+ "next": "中性",
+ "next_prob": 50,
+ "advice": "偏弱修复期，75%次日修复→布局窗口不恐慌",
+ "src": "market_width(2026-09-03)"
 }
