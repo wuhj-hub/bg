@@ -329,7 +329,9 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/hot_emotion.py --da
 - 最高板环比下降 → ⚠️ 高度退潮
 - 昨日 TOP 主线题材涨停家数减半 → ⚠️ 主线退潮
 
-**自动化降级**：GitHub Actions/无 tdx 环境用 westock 批量K线自算（无题材/封单明细）：`python3 hot_emotion.py --date {date} --westock --kline-file {westock_kline_output.txt}`。
+**自动化降级**：GitHub Actions/无 tdx 环境用 westock 批量K线自算（无题材/封单明细）：`python3 hot_emotion.py --date {date} --westock --kline-file {westock_kline_output.txt}`。kline 文件获取：`fetch_hot_kline.py --limit 25 --out /tmp/kline_full.txt`（全主板~3125只×25日，42s 完成，代码在沙箱 workspace 根）。
+**回溯补历史**：`--end-date {YYYY-MM-DD}` 只统计该日(含)之前的K线，连板终点=end_date——漏跑日期无需重拉数据，同一 kline 文件跑多次即可（9/1、9/2 已用此法补齐）。
+⚠️ **westock 模式已修复（2026-09-03）**：npx 批量输出为 markdown 管道表（`| sz000001 | date |...`），parse_westock_kline 原先按空格 split 导致全部过滤、--westock 从未真正工作；已兼容 '|' 分隔（真实校验：新赛5板/国芳4板与实况一致）。
 
 若 tdx 数据不可用（接口异常/非交易日），自动提示占位，不影响报告完整性。
 
