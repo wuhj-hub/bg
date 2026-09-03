@@ -395,8 +395,13 @@ def render_md(date, stats, score, persistence, alerts, sample_note=""):
         for r in stats["lianban_rows"]:
             tiers[r["lianban"]].append(r)
         for lb in sorted(tiers.keys(), reverse=True):
-            names = "、".join(f"{r['name']}({r['ji_ji_ban']}{('·' + r['banxing'].replace('(涨停)', '')) if r['banxing'] else ''})"
-                              for r in tiers[lb])
+            def _fmt(r):
+                nm = r['name'] or r['code']
+                sec = ""
+                if r.get("sectors"):
+                    sec = f"[{'/'.join(r['sectors'][:2])}]"
+                return f"{nm}({r['ji_ji_ban']}{('·' + r['banxing'].replace('(涨停)', '')) if r['banxing'] else ''}){sec}"
+            names = "、".join(_fmt(r) for r in tiers[lb])
             L.append(f"- {lb}板×{len(tiers[lb])}：{names}")
     else:
         L.append("- 无连板（最高仅首板，情绪冰点）")
@@ -441,6 +446,8 @@ def main():
     ap.add_argument("--end-date", help="westock 回溯模式：只统计该日期(含)之前的K线（补历史用）")
     ap.add_argument("--outdir", default=OUT_DIR, help="输出目录")
     ap.add_argument("--history-file", help="历史累积JSON路径（默认 outdir/hot_emotion_history.json）")
+    ap.add_argument("--name-file", help="westock模式: 全市场名称CSV(code,name) 填充涨停股名称")
+    ap.add_argument("--sector-file", help="westock模式: 板块成分JSON(sector_component.json) 填充涨停股板块归属")
     args = ap.parse_args()
 
     os.makedirs(args.outdir, exist_ok=True)
@@ -454,7 +461,38 @@ def main():
         with open(args.kline_file, "r", encoding="utf-8") as f:
             rows = parse_westock_kline(f.read(), end_date=args.end_date)
         total_hint = len(rows)
-        sample_note = "数据源=westock批量K线自算（无题材/封单明细）"
+        # 名称填充（A：all_mainboard.csv 100%覆盖主板）+ 板块归属（B：sector_component.json）
+        name_map, sector_map = {}, {}
+        nf = args.name_file or os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "all_mainboard.csv")
+        if os.path.exists(nf):
+            try:
+                with open(nf, encoding="utf-8") as f2:
+                    for ln in f2:
+                        ln = ln.strip()
+                        if not ln or ln.startswith("code"):
+                            continue
+                        p = ln.split(",")
+                        if len(p) >= 2 and p[0].strip().isdigit():
+                            name_map[p[0].strip()] = p[1].strip().replace(" ", "")
+            except OSError:
+                pass
+        sf = args.sector_file
+        if sf and os.path.exists(sf):
+            try:
+                with open(sf, encoding="utf-8") as f2:
+                    sdata = json.load(f2)
+                sector_map = sdata.get("code_sector", {})
+                if not name_map:
+                    name_map = sdata.get("code_name", {})
+            except (OSError, json.JSONDecodeError):
+                pass
+        for r in rows:
+            code = r["code"][2:] if r["code"].startswith(("sh", "sz")) else r["code"]
+            if not r["name"] and code in name_map:
+                r["name"] = name_map[code]
+            r["sectors"] = sector_map.get(code, [])[:4]
+        nm_note = f"名称{len(name_map)}只·板块源{len(sector_map)}只" if (name_map or sector_map) else "无名称(可--name-file补)"
+        sample_note = f"数据源=westock批量K线自算（{nm_note}）"
     else:
         if not args.input:
             print("错误：需要 --input（tdx_screener 导出的 JSON）或 --westock", file=sys.stderr)
