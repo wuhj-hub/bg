@@ -17,6 +17,17 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: 东财连通性诊断（curl直测）
+        run: |
+          echo "=== push2 直测 ==="
+          curl -s --max-time 10 "https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=3&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m%3A90%2Bt%3A2%2Bf%3A%2150&fields=f12%2Cf14" -H "User-Agent: Mozilla/5.0" -H "Referer: https://quote.eastmoney.com/" | head -c 500
+          echo ""
+          echo "=== 备用域名 push2his/20 ==="
+          curl -s --max-time 10 "http://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=3&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:2+f:!50&fields=f12,f14" -H "User-Agent: Mozilla/5.0" | head -c 300
+          echo ""
+          echo "=== 86.push2 ==="
+          curl -s --max-time 10 "https://86.push2.eastmoney.com/api/qt/clist/get?pn=1&pz=3&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:2+f:!50&fields=f12,f14" -H "User-Agent: Mozilla/5.0" | head -c 300
+
       - name: 东财板块成分拉取（行业+概念，覆盖全市场含次新）
         run: |
           python3 quant_scripts/runner_fetch_em_sectors.py --out outputs/sector_component_em.json
