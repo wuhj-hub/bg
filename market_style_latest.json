@@ -1,24 +1,24 @@
 {
  "date": "2026-09-03",
  "data_date": "2026-09-03",
- "style": "情绪市",
- "icon": "🔥",
- "score": 30,
+ "style": "均衡市",
+ "icon": "⚖️",
+ "score": 23,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 16,
   "volume_structure": 7,
-  "sector_fund": 7
+  "sector_fund": 0
  },
  "size_style": {
-  "hs300_5d": -1.28,
-  "hs300_10d": -0.47,
-  "zz1000_5d": -1.6,
-  "zz1000_10d": 0.25,
-  "rel_5d": -0.32,
-  "rel_10d": 0.73,
-  "rel_20d": 2.77,
-  "zz500_5d": -2.31
+  "hs300_5d": -1.68,
+  "hs300_10d": -0.87,
+  "zz1000_5d": -1.72,
+  "zz1000_10d": 0.14,
+  "rel_5d": -0.04,
+  "rel_10d": 1.01,
+  "rel_20d": 3.05,
+  "zz500_5d": -2.4
  },
  "limitup_structure": {
   "limitup": 52,
@@ -32,46 +32,39 @@
   "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.202,
+  "small_big_ratio_now": 1.178,
   "small_big_ratio_5d": 1.181,
-  "small_vol_pulse": 56.08
+  "small_vol_pulse": 88.86
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "证券Ⅱ",
-    "zdf": "1.27",
-    "main_net5d": -31.2,
-    "retail_net": -19.3,
-    "tag": "游资型"
-   },
-   {
     "name": "一般零售",
-    "zdf": "0.48",
+    "zdf": "0.09",
     "main_net5d": 9.7,
-    "retail_net": -3.2,
+    "retail_net": -6.2,
     "tag": "机构型"
    },
    {
-    "name": "半导体",
-    "zdf": "-0.10",
-    "main_net5d": -167.5,
-    "retail_net": 30.6,
+    "name": "通用设备",
+    "zdf": "1.28",
+    "main_net5d": 11.8,
+    "retail_net": -18.2,
+    "tag": "机构型"
+   },
+   {
+    "name": "证券Ⅱ",
+    "zdf": "0.88",
+    "main_net5d": -31.2,
+    "retail_net": -15.9,
     "tag": "游资型"
    },
    {
-    "name": "通信设备",
-    "zdf": "-0.11",
-    "main_net5d": -66.0,
-    "retail_net": 34.3,
+    "name": "电网设备",
+    "zdf": "1.18",
+    "main_net5d": -25.0,
+    "retail_net": -0.2,
     "tag": "游资型"
-   },
-   {
-    "name": "元件",
-    "zdf": "0.04",
-    "main_net5d": 4.7,
-    "retail_net": 17.2,
-    "tag": "混合"
    }
   ]
  },
@@ -89,8 +82,8 @@
   "gpoints": {
    "欧马模式": 1
   },
-  "verdict": "⚠️ 背离（风格轴与猛兽信号偏好不一致，注意结构分化）",
+  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
- "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
+ "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
 }
