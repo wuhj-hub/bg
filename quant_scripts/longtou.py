@@ -194,37 +194,54 @@ def main():
     # 跟风：涨停但连板=1 且成交额较小
     gen = [s for s in zt_stocks.values() if s["boards"] == 1]
 
-    # Step3: 板块归属（board 行业涨幅榜 leadStock → 名称匹配全市场）
-    hot = cli("board")
-    sector_lead = {}  # 板块名 -> 领涨股名
-    sector_rank = {}  # 板块名 -> 排名（顺序）
-    _rk = 0
-    for ln in hot.splitlines():
-        s = ln.strip()
-        if not s.startswith("|") or "leadStock" in s or "---" in s:
-            continue
-        parts = [p.strip() for p in s.strip("|").split("|")]
-        if len(parts) >= 6:
-            _rk += 1
-            name = parts[0]
-            lead = parts[5]
-            m = re.search(r"([\u4e00-\u9fffA-Za-z]+)\((\d+\.?\d*)\)", lead)
-            if m:
-                sector_lead[name] = m.group(1)
-                sector_rank[name] = _rk
-    # 名称 → 代码映射（all_mainboard）
-    name2code = {n.replace(" ", ""): c for c, n in pool}
-    # 涨停股板块归属：领涨股名匹配
-    for code, st in zt_stocks.items():
-        nm = st["name"].replace(" ", "")
-        for sec, lead in sector_lead.items():
-            if lead.replace(" ", "") == nm:
-                st["sector"] = sec
-                st["sector_rank"] = sector_rank.get(sec, 99)
+    # Step3: 板块归属（优先 sector_component.json code直查，board leadStock 名称匹配兜底）
+    # 3a. 新浪行业+概念成分映射直查（quant_scripts/sector_component.json，覆盖3300只/212板块）
+    sector_map = {}
+    for cand in ("quant_scripts/sector_component.json", "outputs/sector_component.json", "/sandbox/workspace/outputs/sector_component.json"):
+        try:
+            with open(cand, encoding="utf-8") as f:
+                scd = json.load(f)
+            sector_map = scd.get("code_sector", {})
+            if sector_map:
+                print(f"[INFO] 板块成分映射: {len(sector_map)} 只 (源 {cand})", flush=True)
                 break
-        else:
-            st["sector"] = ""
-            st["sector_rank"] = 99
+        except Exception:
+            continue
+    for code, st in stats.items():
+        c6 = code[2:] if code.startswith(("sh", "sz")) else code
+        st["sector"] = (sector_map.get(c6) or [""])[0]
+        st["sector_rank"] = 99
+    # 3b. board 领涨股名匹配兜底（对板块成分未命中者）
+    try:
+        hot = cli("board")
+        sector_lead = {}  # 板块名 -> 领涨股名
+        sector_rank = {}  # 板块名 -> 排名（顺序）
+        _rk = 0
+        for ln in hot.splitlines():
+            s = ln.strip()
+            if not s.startswith("|") or "leadStock" in s or "---" in s:
+                continue
+            parts = [p.strip() for p in s.strip("|").split("|")]
+            if len(parts) >= 6:
+                _rk += 1
+                name = parts[0]
+                lead = parts[5]
+                m = re.search(r"([\u4e00-\u9fffA-Za-z]+)\((\d+\.?\d*)\)", lead)
+                if m:
+                    sector_lead[name] = m.group(1)
+                    sector_rank[name] = _rk
+        name2code = {n.replace(" ", ""): c for c, n in pool}
+        for code, st in zt_stocks.items():
+            if st["sector"]:
+                continue  # 成分映射已命中
+            nm = st["name"].replace(" ", "")
+            for sec, lead in sector_lead.items():
+                if lead.replace(" ", "") == nm:
+                    st["sector"] = sec
+                    st["sector_rank"] = sector_rank.get(sec, 99)
+                    break
+    except Exception:
+        pass
     # 板块龙头：板块内涨停股中连板最高者
     sector_boss = {}
     for code, st in zt_stocks.items():
