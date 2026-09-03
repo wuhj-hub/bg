@@ -17,6 +17,20 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: 同花顺页面数据内容验证（防hexin-v反爬空表）
+        run: |
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36"
+          curl -s --max-time 12 "https://q.10jqka.com.cn/thshy/" -A "$UA" -c /tmp/thscj -o /tmp/ths_hy.html
+          echo "行业页大小: $(wc -c < /tmp/ths_hy.html)"
+          echo "含表格行数: $(grep -c '881[0-9]\{4\}' /tmp/ths_hy.html 2>/dev/null || echo 0)"
+          echo "板块名样例(银行/半导体/白酒): $(grep -oE '(银行|半导体|白酒|证券)' /tmp/ths_hy.html | sort | uniq -c | tr '\n' ' ')"
+          iconv -f gbk -t utf-8 /tmp/ths_hy.html 2>/dev/null | grep -oE '<a[^>]*href="/thshy/detail/code/881[0-9]+/"[^>]*>[^<]+' | head -8
+          echo "=== 成分页验证 881101 ==="
+          curl -s --max-time 12 "https://q.10jqka.com.cn/thshy/detail/code/881101/" -A "$UA" -b /tmp/thscj -o /tmp/ths_c.html
+          echo "成分页大小: $(wc -c < /tmp/ths_c.html)"
+          iconv -f gbk -t utf-8 /tmp/ths_c.html 2>/dev/null | grep -oE '(股票名称|平安银行|招商银行|兴业银行|最新价|涨跌幅)' | sort | uniq -c | head
+          echo "成分表格行: $(iconv -f gbk -t utf-8 /tmp/ths_c.html 2>/dev/null | grep -cE '>601[0-9]{3}|>600[0-9]{3}|>000[0-9]{3}')"
+
       - name: 同花顺板块页结构验证（行业列表+成分页）
         run: |
           echo "=== 同花顺行业列表页(前600字节GBK) ==="
