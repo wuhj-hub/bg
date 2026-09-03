@@ -3,11 +3,11 @@
  "data_date": "2026-09-03",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 23,
+ "score": 16,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 16,
-  "volume_structure": 7,
+  "volume_structure": 0,
   "sector_fund": 0
  },
  "size_style": {
@@ -33,31 +33,16 @@
  },
  "volume_structure": {
   "small_big_ratio_now": 1.178,
-  "small_big_ratio_5d": 1.181,
-  "small_vol_pulse": 88.86
+  "small_big_ratio_5d": 1.181
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "一般零售",
-    "zdf": "0.09",
-    "main_net5d": 9.7,
-    "retail_net": -6.2,
+    "name": "汽车零部件",
+    "zdf": "0.75",
+    "main_net5d": 14.9,
+    "retail_net": -2.9,
     "tag": "机构型"
-   },
-   {
-    "name": "通用设备",
-    "zdf": "1.28",
-    "main_net5d": 11.8,
-    "retail_net": -18.2,
-    "tag": "机构型"
-   },
-   {
-    "name": "证券Ⅱ",
-    "zdf": "0.88",
-    "main_net5d": -31.2,
-    "retail_net": -15.9,
-    "tag": "游资型"
    },
    {
     "name": "电网设备",
@@ -69,18 +54,19 @@
   ]
  },
  "mode_cross": {
-  "dominant": "欧马模式",
+  "dominant": "堆量模式",
   "all": {
-   "堆量模式": 10,
-   "欧马模式": 5
+   "欧马模式": 5,
+   "堆量模式": 10
   },
   "leaders": {
-   "堆量模式": 3,
-   "欧马模式": 4
+   "欧马模式": 5,
+   "堆量模式": 6
   },
   "pullbacks": {},
   "gpoints": {
-   "欧马模式": 1
+   "欧马模式": 1,
+   "堆量模式": 1
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
