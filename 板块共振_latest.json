@@ -1,23 +1,23 @@
 {
- "date": "2026-09-02",
+ "date": "2026-09-03",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 44,
+ "pool_size": 53,
  "resonance_boards": [
   {
-   "name": "地面兵装Ⅱ",
-   "code": "pt01801743",
-   "zdf": 6.48,
+   "name": "航空装备Ⅱ",
+   "code": "pt01801742",
+   "zdf": 0.4,
    "strength": 8,
    "factors": [
-    "抢筹",
     "进场",
-    "吸筹"
+    "吸筹",
+    "控盘"
    ]
   },
   {
-   "name": "玻璃玻纤",
-   "code": "pt01801712",
-   "zdf": 1.23,
+   "name": "保险Ⅱ",
+   "code": "pt01801194",
+   "zdf": 3.41,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -26,38 +26,30 @@
    ]
   },
   {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "zdf": 0.93,
-   "strength": 6,
+   "name": "影视院线",
+   "code": "pt01801766",
+   "zdf": 1.48,
+   "strength": 7,
    "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "旅游及景区",
-   "code": "pt01801993",
-   "zdf": 0.72,
-   "strength": 5,
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "zdf": 1.04,
+   "strength": 7,
    "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "国防军工",
-   "code": "pt01801740",
-   "zdf": 0.26,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "军民融合",
-   "code": "pt02003808",
+   "name": "一般零售",
+   "code": "pt01801203",
    "zdf": 0.69,
    "strength": 5,
    "factors": [
@@ -66,9 +58,49 @@
    ]
   },
   {
-   "name": "服装家纺",
-   "code": "pt01801132",
-   "zdf": 0.38,
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "zdf": 0.63,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "软件开发",
+   "code": "pt01801104",
+   "zdf": 0.26,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "通用设备",
+   "code": "pt01801072",
+   "zdf": 0.67,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "商贸零售",
+   "code": "pt01801200",
+   "zdf": 0.61,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "传媒",
+   "code": "pt01801760",
+   "zdf": 0.17,
    "strength": 5,
    "factors": [
     "进场",
@@ -78,135 +110,140 @@
  ],
  "grab_top": [
   {
-   "name": "地面兵装Ⅱ",
-   "code": "pt01801743",
-   "value": 8
+   "name": "保险Ⅱ",
+   "code": "pt01801194",
+   "value": 7
   },
   {
-   "name": "玻璃玻纤",
-   "code": "pt01801712",
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 7
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
    "value": 7
   }
  ],
  "entry_top": [
-  {
-   "name": "消费电子",
-   "code": "pt01801085",
-   "value": 32.8
-  },
   {
    "name": "航空装备Ⅱ",
    "code": "pt01801742",
    "value": 30.4
   },
   {
-   "name": "地面兵装Ⅱ",
-   "code": "pt01801743",
-   "value": 18.8
+   "name": "传媒",
+   "code": "pt01801760",
+   "value": 27.4
   },
   {
    "name": "汽车零部件",
    "code": "pt01801093",
+   "value": 14.9
+  },
+  {
+   "name": "保险Ⅱ",
+   "code": "pt01801194",
+   "value": 12.3
+  },
+  {
+   "name": "通用设备",
+   "code": "pt01801072",
    "value": 11.8
   },
   {
-   "name": "国防军工",
-   "code": "pt01801740",
-   "value": 10.5
+   "name": "商贸零售",
+   "code": "pt01801200",
+   "value": 9.9
   },
   {
-   "name": "军民融合",
-   "code": "pt02003808",
+   "name": "一般零售",
+   "code": "pt01801203",
+   "value": 9.7
+  },
+  {
+   "name": "种植业",
+   "code": "pt01801016",
+   "value": 6.2
+  },
+  {
+   "name": "软件开发",
+   "code": "pt01801104",
    "value": 4.6
   },
   {
-   "name": "玻璃玻纤",
-   "code": "pt01801712",
-   "value": 4.0
-  },
-  {
-   "name": "服装家纺",
-   "code": "pt01801132",
-   "value": 3.4
-  },
-  {
-   "name": "旅游及景区",
-   "code": "pt01801993",
-   "value": 1.7
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 2.4
   }
  ],
  "absorption_top": [
   {
-   "name": "地面兵装Ⅱ",
-   "code": "pt01801743",
-   "value": 6.56
-  },
-  {
    "name": "航空装备Ⅱ",
    "code": "pt01801742",
-   "value": 3.33
+   "value": 3.34
   },
   {
-   "name": "服装家纺",
-   "code": "pt01801132",
-   "value": 0.93
+   "name": "保险Ⅱ",
+   "code": "pt01801194",
+   "value": 2.22
   },
   {
-   "name": "消费电子",
-   "code": "pt01801085",
-   "value": 0.88
+   "name": "一般零售",
+   "code": "pt01801203",
+   "value": 1.5
   },
   {
-   "name": "旅游及景区",
-   "code": "pt01801993",
-   "value": 0.69
+   "name": "商贸零售",
+   "code": "pt01801200",
+   "value": 0.98
+  },
+  {
+   "name": "传媒",
+   "code": "pt01801760",
+   "value": 0.92
+  },
+  {
+   "name": "种植业",
+   "code": "pt01801016",
+   "value": 0.82
   },
   {
    "name": "汽车零部件",
    "code": "pt01801093",
-   "value": 0.46
+   "value": 0.59
   },
   {
-   "name": "国防军工",
-   "code": "pt01801740",
-   "value": 0.41
-  },
-  {
-   "name": "玻璃玻纤",
-   "code": "pt01801712",
+   "name": "通用设备",
+   "code": "pt01801072",
    "value": 0.33
   },
   {
-   "name": "军民融合",
-   "code": "pt02003808",
-   "value": 0.1
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 0.32
+  },
+  {
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 0.27
   }
  ],
- "control_top": [],
+ "control_top": [
+  {
+   "name": "航空装备Ⅱ",
+   "code": "pt01801742",
+   "value": 3.34
+  }
+ ],
  "zhongjun_candidates": [
   {
-   "board": "航空装备Ⅱ",
-   "stock": "博云新材",
-   "code": "sz002297",
-   "zdf": "10.01",
-   "main1": 3.32,
-   "main5": 0.51
-  },
-  {
-   "board": "旅游及景区",
-   "stock": "云南旅游",
-   "code": "sz002059",
-   "zdf": "10.06",
-   "main1": 1.17,
-   "main5": 0.06
-  },
-  {
-   "board": "玻璃玻纤",
-   "stock": "九鼎新材",
-   "code": "sz002201",
-   "zdf": "10.02",
-   "main1": 1.37,
-   "main5": -0.02
+   "board": "保险Ⅱ",
+   "stock": "中国太保",
+   "code": "sh601601",
+   "zdf": "4.78",
+   "main1": 2.48,
+   "main5": 0.04
   }
  ]
 }
