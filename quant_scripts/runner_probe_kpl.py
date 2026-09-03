@@ -89,6 +89,35 @@ def main():
                 api_hits.append({"js": js.split("/")[-1], "size": len(jsc),
                                  "urls": hits[:12], "paths": hits2[:12]})
         results.append({"api_discovery": api_hits})
+
+        # v6: 深挖含 zhugepan 域名的业务 chunk 路径 + 探测 api.zhugepan.com
+        try:
+            r6 = subprocess.run(["curl", "-s", "--max-time", "12", "-A", UA,
+                                 "http://www.kpl.com.cn/_nuxt/056ba4b.js"],
+                                capture_output=True, text=True, timeout=18)
+            biz = r6.stdout
+            biz_paths = sorted(set(re.findall(r'/[a-zA-Z][a-zA-Z0-9_./-]{2,60}', biz)))
+            biz_paths = [p for p in biz_paths if not p.endswith((".js", ".css", ".png", ".svg", ".json", ".html", ".map"))
+                         and "node_modules" not in p and "webpack" not in p][:60]
+            results.append({"biz_chunk_paths": biz_paths})
+        except Exception as e:
+            results.append({"biz_chunk_err": str(e)[:100]})
+
+        # api.zhugepan.com 连通性 + 常见端点
+        for host in ("api.zhugepan.com",):
+            try:
+                infos = socket.getaddrinfo(host, 443)
+                ips = sorted({i[4][0] for i in infos})
+            except Exception as e:
+                results.append({"zhugepan_dns_err": str(e)[:80]})
+                continue
+            for scheme in ("https", "http"):
+                rr = fetch(f"{scheme}://{host}/")
+                results.append({"zhugepan": host, "ips": ips, "scheme": scheme, **rr})
+            for p in ("/api/plate/list", "/api/limitup/list", "/api/v1/plate/list", "/plate/list", "/api/theme/list", "/api/bankuai", "/v1/limitup"):
+                rr = fetch(f"http://{host}{p}")
+                if rr["code"] not in ("404", "000") or rr["size"] not in ("0", "?"):
+                    results.append({"zhugepan_path": p, **rr})
     except Exception as e:
         results.append({"api_discovery_err": str(e)[:120]})
 
