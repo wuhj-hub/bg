@@ -1,0 +1,33 @@
+name: probe_em
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 东财板块成分拉取（行业+概念，覆盖全市场含次新）
+        run: |
+          python3 quant_scripts/runner_fetch_em_sectors.py --out outputs/sector_component_em.json
+          cp outputs/sector_component_em.json sector_component_em.json 2>/dev/null || true
+          ls -la sector_component_em.json 2>/dev/null || echo "产物未生成"
+
+      - name: 提交东财板块映射到仓库
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f sector_component_em.json ]; then
+            python3 git_api_commit.py --msg "feat: 东财板块成分映射(sector_component_em.json, 覆盖全市场含次新)" sector_component_em.json
+          fi
