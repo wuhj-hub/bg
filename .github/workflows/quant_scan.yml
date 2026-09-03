@@ -82,6 +82,8 @@ jobs:
       # ─── 第二步.1.3b：热点情绪扫描（hot_emotion 连板梯队+情绪温度+退潮预警，westock自算42s，供次日盘前②.5/②.6引用；2026-09-03接入消除手动漏跑断链）───
       - name: 热点情绪扫描（hot_emotion 连板梯队+情绪温度）
         run: |
+          # 先拉取仓库根现有 history 作为累积起点（防 runner 空 history 断链/覆盖丢失，2026-09-03 修复）
+          curl -sL --retry 2 "https://raw.githubusercontent.com/wuhj-hub/bg/main/hot_emotion_history.json" -o outputs/hot_emotion_history.json || echo "{}" > outputs/hot_emotion_history.json
           python3 quant_scripts/fetch_hot_kline.py --limit 25 --out outputs/hot_kline.txt --batch 100 --workers 4 --csv all_mainboard.csv
           python3 quant_scripts/hot_emotion.py --date "$(date +%Y-%m-%d)" --westock \
             --kline-file outputs/hot_kline.txt --end-date "$(date +%Y-%m-%d)" \
