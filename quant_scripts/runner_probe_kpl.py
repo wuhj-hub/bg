@@ -37,18 +37,20 @@ def fetch(url, follow=True):
 
 def main():
     results = []
-    # 连通性
+    # 连通性（https + http 双测：kpl可能只开80）
     for host in DOMAINS:
         try:
             infos = socket.getaddrinfo(host, 443)
             ips = sorted({i[4][0] for i in infos})
-            r = fetch(f"https://{host}/")
-            results.append({"host": host, "ips": ips, **r})
         except Exception as e:
             results.append({"host": host, "err": str(e)[:80]})
+            continue
+        for scheme in ("https", "http"):
+            r = fetch(f"{scheme}://{host}/")
+            results.append({"host": host, "ips": ips, "scheme": scheme, **r})
 
     # 深度：对可达域名探页面 + 提取线索
-    for host in ("www.kpl.com.cn", "kpl.com.cn"):
+    for host, scheme in (("www.kpl.com.cn", "http"), ("www.kpl.com.cn", "https"), ("kpl.com.cn", "http")):
         try:
             body = open("/tmp/kpl_b.html", encoding="utf-8", errors="ignore").read()
         except OSError:
@@ -63,7 +65,7 @@ def main():
         if scripts: results.append({"host": host, "scripts": scripts})
         # 页面路径
         for p in PAGES[1:]:
-            r = fetch(f"https://{host}{p}")
+            r = fetch(f"{scheme}://{host}{p}")
             if r["code"] not in ("404", "000") or r["size"] not in ("0", "?"):
                 results.append(r)
 
