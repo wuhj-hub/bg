@@ -17,6 +17,21 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: 腾讯ifzq板块接口参数调试
+        run: |
+          for U in \
+            "https://proxy.finance.qq.com/cgi/cgi-bin/rank/hs/getBoardRankList?board_type=hy&sort_type=price&direct=down&offset=0&count=5" \
+            "https://proxy.finance.qq.com/cgi/cgi-bin/rank/hs/getBoardRankList?board_type=gn&sort_type=price&direct=down&offset=0&count=5" \
+            "https://proxy.finance.qq.com/cgi/cgi-bin/rank/hs/getBoardRankList?type=hy&sort_type=price&direct=down&offset=0&count=5" \
+            "https://proxy.finance.qq.com/cgi/cgi-bin/rank/hs/getBoardRankList?board_code=hy&sort_type=price&direct=down&offset=0&count=5" \
+            "https://proxy.finance.qq.com/cgi/cgi-bin/rank/hs/getBoardRankList?board_type=hy&sort_type=price&direct=down&offset=0&count=5&board_code=hy880001" \
+            "https://proxy.finance.qq.com/cgi/cgi-bin/rank/hs/getStockListInBoard?board_code=hy880001&sort_type=price&direct=down&offset=0&count=5" \
+            "https://proxy.finance.qq.com/cgi/cgi-bin/rank/hs/getStockListInBoard?board_code=gn880300&sort_type=price&direct=down&offset=0&count=5" ; do
+            echo "--- $U"
+            curl -s --max-time 8 "$U" -H "User-Agent: Mozilla/5.0" -H "Referer: https://gu.qq.com/" | head -c 300
+            echo ""
+          done
+
       - name: 备选板块数据源探测（腾讯ifzq/同花顺/东财备用域）
         run: |
           echo "=== 腾讯 proxy.finance.qq.com 板块排行 ==="
