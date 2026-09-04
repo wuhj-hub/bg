@@ -361,6 +361,13 @@ def gen_report(today_str):
     mm = read_monthly_macd()
     if mm:
         lines.append(f"| 📉 月线MACD | 柱{mm.get('hist','—')}（DIF {mm.get('dif','—')} / DEA {mm.get('dea','—')}）{mm.get('status','')} |")
+    # 🔥 热点情绪（hot_emotion：情绪温度+涨停/连板梯队，quant_scan自动产出）
+    he = read_hot_emotion()
+    if he:
+        sc = he.get("score") or {}
+        he_date = he.get("date", "")
+        he_icon = "🔴" if sc.get("score", 0) >= 70 else "🟠" if sc.get("score", 0) >= 55 else "🟡" if sc.get("score", 0) >= 40 else "🔵"
+        lines.append(f"| 🔥 热点情绪 | **{sc.get('score','—')}/100 {sc.get('level','')}** {he_icon} 涨停{he.get('total','—')} · 连板{he.get('lianban_cnt','—')} · 最高{he.get('max_lb','—')}板（{he_date}） |")
     
     # ②.5.1 曾星智+双弦双体系市场定性（8大指数月线）
     zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
@@ -603,6 +610,18 @@ def read_monthly_macd():
     """读上证月线MACD监控（monthly_macd_latest.json，Seaborg方法论），失败返回None"""
     for p in ("monthly_macd_latest.json", "outputs/monthly_macd_latest.json", "../outputs/monthly_macd_latest.json",
               "/sandbox/workspace/github_bg/outputs/monthly_macd_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def read_hot_emotion():
+    """读热点情绪温度（hot_emotion_latest.json，连板梯队+情绪温度+退潮预警），失败返回None"""
+    for p in ("hot_emotion_latest.json", "outputs/hot_emotion_latest.json", "../outputs/hot_emotion_latest.json",
+              "/sandbox/workspace/github_bg/outputs/hot_emotion_latest.json",
+              "/sandbox/workspace/skills/盘前市场报告/scripts/outputs/hot_emotion_latest.json"):
         try:
             return json.load(open(p, encoding="utf-8"))
         except Exception:
