@@ -1,12 +1,23 @@
 {
- "date": "2026-09-03",
+ "date": "2026-09-04",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 43,
+ "pool_size": 46,
  "resonance_boards": [
   {
-   "name": "培育钻石",
-   "code": "pt02231435",
-   "zdf": 4.18,
+   "name": "航海装备Ⅱ",
+   "code": "pt01801744",
+   "zdf": 6.49,
+   "strength": 8,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "饲料",
+   "code": "pt01801014",
+   "zdf": 4.79,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -15,9 +26,9 @@
    ]
   },
   {
-   "name": "通用设备",
-   "code": "pt01801072",
-   "zdf": 1.28,
+   "name": "渔业",
+   "code": "pt01801015",
+   "zdf": 3.96,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -26,9 +37,20 @@
    ]
   },
   {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
-   "zdf": 1.31,
+   "name": "广告营销",
+   "code": "pt01801765",
+   "zdf": 3.87,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "猪肉",
+   "code": "pt02003882",
+   "zdf": 5.83,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -39,19 +61,10 @@
   {
    "name": "一般零售",
    "code": "pt01801203",
-   "zdf": 0.09,
-   "strength": 5,
+   "zdf": 1.07,
+   "strength": 7,
    "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "汽车零部件",
-   "code": "pt01801093",
-   "zdf": 0.75,
-   "strength": 5,
-   "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -59,9 +72,87 @@
   {
    "name": "种植业",
    "code": "pt01801016",
-   "zdf": 0.38,
-   "strength": 5,
+   "zdf": 3.2,
+   "strength": 7,
    "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "农林牧渔",
+   "code": "pt01801010",
+   "zdf": 4.16,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "zdf": 3.57,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "zdf": 2.47,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "文化传媒概念",
+   "code": "pt02002486",
+   "zdf": 1.76,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "传媒",
+   "code": "pt01801760",
+   "zdf": 3.16,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "商贸零售",
+   "code": "pt01801200",
+   "zdf": 1.19,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "影视院线",
+   "code": "pt01801766",
+   "zdf": 2.24,
+   "strength": 7,
+   "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -69,114 +160,193 @@
  ],
  "grab_top": [
   {
-   "name": "培育钻石",
-   "code": "pt02231435",
+   "name": "航海装备Ⅱ",
+   "code": "pt01801744",
+   "value": 8
+  },
+  {
+   "name": "饲料",
+   "code": "pt01801014",
    "value": 7
   },
   {
-   "name": "通用设备",
-   "code": "pt01801072",
+   "name": "渔业",
+   "code": "pt01801015",
+   "value": 7
+  },
+  {
+   "name": "广告营销",
+   "code": "pt01801765",
+   "value": 7
+  },
+  {
+   "name": "猪肉",
+   "code": "pt02003882",
+   "value": 7
+  },
+  {
+   "name": "一般零售",
+   "code": "pt01801203",
+   "value": 7
+  },
+  {
+   "name": "种植业",
+   "code": "pt01801016",
+   "value": 7
+  },
+  {
+   "name": "农林牧渔",
+   "code": "pt01801010",
    "value": 7
   },
   {
    "name": "游戏Ⅱ",
    "code": "pt01801764",
+   "value": 7
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "农林牧渔",
-   "code": "pt01801010",
-   "value": 16.3
+   "name": "航海装备Ⅱ",
+   "code": "pt01801744",
+   "value": 21.7
   },
   {
-   "name": "汽车零部件",
-   "code": "pt01801093",
-   "value": 14.9
+   "name": "文化传媒概念",
+   "code": "pt02002486",
+   "value": 21.5
   },
   {
-   "name": "通用设备",
-   "code": "pt01801072",
-   "value": 10.2
+   "name": "广告营销",
+   "code": "pt01801765",
+   "value": 21.1
+  },
+  {
+   "name": "传媒",
+   "code": "pt01801760",
+   "value": 17.7
   },
   {
    "name": "商贸零售",
    "code": "pt01801200",
-   "value": 9.9
+   "value": 16.6
   },
   {
    "name": "一般零售",
    "code": "pt01801203",
-   "value": 9.7
-  },
-  {
-   "name": "种植业",
-   "code": "pt01801016",
-   "value": 6.2
-  },
-  {
-   "name": "培育钻石",
-   "code": "pt02231435",
-   "value": 5.0
+   "value": 14.7
   },
   {
    "name": "游戏Ⅱ",
    "code": "pt01801764",
-   "value": 2.4
+   "value": 8.9
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 7.9
+  },
+  {
+   "name": "种植业",
+   "code": "pt01801016",
+   "value": 6.0
+  },
+  {
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "value": 5.7
   }
  ],
  "absorption_top": [
   {
+   "name": "航海装备Ⅱ",
+   "code": "pt01801744",
+   "value": 4.71
+  },
+  {
    "name": "一般零售",
    "code": "pt01801203",
-   "value": 1.4
+   "value": 1.91
+  },
+  {
+   "name": "广告营销",
+   "code": "pt01801765",
+   "value": 1.84
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 1.61
   },
   {
    "name": "商贸零售",
    "code": "pt01801200",
-   "value": 0.91
-  },
-  {
-   "name": "农林牧渔",
-   "code": "pt01801010",
-   "value": 0.8
-  },
-  {
-   "name": "种植业",
-   "code": "pt01801016",
-   "value": 0.79
-  },
-  {
-   "name": "培育钻石",
-   "code": "pt02231435",
-   "value": 0.71
-  },
-  {
-   "name": "汽车零部件",
-   "code": "pt01801093",
-   "value": 0.55
+   "value": 1.39
   },
   {
    "name": "游戏Ⅱ",
    "code": "pt01801764",
-   "value": 0.3
+   "value": 0.96
   },
   {
-   "name": "通用设备",
-   "code": "pt01801072",
-   "value": 0.27
+   "name": "种植业",
+   "code": "pt01801016",
+   "value": 0.73
+  },
+  {
+   "name": "渔业",
+   "code": "pt01801015",
+   "value": 0.58
+  },
+  {
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 0.57
+  },
+  {
+   "name": "传媒",
+   "code": "pt01801760",
+   "value": 0.47
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "培育钻石",
-   "stock": "恒盛能源",
-   "code": "sh605580",
-   "zdf": "10.02",
-   "main1": 0.54,
-   "main5": 0.19
+   "board": "渔业",
+   "stock": "中水渔业",
+   "code": "sz000798",
+   "zdf": "9.98",
+   "main1": 0.92,
+   "main5": 0.49
+  },
+  {
+   "board": "饲料",
+   "stock": "播恩集团",
+   "code": "sz001366",
+   "zdf": "10.04",
+   "main1": 0.86,
+   "main5": 0.37
+  },
+  {
+   "board": "航海装备Ⅱ",
+   "stock": "中国船舶",
+   "code": "sh600150",
+   "zdf": "9.18",
+   "main1": 20.65,
+   "main5": -0.07
+  },
+  {
+   "board": "猪肉",
+   "stock": "罗 牛 山",
+   "code": "sz000735",
+   "zdf": "10.05",
+   "main1": 1.45,
+   "main5": -0.91
   }
  ]
 }
