@@ -10,461 +10,694 @@
  "env_logs": [
   "大盘温度 73.0（过热≥70）→ 全部信号过热警戒（防高位接力）"
  ],
+ "cp_logs": [
+  "🔗 深科技(000021) 宁静卡位70（60-79中性，信号自决）"
+ ],
+ "operations": {
+  "buy": [],
+  "watch": [
+   {
+    "code": "sz000017",
+    "pts": 3,
+    "level": "★ 双信号·过热警戒",
+    "src": [
+     "四维6分",
+     "乾坤A级"
+    ]
+   },
+   {
+    "code": "sz000506",
+    "pts": 3,
+    "level": "★ 双信号·过热警戒",
+    "src": [
+     "四维7分"
+    ]
+   },
+   {
+    "code": "sz002743",
+    "pts": 3,
+    "level": "★ 双信号·过热警戒",
+    "src": [
+     "鱼身MACD空中加油(71)",
+     "双弦共振(67)"
+    ]
+   },
+   {
+    "code": "sz002807",
+    "pts": 3,
+    "level": "★ 双信号·过热警戒",
+    "src": [
+     "鱼身MACD空中加油+均线回踩支撑(78)",
+     "双弦共振(71)"
+    ]
+   },
+   {
+    "code": "sz002999",
+    "pts": 3,
+    "level": "★ 双信号·过热警戒",
+    "src": [
+     "鱼身MACD空中加油+均线回踩支撑(78)",
+     "双弦共振(71)"
+    ]
+   }
+  ],
+  "avoid": [
+   {
+    "code": "sz002700",
+    "pts": 3,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油(80)",
+     "双弦共振(49)"
+    ]
+   },
+   {
+    "code": "sz002790",
+    "pts": 3,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油(71)",
+     "双弦共振(66)"
+    ]
+   },
+   {
+    "code": "sz002877",
+    "pts": 3,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油+均线回踩支撑(89)",
+     "双弦共振(47)"
+    ]
+   },
+   {
+    "code": "sh603105",
+    "pts": 2,
+    "level": "观察·月线空头降级",
+    "src": [
+     "乾坤A级"
+    ]
+   },
+   {
+    "code": "sh603280",
+    "pts": 2,
+    "level": "观察·月线空头降级",
+    "src": [
+     "乾坤A级"
+    ]
+   },
+   {
+    "code": "sz002707",
+    "pts": 2,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油(71)"
+    ]
+   },
+   {
+    "code": "sz002722",
+    "pts": 2,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油(72)"
+    ]
+   },
+   {
+    "code": "sz002752",
+    "pts": 2,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油+均线回踩支撑(82)"
+    ]
+   },
+   {
+    "code": "sz002819",
+    "pts": 2,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油+均线回踩支撑(78)"
+    ]
+   },
+   {
+    "code": "sz002839",
+    "pts": 2,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油(71)"
+    ]
+   },
+   {
+    "code": "sz002846",
+    "pts": 2,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油(72)"
+    ]
+   },
+   {
+    "code": "sz002863",
+    "pts": 2,
+    "level": "观察·月线空头降级",
+    "src": [
+     "鱼身MACD空中加油(71)"
+    ]
+   },
+   {
+    "code": "sz000007",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   },
+   {
+    "code": "sz000021",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   },
+   {
+    "code": "sz000029",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   },
+   {
+    "code": "sz000048",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   },
+   {
+    "code": "sz000060",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   },
+   {
+    "code": "sz000151",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   },
+   {
+    "code": "sz000301",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   },
+   {
+    "code": "sz000403",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   },
+   {
+    "code": "sz000417",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   },
+   {
+    "code": "sz000428",
+    "pts": -3,
+    "level": "观察·过热警戒",
+    "src": [
+     "四维否决⚠️ 反向否决(资金流出+关联方减持)"
+    ]
+   }
+  ]
+ },
+ "market_top": {
+  "score": 0,
+  "level": "🟢 正常",
+  "date": "2026-09-04",
+  "advice": "无顶部信号，正常执行"
+ },
+ "market_width": {
+  "score": 56.8,
+  "level": "偏强（涨多跌少）",
+  "date": "2026-08-11"
+ },
  "sources": {
   "四维": 99,
-  "鱼身": 51,
+  "鱼身": 48,
   "猛兽": 0,
-  "双弦": 105,
+  "双弦": 158,
   "乾坤": 5,
   "武威": 0,
-  "反转": 0
+  "反转": 0,
+  "123_2b": 2630,
+  "rsv": 710
  },
  "counts": {
   "★★★": 0,
   "★★": 0,
-  "★": 29,
-  "观察": 262
+  "★": 5,
+  "观察": 220
  },
  "ranked": [
   {
-   "code": "000509",
-   "pts": 4,
-   "level": "★ 双信号·过热警戒",
-   "src": [
-    "量学(黄金柱·中继)+4"
-   ],
-   "env_note": "过热警戒",
-   "month": "?",
-   "risk": {
-    "code": "000509",
-    "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
-  },
-  {
-   "code": "601279",
-   "pts": 4,
-   "level": "★ 双信号·过热警戒",
-   "src": [
-    "量学(黄金柱·中继)+4"
-   ],
-   "env_note": "过热警戒",
-   "month": "?",
-   "risk": {
-    "code": "601279",
-    "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
-  },
-  {
-   "code": "603500",
-   "pts": 4,
-   "level": "★ 双信号·过热警戒",
-   "src": [
-    "量学(黄金柱·中继)+4"
-   ],
-   "env_note": "过热警戒",
-   "month": "?",
-   "risk": {
-    "code": "603500",
-    "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
-  },
-  {
-   "code": "000882",
+   "code": "sz000017",
    "pts": 3,
    "level": "★ 双信号·过热警戒",
    "src": [
-    "量学(量学100分)+3"
+    "四维6分",
+    "乾坤A级"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "WARN",
    "risk": {
-    "code": "000882",
+    "code": "sz000017",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "⚠️盈亏比不足",
+    "price": 9.52,
+    "stop": 8.28,
+    "target": 11.84,
+    "rr": 1.87,
+    "pos_pct": 15.4,
+    "reason": "止损8.28(-13.0%) 目标11.84 盈亏比1.87 建议仓位15.4%"
+   }
   },
   {
-   "code": "000985",
+   "code": "sz000506",
    "pts": 3,
    "level": "★ 双信号·过热警戒",
    "src": [
-    "量学(黄金柱·中继)+3"
+    "四维7分"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "WARN",
    "risk": {
-    "code": "000985",
+    "code": "sz000506",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 20.64,
+    "stop": 17.63,
+    "target": 28.52,
+    "rr": 2.62,
+    "pos_pct": 13.7,
+    "reason": "止损17.63(-14.6%) 目标28.52 盈亏比2.62 建议仓位13.7%"
+   }
   },
   {
-   "code": "000988",
+   "code": "sz002700",
+   "pts": 3,
+   "level": "观察·月线空头降级",
+   "src": [
+    "鱼身MACD空中加油(80)",
+    "双弦共振(49)"
+   ],
+   "env_note": "过热警戒",
+   "month": "BLOCK",
+   "risk": {
+    "code": "sz002700",
+    "name": "",
+    "status": "✅可执行",
+    "price": 6.59,
+    "stop": 6.2,
+    "target": 9.7,
+    "rr": 8.0,
+    "pos_pct": 30.0,
+    "reason": "止损6.20(-5.9%) 目标9.70 盈亏比8.00 建议仓位30.0%"
+   }
+  },
+  {
+   "code": "sz002743",
    "pts": 3,
    "level": "★ 双信号·过热警戒",
    "src": [
-    "量学(量学100分)+3"
+    "鱼身MACD空中加油(71)",
+    "双弦共振(67)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "WARN",
    "risk": {
-    "code": "000988",
+    "code": "sz002743",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 4.89,
+    "stop": 4.38,
+    "target": 6.61,
+    "rr": 3.38,
+    "pos_pct": 19.2,
+    "reason": "止损4.38(-10.4%) 目标6.61 盈亏比3.38 建议仓位19.2%"
+   }
   },
   {
-   "code": "000995",
+   "code": "sz002790",
+   "pts": 3,
+   "level": "观察·月线空头降级",
+   "src": [
+    "鱼身MACD空中加油(71)",
+    "双弦共振(66)"
+   ],
+   "env_note": "过热警戒",
+   "month": "BLOCK",
+   "risk": {
+    "code": "sz002790",
+    "name": "",
+    "status": "✅可执行",
+    "price": 6.45,
+    "stop": 6.05,
+    "target": 13.21,
+    "rr": 16.9,
+    "pos_pct": 30.0,
+    "reason": "止损6.05(-6.2%) 目标13.21 盈亏比16.90 建议仓位30.0%"
+   }
+  },
+  {
+   "code": "sz002807",
    "pts": 3,
    "level": "★ 双信号·过热警戒",
    "src": [
-    "量学(黄金柱·中继)+3"
+    "鱼身MACD空中加油+均线回踩支撑(78)",
+    "双弦共振(71)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "WARN",
    "risk": {
-    "code": "000995",
+    "code": "sz002807",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 4.22,
+    "stop": 4.05,
+    "target": 4.7,
+    "rr": 2.83,
+    "pos_pct": 30.0,
+    "reason": "止损4.05(-4.0%) 目标4.70 盈亏比2.83 建议仓位30.0%"
+   }
   },
   {
-   "code": "002096",
+   "code": "sz002877",
+   "pts": 3,
+   "level": "观察·月线空头降级",
+   "src": [
+    "鱼身MACD空中加油+均线回踩支撑(89)",
+    "双弦共振(47)"
+   ],
+   "env_note": "过热警戒",
+   "month": "BLOCK",
+   "risk": {
+    "code": "sz002877",
+    "name": "",
+    "status": "✅可执行",
+    "price": 7.6,
+    "stop": 7.19,
+    "target": 11.98,
+    "rr": 10.65,
+    "pos_pct": 30.0,
+    "reason": "止损7.19(-5.4%) 目标11.98 盈亏比10.65 建议仓位30.0%"
+   }
+  },
+  {
+   "code": "sz002999",
    "pts": 3,
    "level": "★ 双信号·过热警戒",
    "src": [
-    "量学(量学100分)+3"
+    "鱼身MACD空中加油+均线回踩支撑(78)",
+    "双弦共振(71)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "WARN",
    "risk": {
-    "code": "002096",
+    "code": "sz002999",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 6.57,
+    "stop": 5.97,
+    "target": 8.16,
+    "rr": 2.67,
+    "pos_pct": 22.1,
+    "reason": "止损5.97(-9.1%) 目标8.16 盈亏比2.67 建议仓位22.1%"
+   }
   },
   {
-   "code": "002251",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sh603105",
+   "pts": 2,
+   "level": "观察·月线空头降级",
    "src": [
-    "量学(量学100分)+3"
+    "乾坤A级"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "BLOCK",
    "risk": {
-    "code": "002251",
+    "code": "sh603105",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 7.93,
+    "stop": 7.36,
+    "target": 14.22,
+    "rr": 10.97,
+    "pos_pct": 27.7,
+    "reason": "止损7.36(-7.2%) 目标14.22 盈亏比10.97 建议仓位27.7%"
+   }
   },
   {
-   "code": "002333",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sh603280",
+   "pts": 2,
+   "level": "观察·月线空头降级",
    "src": [
-    "量学(黄金柱·中继)+3"
+    "乾坤A级"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "BLOCK",
    "risk": {
-    "code": "002333",
+    "code": "sh603280",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 27.45,
+    "stop": 25.17,
+    "target": 47.22,
+    "rr": 8.69,
+    "pos_pct": 24.1,
+    "reason": "止损25.17(-8.3%) 目标47.22 盈亏比8.69 建议仓位24.1%"
+   }
   },
   {
-   "code": "002363",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002707",
+   "pts": 2,
+   "level": "观察·月线空头降级",
    "src": [
-    "量学(量学100分)+3"
+    "鱼身MACD空中加油(71)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "BLOCK",
    "risk": {
-    "code": "002363",
+    "code": "sz002707",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 5.55,
+    "stop": 5.18,
+    "target": 9.09,
+    "rr": 9.6,
+    "pos_pct": 30.0,
+    "reason": "止损5.18(-6.6%) 目标9.09 盈亏比9.60 建议仓位30.0%"
+   }
   },
   {
-   "code": "002456",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002714",
+   "pts": 2,
+   "level": "观察·过热警戒",
    "src": [
-    "量学(量学100分)+3"
+    "鱼身MACD空中加油+均线回踩支撑(70)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "WARN",
    "risk": {
-    "code": "002456",
+    "code": "sz002714",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 43.97,
+    "stop": 41.59,
+    "target": 58.34,
+    "rr": 6.04,
+    "pos_pct": 30.0,
+    "reason": "止损41.59(-5.4%) 目标58.34 盈亏比6.04 建议仓位30.0%"
+   }
   },
   {
-   "code": "002549",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002722",
+   "pts": 2,
+   "level": "观察·月线空头降级",
    "src": [
-    "量学(量学100分)+3"
+    "鱼身MACD空中加油(72)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "BLOCK",
    "risk": {
-    "code": "002549",
+    "code": "sz002722",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 13.16,
+    "stop": 12.53,
+    "target": 18.71,
+    "rr": 8.77,
+    "pos_pct": 30.0,
+    "reason": "止损12.53(-4.8%) 目标18.71 盈亏比8.77 建议仓位30.0%"
+   }
   },
   {
-   "code": "002888",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002752",
+   "pts": 2,
+   "level": "观察·月线空头降级",
    "src": [
-    "量学(量学100分)+3"
+    "鱼身MACD空中加油+均线回踩支撑(82)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "BLOCK",
    "risk": {
-    "code": "002888",
+    "code": "sz002752",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 6.2,
+    "stop": 5.9,
+    "target": 9.47,
+    "rr": 10.89,
+    "pos_pct": 30.0,
+    "reason": "止损5.90(-4.8%) 目标9.47 盈亏比10.89 建议仓位30.0%"
+   }
   },
   {
-   "code": "600152",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002819",
+   "pts": 2,
+   "level": "观察·月线空头降级",
    "src": [
-    "量学(量学100分)+3"
+    "鱼身MACD空中加油+均线回踩支撑(78)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "BLOCK",
    "risk": {
-    "code": "600152",
+    "code": "sz002819",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 21.5,
+    "stop": 19.91,
+    "target": 32.3,
+    "rr": 6.78,
+    "pos_pct": 27.0,
+    "reason": "止损19.91(-7.4%) 目标32.30 盈亏比6.78 建议仓位27.0%"
+   }
   },
   {
-   "code": "600326",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002832",
+   "pts": 2,
+   "level": "观察·过热警戒",
    "src": [
-    "量学(量学100分)+3"
+    "鱼身MACD空中加油+均线回踩支撑(83)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "PASS",
    "risk": {
-    "code": "600326",
+    "code": "sz002832",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "⚠️盈亏比不足",
+    "price": 26.6,
+    "stop": 24.36,
+    "target": 28.73,
+    "rr": 0.95,
+    "pos_pct": 23.8,
+    "reason": "止损24.36(-8.4%) 目标28.73 盈亏比0.95 建议仓位23.8%"
+   }
   },
   {
-   "code": "600609",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002839",
+   "pts": 2,
+   "level": "观察·月线空头降级",
    "src": [
-    "量学(黄金柱·中继)+3"
+    "鱼身MACD空中加油(71)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "BLOCK",
    "risk": {
-    "code": "600609",
+    "code": "sz002839",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "⚠️盈亏比不足",
+    "price": 4.41,
+    "stop": 4.22,
+    "target": 4.78,
+    "rr": 1.94,
+    "pos_pct": 30.0,
+    "reason": "止损4.22(-4.3%) 目标4.78 盈亏比1.94 建议仓位30.0%"
+   }
   },
   {
-   "code": "600764",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002846",
+   "pts": 2,
+   "level": "观察·月线空头降级",
    "src": [
-    "量学(黄金柱·中继)+3"
+    "鱼身MACD空中加油(72)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "BLOCK",
    "risk": {
-    "code": "600764",
+    "code": "sz002846",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 11.03,
+    "stop": 10.28,
+    "target": 23.71,
+    "rr": 17.02,
+    "pos_pct": 29.6,
+    "reason": "止损10.28(-6.8%) 目标23.71 盈亏比17.02 建议仓位29.6%"
+   }
   },
   {
-   "code": "600996",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002852",
+   "pts": 2,
+   "level": "观察·过热警戒",
    "src": [
-    "量学(黄金柱·中继)+3"
+    "鱼身MACD空中加油+均线回踩支撑(80)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "WARN",
    "risk": {
-    "code": "600996",
+    "code": "sz002852",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 8.51,
+    "stop": 7.74,
+    "target": 12.02,
+    "rr": 4.58,
+    "pos_pct": 22.2,
+    "reason": "止损7.74(-9.0%) 目标12.02 盈亏比4.58 建议仓位22.2%"
+   }
   },
   {
-   "code": "603233",
-   "pts": 3,
-   "level": "★ 双信号·过热警戒",
+   "code": "sz002863",
+   "pts": 2,
+   "level": "观察·月线空头降级",
    "src": [
-    "量学(量学100分)+3"
+    "鱼身MACD空中加油(71)"
    ],
    "env_note": "过热警戒",
-   "month": "?",
+   "month": "BLOCK",
    "risk": {
-    "code": "603233",
+    "code": "sz002863",
     "name": "",
-    "status": "⛔无止损不入场",
-    "price": 0,
-    "stop": null,
-    "target": null,
-    "rr": null,
-    "pos_pct": 0,
-    "reason": "日线K线不足(15根)"
-   },
-   "rsg_dev": null
+    "status": "✅可执行",
+    "price": 4.79,
+    "stop": 4.5,
+    "target": 6.69,
+    "rr": 6.53,
+    "pos_pct": 30.0,
+    "reason": "止损4.50(-6.1%) 目标6.69 盈亏比6.53 建议仓位30.0%"
+   }
   }
  ]
 }
