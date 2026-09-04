@@ -1,17 +1,19 @@
 name: 盘前市场报告
 
 on:
-  # ⚠️ 双轨制统一：schedule停用（2026-08-05），盘前报告统一由 ima 生成（质量最高）
-  # GitHub自动版JSON曾污染复盘验证链路（三系统空/板块取错列/关键位空）
-  # schedule:
-  #   # 北京时间 08:00（UTC 0:00），交易日盘前自动生成
-  #   - cron: "0 0 * * 1-5"
+  # ⚠️ 2026-09-04 恢复 schedule（Phase1：GitHub自动盘前，解除ima依赖）
+  # 历史：2026-08-05 因质量停用（三系统空/板块取错列/关键位空）→ 此后持续增强：
+  # 宽度/年线广度/板块共振/风格轴/RSV/月线MACD/量价时空/hot_emotion(2026-09-04接入)均已补入
+  # judgment 由 workflow 内 build_judgment 生成并提交（复盘验证闭环）
+  schedule:
+    # 北京时间 08:00（UTC 0:00），交易日盘前自动生成
+    - cron: "0 0 * * 1-5"
   workflow_dispatch:
     inputs:
       manual_note:
         description: '手动触发说明'
         required: false
-        default: 'ima统一生成盘前报告，本workflow仅保留手动兜底'
+        default: 'GitHub自动生成盘前报告（含judgment提交与微信推送）'
 
 permissions:
   contents: write  # write for premarket_judgment commit (复盘报告引用)
