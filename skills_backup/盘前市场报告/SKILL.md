@@ -513,6 +513,26 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/sandbox_push_report
 > ⚠️ 若 PUSH_TOKEN 环境变量未设置，跳过推送（不影响报告生成）
 > 推送内容自动截取报告前部关键摘要（标题/信号卡/操作建议）
 
+### Step 5.6：预判落盘与 GitHub 推送（⛔ 强制·闭环必需·2026-09-04 固化）
+
+盘前报告生成后**必须**执行预判落盘，否则次日复盘无法验证（9/3 复盘因 judgment 缺失准确率误显 0%；8/12-9/3 长期断链根因=本地手工报告流程无此步骤）：
+
+```bash
+# 从今日报告自动提取预判要素 → 生成 premarket_judgment_{date}.json + 推 GitHub（当日+latest双文件）
+python3 /sandbox/workspace/skills/盘前市场报告/scripts/gen_judgment.py \
+  --date {今日交易日} --from-md /sandbox/workspace/盘前市场报告_{今日}.md
+# 自动提取不准时可手动参数覆盖：
+python3 .../gen_judgment.py --date {今日} --direction "震荡反弹" --key-levels "支撑3930、压力3968" \
+  --position "30-50%" --main-lines "AI算力/液冷,贵金属,航运港口" --three-systems "fish:73;beast:45.7;shuangxian:45" --risk "..."
+```
+
+⛔ **完成标准（缺一不可）**：
+1. 本地 `outputs/premarket_judgment_{date}.json` 生成，`date` 字段 == 今日
+2. GitHub 仓库根 `premarket_judgment_{date}.json` + `premarket_judgment_latest.json` 均推送成功（脚本自动双推，出现 ❌ 视为失败）
+3. key_levels 合规格式："支撑X、压力Y"（复盘侧自检 regex 要求）
+
+> 📌 断链史（防再犯）：8/11 曾修复"复盘侧当日严格校验"并补推 8/10/8/11，但**盘前侧固化随 skills 回滚丢失**（SKILL.md 被平台重置）→ 8/12 起 judgment 断推、9/3 复盘验证失真。修复策略：①本步骤强制固化（SKILL 双备份 GitHub skills_backup）；②gen_judgment.py 已存 GitHub quant_scripts/（不受沙箱回滚影响）；③复盘侧加"缺失微信告警"（当天发现当天补）。
+
 ---
 
 ## 执行规范
