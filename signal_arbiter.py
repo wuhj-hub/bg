@@ -235,25 +235,98 @@ def load_reversal():
     return out
 
 
-def load_liangxue():
-    """量学扫描信号（黑马王子三部曲·2026-08-30接入）：
-    读 liangxue_latest.json（outputs/ 或仓库根），PASS(≥85)标的。
-    返回 {code: {score, has_mid}} —— 100分(黄金柱+倍量+多共振)+3 / 85-99分+2"""
-    d = load_json(["outputs/liangxue_latest.json", "liangxue_latest.json"])
-    if not d:
-        return {}
+
+
+# ═══════ 信号源注册表（P0-1 统一出口 · 2026-08-26）═══════
+# 每个系统标注：权重 / 回测胜率 / 盈亏比 / 验证状态 / 频率 / 说明
+# 胜率数据来源：历史回测（月线反转×武威G1×v2.1漏斗 / 反转多级别 / 5方法对比等）
+SYSTEM_REGISTRY = {
+    "四维共振":   {"weight": 3, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
+                   "note": "证据链闭合（政策/资金/筹码/关联方），≥7分高置信，否决-3"},
+    "猛兽Setup":  {"weight": 3, "winrate": "74.3%", "rr": "2.4", "verified": True, "freq": "日",
+                   "note": "强度刻度，Setup≥60一档；三阶共振E方法回测（1500只×2批一致）"},
+    "乾坤A级":    {"weight": 2, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
+                   "note": "资金强攻+业绩共振"},
+    "鱼身空中加油": {"weight": 2, "winrate": "65.8%", "rr": "2.74", "verified": True, "freq": "日",
+                   "note": "买点时机；武威G1∩月线反转回测（336样本）"},
+    "鱼身回踩/突破": {"weight": 1, "winrate": "65.8%", "rr": "2.74", "verified": True, "freq": "日",
+                   "note": "均线回踩/箱体突破（箱体突破已加有效性三条件）"},
+    "武威G1":     {"weight": 2, "winrate": "65.4%", "rr": "2.88", "verified": True, "freq": "月",
+                   "note": "月线双阴/一阴缩量低吸；∩支撑≥5%回测280样本"},
+    "双弦共振":    {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
+                   "note": "方向系统；月度股池核心层score≥65入池"},
+    "反转数值":    {"weight": 2, "winrate": "51.1%", "rr": "1.63", "verified": True, "freq": "周",
+                   "note": "周线反转持4周最优（300只×5级别回测）；红柱环境过滤+4.6倍"},
+    "月线反转":    {"weight": 1, "winrate": "54.8%", "rr": "2.08", "verified": True, "freq": "月",
+                   "note": "趋势确认（24188样本）；平台突破/均线金叉/趋势确立"},
+    "123/2B反转":  {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
+                   "note": "斯波朗迪结构确认；123法则/2B假突破/ABC末端"},
+    "RSV均":      {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
+                   "note": "腰缠万贯144日RSV均；启动/持有/离场刻度"},
+    "强势体系":    {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
+                   "note": "突破买入+趋势止盈；未接入统一JSON（待接入）"},
+    "西湖三重滤网":  {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
+                   "note": "大周期找趋势小周期找买点；未接入统一JSON（待接入）"},
+    "王者倍量柱":   {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
+                   "note": "倍量突破信号；未接入统一JSON（待接入）"},
+}
+# 市场级环境信号（不参与个股打分，计入环境裁决）
+MARKET_SIGNALS = {
+    "见顶五维":   {"file": "outputs/top_signal_latest.json", "threshold": 3,
+                   "note": "≥3维=顶部区域（强制离场档）"},
+    "市场宽度":   {"file": "outputs/market_width_latest.json", "threshold": 25,
+                   "note": "<25弱势；≥70强势"},
+    "年线广度":   {"file": "outputs/yearline_breadth_latest.json", "threshold": 40,
+                   "note": "站上年线占比；<40%为熊市结构"},
+}
+
+
+def load_123_2b():
+    """123/2B反转信号（斯波朗迪L3结构确认）：buy+2 / risk+1 / abc+1"""
+    d = load_json(["outputs/123_2b_latest.json", "123_2b_latest.json"])
     out = {}
-    for s in d.get("signals", []):
-        if s.get("level") != "PASS" or not s.get("ok"):
-            continue
-        code = norm_cn(s.get("code", ""))
-        if not code:
-            continue
-        sig_types = [x.get("type", "") for x in s.get("signals", [])]
-        has_mid = any("中继" in t for t in sig_types)
-        out[code] = {"score": s.get("score", 0), "has_mid": has_mid,
-                     "name": s.get("name", ""), "sigs": sig_types}
+    if not d:
+        return out
+    for k, pts in (("buy", 2), ("risk", 1), ("abc", 1)):
+        for s in d.get(k, []):
+            code = s.get("code", "") if isinstance(s, dict) else s
+            if code:
+                full = ("sh" if code.startswith("6") else "sz") + code
+                out[full] = {"pts": pts, "tag": k}
     return out
+
+
+def load_rsv():
+    """RSV均信号（腰缠万贯）：launch启动+2 / hold持有+1 / exit离场-1"""
+    d = load_json(["outputs/rsv_strength_latest.json", "rsv_strength_latest.json"])
+    out = {}
+    if not d:
+        return out
+    for k, pts in (("launch", 2), ("hold", 1), ("exit", -1)):
+        for s in d.get(k, []):
+            code = s.get("code", "") if isinstance(s, dict) else s
+            if code:
+                full = ("sh" if code.startswith("6") else "sz") + code
+                out[full] = {"pts": pts, "tag": k}
+    return out
+
+
+def load_market_top():
+    """见顶五维监测（市场级）：score≥3 → 顶部区域预警（强制离场档）"""
+    d = load_json(["outputs/top_signal_latest.json", "top_signal_latest.json"])
+    if not d:
+        return None
+    return {"score": d.get("score", 0), "level": d.get("level", ""),
+            "date": d.get("date", ""), "advice": d.get("advice", "")}
+
+
+def load_market_width():
+    """市场宽度（市场级）：<25弱势 / ≥70强势"""
+    d = load_json(["outputs/market_width_latest.json", "market_width_latest.json"])
+    if not d:
+        return None
+    return {"score": d.get("score", 50), "level": d.get("level", ""), "date": d.get("date", "")}
+
 
 
 def month_gate(code):
@@ -369,8 +442,11 @@ def main():
     qk = load_qiankun()
     wuwei = load_wuwei()
     reversal = load_reversal()
-    lx = load_liangxue()  # 量学（黑马王子，2026-08-30接入）
-    print(f"[INFO] 信号源: 四维{len(four)} 鱼身{len(fish)} 猛兽{len(beast)} 双弦{len(sx)} 乾坤{len(qk)} 武威{len(wuwei)} 反转{len(reversal)} 量学{len(lx)}", flush=True)
+    t2b = load_123_2b()      # 123/2B反转（P0-1新增）
+    rsv = load_rsv()          # RSV均（P0-1新增）
+    mtop = load_market_top()  # 见顶五维（市场级·P0-1新增）
+    mwidth = load_market_width()  # 市场宽度（市场级·P0-1新增）
+    print(f"[INFO] 信号源: 四维{len(four)} 鱼身{len(fish)} 猛兽{len(beast)} 双弦{len(sx)} 乾坤{len(qk)} 武威{len(wuwei)} 反转{len(reversal)} 123/2B{len(t2b)} RSV{len(rsv)}", flush=True)
 
     # 汇总打分
     scores = {}
@@ -412,13 +488,12 @@ def main():
     for code, pts in reversal.items():  # 反转数值周线（2026-08-11接入）
         scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
         scores[code]["src"].append(f"反转数值(+{pts})")
-    for code, info in lx.items():  # 量学（黑马王子·2026-08-30接入）：100分+3/85-99+2，中继黄金柱+1
-        pts = 3 if info["score"] >= 100 else 2
-        if info.get("has_mid"):
-            pts += 1  # 中继黄金柱（最安全买点）加成
-        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
-        sig_note = "黄金柱·中继" if info.get("has_mid") else (f"量学{info['score']}分")
-        scores[code]["src"].append(f"量学({sig_note})+{pts}")
+    for code, info in t2b.items():  # 123/2B反转（P0-1接入：buy+2/risk+1/abc+1）
+        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += info["pts"]
+        scores[code]["src"].append(f"123/2B-{info['tag']}({info['pts']:+d})")
+    for code, info in rsv.items():  # RSV均（P0-1接入：launch+2/hold+1/exit-1）
+        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += info["pts"]
+        scores[code]["src"].append(f"RSV-{info['tag']}({info['pts']:+d})")
 
     # 分级
     ranked = []
@@ -443,11 +518,30 @@ def main():
         if len(ranked) < before:
             print(f"[ST过滤] 剔除 {before - len(ranked)} 只非清单标的（ST/退市/创业板等）")
 
+    # 宁静AI卡位守护层（2026-09-04：横向题材质地裁决，只作用于AI链标的池内；上游层±1/证据铁律降级，异常不阻断）
+    cp_logs = []
+    try:
+        _q_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts")
+        if _q_dir not in sys.path:
+            sys.path.insert(0, _q_dir)
+        from ai_chokepoint_guard import apply_chokepoint_guard
+        ranked, cp_logs = apply_chokepoint_guard(ranked)
+    except Exception as e:
+        print(f"[WARN] 宁静卡位守护层失败(不阻断): {e}")
     # 宏观-技术冲突裁决（斯波朗迪L2：大盘环境定权，冲突信逻辑）
     env = load_market_env()
     env_logs = apply_env_adjudication(ranked, env) if env else []
     if env:
         print(f"[环境裁决] 大盘温度 {env['temp']}（{env['level']}）→ {env_logs[0] if env_logs else '无调整'}")
+    if mtop and mtop["score"] >= 3:
+        for r in ranked:
+            r["level"] = "观察·市场见顶降级"
+            r["env_note"] = f"见顶五维{mtop['score']}/5"
+        env_logs.append(f"⚠️ 见顶五维 {mtop['score']}/5（{mtop['level']}）→ 全部信号降级观察（强制离场档）")
+        print(f"[市场顶预警] 五维 {mtop['score']}/5 → 全部降级观察")
+    if mwidth and mwidth.get("score", 50) < 25:
+        env_logs.append(f"⚠️ 市场宽度 {mwidth.get('score')}（弱势）→ 新开仓谨慎")
+        print(f"[宽度预警] 市场宽度 {mwidth.get('score')} 弱势")
 
     # 月线闸门过滤（TOP N）
     for r in ranked[:top_n]:
@@ -471,27 +565,36 @@ def main():
     except Exception as e:
         print(f"[WARN] 风控卡计算失败: {e}")
 
-    # RSG 强势标注（2026-08-27：RSV体系周线RS偏离52周均线>50‰=强势侧；仅标注，不强制过滤）
-    try:
-        _rsg_map = {}
-        for _p in ("outputs/rsv_strength_latest.json", "rsv_strength_latest.json"):
-            if os.path.exists(_p):
-                _d = json.load(open(_p, encoding="utf-8"))
-                for _r in (_d.get("launch", []) + _d.get("hold", []) + _d.get("exit", [])):
-                    if _r.get("code"):
-                        _rsg_map[_r["code"]] = _r.get("rsg_dev")
-                break
-        for r in ranked[:top_n]:
-            r["rsg_dev"] = _rsg_map.get(r["code"])
-        _n = sum(1 for r in ranked[:top_n] if (r.get("rsg_dev") or 0) > 50)
-        print(f"[RSG标注] TOP{top_n}: {_n} 只在强势池(周RS偏离>50‰)")
-    except Exception as e:
-        print(f"[WARN] RSG标注失败: {e}")
-
     today = datetime.now().strftime("%Y-%m-%d")
-    js = {"date": today, "env": env, "env_logs": env_logs,
+    # 今日操作清单（P0-1：唯一执行出口）
+    operations = {"buy": [], "watch": [], "avoid": []}
+    for r in ranked:
+        rk = r.get("risk", {})
+        rk_ok = rk.get("status", "").startswith("✅")
+        if r["pts"] >= 5 and r.get("month", "?") != "BLOCK" and rk_ok:
+            operations["buy"].append({"code": r["code"], "pts": r["pts"], "level": r["level"],
+                                      "src": r["src"], "pos_pct": rk.get("pos_pct", "—")})
+        elif r["pts"] >= 3 and r.get("month", "?") != "BLOCK":
+            operations["watch"].append({"code": r["code"], "pts": r["pts"], "level": r["level"], "src": r["src"]})
+        elif r["pts"] < 0 or r.get("month", "") == "BLOCK" or "否决" in "".join(r["src"]):
+            operations["avoid"].append({"code": r["code"], "pts": r["pts"], "level": r["level"], "src": r["src"]})
+    # P1-1 顶部禁用规则（2026-08-26，P0-3长历史重验：大顶附近信号胜率14-47%）
+    # 见顶五维≥2（警戒）或市场宽度<25（弱势）→ 买入候选置空（禁开新仓）
+    lock_reasons = []
+    if mtop and mtop["score"] >= 2:
+        lock_reasons.append(f"见顶五维{mtop['score']}/5警戒")
+    if mwidth and mwidth.get("score", 50) < 25:
+        lock_reasons.append(f"市场宽度{mwidth.get('score')}弱势")
+    if lock_reasons:
+        operations["buy"] = []
+        operations["buy_locked"] = "；".join(lock_reasons)
+        if env_logs:
+            env_logs.append(f"🔒 顶部禁用：买入候选置空（{'；'.join(lock_reasons)}）")
+    js = {"date": today, "env": env, "env_logs": env_logs, "cp_logs": cp_logs, "operations": operations,
+          "market_top": mtop, "market_width": mwidth,
           "sources": {"四维": len(four), "鱼身": len(fish), "猛兽": len(beast),
-                                      "双弦": len(sx), "乾坤": len(qk), "武威": len(wuwei), "反转": len(reversal)},
+                                      "双弦": len(sx), "乾坤": len(qk), "武威": len(wuwei), "反转": len(reversal),
+                                      "123_2b": len(t2b), "rsv": len(rsv)},
           "counts": {"★★★": sum(1 for r in ranked if r["level"].startswith("★★★")),
                      "★★": sum(1 for r in ranked if r["level"].startswith("★★")),
                      "★": sum(1 for r in ranked if r["level"].startswith("★")),
@@ -501,46 +604,34 @@ def main():
     json_path = os.path.join(OUT_DIR, "信号仲裁_latest.json")
     open(json_path, "w", encoding="utf-8").write(json.dumps(js, ensure_ascii=False, indent=1))
 
-    # 仲裁信号源日志累积（2026-08-28 P1：供月度权重校准——按信号源统计胜率）
-    # 字段: date,code,pts,level,src,rsg_dev；同(date,code)去重，仅累积不删除
-    try:
-        import csv as _csv
-        os.makedirs("logs", exist_ok=True)
-        log_path = "logs/arbiter_signals_log.csv"
-        new_rows = []
-        for r in ranked[:top_n]:
-            new_rows.append({"date": today, "code": r["code"], "pts": r["pts"],
-                             "level": r["level"], "src": "|".join(r["src"][:5]),
-                             "rsg_dev": r.get("rsg_dev", "")})
-        if os.path.exists(log_path):
-            with open(log_path, encoding="utf-8") as f:
-                seen = {(row["date"], row["code"]) for row in _csv.DictReader(f)}
-        else:
-            seen = set()
-        fresh = [row for row in new_rows if (row["date"], row["code"]) not in seen]
-        if fresh:
-            with open(log_path, "a", encoding="utf-8", newline="") as f:
-                w = _csv.DictWriter(f, fieldnames=["date", "code", "pts", "level", "src", "rsg_dev"])
-                if not os.path.exists(log_path) or os.path.getsize(log_path) == 0:
-                    w.writeheader()
-                w.writerows(fresh)
-            print(f"[日志] 仲裁信号累积 {len(fresh)} 条 → {log_path}")
-    except Exception as e:
-        print(f"[WARN] 仲裁日志写入失败: {e}")
-
-    L = [f"# ⚖️ 六套信号仲裁 {today}", "",
-         f"> 数据源：四维{len(four)}只 / 鱼身{len(fish)} / 猛兽Setup{len(beast)} / 双弦{len(sx)} / 乾坤{len(qk)} / 武威{len(wuwei)} / 反转{len(reversal)}",
-         "> 仲裁权重：四维高置信+3｜猛兽Setup≥60+3/≥50+2｜乾坤A+2｜鱼身加油≥70+2｜伏击/RS_D/G点+1｜双弦共振+1｜四维否决-3",
+    n_src = len(four) + len(fish) + len(beast) + len(sx) + len(qk) + len(wuwei) + len(reversal) + len(t2b) + len(rsv)
+    L = [f"# ⚖️ 全系统信号仲裁（统一出口） {today}", "",
+         f"> 数据源：四维{len(four)} / 鱼身{len(fish)} / 猛兽{len(beast)} / 双弦{len(sx)} / 乾坤{len(qk)} / 武威{len(wuwei)} / 反转{len(reversal)} / 123-2B{len(t2b)} / RSV{len(rsv)}（共{n_src}条）",
+         "> 仲裁权重：四维高置信+3｜猛兽Setup≥60+3/≥50+2｜乾坤A+2｜鱼身加油≥70+2｜伏击/RS_D/G点+1｜双弦共振+1｜123-2B买+2/RSV启动+2｜四维否决-3",
          "> 分级：≥7 ★★★全信号共振(≤15%) / 5-6 ★★(≤10%) / 3-4 ★(≤5%) / <3 观察；月线BLOCK强制降级", ""]
+    if cp_logs:
+        L.append("## 🔗 宁静AI卡位守护（题材质地裁决 · AI链标的池）")
+        for lg in cp_logs:
+            L.append(f"- {lg}")
+        L.append("")
     if env:
         L.append("## 🏛️ 大盘环境裁决（L2宏观 · 斯波朗迪：冲突信逻辑）")
         L.append(f"- 大盘温度 **{env['temp']}**（{env['level']}）｜三系统：{' '.join(f'{k}={v}' for k, v in env.get('detail', {}).items())}")
         for lg in env_logs:
             L.append(f"- ⚖️ {lg}")
         L.append("")
+    if mtop or mwidth:
+        L.append("## 🌡️ 市场级信号")
+        if mtop:
+            mt_warn = " ⚠️ 顶部区域！全部信号降级观察" if mtop["score"] >= 3 else ""
+            L.append(f"- 见顶五维：**{mtop['score']}/5**（{mtop['level']}）{mt_warn}")
+        if mwidth:
+            L.append(f"- 市场宽度：**{mwidth.get('score')}**（{mwidth.get('level', '')}）" +
+                     (" ⚠️ 弱势，新开仓谨慎" if mwidth.get("score", 50) < 25 else ""))
+        L.append("")
     L.append("## 仲裁结果 TOP{0}".format(min(top_n, len(ranked))))
-    L.append("| 排名 | 代码 | 总分 | 分级 | 月线 | RSG | 信号来源 | 风控卡 |")
-    L.append("|:----|:----|:----:|:----|:----:|:----:|:----|:----|")
+    L.append("| 排名 | 代码 | 总分 | 分级 | 月线 | 信号来源 | 风控卡 |")
+    L.append("|:----|:----|:----:|:----|:----:|:----|:----|")
     for i, r in enumerate(ranked[:top_n], 1):
         rk = r.get("risk", {})
         if rk.get("status", "").startswith("✅"):
@@ -551,9 +642,27 @@ def main():
             rk_txt = "⛔ 无止损"
         else:
             rk_txt = "—"
-        _rd = r.get("rsg_dev")
-        _rsg_txt = "🟢强势" if (_rd is not None and _rd > 50) else ("🟡偏离" if _rd is not None and _rd > 0 else "⚪弱势")
-        L.append(f"| {i} | {r['code']} | **{r['pts']}** | {r['level']} | {r['month']} | {_rsg_txt} | {'；'.join(r['src'][:5])}{'…' if len(r['src']) > 5 else ''} | {rk_txt} |")
+        L.append(f"| {i} | {r['code']} | **{r['pts']}** | {r['level']} | {r['month']} | {'；'.join(r['src'][:5])}{'…' if len(r['src']) > 5 else ''} | {rk_txt} |")
+    L.append("")
+    L.append("## 📋 今日操作清单（唯一执行出口）")
+    L.append("### 🟢 买入候选（★★/★★★ 且 月线非空头 且 风控卡✅）")
+    if operations.get("buy_locked"):
+        L.append(f"- 🔒 **顶部禁用：买入候选已置空**（{operations['buy_locked']}）— 禁开新仓")
+    elif operations["buy"]:
+        for r in operations["buy"]:
+            L.append(f"- **{r['code']}** {r['pts']}分 {r['level']}｜仓位≤{r['pos_pct']}%｜{'；'.join(r['src'][:4])}")
+    else:
+        L.append("- （今日无符合全部条件的买入候选）")
+    L.append("### 🟡 观察池（★ 双信号）")
+    if operations["watch"]:
+        L.append("- " + "、".join(f"{r['code']}({r['pts']}分)" for r in operations["watch"][:15]))
+    else:
+        L.append("- （无）")
+    L.append("### 🔴 规避/卖出（四维否决/月线空头/RSV离场）")
+    if operations["avoid"]:
+        L.append("- " + "、".join(f"{r['code']}({r['pts']}分)" for r in operations["avoid"][:10]))
+    else:
+        L.append("- （无）")
     L.append("")
     L.append("## 分级分布")
     L.append(f"- ★★★ 全信号共振: {js['counts']['★★★']} | ★★ 多信号: {js['counts']['★★']} | ★ 双信号: {js['counts']['★']} | 观察: {js['counts']['观察']}")
@@ -562,6 +671,16 @@ def main():
     L.append("- 仲裁优先级（冲突时资金分配）：四维证据链 > 猛兽强度 > 乾坤/鱼身买点 > 双弦/反转")
     L.append("- 武威（月度）与反转数值（周线）已接入，数据出现时自动参与打分")
     L.append("- 月线闸门对TOP标的逐只校验（BLOCK=月线空头强制降级）；四维否决(-3)即使其他信号强也只到观察")
+    L.append("- 市场级信号（见顶五维≥3/市场宽度<25）强制降级全部信号——冲突时信环境（斯波朗迪L2）")
+    L.append("")
+    L.append("## 📚 信号源注册表（回测胜率/权重）")
+    L.append("| 系统 | 权重 | 回测胜率 | 盈亏比 | 验证 | 频率 | 说明 |")
+    L.append("|:----|:----:|:----:|:----:|:----:|:----:|:----|")
+    for _name, _meta in SYSTEM_REGISTRY.items():
+        _v = "✅" if _meta["verified"] else "❌"
+        L.append(f"| {_name} | +{_meta['weight']} | {_meta['winrate']} | {_meta['rr']} | {_v} | {_meta['freq']} | {_meta['note']} |")
+    L.append("")
+    L.append("> ⚠️ 未回测验证的系统（❌）信号权重仅供参考，实盘应以 ✅ 系统为主链；接入新信号源前必须过 backtest_gate 回测门槛")
     md_path = os.path.join(OUT_DIR, f"信号仲裁_{today}.md")
     open(md_path, "w", encoding="utf-8").write("\n".join(L))
     print(f"[OK] {json_path}")
