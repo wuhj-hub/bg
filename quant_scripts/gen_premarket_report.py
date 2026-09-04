@@ -169,12 +169,14 @@ def parse_kline_table(txt):
         if "date" in parts:
             header = parts
             continue
-        if header and "---" not in parts[0] and re.match(r"\d{4}-\d{2}-\d{2}", parts[0]):
+        if header and "---" not in parts[0]:
             row = {}
             for i, h in enumerate(header):
                 if i < len(parts):
                     row[h] = parts[i]
-            rows.append(row)
+            # 兼容批量(symbol|date|...)与单股(date|...)两种列序：date 校验按 header 对齐后的值
+            if re.match(r"\d{4}-\d{2}-\d{2}", str(row.get("date", ""))):
+                rows.append(row)
     # ⚠️ westock kline输出为降序(最新在前)，统一按date升序排序，保证 rows[-1]=最新
     rows.sort(key=lambda r: r.get("date", ""))
     return rows
