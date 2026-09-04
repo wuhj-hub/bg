@@ -255,6 +255,33 @@ def get_news_7x24(maxn=10):
         return []
 
 
+NEWS_SECTOR_MAP = [
+    (["英伟达", "NVIDIA", "AI", "算力", "大模型", "服务器", "液冷"], "AI算力/液冷"),
+    (["黄金", "金价"], "贵金属/黄金"),
+    (["原油", "石油", "OPEC", "油气"], "油气/油服"),
+    (["美联储", "加息", "降息", "利率"], "流动性(影响全局)"),
+    (["半导体", "芯片", "晶圆"], "半导体/芯片"),
+    (["军工", "国防", "导弹", "冲突"], "军工"),
+    (["汽车", "新能源车", "特斯拉"], "汽车链"),
+    (["机器人", "人形机器人", "具身"], "机器人"),
+    (["光伏", "储能", "电池"], "新能源"),
+    (["房地产", "地产", "楼市"], "地产链"),
+    (["华为", "鸿蒙", "昇腾"], "华为链"),
+]
+
+
+def news_sector_hint(news):
+    """新闻关键词 → 板块联动提示（规则化要闻解读）"""
+    text_all = " ".join(n["text"] for n in news)
+    hit = []
+    for kws, sec in NEWS_SECTOR_MAP:
+        if any(k.lower() in text_all.lower() for k in kws) and sec not in hit:
+            hit.append(sec)
+    if not hit:
+        return ""
+    return "📰 要闻联动：" + "、".join(hit) + "（隔夜消息面提示）"
+
+
 def get_index_monthly():
     """获取八大指数月线用于双弦定性"""
     codes = ["sh000001", "sz399106", "sh000016", "sh000300", 
