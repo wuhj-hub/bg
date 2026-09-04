@@ -3,12 +3,12 @@
  "data_date": "2026-09-04",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 22,
+ "score": 3,
  "score_detail": {
   "size_style": -12,
   "limitup_structure": 16,
-  "volume_structure": 15,
-  "sector_fund": 3
+  "volume_structure": 8,
+  "sector_fund": -9
  },
  "size_style": {
   "hs300_5d": -1.33,
@@ -34,31 +34,23 @@
  "volume_structure": {
   "small_big_ratio_now": 1.301,
   "small_big_ratio_5d": 1.18,
-  "vol_shift": "资金流向中小盘",
-  "small_vol_pulse": 108.27
+  "vol_shift": "资金流向中小盘"
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "航海装备Ⅱ",
-    "zdf": "6.49",
-    "main_net5d": -0.1,
-    "retail_net": -22.2,
-    "tag": "游资型"
+    "name": "种植业",
+    "zdf": "3.20",
+    "main_net5d": 6.0,
+    "retail_net": -6.9,
+    "tag": "机构型"
    },
    {
-    "name": "半导体",
-    "zdf": "-2.85",
-    "main_net5d": -392.4,
-    "retail_net": 157.6,
-    "tag": "游资型"
-   },
-   {
-    "name": "养殖业",
-    "zdf": "5.30",
-    "main_net5d": -1.7,
-    "retail_net": -7.5,
-    "tag": "游资型"
+    "name": "猪肉",
+    "zdf": "5.83",
+    "main_net5d": 0.1,
+    "retail_net": -15.8,
+    "tag": "机构型"
    },
    {
     "name": "一般零售",
@@ -66,30 +58,22 @@
     "main_net5d": 14.7,
     "retail_net": -6.2,
     "tag": "机构型"
-   },
-   {
-    "name": "农林牧渔",
-    "zdf": "4.16",
-    "main_net5d": 1.9,
-    "retail_net": -31.2,
-    "tag": "机构型"
    }
   ]
  },
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "欧马模式": 5,
-   "堆量模式": 10
+   "堆量模式": 11,
+   "欧马模式": 4
   },
   "leaders": {
-   "欧马模式": 5,
-   "堆量模式": 6
+   "堆量模式": 5,
+   "欧马模式": 1
   },
   "pullbacks": {},
   "gpoints": {
-   "欧马模式": 1,
-   "堆量模式": 1
+   "堆量模式": 2
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
