@@ -236,6 +236,25 @@ def get_news():
     except:
         return ""
 
+def get_news_7x24(maxn=10):
+    """新浪财经7x24快讯（沙箱/runner均可达）。返回 [{time, text}]，失败返回[]"""
+    try:
+        r = subprocess.run(["curl", "-s", "--max-time", "12",
+                            "https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size=%d&zhibo_id=152" % maxn,
+                            "-H", "User-Agent: Mozilla/5.0"],
+                           capture_output=True, text=True, timeout=18)
+        d = json.loads(r.stdout)
+        items = d.get("result", {}).get("data", {}).get("feed", {}).get("list", [])
+        out = []
+        for it in items:
+            t = re.sub(r"<[^>]+>", "", it.get("rich_text", "")).strip()
+            if t:
+                out.append({"time": (it.get("create_time") or "")[11:16], "text": t[:80]})
+        return out[:maxn]
+    except Exception:
+        return []
+
+
 def get_index_monthly():
     """获取八大指数月线用于双弦定性"""
     codes = ["sh000001", "sz399106", "sh000016", "sh000300", 
@@ -326,6 +345,19 @@ def gen_report(today_str):
             else:
                 last, prev, chg = bars[-1]["last"], "—", "—"
             lines.append(f"| {name_map.get(sym, sym)} | {last} | {prev} | {chg} |")
+
+    lines.append("\n### 隔夜要闻（新浪7x24）\n")
+    news = get_news_7x24(8)
+    if news:
+        for n in news:
+            lines.append(f"- [{n['time']}] {n['text']}")
+        hint = news_sector_hint(news)
+        if hint:
+            lines.append(f"\n{hint}\n")
+        else:
+            lines.append("")
+    else:
+        lines.append("- ⏳ 快讯获取失败\n")
 
     lines.append("\n### 商品\n")
     oil = run_curl("https://api.exchangerate-api.com/v4/latest/USD")[:100] or "⏳ 数据获取中"
