@@ -308,11 +308,25 @@ def gen_report(today_str):
     us = run(["kline", "usDJI,usIXIC,usINX", "--period", "day", "--limit", "3"])
     rows = parse_kline_table(us)
     if rows:
-        lines.append("| 指数 | 最新 | 前日 | 涨跌幅 |")
+        # 每股取最新2日 → 最新收盘 + 前收(前一交易日last) → 涨跌幅
+        by_sym = {}
+        for r in rows:
+            by_sym.setdefault(r["symbol"], []).append(r)
+        name_map = {"usDJI": "道指", "usIXIC": "纳指", "usINX": "标普"}
+        lines.append("| 指数 | 收盘 | 前收 | 涨跌幅 |")
         lines.append("|---|---|---|---|")
-        for r in rows[-2:]:
-            lines.append(f"| {r['symbol']} | {r['last']} | ... | ... |")
-    
+        for sym in sorted(by_sym.keys()):
+            bars = sorted(by_sym[sym], key=lambda x: x.get("date", ""))
+            if len(bars) >= 2:
+                last, prev = bars[-1]["last"], bars[-2]["last"]
+                try:
+                    chg = f"{(float(last)/float(prev)-1)*100:+.2f}%"
+                except (ValueError, ZeroDivisionError):
+                    chg = "—"
+            else:
+                last, prev, chg = bars[-1]["last"], "—", "—"
+            lines.append(f"| {name_map.get(sym, sym)} | {last} | {prev} | {chg} |")
+
     lines.append("\n### 商品\n")
     oil = run_curl("https://api.exchangerate-api.com/v4/latest/USD")[:100] or "⏳ 数据获取中"
     lines.append(f"- 原油/黄金数据：正在采集\n")
