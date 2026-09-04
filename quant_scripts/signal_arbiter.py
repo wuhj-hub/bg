@@ -518,6 +518,16 @@ def main():
         if len(ranked) < before:
             print(f"[ST过滤] 剔除 {before - len(ranked)} 只非清单标的（ST/退市/创业板等）")
 
+    # 宁静AI卡位守护层（2026-09-04：横向题材质地裁决，只作用于AI链标的池内；上游层±1/证据铁律降级，异常不阻断）
+    cp_logs = []
+    try:
+        _q_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts")
+        if _q_dir not in sys.path:
+            sys.path.insert(0, _q_dir)
+        from ai_chokepoint_guard import apply_chokepoint_guard
+        ranked, cp_logs = apply_chokepoint_guard(ranked)
+    except Exception as e:
+        print(f"[WARN] 宁静卡位守护层失败(不阻断): {e}")
     # 宏观-技术冲突裁决（斯波朗迪L2：大盘环境定权，冲突信逻辑）
     env = load_market_env()
     env_logs = apply_env_adjudication(ranked, env) if env else []
@@ -580,7 +590,7 @@ def main():
         operations["buy_locked"] = "；".join(lock_reasons)
         if env_logs:
             env_logs.append(f"🔒 顶部禁用：买入候选置空（{'；'.join(lock_reasons)}）")
-    js = {"date": today, "env": env, "env_logs": env_logs, "operations": operations,
+    js = {"date": today, "env": env, "env_logs": env_logs, "cp_logs": cp_logs, "operations": operations,
           "market_top": mtop, "market_width": mwidth,
           "sources": {"四维": len(four), "鱼身": len(fish), "猛兽": len(beast),
                                       "双弦": len(sx), "乾坤": len(qk), "武威": len(wuwei), "反转": len(reversal),
@@ -599,6 +609,11 @@ def main():
          f"> 数据源：四维{len(four)} / 鱼身{len(fish)} / 猛兽{len(beast)} / 双弦{len(sx)} / 乾坤{len(qk)} / 武威{len(wuwei)} / 反转{len(reversal)} / 123-2B{len(t2b)} / RSV{len(rsv)}（共{n_src}条）",
          "> 仲裁权重：四维高置信+3｜猛兽Setup≥60+3/≥50+2｜乾坤A+2｜鱼身加油≥70+2｜伏击/RS_D/G点+1｜双弦共振+1｜123-2B买+2/RSV启动+2｜四维否决-3",
          "> 分级：≥7 ★★★全信号共振(≤15%) / 5-6 ★★(≤10%) / 3-4 ★(≤5%) / <3 观察；月线BLOCK强制降级", ""]
+    if cp_logs:
+        L.append("## 🔗 宁静AI卡位守护（题材质地裁决 · AI链标的池）")
+        for lg in cp_logs:
+            L.append(f"- {lg}")
+        L.append("")
     if env:
         L.append("## 🏛️ 大盘环境裁决（L2宏观 · 斯波朗迪：冲突信逻辑）")
         L.append(f"- 大盘温度 **{env['temp']}**（{env['level']}）｜三系统：{' '.join(f'{k}={v}' for k, v in env.get('detail', {}).items())}")
