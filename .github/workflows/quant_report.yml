@@ -192,6 +192,14 @@ jobs:
         continue-on-error: true
         run: python3 signal_arbiter.py --top 20
 
+      # ─── 第三步.5c2：宁静AI卡位每日观察（主板AI链30只标的 × 卡位分×四维信号，依赖四维共振输出）───
+      - name: 宁静AI卡位每日观察清单
+        continue-on-error: true
+        timeout-minutes: 15
+        run: |
+          cd /sandbox/workspace
+          python3 quant_scripts/ai_chokepoint_guard.py --daily outputs/四维共振_latest.json outputs --date "$(date +%Y-%m-%d)" || true
+
       # ─── 第三步.5d：创业板/科创四维补充通道（代表性优化A·2026-08-11）───
       - name: 创业板/科创四维补充扫描（代表性补充通道）
         continue-on-error: true
@@ -247,11 +255,13 @@ jobs:
           cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
           cp outputs/四维共振_latest.json 四维共振_latest.json 2>/dev/null || true
           cp outputs/信号仲裁_latest.json 信号仲裁_latest.json 2>/dev/null || true
+          cp outputs/ai_chokepoint_watch_$(date +%Y-%m-%d).json ai_chokepoint_watch_latest.json 2>/dev/null || true
           cp outputs/四维共振_chinext_kcb_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || true
           cp outputs/组合风控_latest.json 组合风控_latest.json 2>/dev/null || true
           cp outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
           python3 git_api_commit.py --msg "chore: report results ($(date +%Y-%m-%d))" \
             market_style_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json \
+            ai_chokepoint_watch_latest.json \
             四维共振_chinext_kcb_latest.json 组合风控_latest.json 执行纪律_latest.json \
             quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
             pools/pool_$(date +%Y-%m).json || true
