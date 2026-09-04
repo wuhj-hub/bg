@@ -177,7 +177,7 @@ def replay(json_path):
             ck = r.get("chokepoint", {})
             print(f"  {r['code']} {pool[_norm(r['code'])]['name']}: pts={r['pts']} {r['level']} | 卡位{ck.get('score')} ev={ck.get('evidence')} chg120={ck.get('chg120')}")
 
-def daily_watch(four_dim_path=None, out_dir=None):
+def daily_watch(four_dim_path=None, out_dir=None, date_str=None):
     """
     AI卡位每日观察清单: 池内30只主板AI链标的 × 四维共振状态 → 卡位分/信号分层
     输入: 四维共振_latest.json (全市场扫描, 池内标的的共振状态)
@@ -213,7 +213,7 @@ def daily_watch(four_dim_path=None, out_dir=None):
     rows.sort(key=lambda x: (-(x["chokepoint"] if x["chokepoint"] is not None else 0), -x["four_dim_total"]))
     if out_dir:
         os.makedirs(out_dir, exist_ok=True)
-        today = __import__("datetime").datetime.now().strftime("%Y-%m-%d")
+        today = date_str or __import__("datetime").datetime.now().strftime("%Y-%m-%d")
         with open(os.path.join(out_dir, f"ai_chokepoint_watch_{today}.json"), "w", encoding="utf-8") as f:
             json.dump({"date": today, "rows": rows}, f, ensure_ascii=False, indent=1)
         # md 摘要
@@ -235,8 +235,11 @@ if __name__ == "__main__":
         if sys.argv[1] == "--daily":
             four = sys.argv[2] if len(sys.argv) > 2 else "四维共振_latest.json"
             out = sys.argv[3] if len(sys.argv) > 3 else "outputs"
-            daily_watch(four, out)
+            dstr = None
+            if "--date" in sys.argv:
+                dstr = sys.argv[sys.argv.index("--date") + 1]
+            daily_watch(four, out, dstr)
         else:
             replay(sys.argv[1])
     else:
-        print("用法: python3 ai_chokepoint_guard.py <信号仲裁_latest.json>  |  --daily [四维共振.json] [out_dir]")
+        print("用法: python3 ai_chokepoint_guard.py <信号仲裁_latest.json>  |  --daily [四维共振.json] [out_dir] [--date YYYY-MM-DD]")
