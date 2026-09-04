@@ -36,6 +36,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: 预热westock数据包（避免生成时npx首次下载超时）
+        run: npx -y westock-data-skillhub@1.0.3 hot board --limit 3
+
       - name: 生成盘前市场报告
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
