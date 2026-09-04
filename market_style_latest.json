@@ -1,24 +1,24 @@
 {
- "date": "2026-09-03",
- "data_date": "2026-09-03",
+ "date": "2026-09-04",
+ "data_date": "2026-09-04",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 16,
+ "score": 22,
  "score_detail": {
-  "size_style": 0,
+  "size_style": -12,
   "limitup_structure": 16,
-  "volume_structure": 0,
-  "sector_fund": 0
+  "volume_structure": 15,
+  "sector_fund": 3
  },
  "size_style": {
-  "hs300_5d": -1.68,
-  "hs300_10d": -0.87,
-  "zz1000_5d": -1.72,
-  "zz1000_10d": 0.14,
-  "rel_5d": -0.04,
-  "rel_10d": 1.01,
-  "rel_20d": 3.05,
-  "zz500_5d": -2.4
+  "hs300_5d": -1.33,
+  "hs300_10d": -1.53,
+  "zz1000_5d": -2.56,
+  "zz1000_10d": -1.23,
+  "rel_5d": -1.23,
+  "rel_10d": 0.3,
+  "rel_20d": 0.89,
+  "zz500_5d": -3.07
  },
  "limitup_structure": {
   "limitup": 52,
@@ -32,24 +32,47 @@
   "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.178,
-  "small_big_ratio_5d": 1.181
+  "small_big_ratio_now": 1.301,
+  "small_big_ratio_5d": 1.18,
+  "vol_shift": "资金流向中小盘",
+  "small_vol_pulse": 108.27
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "汽车零部件",
-    "zdf": "0.75",
-    "main_net5d": 14.9,
-    "retail_net": -2.9,
+    "name": "航海装备Ⅱ",
+    "zdf": "6.49",
+    "main_net5d": -0.1,
+    "retail_net": -22.2,
+    "tag": "游资型"
+   },
+   {
+    "name": "半导体",
+    "zdf": "-2.85",
+    "main_net5d": -392.4,
+    "retail_net": 157.6,
+    "tag": "游资型"
+   },
+   {
+    "name": "养殖业",
+    "zdf": "5.30",
+    "main_net5d": -1.7,
+    "retail_net": -7.5,
+    "tag": "游资型"
+   },
+   {
+    "name": "一般零售",
+    "zdf": "1.07",
+    "main_net5d": 14.7,
+    "retail_net": -6.2,
     "tag": "机构型"
    },
    {
-    "name": "电网设备",
-    "zdf": "1.18",
-    "main_net5d": -25.0,
-    "retail_net": -0.2,
-    "tag": "游资型"
+    "name": "农林牧渔",
+    "zdf": "4.16",
+    "main_net5d": 1.9,
+    "retail_net": -31.2,
+    "tag": "机构型"
    }
   ]
  },
