@@ -1,1 +1,124 @@
-{"date": "2026-09-03", "total": 42, "lianban_cnt": 9, "max_lb": 5, "shouban": 33, "by_lb": {"5": 1, "4": 2, "2": 6, "1": 33}, "score": {"score": 66, "level": "活跃", "parts": {"涨停家数": 8, "连板高度": 28, "连板占比": 30}}, "persistence": [], "alerts": [], "lianban_rows": [{"code": "sh601086", "name": "", "price": "", "chg": "", "lianban": 5, "ji_ji_ban": "5天5板", "reason": "", "banxing": "", "first_time": "", "open_cnt": "", "fengdan": ""}, {"code": "sz002909", "name": "", "price": "", "chg": "", "lianban": 4, "ji_ji_ban": "4天4板", "reason": "", "banxing": "", "first_time": "", "open_cnt": "", "fengdan": ""}, {"code": "sh605577", "name": "", "price": "", "chg": "", "lianban": 4, "ji_ji_ban": "4天4板", "reason": "", "banxing": "", "first_time": "", "open_cnt": "", "fengdan": ""}, {"code": "sz002059", "name": "", "price": "", "chg": "", "lianban": 2, "ji_ji_ban": "2天2板", "reason": "", "banxing": "", "first_time": "", "open_cnt": "", "fengdan": ""}, {"code": "sz002297", "name": "", "price": "", "chg": "", "lianban": 2, "ji_ji_ban": "2天2板", "reason": "", "banxing": "", "first_time": "", "open_cnt": "", "fengdan": ""}, {"code": "sz002300", "name": "", "price": "", "chg": "", "lianban": 2, "ji_ji_ban": "2天2板", "reason": "", "banxing": "", "first_time": "", "open_cnt": "", "fengdan": ""}, {"code": "sz002708", "name": "", "price": "", "chg": "", "lianban": 2, "ji_ji_ban": "2天2板", "reason": "", "banxing": "", "first_time": "", "open_cnt": "", "fengdan": ""}, {"code": "sh600657", "name": "", "price": "", "chg": "", "lianban": 2, "ji_ji_ban": "2天2板", "reason": "", "banxing": "", "first_time": "", "open_cnt": "", "fengdan": ""}, {"code": "sh603270", "name": "", "price": "", "chg": "", "lianban": 2, "ji_ji_ban": "2天2板", "reason": "", "banxing": "", "first_time": "", "open_cnt": "", "fengdan": ""}], "leaders": {}}
+{
+ "date": "2026-09-04",
+ "total": 39,
+ "lianban_cnt": 7,
+ "max_lb": 5,
+ "shouban": 32,
+ "by_lb": {
+  "5": 1,
+  "2": 6,
+  "1": 32
+ },
+ "score": {
+  "score": 57,
+  "level": "活跃",
+  "parts": {
+   "涨停家数": 5,
+   "连板高度": 28,
+   "连板占比": 24
+  }
+ },
+ "persistence": [],
+ "alerts": [],
+ "lianban_rows": [
+  {
+   "code": "sh605577",
+   "name": "",
+   "price": "",
+   "chg": "",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sz002403",
+   "name": "",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh600108",
+   "name": "",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh600865",
+   "name": "",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh603162",
+   "name": "",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh605398",
+   "name": "",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh605580",
+   "name": "",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  }
+ ],
+ "leaders": {}
+}
