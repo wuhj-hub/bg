@@ -706,6 +706,93 @@ def signal_arbiter_section(today):
     return "\n".join(L)
 
 
+def read_ai_chokepoint_watch():
+    """读宁静AI卡位观察清单（ai_chokepoint_watch_latest.json），失败返回None"""
+    for p in ("ai_chokepoint_watch_latest.json", "outputs/ai_chokepoint_watch_latest.json",
+              "../outputs/ai_chokepoint_watch_latest.json",
+              "/sandbox/workspace/github_bg/ai_chokepoint_watch_latest.json",
+              "/sandbox/workspace/github_bg/outputs/ai_chokepoint_watch_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def read_signal_arbiter_cp():
+    """读当日信号仲裁JSON的cp_logs（宁静守护层裁决日志），失败返回[]"""
+    for p in ("outputs/信号仲裁_latest.json", "信号仲裁_latest.json",
+              "../outputs/信号仲裁_latest.json", "/sandbox/workspace/github_bg/信号仲裁_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8")).get("cp_logs", [])
+        except Exception:
+            continue
+    return []
+
+
+def ai_chokepoint_section(today):
+    """
+    ③.9 宁静AI卡位·主线尾声监测（Serenity bearish 4信号数据化判定）
+    信号1 relabel完成: 池内120日涨幅≥80%的标的多=主线定价过半
+    信号2 卡位分整体走低: 池内平均卡位<65 或 顶部标的卡位被摊薄
+    信号3 有信号标的全部中性自决: cp_logs无±1=资金已不在卡位链做多
+    输出: 🟢健康 / 🟡警惕 / 🔴尾声 三态
+    """
+    watch = read_ai_chokepoint_watch()
+    cp_logs = read_signal_arbiter_cp()
+    L = []
+    A = L.append
+    if not watch:
+        return "\n### ③.9 🔗 宁静AI卡位·主线尾声监测\n\n> ⏳ AI卡位观察清单缺失（盘后流水线未产出）。运行 `python3 ai_chokepoint_guard.py --daily` 补生成。\n"
+    rows = watch.get("rows", [])
+    date_src = watch.get("date", "?")
+    A("\n### ③.9 🔗 宁静AI卡位·主线尾声监测（bearish信号）")
+    A(f"> 数据源：ai_chokepoint_watch_{date_src}（池内{len(rows)}只主板AI链标的）")
+    # 信号1: relabel 完成度
+    relabel = []
+    for r in rows:
+        c = r.get("chg120")
+        if isinstance(c, str) and c.startswith("+"):
+            try:
+                if float(c.rstrip("%").lstrip("+")) >= 80:
+                    relabel.append(r)
+            except Exception:
+                pass
+    # 信号2: 平均卡位 + 顶部结构
+    scores = [r.get("chokepoint") for r in rows if isinstance(r.get("chokepoint"), int)]
+    avg = sum(scores) / len(scores) if scores else 0
+    top_cnt = sum(1 for s in scores if s >= 80) if scores else 0
+    # 信号3: cp_logs 裁决方向
+    plus = sum(1 for l in cp_logs if "+1" in l or "题材确认" in l)
+    minus = sum(1 for l in cp_logs if "-1" in l or "题材劣质" in l)
+    # 综合判定
+    warn = []
+    if relabel:
+        warn.append(f"relabel过半标的{len(relabel)}只（" + "、".join(r["name"] for r in relabel[:4]) + "…）")
+    if avg < 68:
+        warn.append(f"池内平均卡位{avg:.0f}偏低")
+    if len(cp_logs) > 0 and plus == 0:
+        warn.append("当日有信号标的全为中性自决，无题材确认加成")
+    if minus > 0:
+        warn.append(f"当日{minus}只被题材劣质降权")
+    if not warn:
+        state = "🟢 主线健康（无bearish信号触发）"
+    elif len(warn) >= 2:
+        state = "🔴 主线尾声预警（" + "；".join(warn[:3]) + "）"
+    else:
+        state = "🟡 主线警惕（" + "；".join(warn) + "）"
+    A(f"**判定：{state}**")
+    A("")
+    if cp_logs:
+        A("**今日宁静守护裁决**：")
+        for lg in cp_logs[:8]:
+            A(f"- {lg}")
+        A("")
+    A("- **解读**：relabel完成=市场已按AI卡位股定价（alpha被吃）；平均卡位走低=上游供给瓶颈叙事弱化；无题材确认=资金未在卡位链做多。三者齐备即 bearish 主线尾声，对应操作=AI链持仓降级、不追高、等待替代设计/扩产扎堆信号确认离场。")
+    L.append("")
+    return "\n".join(L)
+
+
 
 def pool_status_section(today):
     """生成复盘报告中的「股池三阶漏斗状态」章节"""
@@ -1007,6 +1094,11 @@ def gen_report(today_str):
     lines.append(quad_resonance_section(today))
     # 五.5d 六套信号仲裁速览（signal_arbiter.py 产出，B1）
     lines.append(signal_arbiter_section(today))
+    # 五.5e 宁静AI卡位·主线尾声监测（③.9，Serenity bearish信号；依赖watch+cp_logs，缺数据自降级为提示行）
+    try:
+        lines.append(ai_chokepoint_section(today))
+    except Exception as e:
+        lines.append(f"\n### ③.9 🔗 宁静AI卡位\n\n> 监测生成失败({e})\n")
 
     # ════════════════════════════════════════
     # 六、明日展望（新增！闭环收口）
