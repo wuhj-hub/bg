@@ -24,17 +24,32 @@ def _norm(code):
     return code
 
 def load_pool(path=None):
-    p = path or POOL_PATH
-    try:
-        with open(p, encoding="utf-8") as f:
-            d = json.load(f)
-        idx = {}
-        for s in d.get("stocks", []):
-            idx[_norm(s["code"])] = s
-        return idx, d.get("relabel_scoring", ""), d.get("guard_rules", "")
-    except Exception as e:
-        print(f"[宁静守护] 读取池失败: {e}")
-        return {}, "", ""
+    """加载卡位标的池（支持单文件路径或同目录全部 *_pool.json 多池合并）。
+    返回 (idx, relabel规则, guard规则)。idx: code -> 标的信息（多池自动合并，重复code后者覆盖）"""
+    files = []
+    if path:
+        files = [path]
+    else:
+        _dir = os.path.dirname(os.path.abspath(__file__))
+        for fn in sorted(os.listdir(_dir)):
+            if fn.endswith("_pool.json") and os.path.exists(os.path.join(_dir, fn)):
+                files.append(os.path.join(_dir, fn))
+    idx = {}
+    relabel = ""
+    guard = ""
+    for p in files:
+        try:
+            with open(p, encoding="utf-8") as f:
+                d = json.load(f)
+            for s in d.get("stocks", []):
+                idx[_norm(s["code"])] = s
+            relabel = relabel or d.get("relabel_scoring", "")
+            guard = guard or d.get("guard_rules", "")
+        except Exception as e:
+            print(f"[宁静守护] 读取池 {p} 失败: {e}")
+    if not files:
+        print("[宁静守护] 未找到任何 *_pool.json")
+    return idx, relabel, guard
 
 def fetch_chg120(code):
     """近120交易日区间涨幅(%). 失败返回 None. 自动补 sh/sz 前缀."""
@@ -217,8 +232,9 @@ def daily_watch(four_dim_path=None, out_dir=None, date_str=None):
         with open(os.path.join(out_dir, f"ai_chokepoint_watch_{today}.json"), "w", encoding="utf-8") as f:
             json.dump({"date": today, "rows": rows}, f, ensure_ascii=False, indent=1)
         # md 摘要
-        L = [f"# 🔗 AI卡位每日观察 {today}", "",
-             f"> 池内 {len(rows)} 只主板AI链标的 · 卡位分=base(不可替代/供给/政策)+relabel(120日涨幅) · 证据铁律:无强/中证据降级", ""]
+        chains = sorted(set(r["chain"] for r in rows if r["chain"]))
+        L = [f"# 🔗 宁静卡位每日观察 {today}", "",
+             f"> 池内 {len(rows)} 只主板卡位链标的（{' / '.join(chains)}）· 卡位分=base(不可替代/供给/政策)+relabel(120日涨幅) · 证据铁律:无强/中证据降级", ""]
         L.append("| 代码 | 名称 | 子链 | 环节 | 卡位分 | 四维信号 | 证据 | 120日 |")
         L.append("|---|---|---|---|---|---|---|---|")
         for r in rows[:25]:
