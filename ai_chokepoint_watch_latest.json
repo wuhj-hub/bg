@@ -2,6 +2,23 @@
  "date": "2026-09-05",
  "rows": [
   {
+   "code": "001270",
+   "name": "铖昌科技",
+   "chain": "商业航天",
+   "segment": "星载T/R芯片(相控阵)",
+   "tier": "芯片器件",
+   "coef": 0.78,
+   "base": 68,
+   "relabel": 18,
+   "chokepoint": 86,
+   "evidence": "strong",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "-18%",
+   "note": "最正宗卡位·卫星相控阵刚需",
+   "evidence_note": "半年报+互动易(8-9月): 星载T/R芯片批量应用于多系列卫星,毛利率83%,净利+34.7%;5月*ST摘帽"
+  },
+  {
    "code": "000988",
    "name": "华工科技",
    "chain": "光互连算力",
@@ -189,6 +206,40 @@
    "evidence_note": "公告+投关(3-6月)确认: 轻快世界占eVTOL预浸料80%份额合作28家,部分订单已批量交付;业务运营初期收入占比小"
   },
   {
+   "code": "002049",
+   "name": "紫光国微",
+   "chain": "商业航天",
+   "segment": "宇航FPGA/高可靠集成电路",
+   "tier": "芯片器件",
+   "coef": 0.78,
+   "base": 58,
+   "relabel": 18,
+   "chokepoint": 76,
+   "evidence": "strong",
+   "four_dim_total": 2,
+   "four_dim_level": "无共振",
+   "chg120": "-15%",
+   "note": "",
+   "evidence_note": "半年报+互动易(8月): 宇航FPGA/回读刷新芯片商业航天持续出货,完整宇航方案获核心用户应用"
+  },
+  {
+   "code": "002025",
+   "name": "航天电器",
+   "chain": "商业航天",
+   "segment": "宇航级连接器",
+   "tier": "芯片器件",
+   "coef": 0.78,
+   "base": 56,
+   "relabel": 18,
+   "chokepoint": 74,
+   "evidence": "medium",
+   "four_dim_total": 7,
+   "four_dim_level": "★★ 高置信",
+   "chg120": "+17%",
+   "note": "",
+   "evidence_note": "互动易6/22官方: ⚠️26H1航天领域订单与去年同期持平(卫星批产爆发叙事不成立);增长来自高速互连新域；等卫星批产大单"
+  },
+  {
    "code": "002281",
    "name": "光迅科技",
    "chain": "光互连算力",
@@ -291,6 +342,40 @@
    "evidence_note": "商飞合作4座eVTOL电机在研(功率密度3.7kW/kg)+小功率供样物流无人机;⚠️仅券商研报,无公司公告定点/量产；等主机厂定点/中标公告"
   },
   {
+   "code": "603267",
+   "name": "鸿远电子",
+   "chain": "商业航天",
+   "segment": "高可靠MLCC(宇航级电容)",
+   "tier": "芯片器件",
+   "coef": 0.78,
+   "base": 56,
+   "relabel": 18,
+   "chokepoint": 74,
+   "evidence": "medium",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "-13%",
+   "note": "MLCC缺口环节",
+   "evidence_note": "投关记录(9月官方口径): 卫星陶瓷管壳批量供货但H1收入仅0.11亿;⚠️8亿订单/市占60%仅自媒体无公告；等专项订单公告"
+  },
+  {
+   "code": "002149",
+   "name": "西部材料",
+   "chain": "商业航天",
+   "segment": "宇航级钛合金/高温合金",
+   "tier": "材料耗材",
+   "coef": 1.0,
+   "base": 56,
+   "relabel": 18,
+   "chokepoint": 74,
+   "evidence": "weak",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "-22%",
+   "note": "可回收火箭材料变耗材逻辑",
+   "evidence_note": "⚠️朱雀三号/发动机供货仅自媒体KOL,无公告无互动易无权威媒体;H1营收-11%净利-27%；降级观察或移出"
+  },
+  {
    "code": "002837",
    "name": "英维克",
    "chain": "光互连算力",
@@ -376,6 +461,23 @@
    "evidence_note": "投关9月确认FC-BGA基板多客户规模化量产；H1净利+66%"
   },
   {
+   "code": "000733",
+   "name": "振华科技",
+   "chain": "商业航天",
+   "segment": "宇航级元器件平台(阻容/半导体)",
+   "tier": "芯片器件",
+   "coef": 0.78,
+   "base": 54,
+   "relabel": 18,
+   "chokepoint": 72,
+   "evidence": "medium",
+   "four_dim_total": 3,
+   "four_dim_level": "无共振",
+   "chg120": "-19%",
+   "note": "",
+   "evidence_note": "互动易(1月): 稳定配套高/中/低轨卫星;⚠️H1净利-21%增量证据不足无金额；等增量订单披露"
+  },
+  {
    "code": "002130",
    "name": "沃尔核材",
    "chain": "光互连算力",
@@ -427,6 +529,23 @@
    "evidence_note": "⚠️互动7/29仅氧化锆样品获研发试用初步认可,无订单/中试;扩产为通用电池级原料非电解质产线；降级观察"
   },
   {
+   "code": "600879",
+   "name": "航天电子",
+   "chain": "商业航天",
+   "segment": "星载测控/火箭配套",
+   "tier": "模块子系统",
+   "coef": 0.62,
+   "base": 54,
+   "relabel": 18,
+   "chokepoint": 72,
+   "evidence": "medium",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "-38%",
+   "note": "订单最实但央企体量大",
+   "evidence_note": "业绩说明会(4月): 激光终端/数据分发机等星载载荷已配套用户星;⚠️325亿/星网150亿回避确认,2025年报未披露；等官方订单口径"
+  },
+  {
    "code": "002851",
    "name": "麦格米特",
    "chain": "光互连算力",
@@ -476,6 +595,23 @@
    "chg120": "-16%",
    "note": "",
    "evidence_note": "投关4月: 通航/无人机动力控制全谱系布局+AES100配套完成研制;⚠️低空收入未兑现军品为主；等通航动力收入放量"
+  },
+  {
+   "code": "600487",
+   "name": "亨通光电",
+   "chain": "光互连算力",
+   "segment": "光纤光缆",
+   "tier": "模块子系统",
+   "coef": 0.62,
+   "base": 52,
+   "relabel": 18,
+   "chokepoint": 70,
+   "evidence": "strong",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "+26%",
+   "note": "",
+   "evidence_note": "8/27上交所公告中标海洋能源项目；5月中标电信空芯光缆"
   },
   {
    "code": "000021",
@@ -614,6 +750,23 @@
    "evidence_note": "厦钨新能高容量固态正极批量供货+硫化锂试产+电解质中试线建成(公开报道)"
   },
   {
+   "code": "603678",
+   "name": "火炬电子",
+   "chain": "商业航天",
+   "segment": "宇航级陶瓷电容/新材料",
+   "tier": "芯片器件",
+   "coef": 0.78,
+   "base": 50,
+   "relabel": 18,
+   "chokepoint": 68,
+   "evidence": "medium",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "+17%",
+   "note": "",
+   "evidence_note": "互动易(25-12): ⚠️仅'参与部分客户配套'表述,无订单无金额;H1净利-7%靠贸易撑营收；降级观察"
+  },
+  {
    "code": "600183",
    "name": "生益科技",
    "chain": "光互连算力",
@@ -680,6 +833,40 @@
    "chg120": "-46%",
    "note": "卡位弱，观察",
    "evidence_note": "券商研报(含盈利预测)+证券时报报道+半年报确认恒丰特导AI渗透；无公告级订单量化"
+  },
+  {
+   "code": "002465",
+   "name": "海格通信",
+   "chain": "商业航天",
+   "segment": "卫星通信终端/北斗",
+   "tier": "模块子系统",
+   "coef": 0.62,
+   "base": 48,
+   "relabel": 18,
+   "chokepoint": 66,
+   "evidence": "medium",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "-37%",
+   "note": "",
+   "evidence_note": "半年报: 北斗短报文套片首个规模化合同+中石化北斗主力供应商;⚠️卫星互联网无实质订单,主业由盈转亏；等低轨终端订单"
+  },
+  {
+   "code": "600118",
+   "name": "中国卫星",
+   "chain": "商业航天",
+   "segment": "卫星总体制造",
+   "tier": "系统集成",
+   "coef": 0.5,
+   "base": 48,
+   "relabel": 18,
+   "chokepoint": 66,
+   "evidence": "strong",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "-34%",
+   "note": "整星龙头但宁静逻辑卡位低",
+   "evidence_note": "半年报: H1发射11颗追平25全年,合同负债+69.45%,扭亏为盈;⚠️'300亿订单/540-720颗'仅自媒体非公告；整星集成层低卡位参照"
   },
   {
    "code": "000977",
@@ -833,23 +1020,6 @@
    "chg120": "-3%",
    "note": "弹性小票",
    "evidence_note": "⚠️仅2020年共建中科丰元研究院(研究层)+参股4%;流传中试线/量产无公司确认,主业磷酸铁锂；纯研究属性,建议移出候选"
-  },
-  {
-   "code": "600487",
-   "name": "亨通光电",
-   "chain": "光互连算力",
-   "segment": "光纤光缆",
-   "tier": "模块子系统",
-   "coef": 0.62,
-   "base": 52,
-   "relabel": null,
-   "chokepoint": null,
-   "evidence": "strong",
-   "four_dim_total": 0,
-   "four_dim_level": "无共振",
-   "chg120": "N/A",
-   "note": "",
-   "evidence_note": "8/27上交所公告中标海洋能源项目；5月中标电信空芯光缆"
   }
  ]
 }
