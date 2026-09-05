@@ -3,7 +3,7 @@
 """
 evidence_review.py —— AI链标的 evidence 月度复核工作单生成器 (v1.0, 2026-09-05)
 ================================================================================
-用途：每月对 ai_chain_pool.json 的 30 只主板AI链标的做 evidence（证据等级）复核。
+用途：每月对所有 *_pool.json（AI链30只 + 固态电池10只等）标的做 evidence（证据等级）复核。
 背景：evidence 决定宁静守护层的"证据铁律"（无 strong/medium 则信号强制降一档），
       且 pool 内字段必须人工维护——公告/投关/研报会随时间改变标的证据状态。
 
@@ -18,13 +18,17 @@ evidence_review.py —— AI链标的 evidence 月度复核工作单生成器 (v
 SOP（每月1号）：
   1. 跑本脚本生成工作单 → PushPlus/微信查看
   2. 对 🟡/🔴 标的检索：巨潮公告(大单/长协/定点/量产/认证) > 投关记录表 > 互动易 > 券商研报
-  3. 确认后手工更新 ai_chain_pool.json 的 evidence / evidence_note / evidence_date 三项
+  3. 确认后手工更新对应 *_pool.json 的 evidence / evidence_note / evidence_date 三项
   4. 推送 GitHub（evidence 是唯一人工字段，guard/仲裁全自动引用）
 """
 import json, os, sys
 from datetime import datetime, date
 
-POOL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ai_chain_pool.json")
+_DIR = os.path.dirname(os.path.abspath(__file__))
+def _all_pools():
+    """同目录所有 *_pool.json（多池合并）"""
+    files = sorted(os.path.join(_DIR, fn) for fn in os.listdir(_DIR) if fn.endswith("_pool.json"))
+    return files or [os.path.join(_DIR, "ai_chain_pool.json")]
 
 # 升级路径建议（weak→medium→strong 需要什么证据）
 UPGRADE_HINT = {
@@ -64,15 +68,19 @@ def main():
         if a == "--days" and i + 1 < len(argv):
             days = int(argv[i + 1])
 
-    pool = json.load(open(POOL, encoding="utf-8"))
-    stocks = pool["stocks"]
+    stocks = []
+    for _pf in _all_pools():
+        try:
+            stocks.extend(json.load(open(_pf, encoding="utf-8"))["stocks"])
+        except Exception as e:
+            print(f"[evidence] 读取池 {_pf} 失败: {e}")
     today = date.today()
     L = []
     A = L.append
     A(f"# 🔍 AI链 evidence 月度复核工作单 · {today}")
     A("")
-    A(f"> 池内 {len(stocks)} 只主板AI链标的 · 阈值：> {days} 天未核验 = 🟡待复核，> {days * 2} 天 = 🔴过期")
-    A("> SOP：对 🟡/🔴 标的检索 公告(巨潮) > 投关记录表 > 互动易 > 券商研报 → 更新 ai_chain_pool.json 的 evidence/evidence_note/evidence_date")
+    A(f"> 池内 {len(stocks)} 只主板卡位链标的 · 阈值：> {days} 天未核验 = 🟡待复核，> {days * 2} 天 = 🔴过期")
+    A("> SOP：对 🟡/🔴 标的检索 公告(巨潮) > 投关记录表 > 互动易 > 券商研报 → 更新对应 *_pool.json 的 evidence/evidence_note/evidence_date")
     A("")
     # 分组：优先级排序
     def prio(s):
