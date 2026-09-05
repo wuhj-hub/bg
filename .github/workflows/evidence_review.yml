@@ -1,0 +1,60 @@
+name: evidence月度复核提醒
+
+on:
+  schedule:
+    # 每月1号北京时间 09:00（UTC 01:00），生成AI链evidence复核工作单并推送提醒
+    - cron: "0 1 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: evidence-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 生成 evidence 复核工作单
+        run: |
+          python3 quant_scripts/evidence_review.py --days 45 --out outputs
+          F="outputs/evidence_review_$(date +%Y-%m-%d).md"
+          echo "工作单: $F"
+          grep "**汇总" "$F" || echo "无汇总行"
+          # 统计待复核数供推送
+          Y=$(grep -c "🟡" "$F" || true)
+          R=$(grep -c "🔴" "$F" || true)
+          echo "REVIEW_YELLOW=$Y" >> $GITHUB_ENV
+          echo "REVIEW_RED=$R" >> $GITHUB_ENV
+
+      - name: 提交工作单到仓库（outputs/）
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          F="outputs/evidence_review_$(date +%Y-%m-%d).md"
+          python3 quant_scripts/git_push.py bg main "$F" "$F" "chore: evidence月度复核工作单 $(date +%Y-%m-%d)" || true
+
+      - name: PushPlus 推送复核提醒（含待复核/过期统计）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          TODAY=$(date +%Y-%m-%d)
+          Y="${REVIEW_YELLOW:-0}"
+          R="${REVIEW_RED:-0}"
+          TITLE="🔍 AI链 evidence 月度复核提醒"
+          CONTENT="本月AI链30只标的复核工作单已生成。待复核🟡 ${Y} 只｜过期🔴 ${R} 只。请在ima中检索公告/投关/研报更新 ai_chain_pool.json 的 evidence 字段。运行: python3 evidence_review.py 查看工作单"
+          # PushPlus token从secret读（工作区沙箱secret可能缺失，静默）
+          if [ -n "$PUSH_TOKEN" ] && [ "$PUSH_TOKEN" != "None" ]; then
+            curl -s "https://www.pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=${TITLE}&content=${CONTENT}&template=txt" || echo "推送失败"
+          else
+            echo "PUSH_TOKEN 未配置，跳过推送"
+          fi
