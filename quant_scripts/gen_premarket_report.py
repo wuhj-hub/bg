@@ -545,13 +545,13 @@ def gen_report(today_str):
         lines.append("")
         lines.append(f"> 说明：{hr.get('source', '本地复算')}；因子=主力5日净流入/散户流出/量能/沉淀率，缺失时自动降级为仅涨跌幅排行")
     
-    # ③.4 宁静AI卡位链观察（Serenity题材质地裁决：只读盘后产出，缺数据静默跳过）
+    # ③.4 宁静卡位链观察（Serenity题材质地裁决：多卡位链池，缺数据静默跳过）
     try:
         _ai = render_ai_chokepoint()
         if _ai:
             lines.append(_ai)
     except Exception as e:
-        lines.append(f"- AI卡位观察：读取失败({e})")
+        lines.append(f"- 宁静卡位观察：读取失败({e})")
     
     lines.append("\n## ④ 个股定点\n")
     lines.append("⏳ 每日量化数据由15:30全盘量化扫描生成，盘前时段引用昨日数据。\n")
@@ -727,7 +727,7 @@ def read_hot_emotion():
 
 def render_ai_chokepoint():
     """
-    ③.4 宁静AI卡位链观察（Serenity题材质地裁决·只读盘后产出，缺数据返回None）
+    ③.4 宁静卡位链观察（Serenity题材质地裁决·多池，缺数据返回None）
     展示: ①卡位分≥80的题材确认候选 ②有信号且有卡位背书的交集 ③relabel警告(bearish前期)
     """
     w = read_ai_chokepoint_watch()
@@ -735,7 +735,7 @@ def render_ai_chokepoint():
         return None
     rows = w["rows"]
     L = []
-    L.append("\n### ③.4 🔗 AI卡位链观察（宁静题材质地 · 盘后产出）")
+    L.append("\n### ③.4 🔗 宁静卡位链观察（题材质地 · 盘后产出）")
     L.append("")
     # ① 卡位≥80
     top = [r for r in rows if (r.get("chokepoint") or 0) >= 80]
@@ -762,7 +762,7 @@ def render_ai_chokepoint():
     wk = [r for r in rows if r.get("evidence") in ("weak", "none")]
     if wk:
         L.append("- 🔻 **证据待核验**（无强/中证据·若进信号将降级）：" + " / ".join(r["name"] + "(" + str(r["evidence"]) + ")" for r in wk))
-    L.append(f"\n> 数据源：ai_chokepoint_watch_{w.get('date', '?')}（池内{len(rows)}只主板AI链标的·卡位分=基础分+relabel自动衰减）")
+    L.append(f"\n> 数据源：ai_chokepoint_watch_{w.get('date', '?')}（池内{len(rows)}只主板卡位链标的(多池)·卡位分=基础分+relabel自动衰减）")
     return "\n".join(L)
 
 
