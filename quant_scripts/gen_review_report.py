@@ -732,7 +732,7 @@ def read_signal_arbiter_cp():
 
 def ai_chokepoint_section(today):
     """
-    ③.9 宁静AI卡位·主线尾声监测（Serenity bearish 4信号数据化判定）
+    ③.9 宁静卡位·主线尾声监测（Serenity bearish 4信号数据化判定·多池）
     信号1 relabel完成: 池内120日涨幅≥80%的标的多=主线定价过半
     信号2 卡位分整体走低: 池内平均卡位<65 或 顶部标的卡位被摊薄
     信号3 有信号标的全部中性自决: cp_logs无±1=资金已不在卡位链做多
@@ -746,8 +746,8 @@ def ai_chokepoint_section(today):
         return "\n### ③.9 🔗 宁静AI卡位·主线尾声监测\n\n> ⏳ AI卡位观察清单缺失（盘后流水线未产出）。运行 `python3 ai_chokepoint_guard.py --daily` 补生成。\n"
     rows = watch.get("rows", [])
     date_src = watch.get("date", "?")
-    A("\n### ③.9 🔗 宁静AI卡位·主线尾声监测（bearish信号）")
-    A(f"> 数据源：ai_chokepoint_watch_{date_src}（池内{len(rows)}只主板AI链标的）")
+    A("\n### ③.9 🔗 宁静卡位·主线尾声监测（bearish信号）")
+    A(f"> 数据源：ai_chokepoint_watch_{date_src}（池内{len(rows)}只主板卡位链标的·多池）")
     # 信号1: relabel 完成度
     relabel = []
     for r in rows:
