@@ -38,8 +38,32 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          F="outputs/evidence_review_$(date +%Y-%m-%d).md"
-          python3 quant_scripts/git_push.py bg main "$F" "$F" "chore: evidence月度复核工作单 $(date +%Y-%m-%d)" || true
+          python3 - <<'PYEOF'
+          import os, base64, json, urllib.request, urllib.parse
+          TOKEN = os.environ["GITHUB_TOKEN"]
+          f = "outputs/evidence_review_" + __import__("datetime").date.today().strftime("%Y-%m-%d") + ".md"
+          if not os.path.exists(f):
+              print("工作单不存在:", f); raise SystemExit(0)
+          content = open(f, "rb").read()
+          b64 = base64.b64encode(content).decode()
+          url = "https://api.github.com/repos/wuhj-hub/bg/contents/" + urllib.parse.quote(f)
+          def api(method, data=None):
+              req = urllib.request.Request(url, method=method)
+              req.add_header("Authorization", "token " + TOKEN)
+              req.add_header("Accept", "application/vnd.github+json")
+              body = json.dumps(data).encode() if data is not None else None
+              try:
+                  with urllib.request.urlopen(req, body, timeout=60) as r:
+                      return r.status, json.loads(r.read().decode() or "{}")
+              except urllib.error.HTTPError as e:
+                  return e.code, json.loads(e.read().decode() or "{}")
+          code, resp = api("GET")
+          data = {"message": "chore: evidence月度复核工作单", "content": b64, "branch": "main"}
+          if code == 200 and isinstance(resp, dict) and resp.get("sha"):
+              data["sha"] = resp["sha"]
+          code, resp = api("PUT", data)
+          print(("✅ 工作单已入库" if code in (200, 201) else "❌ 提交失败 HTTP %s" % code), f)
+          PYEOF
 
       - name: PushPlus 推送复核提醒（含待复核/过期统计）
         if: always()
