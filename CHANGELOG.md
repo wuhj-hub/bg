@@ -161,3 +161,52 @@ AND NOT(NAMELIKE('ST')) AND NOT(NAMELIKE('*ST'))
 ### 🔧 优化
 
 - chore: update quant/fish_latest (2026-08-12) (a98099f)
+
+---
+
+## v3.0 (2026-09-06) — 周期级联执行卡 · 宁静卡位体系 · 体系韧性加固
+
+> 跨度：2026-08-12（v2.9）→ 2026-09-06。此版本手工聚合，覆盖 v2.9 以来全部增量。
+
+### 🃏 个股执行卡（张穗鸿「卷钱机器」周期级联落地）
+- **`execution_card.py` 新增**：①上级周期门禁（月线+周线双闸门合成：月BLOCK→⛔拦截 / 月WARN或周BLOCK→🟡试仓×0.5 / 月PASS+周WARN→🟡谨慎×0.7 / 双PASS→✅放行）②资金预算（2×ATR止损 / 月线前12月高目标 / 盈亏比≥2 / 单票≤30%=张穗鸿3331 / 账户2%风险→最大亏损金额）③分批 5:3:2（B1底仓@信号确认→B2@回踩MA10→B3@突破前高；B1+B2波段到目标止盈，B3趋势跌破MA20离场）
+- **盘前报告 ④.1 个股执行卡段**：`gen_premarket_report.py` 新增 read/render_execution_cards，读仓库根 execution_cards_latest.json 自动渲染
+- **盘后 workflow**：`quant_report.yml` 第五.4.7 步每日自动对持仓生成执行卡并提交（供次日盘前引用）
+- 实测（9/4收盘）：中石油/平安银行✅放行(盈亏比3.98/2.48)，海康🟡谨慎(21%)，茅台/华能🟡试仓(15%/14%)，浙大网新/国安股份⛔拦截(月线空头)——与既有月线闸门判断一致
+- 依据：张穗鸿龙虎跃精修课第34/35节《同一只股票开三个卷钱机器》视频分析（百度网盘），思想同源但取其框架弃其信仰（其指标未经数据验证）
+
+### 🎯 宁静卡位体系（题材质地裁决·evidence铁律）
+- **AI硬件卡位链 30只** `ai_chain_pool.json`：光互连19/具身智能8/终端光学3，evidence分级（strong/medium/weak）+ 卡位评分80+
+- **固态电池链 10只** `solid_battery_pool.json`：硫化物电解质/硫化锂/LLZO/锂金属负极环节，排除电芯整机厂
+- **低空经济链 10只** `low_altitude_pool.json`：复材/电驱/空管/发动机/连接器环节，排除整机厂
+- **商业航天链 10只** `space_pool.json`：T/R芯片/宇航FPGA/高可靠MLCC/连接器/材料（2026供需缺口=宇航级芯片83%居首）
+- 四池自动合并（60只），多池观察：盘前③.4题材确认（卡位≥80）/卡位×信号交集（四维≥4+卡位≥70）/relabel过半追高警惕/证据待核验
+- **evidence月度复核** `evidence_review.py` + workflow 每月1号自动生成工作单推送（strong/medium/weak 分级核验升级路径）
+
+### 🏛️ 盘前/复盘链路重构（GitHub 自动 Phase1）
+- `premarket_report.yml` 恢复 08:00(BJT) schedule，解除 ima 依赖，端到端闭环（报告+judgment+微信推送）
+- **`gen_judgment.py` 新增**：盘前预判落盘标准化（schema 双兼容），修复 8/12-9/3 judgment 断链（SKILL.md 固化 Step5.6 强制纪律）
+- 复盘报告：③.9 AI卡位主线尾声监测（🟢健康/🟡警惕/🔴尾声三态）+ ③.6 猛兽子池三元扩展（主池/观察池/信号子池）
+
+### 📊 新指标与新模块
+- **年线广度** `yearline_breadth.py`：站上年线占比（8/21实测 684/3024=22.6% bear级），剔除13只僵尸退市股
+- **RSV均强度** `rsv_strength.py`：RSV均=(价格RSV1+相对基准RSV2)/2 N=144；880003 基准快照自动化（tdx 分页拉取）
+- **市场宽度** `market_width.py`：涨跌家数+强势/涨停结构 → 宽度分 0-100
+- **123-2B反转扫描** `scan_123_2b.py`（《专业投机原理》）：123法则/2B假突破/ABC末端 + 宏观-技术冲突环境裁决（冷市<40全部降级）
+- **龙头战法 v2** `longtou.py`：五维定位/梯队/见顶预警/机构锁仓标签
+- **张穗鸿指标验证**：九五至尊扩大样本 2516 信号——原版低价(≤15元)用法**证伪**（20日超额-0.22%），有效组合=九五至尊+环境关(上证>MA60)+股价>30元（10日+2.95%/20日+2.57%）
+- **市场状态×策略矩阵 v2** `market_model_matrix.md`：18模块×三市态（牛/震荡/熊）完整映射
+- **颜劼情绪周期统计**：82交易日 6态转移矩阵（高潮次日95%不转弱等）
+- **做T狂人策略引擎** `zuot_kuangren.py`：132交易法（5m96均线+VWAP）
+- 情绪预判 `emotion_forecast.py`、盘中监控、双弦月池分层（核心≥65入池/观察50-65独立跟踪）
+
+### 🔧 数据铁律与韧性修复（关键坑固化）
+- GitHub 断链根因链修复：提交步骤补 GITHUB_TOKEN env、secret 命名合规（禁 GITHUB_ 前缀）
+- **kline 批量列序铁律**：批量输出首列=symbol 非 date、date 降序（最新在前）、exchange=换手率%
+- market_width 涨跌全反修复；hot_emotion 接入 workflow + 仓库根累积起点 + 解析修复（'|'优先）
+- ST 防线第三轮：代码级实时校验（st_guard 查 qt.gtimg.cn），9个标的输出脚本全部接入
+- IMA 凭证健康检查 `ima_cred_check.py`（probe/mark-ok/staleness 三功能 + guard_selfcheck 每日预检）
+- tdx 交叉验证（tdx_quotes vs westock 4/4 完全一致）；新浪分钟线/腾讯域名被沙箱封禁的降级方案
+- 百度网盘直读通道 `baidu_pan.py`（xpan 原生 API + dlink 下载，token 持久化）
+
+---
