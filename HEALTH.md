@@ -29,9 +29,11 @@
 
 ## 📊 历史健康记录
 
-<!-- self_check.py 每次运行后在此追加记录 -->
-
-_暂无记录 — 自检系统尚未运行_
+### 🟢 2026-09-06 人工自检 — 85分（健康）
+- **状态**：组件齐全（quant_scripts 66+脚本 / 宁静4池 / holdings一致）；数据最新 2026-09-04
+- **新增**：v3.0 版本存档；个股执行卡 execution_card.py 落地并接入盘后 workflow（待下交易日实测）
+- **发现**：9/5 起主要 schedule workflow（quant_scan/quant_report/premarket/intraday）未触发，guard_selfcheck 正常 → GitHub schedule 疑似跳单，观察 9/8 周一盘前是否自动恢复
+- **行动**：周一 08:00 盘前未出则手动 dispatch 补跑；执行卡首跑验证
 
 ---
 
