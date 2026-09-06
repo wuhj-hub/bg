@@ -556,6 +556,14 @@ def gen_report(today_str):
     lines.append("\n## ④ 个股定点\n")
     lines.append("⏳ 每日量化数据由15:30全盘量化扫描生成，盘前时段引用昨日数据。\n")
     
+    # ④.1 个股执行卡（张穗鸿卷钱机器·周期级联，读盘后 execution_card 输出）
+    try:
+        _ec = render_execution_cards()
+        if _ec:
+            lines.append(_ec)
+    except Exception as e:
+        lines.append(f"- 🃏 执行卡：读取失败({e})")
+    
     lines.append("\n## ⑤ 策略要点\n")
     lines.append(f"- 操作基调：{j['operation']}")
     lines.append(f"- 关注板块：{j['sectors']}")
@@ -894,6 +902,55 @@ def main():
         print("[OK] uploaded to IMA knowledge base")
     else:
         print("[WARN] upload failed, report saved locally")
+
+
+def read_execution_cards():
+    """读个股执行卡（execution_cards_latest.json，盘后 execution_card.py 产出），失败返回None"""
+    for p in ("execution_cards_latest.json", "outputs/execution_cards_latest.json",
+              "../outputs/execution_cards_latest.json",
+              "/sandbox/workspace/github_bg/outputs/execution_cards_latest.json",
+              "/sandbox/workspace/outputs/execution_cards_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def render_execution_cards():
+    """④.1 个股执行卡紧凑渲染（卷钱机器·周期级联：月/周门禁→预算→5:3:2分批）"""
+    d = read_execution_cards()
+    if not d or not d.get("cards"):
+        return ""
+    cards = d["cards"]
+    total = d.get("total_capital", 1000000)
+    L = ["\n### ④.1 个股执行卡（卷钱机器·周期级联）\n",
+         f"> 昨日盘后 execution_card 输出 · 基准{total/10000:.0f}万：①月/周上级门禁 ②2×ATR止损·盈亏比≥2·单票≤30% ③5:3:2分批。\n"]
+    for c in cards:
+        nm = f"{c['name']}({c['code']})"
+        if c.get("signal"):
+            nm += f"·{c['signal']}"
+        v = c.get("verdict", "?")
+        if c.get("action"):
+            L.append(f"- {v} **{nm}**：{c['action']}")
+            continue
+        up = c.get("upper", {})
+        b = c.get("budget", {})
+        parts = []
+        for x in c.get("batches", []):
+            tr = x.get("trigger", "")
+            if tr.startswith("信号确认位附近(≈"):
+                tr = "≈" + tr.split("(≈")[1].rstrip(")")
+            parts.append(f"{x['batch']} {x.get('pct')}%@{tr}")
+        bs = " → ".join(parts)
+        L.append(f"- {v} **{nm}**：月{up.get('month_trend')}({up.get('month_gate')})/"
+                 f"周{up.get('week_trend')}({up.get('week_gate')}) | 止损{b.get('stop')} "
+                 f"目标{b.get('target')} 盈亏比{b.get('rr')} | {bs}")
+        if c.get("summary"):
+            L.append(f"  - {c['summary']}")
+    L.append("")
+    return "\n".join(L)
+
 
 if __name__ == "__main__":
     main()
