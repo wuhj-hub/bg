@@ -245,6 +245,13 @@ jobs:
           cp quant_scripts/outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
           echo "执行纪律: $(python3 -c "import json;d=json.load(open('执行纪律_latest.json'));print('买入'+str(d['buy_rate'])+'% 卖出'+str(d['sell_rate'])+'%')" 2>/dev/null || echo '无数据')"
 
+      # ─── 第五.4.7步：个股执行卡（张穗鸿卷钱机器·周期级联：月/周门禁→ATR预算→5:3:2分批，供次日盘前④.1引用）───
+      - name: 个股执行卡生成（卷钱机器·周期级联）
+        continue-on-error: true
+        run: |
+          python3 quant_scripts/execution_card.py --holdings --total 1000000 --out outputs
+          echo "执行卡: $(python3 -c "import json;d=json.load(open('outputs/execution_cards_latest.json'));print(','.join(c['code']+':'+c['verdict'] for c in d['cards']))" 2>/dev/null || echo '无输出')"
+
       # ─── 第三步.6：提交报告阶段产物（供次日盘前报告引用）───
       - name: 提交报告产物到仓库（供盘前报告引用）
         continue-on-error: true
@@ -259,10 +266,11 @@ jobs:
           cp outputs/四维共振_chinext_kcb_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || true
           cp outputs/组合风控_latest.json 组合风控_latest.json 2>/dev/null || true
           cp outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
+          cp outputs/execution_cards_latest.json execution_cards_latest.json 2>/dev/null || true
           python3 git_api_commit.py --msg "chore: report results ($(date +%Y-%m-%d))" \
             market_style_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json \
             ai_chokepoint_watch_latest.json \
-            四维共振_chinext_kcb_latest.json 组合风控_latest.json 执行纪律_latest.json \
+            四维共振_chinext_kcb_latest.json 组合风控_latest.json 执行纪律_latest.json execution_cards_latest.json \
             quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
             pools/pool_$(date +%Y-%m).json || true
 
