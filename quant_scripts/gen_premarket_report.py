@@ -339,7 +339,10 @@ def calc_zengxingzhi():
 def gen_report(today_str):
     """生成完整盘前报告"""
     today = today_str
-    yesterday = (datetime.strptime(today, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+    _y = datetime.strptime(today, "%Y-%m-%d") - timedelta(days=1)
+    while _y.weekday() >= 5:  # 跳过周末（周六=5/周日=6），回退到最近交易日(周五)
+        _y -= timedelta(days=1)
+    yesterday = _y.strftime("%Y-%m-%d")
     quant = load_quant_latest()
     
     lines = []
