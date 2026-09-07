@@ -1,16 +1,16 @@
 {
-  "tone": "中性偏多·结构性机会",
-  "operation": "仓位≤50%，可参与但控制仓位（⚖️均衡市(+16)仓位不变）",
-  "sectors": "液冷概念、ChatGPT、电网设备",
+  "tone": "中性偏防守",
+  "operation": "仓位≤40%，轻仓参与，严格止损（⚖️均衡市(+3)仓位不变）",
+  "sectors": "通信设备、种植业、半导体",
   "key_levels": "支撑3851、压力3995",
   "fish_temp": "73/100",
-  "beast_score": "45.7/100",
+  "beast_score": "34.8/100",
   "shuangxian": "—",
-  "style_score": 16,
+  "style_score": 3,
   "style_name": "均衡市",
-  "base_pos": 50,
+  "base_pos": 40,
   "style_fix": 0,
   "temp_fix": 0,
-  "final_pos": 50,
-  "date": "2026-09-04"
+  "final_pos": 40,
+  "date": "2026-09-07"
 }
