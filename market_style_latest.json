@@ -1,24 +1,24 @@
 {
- "date": "2026-09-04",
- "data_date": "2026-09-04",
+ "date": "2026-09-07",
+ "data_date": "2026-09-07",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 3,
+ "score": 20,
  "score_detail": {
-  "size_style": -12,
+  "size_style": 0,
   "limitup_structure": 16,
-  "volume_structure": 8,
-  "sector_fund": -9
+  "volume_structure": 0,
+  "sector_fund": 4
  },
  "size_style": {
-  "hs300_5d": -1.33,
-  "hs300_10d": -1.53,
-  "zz1000_5d": -2.56,
-  "zz1000_10d": -1.23,
-  "rel_5d": -1.23,
-  "rel_10d": 0.3,
-  "rel_20d": 0.89,
-  "zz500_5d": -3.07
+  "hs300_5d": -1.08,
+  "hs300_10d": 0.26,
+  "zz1000_5d": -1.69,
+  "zz1000_10d": 1.97,
+  "rel_5d": -0.6,
+  "rel_10d": 1.71,
+  "rel_20d": 1.48,
+  "zz500_5d": -2.42
  },
  "limitup_structure": {
   "limitup": 52,
@@ -32,32 +32,38 @@
   "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.301,
-  "small_big_ratio_5d": 1.18,
-  "vol_shift": "资金流向中小盘"
+  "small_big_ratio_now": 1.194,
+  "small_big_ratio_5d": 1.178
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "种植业",
-    "zdf": "3.20",
-    "main_net5d": 6.0,
-    "retail_net": -6.9,
-    "tag": "机构型"
+    "name": "通信设备",
+    "zdf": "7.15",
+    "main_net5d": -180.4,
+    "retail_net": -204.5,
+    "tag": "游资型"
    },
    {
-    "name": "猪肉",
-    "zdf": "5.83",
-    "main_net5d": 0.1,
-    "retail_net": -15.8,
-    "tag": "机构型"
+    "name": "元件",
+    "zdf": "7.55",
+    "main_net5d": -133.9,
+    "retail_net": -157.4,
+    "tag": "游资型"
    },
    {
     "name": "一般零售",
-    "zdf": "1.07",
-    "main_net5d": 14.7,
-    "retail_net": -6.2,
+    "zdf": "2.07",
+    "main_net5d": 18.6,
+    "retail_net": -9.3,
     "tag": "机构型"
+   },
+   {
+    "name": "种植业",
+    "zdf": "4.48",
+    "main_net5d": 9.8,
+    "retail_net": 0.4,
+    "tag": "混合"
    }
   ]
  },
@@ -68,13 +74,13 @@
    "欧马模式": 4
   },
   "leaders": {
-   "堆量模式": 5,
+   "堆量模式": 8,
+   "欧马模式": 2
+  },
+  "pullbacks": {
    "欧马模式": 1
   },
-  "pullbacks": {},
-  "gpoints": {
-   "堆量模式": 2
-  },
+  "gpoints": {},
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
