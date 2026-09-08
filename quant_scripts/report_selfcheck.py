@@ -62,6 +62,10 @@ def check_premarket(path, today=""):
     dt = str(d.get("date", ""))
     if today and dt and dt != today:
         issues.append(f"JSON日期{dt}≠今日{today}")
+    # 4.5 盘后数据就绪度（quant_results date 过期/缺失）
+    df = str(d.get("data_fresh", ""))
+    if df in ("stale", "missing"):
+        issues.append(f"盘后量化数据{('过期' if df == 'stale' else '缺失')}（data_fresh={df}，三系统/资金数据可能非最新）")
     # 5. A3风格轴硬接线：style_score缺失 或 operation未体现仓位映射
     if d.get("style_score") is None:
         issues.append("风格轴评分缺失（market_style_latest.json 未读取，仓位映射未生效）")
