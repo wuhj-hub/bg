@@ -6,8 +6,9 @@ on:
   # 宽度/年线广度/板块共振/风格轴/RSV/月线MACD/量价时空/hot_emotion(2026-09-04接入)均已补入
   # judgment 由 workflow 内 build_judgment 生成并提交（复盘验证闭环）
   schedule:
-    # 北京时间 08:00（UTC 0:00），交易日盘前自动生成
-    - cron: "0 0 * * 1-5"
+    # 北京时间 06:30，交易日盘前生成（原08:00实测延迟1.5-2h致09:35-09:45才出，已开盘）
+    # GitHub cron 为 UTC 时区："30 22 * * 0-4" = UTC 周日~周四 22:30 = 北京 周一~周五 06:30
+    - cron: "30 22 * * 0-4"
   workflow_dispatch:
     inputs:
       manual_note:
