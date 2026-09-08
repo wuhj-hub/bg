@@ -39,6 +39,18 @@ def load_quant_latest():
     return None
 
 
+def check_quant_fresh(quant, yesterday):
+    """检查盘后量化数据就绪度：date==昨日→ok；quant缺失→missing；date不符→stale；无date→unknown"""
+    if quant is None:
+        return "missing"
+    data_date = str(quant.get("date", "") or "").strip()
+    if not data_date:
+        return "unknown"
+    if data_date == yesterday:
+        return "ok"
+    return "stale"
+
+
 def parse_quant_temps(quant):
     """从 quant_results 解析三系统温度（兼容结构化字段 + stdout 文本，2026-09-02修复）
     返回 (fish_temp, beast_score, sx_temp, sx_air)
@@ -344,11 +356,18 @@ def gen_report(today_str):
         _y -= timedelta(days=1)
     yesterday = _y.strftime("%Y-%m-%d")
     quant = load_quant_latest()
+    quant_fresh = check_quant_fresh(quant, yesterday)
     
     lines = []
     lines.append(f"# 📊 盘前市场报告 · {today}\n")
     lines.append("布局：本报告采用「外围(输入) → 大盘(势) → 板块(线) → 个股(点)」信号传导链。")
-    lines.append(f"数据截止：A股 {yesterday} 收盘；美股 {yesterday} 收盘。")
+    if quant_fresh == "ok":
+        lines.append(f"数据截止：A股 {yesterday} 收盘；美股 {yesterday} 收盘。")
+    else:
+        _warn = {"missing": "盘后量化数据缺失",
+                 "stale": f"盘后量化数据过期(实际{quant.get('date', '?') if quant else '无'})",
+                 "unknown": "盘后量化数据日期未知"}[quant_fresh]
+        lines.append(f"⚠️ 数据截止：A股 {yesterday} 收盘；美股 {yesterday} 收盘。【{_warn}，三系统/资金/板块等盘后数据可能不完整，仅供参考】")
     lines.append("⚠️ 基于公开数据整理，不构成投资建议。\n")
     
     # ① 外围环境
@@ -497,6 +516,7 @@ def gen_report(today_str):
             if len(parts) >= 9 and parts[0].isdigit():
                 board_rows.append({"name": parts[7], "zdf": parts[8]})
     j = build_judgment(idx_rows_all, board_rows, quant)
+    j["data_fresh"] = quant_fresh
     lines.append("\n### 🎯 综合决策\n")
     lines.append(f"- 大盘方向：**{j['tone']}**")
     lines.append(f"- 操作基调：**{j['operation']}**")
