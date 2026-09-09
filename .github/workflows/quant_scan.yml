@@ -1,8 +1,11 @@
 name: 全盘量化扫描
 
 on:
+  # 外部精确触发（cron-job.org → repository_dispatch）
+  repository_dispatch:
+    types: [quant-scan-run]
   schedule:
-    # 北京时间 15:05（UTC 7:05），交易日收盘后自动运行（提前25min，规避cron延迟影响次日盘前引用）
+    # 兜底：北京时间 15:05（UTC 7:05），主触发由 cron-job.org 精确控制
     - cron: "5 7 * * 1-5"
   workflow_dispatch: {}
 
