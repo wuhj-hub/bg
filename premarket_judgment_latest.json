@@ -1,16 +1,17 @@
 {
   "tone": "中性偏防守",
-  "operation": "仓位≤30%，轻仓参与，严格止损（⚖️均衡市(+20)仓位不变·🔥沸点(温度>80)仓位-10%）",
-  "sectors": "元件、一般零售、种植业",
+  "operation": "仓位≤50%，轻仓参与，严格止损（🔥情绪市(+30)仓位+10%）·主扫堆量模式/武威G1低吸",
+  "sectors": "铜概念、工业金属、农化制品",
   "key_levels": "支撑3851、压力3995",
-  "fish_temp": "83/100",
-  "beast_score": "33.6/100",
+  "fish_temp": "53/100",
+  "beast_score": "35.3/100",
   "shuangxian": "—",
-  "style_score": 20,
-  "style_name": "均衡市",
+  "style_score": 30,
+  "style_name": "情绪市",
   "base_pos": 40,
-  "style_fix": 0,
-  "temp_fix": -10,
-  "final_pos": 30,
-  "date": "2026-09-08"
+  "style_fix": 10,
+  "temp_fix": 0,
+  "final_pos": 50,
+  "data_fresh": "ok",
+  "date": "2026-09-09"
 }
