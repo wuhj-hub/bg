@@ -1,7 +1,7 @@
 {
   "year_month": "2026-09",
-  "updated_at": "2026-09-08 14:14:21",
-  "total_count": 205,
+  "updated_at": "2026-09-09 14:25:57",
+  "total_count": 227,
   "entries": [
     {
       "code": "sz000536",
@@ -42,13 +42,13 @@
     {
       "code": "sz002349",
       "name": "精华制药",
-      "price": 8.42,
+      "price": 9.26,
       "signal_type": "共振",
       "date_str": "2026-09-01",
       "score": 78,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: SSV>100 | RS_D背离 | 伏击线 [堆量模式]",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 [堆量模式]",
       "is_new": false
     },
     {
@@ -126,13 +126,13 @@
     {
       "code": "sz002388",
       "name": "新亚制程",
-      "price": 6.45,
+      "price": 6.51,
       "signal_type": "共振",
       "date_str": "2026-09-01",
       "score": 76,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 [欧马模式]",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 | 伏击线 [堆量模式]",
       "is_new": false
     },
     {
@@ -210,13 +210,13 @@
     {
       "code": "sz000019",
       "name": "深粮控股",
-      "price": 7.92,
+      "price": 8.46,
       "signal_type": "共振",
       "date_str": "2026-09-01",
       "score": 73,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: SSV>100 | 伏击线 [堆量模式]",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 [堆量模式]",
       "is_new": false
     },
     {
@@ -294,7 +294,7 @@
     {
       "code": "sz002470",
       "name": "金正大",
-      "price": 2.53,
+      "price": 2.78,
       "signal_type": "共振",
       "date_str": "2026-09-01",
       "score": 73,
@@ -412,6 +412,30 @@
       "is_new": false
     },
     {
+      "code": "sz000930",
+      "name": "中粮科技",
+      "price": 6.41,
+      "signal_type": "共振",
+      "date_str": "2026-09-01",
+      "score": 73,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过",
+      "is_new": false
+    },
+    {
+      "code": "sh600059",
+      "name": "古越龙山",
+      "price": 9.4,
+      "signal_type": "共振",
+      "date_str": "2026-09-09",
+      "score": 73,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]",
+      "is_new": true
+    },
+    {
       "code": "sz000711",
       "name": "京蓝科技",
       "price": 6.48,
@@ -450,13 +474,13 @@
     {
       "code": "sz000876",
       "name": "新希望",
-      "price": 7.7,
+      "price": 7.91,
       "signal_type": "共振",
       "date_str": "2026-09-04",
       "score": 72,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过",
+      "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]",
       "is_new": false
     },
     {
@@ -498,13 +522,13 @@
     {
       "code": "sz002107",
       "name": "沃华医药",
-      "price": 7.37,
+      "price": 7.36,
       "signal_type": "共振",
       "date_str": "2026-09-01",
       "score": 71,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过",
+      "reason": "双弦门控通过 | 猛兽: 伏击线 [堆量模式]",
       "is_new": false
     },
     {
@@ -546,7 +570,7 @@
     {
       "code": "sz002807",
       "name": "江阴银行",
-      "price": 4.22,
+      "price": 4.23,
       "signal_type": "共振",
       "date_str": "2026-09-01",
       "score": 71,
@@ -570,7 +594,7 @@
     {
       "code": "sz002999",
       "name": "天禾股份",
-      "price": 7.33,
+      "price": 7.44,
       "signal_type": "共振",
       "date_str": "2026-09-02",
       "score": 71,
@@ -582,13 +606,13 @@
     {
       "code": "sz002498",
       "name": "汉缆股份",
-      "price": 6.87,
+      "price": 7.08,
       "signal_type": "共振",
       "date_str": "2026-09-03",
       "score": 71,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过",
+      "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]",
       "is_new": false
     },
     {
@@ -630,7 +654,7 @@
     {
       "code": "sz002696",
       "name": "百洋股份",
-      "price": 7.55,
+      "price": 7.76,
       "signal_type": "共振",
       "date_str": "2026-09-01",
       "score": 70,
@@ -654,14 +678,26 @@
     {
       "code": "sz002303",
       "name": "美盈森",
-      "price": 5.57,
+      "price": 5.55,
       "signal_type": "共振",
       "date_str": "2026-09-01",
       "score": 70,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: SSV>100 | RS_D背离 | 伏击线 [堆量模式]",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 | RS_D背离 [堆量模式]",
       "is_new": false
+    },
+    {
+      "code": "sh600121",
+      "name": "郑州煤电",
+      "price": 5.7,
+      "signal_type": "共振",
+      "date_str": "2026-09-09",
+      "score": 70,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 | RS_D背离 [欧马模式]",
+      "is_new": true
     },
     {
       "code": "sz000059",
@@ -702,13 +738,13 @@
     {
       "code": "sz000731",
       "name": "四川美丰",
-      "price": 7.21,
+      "price": 7.86,
       "signal_type": "共振",
       "date_str": "2026-09-01",
       "score": 68,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过",
+      "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]",
       "is_new": false
     },
     {
@@ -882,13 +918,13 @@
     {
       "code": "sz000912",
       "name": "泸天化",
-      "price": 4.38,
+      "price": 5.2,
       "signal_type": "共振",
       "date_str": "2026-09-02",
       "score": 68,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]",
+      "reason": "双弦门控通过",
       "is_new": false
     },
     {
@@ -1098,7 +1134,7 @@
     {
       "code": "sz000428",
       "name": "华天酒店",
-      "price": 5.16,
+      "price": 5.14,
       "signal_type": "共振",
       "date_str": "2026-09-07",
       "score": 67,
@@ -1110,13 +1146,13 @@
     {
       "code": "sz000608",
       "name": "阳光股份",
-      "price": 7.83,
+      "price": 7.86,
       "signal_type": "共振",
       "date_str": "2026-09-07",
       "score": 67,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: SSV>100 | RS_D背离 [堆量模式]",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 [堆量模式]",
       "is_new": false
     },
     {
@@ -1134,7 +1170,7 @@
     {
       "code": "sz002564",
       "name": "天沃科技",
-      "price": 5.42,
+      "price": 5.35,
       "signal_type": "共振",
       "date_str": "2026-09-07",
       "score": 67,
@@ -1165,19 +1201,19 @@
       "resonance_label": "中性",
       "sector": "",
       "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000980",
       "name": "众泰汽车",
-      "price": 1.84,
+      "price": 2.02,
       "signal_type": "共振",
       "date_str": "2026-09-08",
       "score": 67,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]",
-      "is_new": true
+      "reason": "双弦门控通过",
+      "is_new": false
     },
     {
       "code": "sz002264",
@@ -1189,7 +1225,7 @@
       "resonance_label": "中性",
       "sector": "",
       "reason": "双弦门控通过",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002312",
@@ -1201,6 +1237,90 @@
       "resonance_label": "中性",
       "sector": "",
       "reason": "双弦门控通过",
+      "is_new": false
+    },
+    {
+      "code": "sz000523",
+      "name": "红棉股份",
+      "price": 4.36,
+      "signal_type": "共振",
+      "date_str": "2026-09-01",
+      "score": 67,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 [堆量模式]",
+      "is_new": false
+    },
+    {
+      "code": "sz000735",
+      "name": "罗牛山",
+      "price": 7.02,
+      "signal_type": "共振",
+      "date_str": "2026-09-04",
+      "score": 67,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过",
+      "is_new": false
+    },
+    {
+      "code": "sz002162",
+      "name": "悦心健康",
+      "price": 4.51,
+      "signal_type": "低吸",
+      "date_str": "2026-09-04",
+      "score": 67,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过",
+      "is_new": false
+    },
+    {
+      "code": "sz000565",
+      "name": "渝三峡Ａ",
+      "price": 7.19,
+      "signal_type": "共振",
+      "date_str": "2026-09-09",
+      "score": 67,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过",
+      "is_new": true
+    },
+    {
+      "code": "sz000972",
+      "name": "中基健康",
+      "price": 4.37,
+      "signal_type": "共振",
+      "date_str": "2026-09-09",
+      "score": 67,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 [堆量模式]",
+      "is_new": true
+    },
+    {
+      "code": "sz002377",
+      "name": "国创高新",
+      "price": 3.15,
+      "signal_type": "共振",
+      "date_str": "2026-09-09",
+      "score": 67,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过",
+      "is_new": true
+    },
+    {
+      "code": "sh600192",
+      "name": "长城电工",
+      "price": 7.89,
+      "signal_type": "共振",
+      "date_str": "2026-09-09",
+      "score": 67,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]",
       "is_new": true
     },
     {
@@ -1216,18 +1336,6 @@
       "is_new": false
     },
     {
-      "code": "sz000523",
-      "name": "红棉股份",
-      "price": 3.96,
-      "signal_type": "共振",
-      "date_str": "2026-09-01",
-      "score": 66,
-      "resonance_label": "中性",
-      "sector": "",
-      "reason": "双弦门控通过",
-      "is_new": false
-    },
-    {
       "code": "sz000796",
       "name": "凯撒旅业",
       "price": 4.42,
@@ -1237,18 +1345,6 @@
       "resonance_label": "中性",
       "sector": "",
       "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [堆量模式]",
-      "is_new": false
-    },
-    {
-      "code": "sz000930",
-      "name": "中粮科技",
-      "price": 5.22,
-      "signal_type": "共振",
-      "date_str": "2026-09-01",
-      "score": 66,
-      "resonance_label": "中性",
-      "sector": "",
-      "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]",
       "is_new": false
     },
     {
@@ -1410,13 +1506,13 @@
     {
       "code": "sz002040",
       "name": "南京港",
-      "price": 9.17,
+      "price": 9.98,
       "signal_type": "共振",
       "date_str": "2026-09-03",
       "score": 66,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: RS_D背离 | 伏击线 [堆量模式]",
+      "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]",
       "is_new": false
     },
     {
@@ -1456,18 +1552,6 @@
       "is_new": false
     },
     {
-      "code": "sz000735",
-      "name": "罗牛山",
-      "price": 6.13,
-      "signal_type": "共振",
-      "date_str": "2026-09-04",
-      "score": 65,
-      "resonance_label": "中性",
-      "sector": "",
-      "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]",
-      "is_new": false
-    },
-    {
       "code": "sz000759",
       "name": "中百集团",
       "price": 7.7,
@@ -1490,6 +1574,30 @@
       "sector": "",
       "reason": "双弦门控通过",
       "is_new": false
+    },
+    {
+      "code": "sz002121",
+      "name": "科陆电子",
+      "price": 5.26,
+      "signal_type": "共振",
+      "date_str": "2026-09-09",
+      "score": 65,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过 | 猛兽: RS_D背离 [堆量模式]",
+      "is_new": true
+    },
+    {
+      "code": "sh600177",
+      "name": "雅戈尔",
+      "price": 8.32,
+      "signal_type": "共振",
+      "date_str": "2026-09-09",
+      "score": 65,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 [堆量模式]",
+      "is_new": true
     },
     {
       "code": "sz002197",
@@ -1542,14 +1650,14 @@
     {
       "code": "sz002763",
       "name": "汇洁股份",
-      "price": 7.66,
+      "price": 7.59,
       "signal_type": "低吸",
       "date_str": "2026-09-08",
       "score": 50,
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000589",
@@ -1626,7 +1734,7 @@
     {
       "code": "sz002566",
       "name": "益盛药业",
-      "price": 7.05,
+      "price": 7.32,
       "signal_type": "低吸",
       "date_str": "2026-09-04",
       "score": 49,
@@ -1770,7 +1878,7 @@
     {
       "code": "sz002766",
       "name": "索菱股份",
-      "price": 4.27,
+      "price": 4.17,
       "signal_type": "低吸",
       "date_str": "2026-09-04",
       "score": 49,
@@ -1789,7 +1897,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000875",
@@ -1801,7 +1909,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002345",
@@ -1813,6 +1921,66 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 + VAD偏多 | G点 | RS_D背离",
+      "is_new": false
+    },
+    {
+      "code": "sz002817",
+      "name": "黄山胶囊",
+      "price": 6.9,
+      "signal_type": "低吸",
+      "date_str": "2026-09-04",
+      "score": 49,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
+      "is_new": false
+    },
+    {
+      "code": "sz002877",
+      "name": "智能自控",
+      "price": 7.61,
+      "signal_type": "低吸",
+      "date_str": "2026-09-04",
+      "score": 49,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
+      "is_new": false
+    },
+    {
+      "code": "sz002337",
+      "name": "赛象科技",
+      "price": 4.78,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 49,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
+      "is_new": true
+    },
+    {
+      "code": "sz002535",
+      "name": "林州重机",
+      "price": 2.57,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 49,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + G点 + VAD偏多 | G点 | RS_D背离",
+      "is_new": true
+    },
+    {
+      "code": "sz002642",
+      "name": "荣联科技",
+      "price": 7.16,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 49,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
       "is_new": true
     },
     {
@@ -1830,7 +1998,7 @@
     {
       "code": "sz000521",
       "name": "长虹美菱",
-      "price": 4.93,
+      "price": 4.8,
       "signal_type": "低吸",
       "date_str": "2026-09-04",
       "score": 47,
@@ -1866,7 +2034,7 @@
     {
       "code": "sz002099",
       "name": "海翔药业",
-      "price": 5.41,
+      "price": 5.47,
       "signal_type": "低吸",
       "date_str": "2026-09-04",
       "score": 47,
@@ -1900,33 +2068,9 @@
       "is_new": false
     },
     {
-      "code": "sz002817",
-      "name": "黄山胶囊",
-      "price": 6.76,
-      "signal_type": "低吸",
-      "date_str": "2026-09-04",
-      "score": 47,
-      "resonance_label": "",
-      "sector": "",
-      "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
-      "is_new": false
-    },
-    {
-      "code": "sz002877",
-      "name": "智能自控",
-      "price": 7.56,
-      "signal_type": "低吸",
-      "date_str": "2026-09-04",
-      "score": 47,
-      "resonance_label": "",
-      "sector": "",
-      "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
-      "is_new": false
-    },
-    {
       "code": "sz002666",
       "name": "德联集团",
-      "price": 4.26,
+      "price": 4.33,
       "signal_type": "低吸",
       "date_str": "2026-09-04",
       "score": 47,
@@ -1950,7 +2094,7 @@
     {
       "code": "sz000544",
       "name": "中原环保",
-      "price": 7.36,
+      "price": 7.45,
       "signal_type": "低吸",
       "date_str": "2026-09-07",
       "score": 47,
@@ -1962,7 +2106,7 @@
     {
       "code": "sz000900",
       "name": "现代投资",
-      "price": 3.67,
+      "price": 3.72,
       "signal_type": "低吸",
       "date_str": "2026-09-07",
       "score": 47,
@@ -1974,7 +2118,7 @@
     {
       "code": "sz002022",
       "name": "科华生物",
-      "price": 5.77,
+      "price": 5.85,
       "signal_type": "低吸",
       "date_str": "2026-09-07",
       "score": 47,
@@ -2010,7 +2154,7 @@
     {
       "code": "sz002609",
       "name": "捷顺科技",
-      "price": 7.85,
+      "price": 7.79,
       "signal_type": "低吸",
       "date_str": "2026-09-07",
       "score": 47,
@@ -2022,7 +2166,7 @@
     {
       "code": "sz002873",
       "name": "新天药业",
-      "price": 8.67,
+      "price": 8.52,
       "signal_type": "低吸",
       "date_str": "2026-09-07",
       "score": 47,
@@ -2034,21 +2178,57 @@
     {
       "code": "sz002060",
       "name": "广东建工",
-      "price": 3.24,
+      "price": 3.23,
       "signal_type": "低吸",
       "date_str": "2026-09-08",
       "score": 47,
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002145",
       "name": "钛能化学",
-      "price": 4.32,
+      "price": 4.31,
       "signal_type": "低吸",
       "date_str": "2026-09-08",
+      "score": 47,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
+      "is_new": false
+    },
+    {
+      "code": "sz002641",
+      "name": "公元股份",
+      "price": 4.01,
+      "signal_type": "低吸",
+      "date_str": "2026-09-07",
+      "score": 47,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
+      "is_new": false
+    },
+    {
+      "code": "sh600094",
+      "name": "大名城",
+      "price": 4.06,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 47,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + G点 + VAD偏多 | G点 | RS_D背离",
+      "is_new": true
+    },
+    {
+      "code": "sh600168",
+      "name": "武汉控股",
+      "price": 4.52,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
       "score": 47,
       "resonance_label": "",
       "sector": "",
@@ -2082,7 +2262,7 @@
     {
       "code": "sz002061",
       "name": "浙江交科",
-      "price": 3.47,
+      "price": 3.44,
       "signal_type": "低吸",
       "date_str": "2026-09-04",
       "score": 45,
@@ -2116,18 +2296,6 @@
       "is_new": false
     },
     {
-      "code": "sz002162",
-      "name": "悦心健康",
-      "price": 4.05,
-      "signal_type": "低吸",
-      "date_str": "2026-09-04",
-      "score": 45,
-      "resonance_label": "",
-      "sector": "",
-      "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": false
-    },
-    {
       "code": "sz002554",
       "name": "惠博普",
       "price": 2.89,
@@ -2138,6 +2306,18 @@
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
       "is_new": false
+    },
+    {
+      "code": "sz002775",
+      "name": "文科股份",
+      "price": 3.56,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 45,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
+      "is_new": true
     },
     {
       "code": "sz000548",
@@ -2154,7 +2334,7 @@
     {
       "code": "sz002892",
       "name": "科力尔",
-      "price": 9.13,
+      "price": 9.02,
       "signal_type": "低吸",
       "date_str": "2026-09-07",
       "score": 44,
@@ -2164,9 +2344,45 @@
       "is_new": false
     },
     {
+      "code": "sz002404",
+      "name": "嘉欣丝绸",
+      "price": 6.07,
+      "signal_type": "低吸",
+      "date_str": "2026-09-04",
+      "score": 44,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
+      "is_new": false
+    },
+    {
+      "code": "sz002010",
+      "name": "传化智联",
+      "price": 4.74,
+      "signal_type": "低吸",
+      "date_str": "2026-09-07",
+      "score": 44,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + G点 | G点 | RS_D背离",
+      "is_new": false
+    },
+    {
+      "code": "sh600149",
+      "name": "廊坊发展",
+      "price": 5.21,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 44,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
+      "is_new": true
+    },
+    {
       "code": "sz000757",
       "name": "浩物股份",
-      "price": 4.33,
+      "price": 4.35,
       "signal_type": "低吸",
       "date_str": "2026-09-07",
       "score": 42,
@@ -2185,7 +2401,19 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
+    },
+    {
+      "code": "sz000599",
+      "name": "青岛双星",
+      "price": 4.78,
+      "signal_type": "低吸",
+      "date_str": "2026-09-07",
+      "score": 42,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + G点 | G点 | RS_D背离",
+      "is_new": false
     },
     {
       "code": "sz000042",
@@ -2236,18 +2464,6 @@
       "is_new": false
     },
     {
-      "code": "sz002404",
-      "name": "嘉欣丝绸",
-      "price": 5.86,
-      "signal_type": "低吸",
-      "date_str": "2026-09-04",
-      "score": 41,
-      "resonance_label": "",
-      "sector": "",
-      "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
-      "is_new": false
-    },
-    {
       "code": "sz002483",
       "name": "润邦股份",
       "price": 5.47,
@@ -2274,7 +2490,7 @@
     {
       "code": "sz002658",
       "name": "雪迪龙",
-      "price": 7.75,
+      "price": 7.69,
       "signal_type": "低吸",
       "date_str": "2026-09-04",
       "score": 41,
@@ -2308,30 +2524,6 @@
       "is_new": false
     },
     {
-      "code": "sz000599",
-      "name": "青岛双星",
-      "price": 4.69,
-      "signal_type": "低吸",
-      "date_str": "2026-09-07",
-      "score": 41,
-      "resonance_label": "",
-      "sector": "",
-      "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": false
-    },
-    {
-      "code": "sz002010",
-      "name": "传化智联",
-      "price": 4.69,
-      "signal_type": "低吸",
-      "date_str": "2026-09-07",
-      "score": 41,
-      "resonance_label": "",
-      "sector": "",
-      "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": false
-    },
-    {
       "code": "sz002108",
       "name": "沧州明珠",
       "price": 4.32,
@@ -2344,11 +2536,11 @@
       "is_new": false
     },
     {
-      "code": "sz002641",
-      "name": "公元股份",
-      "price": 3.92,
+      "code": "sz002480",
+      "name": "新筑股份",
+      "price": 5.38,
       "signal_type": "低吸",
-      "date_str": "2026-09-07",
+      "date_str": "2026-09-08",
       "score": 41,
       "resonance_label": "",
       "sector": "",
@@ -2356,15 +2548,39 @@
       "is_new": false
     },
     {
-      "code": "sz002480",
-      "name": "新筑股份",
-      "price": 5.45,
+      "code": "sz002376",
+      "name": "新北洋",
+      "price": 6.64,
       "signal_type": "低吸",
-      "date_str": "2026-09-08",
+      "date_str": "2026-09-09",
       "score": 41,
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
+      "is_new": true
+    },
+    {
+      "code": "sz002599",
+      "name": "盛通股份",
+      "price": 5.84,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 41,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
+      "is_new": true
+    },
+    {
+      "code": "sz002686",
+      "name": "亿利达",
+      "price": 6.45,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 41,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + G点 | G点 | RS_D背离",
       "is_new": true
     },
     {
@@ -2382,14 +2598,50 @@
     {
       "code": "sz000790",
       "name": "华神科技",
-      "price": 4.16,
+      "price": 4.2,
       "signal_type": "低吸",
       "date_str": "2026-09-04",
-      "score": 38,
+      "score": 40,
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
       "is_new": false
+    },
+    {
+      "code": "sz002154",
+      "name": "报喜鸟",
+      "price": 4.12,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 40,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
+      "is_new": true
+    },
+    {
+      "code": "sz002656",
+      "name": "摩登大道",
+      "price": 2.91,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 40,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
+      "is_new": true
+    },
+    {
+      "code": "sz000516",
+      "name": "国际医学",
+      "price": 4.28,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 39,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 | RS_D背离",
+      "is_new": true
     },
     {
       "code": "sz000709",
@@ -2430,7 +2682,7 @@
     {
       "code": "sz002373",
       "name": "千方科技",
-      "price": 7.64,
+      "price": 7.54,
       "signal_type": "低吸",
       "date_str": "2026-09-07",
       "score": 37,
@@ -2449,7 +2701,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000953",
@@ -2462,6 +2714,18 @@
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
       "is_new": false
+    },
+    {
+      "code": "sz002615",
+      "name": "哈尔斯",
+      "price": 6.54,
+      "signal_type": "低吸",
+      "date_str": "2026-09-09",
+      "score": 36,
+      "resonance_label": "",
+      "sector": "",
+      "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
+      "is_new": true
     }
   ]
 }
