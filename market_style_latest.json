@@ -1,24 +1,24 @@
 {
- "date": "2026-09-09",
- "data_date": "2026-09-09",
- "style": "均衡市",
- "icon": "⚖️",
- "score": 18,
+ "date": "2026-09-10",
+ "data_date": "2026-09-10",
+ "style": "情绪市",
+ "icon": "🔥",
+ "score": 32,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 16,
-  "volume_structure": 8,
-  "sector_fund": -6
+  "volume_structure": 15,
+  "sector_fund": 1
  },
  "size_style": {
-  "hs300_5d": 0.54,
-  "hs300_10d": -0.4,
-  "zz1000_5d": 0.86,
-  "zz1000_10d": 1.38,
-  "rel_5d": 0.32,
-  "rel_10d": 1.78,
-  "rel_20d": 0.66,
-  "zz500_5d": 0.5
+  "hs300_5d": 0.07,
+  "hs300_10d": -1.61,
+  "zz1000_5d": -0.07,
+  "zz1000_10d": -1.79,
+  "rel_5d": -0.14,
+  "rel_10d": -0.18,
+  "rel_20d": 0.75,
+  "zz500_5d": -0.41
  },
  "limitup_structure": {
   "limitup": 52,
@@ -32,58 +32,67 @@
   "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.485,
-  "small_big_ratio_5d": 1.247,
-  "vol_shift": "资金流向中小盘"
+  "small_big_ratio_now": 1.676,
+  "small_big_ratio_5d": 1.307,
+  "vol_shift": "资金流向中小盘",
+  "small_vol_pulse": 49.41
  },
  "sector_fund": {
   "sectors": [
    {
     "name": "电力",
-    "zdf": "0.85",
-    "main_net5d": -16.5,
-    "retail_net": -12.7,
-    "tag": "游资型"
-   },
-   {
-    "name": "航运港口",
-    "zdf": "3.86",
-    "main_net5d": 8.2,
-    "retail_net": -11.0,
-    "tag": "机构型"
-   },
-   {
-    "name": "通信设备",
-    "zdf": "0.79",
-    "main_net5d": 69.3,
-    "retail_net": -57.1,
+    "zdf": "0.05",
+    "main_net5d": 3.3,
+    "retail_net": -4.1,
     "tag": "机构型"
    },
    {
     "name": "元件",
-    "zdf": "2.04",
-    "main_net5d": 70.7,
-    "retail_net": -49.3,
+    "zdf": "1.16",
+    "main_net5d": 163.8,
+    "retail_net": -27.2,
     "tag": "机构型"
+   },
+   {
+    "name": "玻璃玻纤",
+    "zdf": "2.74",
+    "main_net5d": -32.9,
+    "retail_net": -13.4,
+    "tag": "游资型"
+   },
+   {
+    "name": "半导体",
+    "zdf": "-0.09",
+    "main_net5d": -169.9,
+    "retail_net": 7.5,
+    "tag": "游资型"
+   },
+   {
+    "name": "通信设备",
+    "zdf": "-0.40",
+    "main_net5d": 193.0,
+    "retail_net": 18.6,
+    "tag": "混合"
    }
   ]
  },
  "mode_cross": {
-  "dominant": "欧马模式",
+  "dominant": "堆量模式",
   "all": {
-   "欧马模式": 4,
-   "堆量模式": 11
+   "堆量模式": 14,
+   "欧马模式": 1
   },
   "leaders": {
-   "欧马模式": 3,
    "堆量模式": 7
   },
   "pullbacks": {
    "堆量模式": 1
   },
-  "gpoints": {},
-  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
+  "gpoints": {
+   "堆量模式": 2
+  },
+  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
   "total_scored": 15
  },
- "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
+ "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
 }
