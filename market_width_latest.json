@@ -1,16 +1,16 @@
 {
  "date": "2026-09-10",
  "total": 3125,
- "valid": 2995,
- "up": 580,
- "down": 2353,
+ "valid": 3051,
+ "up": 583,
+ "down": 2406,
  "flat": 62,
  "strong": 57,
- "weak": 107,
+ "weak": 109,
  "limitup": 34,
  "limitdown": 13,
- "up_pct": 19.4,
- "score": 49.4,
+ "up_pct": 19.1,
+ "score": 49.1,
  "level": "震荡（多空均衡）",
  "top": [
   [
@@ -524,9 +524,9 @@
   }
  ],
  "limitup_stats": {
-  "touched": 69,
-  "zhaban": 35,
-  "zhaban_rate": 50.7,
+  "touched": 70,
+  "zhaban": 36,
+  "zhaban_rate": 51.4,
   "lianban": 9,
   "lianban3": 3,
   "max_lianban": 4,
