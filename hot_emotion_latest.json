@@ -1,14 +1,14 @@
 {
  "date": "2026-09-10",
- "total": 33,
+ "total": 34,
  "lianban_cnt": 9,
  "max_lb": 4,
- "shouban": 24,
+ "shouban": 25,
  "by_lb": {
   "4": 1,
   "3": 2,
   "2": 6,
-  "1": 24
+  "1": 25
  },
  "score": {
   "score": 58,
@@ -20,9 +20,7 @@
   }
  },
  "persistence": [],
- "alerts": [
-  "⚠️ 高度退潮：最高板从5板降至4板（昨2026-09-10）"
- ],
+ "alerts": [],
  "lianban_rows": [
   {
    "code": "sz000978",
