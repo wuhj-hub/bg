@@ -1,89 +1,35 @@
 {
- "date": "2026-09-09",
+ "date": "2026-09-10",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 41,
+ "pool_size": 53,
  "resonance_boards": [
   {
-   "name": "黄酒概念",
-   "code": "pt02020003",
-   "zdf": 5.23,
-   "strength": 8,
+   "name": "工程咨询服务Ⅱ",
+   "code": "pt01801726",
+   "zdf": 2.13,
+   "strength": 10,
    "factors": [
     "抢筹",
     "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "橡胶",
-   "code": "pt01801037",
-   "zdf": 4.07,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "zdf": 3.86,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "培育钻石",
-   "code": "pt02231435",
-   "zdf": 3.12,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
+    "吸筹",
+    "控盘"
    ]
   },
   {
    "name": "元件",
    "code": "pt01801083",
-   "zdf": 2.04,
-   "strength": 7,
+   "zdf": 0.2,
+   "strength": 8,
    "factors": [
-    "抢筹",
     "进场",
-    "吸筹"
+    "吸筹",
+    "控盘"
    ]
   },
   {
-   "name": "电网设备",
-   "code": "pt01801738",
-   "zdf": 1.09,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "国防军工",
-   "code": "pt01801740",
-   "zdf": 1.27,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "通信设备",
-   "code": "pt01801102",
-   "zdf": 0.79,
+   "name": "出版",
+   "code": "pt01801769",
+   "zdf": 0.06,
    "strength": 5,
    "factors": [
     "进场",
@@ -91,9 +37,9 @@
    ]
   },
   {
-   "name": "电力",
-   "code": "pt01801161",
-   "zdf": 0.85,
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "zdf": 0.76,
    "strength": 5,
    "factors": [
     "进场",
@@ -101,59 +47,9 @@
    ]
   },
   {
-   "name": "炼化及贸易",
-   "code": "pt01801963",
-   "zdf": 0.79,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "地面兵装Ⅱ",
-   "code": "pt01801743",
-   "zdf": 2.37,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "通信",
-   "code": "pt01801770",
-   "zdf": 0.58,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "PCB概念",
-   "code": "pt02101284",
-   "zdf": 0.88,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "汽车零部件",
-   "code": "pt01801093",
-   "zdf": 0.16,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "zdf": 1.51,
+   "name": "石油石化",
+   "code": "pt01801960",
+   "zdf": 0.05,
    "strength": 5,
    "factors": [
     "进场",
@@ -163,170 +59,120 @@
  ],
  "grab_top": [
   {
-   "name": "黄酒概念",
-   "code": "pt02020003",
-   "value": 8
-  },
-  {
-   "name": "橡胶",
-   "code": "pt01801037",
-   "value": 7
-  },
-  {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "value": 7
-  },
-  {
-   "name": "培育钻石",
-   "code": "pt02231435",
-   "value": 7
-  },
-  {
-   "name": "元件",
-   "code": "pt01801083",
-   "value": 7
-  },
-  {
-   "name": "电网设备",
-   "code": "pt01801738",
-   "value": 7
-  },
-  {
-   "name": "国防军工",
-   "code": "pt01801740",
-   "value": 7
+   "name": "工程咨询服务Ⅱ",
+   "code": "pt01801726",
+   "value": 10
   }
  ],
  "entry_top": [
   {
-   "name": "通信设备",
-   "code": "pt01801102",
-   "value": 193.0
-  },
-  {
    "name": "元件",
    "code": "pt01801083",
-   "value": 163.8
+   "value": 182.1
   },
   {
-   "name": "通信",
-   "code": "pt01801770",
-   "value": 56.0
-  },
-  {
-   "name": "汽车零部件",
-   "code": "pt01801093",
-   "value": 18.6
-  },
-  {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "value": 14.8
-  },
-  {
-   "name": "培育钻石",
-   "code": "pt02231435",
-   "value": 14.5
-  },
-  {
-   "name": "国防军工",
-   "code": "pt01801740",
-   "value": 13.5
+   "name": "工程咨询服务Ⅱ",
+   "code": "pt01801726",
+   "value": 16.7
   },
   {
    "name": "炼化及贸易",
    "code": "pt01801963",
-   "value": 8.8
+   "value": 12.4
   },
   {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "value": 8.2
+   "name": "石油石化",
+   "code": "pt01801960",
+   "value": 6.6
   },
   {
-   "name": "地面兵装Ⅱ",
-   "code": "pt01801743",
-   "value": 7.6
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 5.9
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 3.7
+  },
+  {
+   "name": "渔业",
+   "code": "pt01801015",
+   "value": 1.8
+  },
+  {
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "value": 1.0
   }
  ],
  "absorption_top": [
   {
-   "name": "黄酒概念",
-   "code": "pt02020003",
-   "value": 3.85
+   "name": "工程咨询服务Ⅱ",
+   "code": "pt01801726",
+   "value": 3.9
   },
   {
    "name": "元件",
    "code": "pt01801083",
-   "value": 2.64
+   "value": 3.18
   },
   {
-   "name": "通信设备",
-   "code": "pt01801102",
-   "value": 2.27
-  },
-  {
-   "name": "培育钻石",
-   "code": "pt02231435",
-   "value": 1.5
-  },
-  {
-   "name": "地面兵装Ⅱ",
-   "code": "pt01801743",
-   "value": 1.37
-  },
-  {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "value": 1.27
-  },
-  {
-   "name": "橡胶",
-   "code": "pt01801037",
-   "value": 1.26
+   "name": "渔业",
+   "code": "pt01801015",
+   "value": 2.26
   },
   {
    "name": "炼化及贸易",
    "code": "pt01801963",
-   "value": 1.23
+   "value": 1.99
   },
   {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "value": 1.05
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 1.17
   },
   {
-   "name": "汽车零部件",
-   "code": "pt01801093",
-   "value": 0.64
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "value": 1.0
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 0.75
+  },
+  {
+   "name": "石油石化",
+   "code": "pt01801960",
+   "value": 0.69
   }
  ],
- "control_top": [],
+ "control_top": [
+  {
+   "name": "工程咨询服务Ⅱ",
+   "code": "pt01801726",
+   "value": 3.9
+  },
+  {
+   "name": "航海装备Ⅱ",
+   "code": "pt01801744",
+   "value": 3.58
+  },
+  {
+   "name": "元件",
+   "code": "pt01801083",
+   "value": 3.18
+  }
+ ],
  "zhongjun_candidates": [
   {
-   "board": "橡胶",
-   "stock": "黑猫股份",
-   "code": "sz002068",
-   "zdf": "10.00",
-   "main1": 0.08,
-   "main5": 1.75
-  },
-  {
-   "board": "黄酒概念",
-   "stock": "会稽山",
-   "code": "sh601579",
-   "zdf": "10.00",
-   "main1": 1.52,
-   "main5": 1.51
-  },
-  {
-   "board": "航运港口",
-   "stock": "南 京 港",
-   "code": "sz002040",
-   "zdf": "10.03",
-   "main1": 1.09,
-   "main5": 0.55
+   "board": "工程咨询服务Ⅱ",
+   "stock": "太极实业",
+   "code": "sh600667",
+   "zdf": "10.02",
+   "main1": 15.11,
+   "main5": -1.09
   }
  ]
 }
