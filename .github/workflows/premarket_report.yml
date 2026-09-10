@@ -8,10 +8,9 @@ on:
   # 外部精确触发（cron-job.org → repository_dispatch，规避 GitHub 原生 cron 延迟）
   repository_dispatch:
     types: [premarket-run]
-  schedule:
-    # 兜底：北京时间 06:30（主触发由 cron-job.org 精确控制）
-    # GitHub cron 为 UTC 时区："30 22 * * 0-4" = UTC 周日~周四 22:30 = 北京 周一~周五 06:30
-    - cron: "30 22 * * 0-4"
+  # ⚠️ 2026-09-10 方案A：移除原生 schedule，避免与 cron-job.org 重复触发
+  # schedule:
+  #   - cron: "30 22 * * 0-4"
   workflow_dispatch:
     inputs:
       manual_note:
