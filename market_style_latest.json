@@ -1,13 +1,13 @@
 {
  "date": "2026-09-10",
  "data_date": "2026-09-10",
- "style": "情绪市",
- "icon": "🔥",
- "score": 29,
+ "style": "均衡市",
+ "icon": "⚖️",
+ "score": 22,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 16,
-  "volume_structure": 15,
+  "volume_structure": 8,
   "sector_fund": -2
  },
  "size_style": {
@@ -34,8 +34,7 @@
  "volume_structure": {
   "small_big_ratio_now": 1.477,
   "small_big_ratio_5d": 1.307,
-  "vol_shift": "资金流向中小盘",
-  "small_vol_pulse": 92.88
+  "vol_shift": "资金流向中小盘"
  },
  "sector_fund": {
   "sectors": [
@@ -54,26 +53,26 @@
     "tag": "机构型"
    },
    {
-    "name": "玻璃玻纤",
-    "zdf": "2.23",
-    "main_net5d": -32.9,
-    "retail_net": -22.4,
-    "tag": "游资型"
-   },
-   {
     "name": "一般零售",
     "zdf": "-1.60",
     "main_net5d": 11.9,
     "retail_net": 4.7,
     "tag": "混合"
+   },
+   {
+    "name": "玻璃玻纤",
+    "zdf": "2.23",
+    "main_net5d": -32.9,
+    "retail_net": -22.4,
+    "tag": "游资型"
    }
   ]
  },
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 12,
-   "欧马模式": 3
+   "堆量模式": 11,
+   "欧马模式": 4
   },
   "leaders": {
    "堆量模式": 6,
@@ -83,8 +82,8 @@
   "gpoints": {
    "欧马模式": 1
   },
-  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
+  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
- "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
+ "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
 }
