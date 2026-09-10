@@ -4,9 +4,9 @@ on:
   # 外部精确触发（cron-job.org → repository_dispatch）
   repository_dispatch:
     types: [quant-scan-run]
-  schedule:
-    # 兜底：北京时间 15:05（UTC 7:05），主触发由 cron-job.org 精确控制
-    - cron: "5 7 * * 1-5"
+  # ⚠️ 2026-09-10 方案A：移除原生 schedule，避免与 cron-job.org 重复触发
+  # schedule:
+  #   - cron: "5 7 * * 1-5"
   workflow_dispatch: {}
 
 permissions:
