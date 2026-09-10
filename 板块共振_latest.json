@@ -1,34 +1,12 @@
 {
  "date": "2026-09-10",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 51,
+ "pool_size": 45,
  "resonance_boards": [
-  {
-   "name": "工程咨询服务Ⅱ",
-   "code": "pt01801726",
-   "zdf": 1.62,
-   "strength": 8,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
   {
    "name": "玻璃玻纤",
    "code": "pt01801712",
    "zdf": 2.23,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "教育",
-   "code": "pt01801994",
-   "zdf": 1.02,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -57,19 +35,19 @@
    ]
   },
   {
-   "name": "电力",
-   "code": "pt01801161",
-   "zdf": 0.48,
+   "name": "工程咨询服务Ⅱ",
+   "code": "",
+   "zdf": 1.62,
    "strength": 5,
    "factors": [
-    "进场",
-    "吸筹"
+    "抢筹",
+    "进场"
    ]
   },
   {
-   "name": "焦炭Ⅱ",
-   "code": "pt01801952",
-   "zdf": 0.27,
+   "name": "电力",
+   "code": "pt01801161",
+   "zdf": 0.48,
    "strength": 5,
    "factors": [
     "进场",
@@ -79,19 +57,14 @@
  ],
  "grab_top": [
   {
-   "name": "工程咨询服务Ⅱ",
-   "code": "pt01801726",
-   "value": 8
-  },
-  {
    "name": "玻璃玻纤",
    "code": "pt01801712",
    "value": 7
   },
   {
-   "name": "教育",
-   "code": "pt01801994",
-   "value": 7
+   "name": "工程咨询服务Ⅱ",
+   "code": "",
+   "value": 5
   }
  ],
  "entry_top": [
@@ -112,7 +85,7 @@
   },
   {
    "name": "工程咨询服务Ⅱ",
-   "code": "pt01801726",
+   "code": "",
    "value": 19.8
   },
   {
@@ -121,27 +94,17 @@
    "value": 7.1
   },
   {
+   "name": "石油石化",
+   "code": "pt01801960",
+   "value": 6.6
+  },
+  {
    "name": "电力",
    "code": "pt01801161",
    "value": 3.3
-  },
-  {
-   "name": "焦炭Ⅱ",
-   "code": "pt01801952",
-   "value": 1.0
-  },
-  {
-   "name": "教育",
-   "code": "pt01801994",
-   "value": 0.1
   }
  ],
  "absorption_top": [
-  {
-   "name": "工程咨询服务Ⅱ",
-   "code": "pt01801726",
-   "value": 4.34
-  },
   {
    "name": "元件",
    "code": "pt01801083",
@@ -158,9 +121,9 @@
    "value": 1.05
   },
   {
-   "name": "焦炭Ⅱ",
-   "code": "pt01801952",
-   "value": 0.87
+   "name": "石油石化",
+   "code": "pt01801960",
+   "value": 0.62
   },
   {
    "name": "玻璃玻纤",
@@ -171,11 +134,6 @@
    "name": "电力",
    "code": "pt01801161",
    "value": 0.17
-  },
-  {
-   "name": "教育",
-   "code": "pt01801994",
-   "value": 0.05
   }
  ],
  "control_top": [],
