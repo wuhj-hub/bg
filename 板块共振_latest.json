@@ -1,12 +1,12 @@
 {
- "date": "2026-09-10",
+ "date": "2026-09-11",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 45,
+ "pool_size": 47,
  "resonance_boards": [
   {
-   "name": "玻璃玻纤",
-   "code": "pt01801712",
-   "zdf": 2.23,
+   "name": "地面兵装Ⅱ",
+   "code": "pt01801743",
+   "zdf": 4.44,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -15,11 +15,23 @@
    ]
   },
   {
-   "name": "航海装备Ⅱ",
-   "code": "pt01801744",
-   "zdf": 2.76,
-   "strength": 6,
+   "name": "玻璃玻纤",
+   "code": "pt01801712",
+   "zdf": 2.63,
+   "strength": 7,
    "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "被动元件概念",
+   "code": "pt02101345",
+   "zdf": 2.22,
+   "strength": 7,
+   "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -27,7 +39,7 @@
   {
    "name": "元件",
    "code": "pt01801083",
-   "zdf": 0.18,
+   "zdf": 1.8,
    "strength": 6,
    "factors": [
     "进场",
@@ -35,19 +47,29 @@
    ]
   },
   {
-   "name": "工程咨询服务Ⅱ",
-   "code": "",
-   "zdf": 1.62,
+   "name": "通信设备",
+   "code": "pt01801102",
+   "zdf": 1.66,
    "strength": 5,
    "factors": [
-    "抢筹",
-    "进场"
+    "进场",
+    "吸筹"
    ]
   },
   {
-   "name": "电力",
-   "code": "pt01801161",
-   "zdf": 0.48,
+   "name": "风电设备",
+   "code": "pt01801736",
+   "zdf": 0.97,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "通信",
+   "code": "pt01801770",
+   "zdf": 1.41,
    "strength": 5,
    "factors": [
     "进场",
@@ -57,36 +79,51 @@
  ],
  "grab_top": [
   {
+   "name": "地面兵装Ⅱ",
+   "code": "pt01801743",
+   "value": 7
+  },
+  {
    "name": "玻璃玻纤",
    "code": "pt01801712",
    "value": 7
   },
   {
-   "name": "工程咨询服务Ⅱ",
-   "code": "",
-   "value": 5
+   "name": "被动元件概念",
+   "code": "pt02101345",
+   "value": 7
   }
  ],
  "entry_top": [
   {
    "name": "元件",
    "code": "pt01801083",
-   "value": 210.7
+   "value": 271.5
   },
   {
-   "name": "PCB概念",
-   "code": "pt02101284",
-   "value": 134.6
+   "name": "通信设备",
+   "code": "pt01801102",
+   "value": 268.4
   },
   {
-   "name": "航海装备Ⅱ",
-   "code": "pt01801744",
-   "value": 21.2
+   "name": "通信",
+   "code": "pt01801770",
+   "value": 173.8
   },
   {
-   "name": "工程咨询服务Ⅱ",
-   "code": "",
-   "value": 19.8
+   "name": "国防军工",
+   "code": "pt01801740",
+   "value": 13.0
+  },
+  {
+   "name": "航运港口",
+   "code": "pt01801992",
+   "value": 10.2
+  },
+  {
+   "name": "地面兵装Ⅱ",
+   "code": "pt01801743",
+   "value": 9.4
   },
   {
    "name": "玻璃玻纤",
@@ -94,65 +131,106 @@
    "value": 7.1
   },
   {
-   "name": "石油石化",
-   "code": "pt01801960",
-   "value": 6.6
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 5.0
   },
   {
-   "name": "电力",
-   "code": "pt01801161",
-   "value": 3.3
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 4.6
+  },
+  {
+   "name": "被动元件概念",
+   "code": "pt02101345",
+   "value": 0.8
   }
  ],
  "absorption_top": [
   {
    "name": "元件",
    "code": "pt01801083",
-   "value": 3.24
+   "value": 3.8
   },
   {
-   "name": "航海装备Ⅱ",
-   "code": "pt01801744",
-   "value": 3.04
+   "name": "通信设备",
+   "code": "pt01801102",
+   "value": 2.96
   },
   {
-   "name": "PCB概念",
-   "code": "pt02101284",
-   "value": 1.05
+   "name": "通信",
+   "code": "pt01801770",
+   "value": 1.81
   },
   {
-   "name": "石油石化",
-   "code": "pt01801960",
-   "value": 0.62
+   "name": "地面兵装Ⅱ",
+   "code": "pt01801743",
+   "value": 1.79
+  },
+  {
+   "name": "航运港口",
+   "code": "pt01801992",
+   "value": 1.19
+  },
+  {
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 1.01
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 0.89
   },
   {
    "name": "玻璃玻纤",
    "code": "pt01801712",
-   "value": 0.61
+   "value": 0.55
   },
   {
-   "name": "电力",
-   "code": "pt01801161",
-   "value": 0.17
+   "name": "国防军工",
+   "code": "pt01801740",
+   "value": 0.37
+  },
+  {
+   "name": "风电设备",
+   "code": "pt01801736",
+   "value": 0.07
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "工程咨询服务Ⅱ",
-   "stock": "太极实业",
-   "code": "sh600667",
+   "board": "玻璃玻纤",
+   "stock": "九鼎新材",
+   "code": "sz002201",
    "zdf": "10.02",
-   "main1": 19.18,
-   "main5": -1.09
+   "main1": 1.12,
+   "main5": 1.48
   },
   {
-   "board": "玻璃玻纤",
-   "stock": "再升科技",
-   "code": "sh603601",
-   "zdf": "10.06",
-   "main1": 5.48,
-   "main5": -1.11
+   "board": "风电设备",
+   "stock": "大金重工",
+   "code": "sz002487",
+   "zdf": "5.25",
+   "main1": 3.38,
+   "main5": 0.16
+  },
+  {
+   "board": "元件",
+   "stock": "崇达技术",
+   "code": "sz002815",
+   "zdf": "10.03",
+   "main1": 2.26,
+   "main5": 0.07
+  },
+  {
+   "board": "地面兵装Ⅱ",
+   "stock": "光电股份",
+   "code": "sh600184",
+   "zdf": "10.02",
+   "main1": 2.58,
+   "main5": -0.02
   }
  ]
 }
