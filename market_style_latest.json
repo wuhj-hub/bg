@@ -1,24 +1,24 @@
 {
- "date": "2026-09-10",
- "data_date": "2026-09-10",
+ "date": "2026-09-11",
+ "data_date": "2026-09-11",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 22,
+ "score": 10,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 16,
-  "volume_structure": 8,
-  "sector_fund": -2
+  "volume_structure": -1,
+  "sector_fund": -5
  },
  "size_style": {
-  "hs300_5d": -0.09,
-  "hs300_10d": -1.77,
-  "zz1000_5d": -0.16,
-  "zz1000_10d": -1.88,
-  "rel_5d": -0.07,
-  "rel_10d": -0.11,
-  "rel_20d": 0.82,
-  "zz500_5d": -0.48
+  "hs300_5d": -0.83,
+  "hs300_10d": -2.15,
+  "zz1000_5d": -1.08,
+  "zz1000_10d": -3.61,
+  "rel_5d": -0.24,
+  "rel_10d": -1.46,
+  "rel_20d": -1.07,
+  "zz500_5d": -0.94
  },
  "limitup_structure": {
   "limitup": 52,
@@ -32,39 +32,47 @@
   "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.477,
-  "small_big_ratio_5d": 1.307,
-  "vol_shift": "资金流向中小盘"
+  "small_big_ratio_now": 1.222,
+  "small_big_ratio_5d": 1.363,
+  "vol_shift": "资金回流大盘",
+  "small_vol_pulse": 106.6
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "电力",
-    "zdf": "0.48",
-    "main_net5d": 3.3,
-    "retail_net": -15.4,
+    "name": "通信设备",
+    "zdf": "1.66",
+    "main_net5d": 187.4,
+    "retail_net": -51.1,
     "tag": "机构型"
    },
    {
     "name": "元件",
-    "zdf": "0.18",
-    "main_net5d": 163.8,
-    "retail_net": -32.4,
+    "zdf": "1.80",
+    "main_net5d": 210.7,
+    "retail_net": -41.0,
     "tag": "机构型"
    },
    {
-    "name": "一般零售",
-    "zdf": "-1.60",
-    "main_net5d": 11.9,
-    "retail_net": 4.7,
+    "name": "地面兵装Ⅱ",
+    "zdf": "4.44",
+    "main_net5d": -3.0,
+    "retail_net": -13.7,
+    "tag": "游资型"
+   },
+   {
+    "name": "电力",
+    "zdf": "-0.09",
+    "main_net5d": 22.4,
+    "retail_net": 1.3,
     "tag": "混合"
    },
    {
     "name": "玻璃玻纤",
-    "zdf": "2.23",
-    "main_net5d": -32.9,
-    "retail_net": -22.4,
-    "tag": "游资型"
+    "zdf": "2.63",
+    "main_net5d": 7.1,
+    "retail_net": -7.2,
+    "tag": "机构型"
    }
   ]
  },
@@ -80,6 +88,7 @@
   },
   "pullbacks": {},
   "gpoints": {
+   "堆量模式": 1,
    "欧马模式": 1
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
