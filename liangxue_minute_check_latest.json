@@ -1,5 +1,5 @@
 {
- "date": "2026-09-11",
+ "date": "2026-09-12",
  "desc": "量学PASS股分时量波验证（人线为王/4G为皇/天人和谐）",
  "total": 20,
  "check": [
@@ -214,6 +214,20 @@
    "score": 95
   },
   {
+   "code": "sz002950",
+   "ok": true,
+   "close": 8.58,
+   "vwap": 8.6,
+   "dev_pct": -0.2,
+   "pos_pct": 24.0,
+   "tail_slope": 0.0,
+   "volatility": 0.24,
+   "wave": "天人和谐·续原势",
+   "kline": "上红下绿·注意回落",
+   "name": "奥美医疗",
+   "score": 100
+  },
+  {
    "code": "sh600582",
    "ok": true,
    "close": 4.87,
@@ -267,20 +281,6 @@
    "wave": "天人和谐·续原势",
    "kline": "上红下绿·注意回落",
    "name": "东华能源",
-   "score": 92
-  },
-  {
-   "code": "sh600303",
-   "ok": true,
-   "close": 3.01,
-   "vwap": 3.03,
-   "dev_pct": -0.8,
-   "pos_pct": 11.0,
-   "tail_slope": 0.0,
-   "volatility": 0.75,
-   "wave": "天人和谐·续原势",
-   "kline": "上红下绿·注意回落",
-   "name": "曙光股份",
    "score": 92
   }
  ]
