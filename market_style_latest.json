@@ -1,13 +1,13 @@
 {
- "date": "2026-09-11",
+ "date": "2026-09-12",
  "data_date": "2026-09-11",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 10,
+ "score": 3,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 16,
-  "volume_structure": -1,
+  "volume_structure": -8,
   "sector_fund": -5
  },
  "size_style": {
@@ -34,23 +34,22 @@
  "volume_structure": {
   "small_big_ratio_now": 1.222,
   "small_big_ratio_5d": 1.363,
-  "vol_shift": "资金回流大盘",
-  "small_vol_pulse": 106.6
+  "vol_shift": "资金回流大盘"
  },
  "sector_fund": {
   "sectors": [
-   {
-    "name": "通信设备",
-    "zdf": "1.66",
-    "main_net5d": 187.4,
-    "retail_net": -51.1,
-    "tag": "机构型"
-   },
    {
     "name": "元件",
     "zdf": "1.80",
     "main_net5d": 210.7,
     "retail_net": -41.0,
+    "tag": "机构型"
+   },
+   {
+    "name": "通信设备",
+    "zdf": "1.66",
+    "main_net5d": 187.4,
+    "retail_net": -51.1,
     "tag": "机构型"
    },
    {
@@ -79,17 +78,17 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 11,
-   "欧马模式": 4
+   "堆量模式": 8,
+   "欧马模式": 7
   },
   "leaders": {
    "堆量模式": 6,
-   "欧马模式": 3
+   "欧马模式": 5
   },
   "pullbacks": {},
   "gpoints": {
    "堆量模式": 1,
-   "欧马模式": 1
+   "欧马模式": 3
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
