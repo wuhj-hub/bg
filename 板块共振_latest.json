@@ -1,7 +1,7 @@
 {
- "date": "2026-09-11",
+ "date": "2026-09-12",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 47,
+ "pool_size": 48,
  "resonance_boards": [
   {
    "name": "地面兵装Ⅱ",
@@ -18,17 +18,6 @@
    "name": "玻璃玻纤",
    "code": "pt01801712",
    "zdf": 2.63,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "被动元件概念",
-   "code": "pt02101345",
-   "zdf": 2.22,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -87,11 +76,6 @@
    "name": "玻璃玻纤",
    "code": "pt01801712",
    "value": 7
-  },
-  {
-   "name": "被动元件概念",
-   "code": "pt02101345",
-   "value": 7
   }
  ],
  "entry_top": [
@@ -141,9 +125,9 @@
    "value": 4.6
   },
   {
-   "name": "被动元件概念",
-   "code": "pt02101345",
-   "value": 0.8
+   "name": "风电设备",
+   "code": "pt01801736",
+   "value": 0.3
   }
  ],
  "absorption_top": [
