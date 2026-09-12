@@ -196,6 +196,11 @@ jobs:
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
         run: python3 quant_scripts/run_all_quant.py
 
+      # ─── 第三步.5：一统天下·RSV50三线强度扫描（建仓区×相对强度，盘前③.5引用）───
+      - name: 一统天下多周期扫描（建仓区+月线反转+RSV50三线强度）
+        continue-on-error: true
+        run: python3 quant_scripts/yitong_screener.py
+
       # ─── 第三步.4：上传三系统原始数据到知识库（供次日盘前报告引用，防止缺失）───
       - name: 上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源）
         continue-on-error: true
@@ -278,6 +283,9 @@ jobs:
           cp outputs/hot_emotion_latest.json hot_emotion_latest.json 2>/dev/null || true
           cp outputs/hot_emotion_history.json hot_emotion_history.json 2>/dev/null || true
           cp outputs/hot_emotion_$(date +%Y-%m-%d).md hot_emotion_latest.md 2>/dev/null || true
+          # 一统天下股池（盘前③.5引用：建仓区×RSV50三线强度）
+          cp outputs/一统天下建仓区股池_$(date +%Y-%m-%d).json 一统天下建仓区股池_latest.json 2>/dev/null || true
+          cp outputs/一统天下建仓区股池_$(date +%Y-%m-%d).md 一统天下建仓区股池_latest.md 2>/dev/null || true
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             # 改用 Contents API 提交（git pull/push 浅克隆+并发冲突曾导致连续失败，API 绕开）
             python3 git_api_commit.py --msg "chore: scan results ($(date +%Y-%m-%d))" \
@@ -288,7 +296,8 @@ jobs:
               all_mainboard.csv ima_cred_last_ok.json liangxue_latest.json \
               liangxue_month_join_latest.json liangxue_minute_check_latest.json \
               hot_emotion_latest.json hot_emotion_history.json hot_emotion_latest.md \
-              pools/pool_$(date +%Y-%m).json
+              pools/pool_$(date +%Y-%m).json \
+              一统天下建仓区股池_latest.json 一统天下建仓区股池_latest.md yitong_pool.txt
           fi
 
       # ─── 关键产物完整性检查（2026-08-28：任一关键步骤失败→微信告警明细）───
