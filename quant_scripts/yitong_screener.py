@@ -270,10 +270,11 @@ def main():
             strength_map[code] = f"{sr:+.1f}>{ir:+.1f}>{sh_r50:+.1f}"
     print(f"[INFO] RSV50三线强度: {len(strength_map)} 只 (大盘50日{sh_r50:+.2f}%)", flush=True)
 
-    # Step3: 60分钟确认（新浪，仅最终候选，串行+间隔）
-    print(f"[INFO] Step3 60分钟确认（{len(cand2)} 只，新浪串行）...", flush=True)
-    results = []
-    for i, (code, name, entry, gl, in_now, w_entry) in enumerate(cand2):
+    # Step3: 60分钟确认（仅四星以上候选：w_entry不为None，省时）
+    need60 = [c for c in cand2 if c[5]]
+    print(f"[INFO] Step3 60分钟确认（{len(need60)}/{len(cand2)} 只四星以上，新浪串行）...", flush=True)
+    m60_map = {}
+    for k, (code, name, entry, gl, in_now, w_entry) in enumerate(need60):
         rows = fetch_sina_5m(code)
         m60 = False
         if len(rows) > 400:
@@ -281,6 +282,14 @@ def main():
             if len(bars60) > 35:
                 v60 = compute_varo7(bars60)
                 m60 = v60[-1] < 12  # 60m当前低位（放宽到12，近窗口样本少）
+        m60_map[code] = m60
+        if (k + 1) % 5 == 0:
+            print(f"  [进度] {k+1}/{len(need60)}", flush=True)
+        time.sleep(1.2)
+
+    results = []
+    for code, name, entry, gl, in_now, w_entry in cand2:
+        m60 = m60_map.get(code, False)
         stars = 3
         if w_entry:
             stars = 4
@@ -292,9 +301,6 @@ def main():
                         "in_now": in_now, "week": w_entry, "m60": m60, "stars": stars,
                         "reversal": rev, "strength": st,
                         "note": f"日线建仓{entry}" + ("+周线" if w_entry else "") + ("+60m" if m60 else "")})
-        if (i + 1) % 5 == 0:
-            print(f"  [进度] {i+1}/{len(cand2)}", flush=True)
-        time.sleep(1.2)
 
     results.sort(key=lambda r: -r["stars"])
     # 实时ST/退市兜底（清单快照可能漏掉后续戴帽股，如交大昂立→ST交昂）
