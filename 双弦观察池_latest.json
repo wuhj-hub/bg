@@ -1,6 +1,6 @@
 {
  "date": "2026-09-12",
- "count": 168,
+ "count": 167,
  "entries": [
   {
    "code": "sz001330",
@@ -30,18 +30,18 @@
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
   },
   {
-   "code": "sz002309",
-   "name": "中利集团",
-   "price": 3.04,
+   "code": "sz002310",
+   "name": "东方新能",
+   "price": 2.36,
    "score": 62,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [堆量模式]"
   },
   {
-   "code": "sz002310",
-   "name": "东方新能",
-   "price": 2.36,
+   "code": "sz002309",
+   "name": "中利集团",
+   "price": 3.04,
    "score": 62,
    "resonance_label": "中性",
    "sector": "",
@@ -766,15 +766,6 @@
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 [欧马模式]"
-  },
-  {
-   "code": "sh600167",
-   "name": "联美控股",
-   "price": 5.85,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: G点 | RS_D背离 | 伏击线 [欧马模式]"
   },
   {
    "code": "sh600179",
