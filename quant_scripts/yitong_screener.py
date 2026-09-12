@@ -111,6 +111,27 @@ def compute_varo7(bars):
         varo7[i] = raw if i == 33 else (raw * 2 + varo7[i - 1] * 3) / 5
     return varo7
 
+def detect_reversal(month_bars):
+    """月线反转检测：平台突破12月新高 / 均线金叉 / 趋势确立（用最新月）"""
+    closes = [b["close"] for b in month_bars]
+    n = len(closes)
+    if n < 13:
+        return None
+    i = n - 1
+    cur = closes[i]
+    ma6 = sum(closes[i - 5:i + 1]) / 6
+    ma12 = sum(closes[i - 11:i + 1]) / 12
+    ma6_prev = sum(closes[i - 6:i]) / 6
+    ma12_prev = sum(closes[i - 12:i]) / 12
+    prev_max = max(closes[i - 11:i])
+    if cur > prev_max and cur > ma6:
+        return "平台突破"
+    if ma6 > ma12 and ma6_prev <= ma12_prev:
+        return "均线金叉"
+    if ma6 > ma12 and cur > ma6 and ma6 > ma6_prev:
+        return "趋势确立"
+    return None
+
 def in_jcq_and_signal(bars, varo7, lookback=5):
     """最近lookback根是否进入建仓区 → (进入日, 是否当前在建仓区)"""
     if len(bars) < 35:
@@ -198,6 +219,54 @@ def main():
         cand2.append((code, name, entry, gl, in_now, w_entry))
     print(f"[INFO] 周线闸门通过: {len(cand2)} 只", flush=True)
 
+    # Step2.5: 月线反转检测（新增：判断是否已呈现月线反转）
+    print(f"[INFO] Step2.5 月线反转检测（{len(cand2)} 只）...", flush=True)
+    rev_map = {}
+    c_syms2 = [c for c, *_ in cand2]
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        futs = {}
+        for i in range(0, len(c_syms2), BATCH):
+            futs[ex.submit(fetch_kline, c_syms2[i:i + BATCH], "month", 40)] = 1
+        for f in as_completed(futs):
+            for k, v in f.result().items():
+                if len(v) >= 13:
+                    rv = detect_reversal(v)
+                    if rv:
+                        rev_map[k] = rv
+    print(f"[INFO] 月线反转: {len(rev_map)} 只", flush=True)
+
+    # Step2.6: 三线相对强度（个股>行业>大盘，当日涨幅）
+    print("[INFO] Step2.6 三线相对强度检测...", flush=True)
+    ind_map6 = {}
+    for i in range(0, len(syms), 60):
+        md6 = cli(f"profile {','.join(syms[i:i+60])}")
+        for ln6 in md6.splitlines():
+            ln6 = ln6.strip()
+            if ln6.startswith("|") and "code" not in ln6 and "---" not in ln6:
+                q = [x.strip() for x in ln6.strip("|").split("|")]
+                if len(q) > 6 and q[0].startswith(("sh", "sz")):
+                    ind_map6[q[0]] = q[5]
+    stk_ret = {}
+    ind_acc = {}
+    for code, bars in day_map.items():
+        if len(bars) >= 2 and bars[-2].get("close", 0) > 0:
+            r = (bars[-1]["close"] / bars[-2]["close"] - 1) * 100
+            stk_ret[code] = r
+            ind = ind_map6.get(code)
+            if ind:
+                ind_acc.setdefault(ind, []).append(r)
+    ind_avg = {k: sum(v) / len(v) for k, v in ind_acc.items() if len(v) >= 3}
+    shb = fetch_kline(["sh000001"], "day", 5).get("sh000001", [])
+    sh_ret = (shb[-1]["close"] / shb[-2]["close"] - 1) * 100 if len(shb) >= 2 else 0
+    strength_map = {}
+    for code, *_ in cand2:
+        sr = stk_ret.get(code)
+        ind = ind_map6.get(code)
+        ir = ind_avg.get(ind) if ind else None
+        if sr is not None and ir is not None and sr > ir > sh_ret:
+            strength_map[code] = f"{sr:.1f}>{ir:.1f}>{sh_ret:.1f}"
+    print(f"[INFO] 三线相对强度: {len(strength_map)} 只 (大盘{sh_ret:+.2f}%)", flush=True)
+
     # Step3: 60分钟确认（新浪，仅最终候选，串行+间隔）
     print(f"[INFO] Step3 60分钟确认（{len(cand2)} 只，新浪串行）...", flush=True)
     results = []
@@ -214,8 +283,11 @@ def main():
             stars = 4
         if m60:
             stars = 5
+        rev = rev_map.get(code)
+        st = strength_map.get(code)
         results.append({"code": code, "name": name, "entry": entry, "guaili": gl,
                         "in_now": in_now, "week": w_entry, "m60": m60, "stars": stars,
+                        "reversal": rev, "strength": st,
                         "note": f"日线建仓{entry}" + ("+周线" if w_entry else "") + ("+60m" if m60 else "")})
         if (i + 1) % 5 == 0:
             print(f"  [进度] {i+1}/{len(cand2)}", flush=True)
@@ -235,19 +307,33 @@ def main():
     # 输出
     os.makedirs("/sandbox/workspace/outputs", exist_ok=True)
     md_path = f"/sandbox/workspace/outputs/一统天下建仓区股池_{date_str}.md"
+    rev_cnt = sum(1 for r in results if r.get("reversal"))
+    st_cnt = sum(1 for r in results if r.get("strength"))
+    both_cnt = sum(1 for r in results if r.get("reversal") and r.get("strength"))
     L = [f"# 🏆 一统天下·多周期建仓区股池 {date_str}\n",
-         f"**扫描**: {len(pool)} 只主板 | **日线候选**: {len(cand)} | **周线闸门**: {len(cand2)} | **总信号**: {len(results)}\n"]
+         f"**扫描**: {len(pool)} 只主板 | **日线候选**: {len(cand)} | **周线闸门**: {len(cand2)} | **总信号**: {len(results)}\n",
+         f"**⭐月线反转**: {rev_cnt} 只 | **📊三线相对强度(个>行>大)**: {st_cnt} 只 | **双共振**: {both_cnt} 只\n"]
     for stars in (5, 4, 3):
         grp = [r for r in results if r["stars"] == stars]
         label = {5: "★五星共振（日+周+60m）", 4: "☆四星（日+周）", 3: "☆三星（日线建仓区）"}[stars]
         L.append(f"\n## {label}（{len(grp)}只）\n")
         if grp:
-            L.append("| 代码 | 名称 | 日线建仓日 | 乖离低买 | 当前建仓区 | 说明 |")
-            L.append("|------|------|----------|:---:|:---:|------|")
+            L.append("| 代码 | 名称 | 日线建仓日 | 乖离低买 | 当前建仓区 | 月线反转 | 三线强度 | 说明 |")
+            L.append("|------|------|----------|:---:|:---:|:---:|:---:|------|")
             for r in grp:
-                L.append(f"| {r['code']} | {r['name']} | {r['entry']} | {'✅' if r['guaili'] else '—'} | {'✅' if r['in_now'] else '—'} | {r['note']} |")
+                L.append(f"| {r['code']} | {r['name']} | {r['entry']} | {'✅' if r['guaili'] else '—'} | {'✅' if r['in_now'] else '—'} | {r.get('reversal') or '—'} | {r.get('strength') or '—'} | {r['note']} |")
         else:
             L.append("📭 无信号")
+    # 建仓区 × 月线反转 / 三线强度 专表
+    best_grp = [r for r in results if r.get("reversal") or r.get("strength")]
+    L.append(f"\n## ⭐建仓区 × 月线反转/三线强度（{len(best_grp)}只）\n")
+    if best_grp:
+        L.append("| 代码 | 名称 | 星级 | 月线反转 | 三线强度 | 说明 |")
+        L.append("|------|------|:---:|:---:|:---:|------|")
+        for r in best_grp:
+            L.append(f"| {r['code']} | {r['name']} | {'★'*r['stars']} | {r.get('reversal') or '—'} | {r.get('strength') or '—'} | {r['note']} |")
+    else:
+        L.append("📭 无")
     report = "\n".join(L)
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(report)
