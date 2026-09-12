@@ -575,7 +575,15 @@ def gen_report(today_str):
             lines.append(_ai)
     except Exception as e:
         lines.append(f"- 宁静卡位观察：读取失败({e})")
-    
+
+    # ③.5 一统天下·RSV50三线强度（建仓区×相对强度，回测最强组合）
+    try:
+        _yt = render_yitong_rsv50()
+        if _yt:
+            lines.append(_yt)
+    except Exception as e:
+        lines.append(f"- 一统天下RSV50：读取失败({e})")
+
     lines.append("\n## ④ 个股定点\n")
     lines.append("⏳ 每日量化数据由15:30全盘量化扫描生成，盘前时段引用昨日数据。\n")
     
@@ -794,6 +802,44 @@ def render_ai_chokepoint():
     if wk:
         L.append("- 🔻 **证据待核验**（无强/中证据·若进信号将降级）：" + " / ".join(r["name"] + "(" + str(r["evidence"]) + ")" for r in wk))
     L.append(f"\n> 数据源：ai_chokepoint_watch_{w.get('date', '?')}（池内{len(rows)}只主板卡位链标的(多池)·卡位分=基础分+relabel自动衰减）")
+    return "\n".join(L)
+
+
+def read_yitong_pool():
+    """读一统天下建仓区股池JSON（盘后产出），失败返回None"""
+    import glob
+    cands = sorted(glob.glob("outputs/一统天下建仓区股池_*.json")
+                   + glob.glob("/sandbox/workspace/outputs/一统天下建仓区股池_*.json"))
+    if not cands:
+        return None
+    try:
+        return json.load(open(cands[-1], encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def render_yitong_rsv50():
+    """③.5 一统天下·RSV50三线强度（建仓区×相对强度，缺数据返回None）"""
+    d = read_yitong_pool()
+    if not d or not d.get("results"):
+        return None
+    rs = d["results"]
+    rev = [r for r in rs if r.get("reversal")]
+    stg = [r for r in rs if r.get("strength")]
+    dual = [r for r in rs if r.get("reversal") and r.get("strength")]
+    if not stg and not rev:
+        return None
+    L = ["\n### ③.5 🏆 一统天下·RSV50三线强度（建仓区×相对强度·回测20日超额+5.87pct）"]
+    L.append("")
+    if dual:
+        L.append("- 🔥 **月线反转 + RSV50 双共振**：" + " / ".join(
+            f"{r['name']}({r['code'][2:]})" for r in dual))
+    if stg:
+        top = sorted(stg, key=lambda r: -r.get("stars", 0))[:8]
+        L.append("- 📊 **建仓区 + RSV50三线强度**（个股50日>行业50日>大盘50日）：" + " / ".join(
+            f"{r['name']}({r['code'][2:]})" for r in top))
+    L.append(f"- 统计：建仓区{len(rs)}只 | RSV50强度{len(stg)}只 | 双共振{len(dual)}只")
+    L.append("\n> 数据源：一统天下建仓区股池（yitong_screener·盘后产出）")
     return "\n".join(L)
 
 
