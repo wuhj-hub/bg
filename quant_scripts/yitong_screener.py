@@ -235,8 +235,8 @@ def main():
                         rev_map[k] = rv
     print(f"[INFO] 月线反转: {len(rev_map)} 只", flush=True)
 
-    # Step2.6: 三线相对强度（个股>行业>大盘，当日涨幅）
-    print("[INFO] Step2.6 三线相对强度检测...", flush=True)
+    # Step2.6: RSV50三线相对强度（50日相对强度：个股>行业>大盘）
+    print("[INFO] Step2.6 RSV50三线强度检测...", flush=True)
     ind_map6 = {}
     for i in range(0, len(syms), 60):
         md6 = cli(f"profile {','.join(syms[i:i+60])}")
@@ -246,26 +246,27 @@ def main():
                 q = [x.strip() for x in ln6.strip("|").split("|")]
                 if len(q) > 6 and q[0].startswith(("sh", "sz")):
                     ind_map6[q[0]] = q[5]
-    stk_ret = {}
+    N6 = 50
+    stk_r50 = {}
     ind_acc = {}
     for code, bars in day_map.items():
-        if len(bars) >= 2 and bars[-2].get("close", 0) > 0:
-            r = (bars[-1]["close"] / bars[-2]["close"] - 1) * 100
-            stk_ret[code] = r
+        if len(bars) > N6 and bars[-1 - N6].get("close", 0) > 0:
+            r = (bars[-1]["close"] / bars[-1 - N6]["close"] - 1) * 100
+            stk_r50[code] = r
             ind = ind_map6.get(code)
             if ind:
                 ind_acc.setdefault(ind, []).append(r)
-    ind_avg = {k: sum(v) / len(v) for k, v in ind_acc.items() if len(v) >= 3}
-    shb = fetch_kline(["sh000001"], "day", 5).get("sh000001", [])
-    sh_ret = (shb[-1]["close"] / shb[-2]["close"] - 1) * 100 if len(shb) >= 2 else 0
+    ind_r50 = {k: sum(v) / len(v) for k, v in ind_acc.items() if len(v) >= 3}
+    shb = fetch_kline(["sh000001"], "day", N6 + 5).get("sh000001", [])
+    sh_r50 = (shb[-1]["close"] / shb[-1 - N6]["close"] - 1) * 100 if len(shb) > N6 else 0
     strength_map = {}
     for code, *_ in cand2:
-        sr = stk_ret.get(code)
+        sr = stk_r50.get(code)
         ind = ind_map6.get(code)
-        ir = ind_avg.get(ind) if ind else None
-        if sr is not None and ir is not None and sr > ir > sh_ret:
-            strength_map[code] = f"{sr:.1f}>{ir:.1f}>{sh_ret:.1f}"
-    print(f"[INFO] 三线相对强度: {len(strength_map)} 只 (大盘{sh_ret:+.2f}%)", flush=True)
+        ir = ind_r50.get(ind) if ind else None
+        if sr is not None and ir is not None and sr > ir > sh_r50:
+            strength_map[code] = f"{sr:+.1f}>{ir:+.1f}>{sh_r50:+.1f}"
+    print(f"[INFO] RSV50三线强度: {len(strength_map)} 只 (大盘50日{sh_r50:+.2f}%)", flush=True)
 
     # Step3: 60分钟确认（新浪，仅最终候选，串行+间隔）
     print(f"[INFO] Step3 60分钟确认（{len(cand2)} 只，新浪串行）...", flush=True)
@@ -312,26 +313,36 @@ def main():
     both_cnt = sum(1 for r in results if r.get("reversal") and r.get("strength"))
     L = [f"# 🏆 一统天下·多周期建仓区股池 {date_str}\n",
          f"**扫描**: {len(pool)} 只主板 | **日线候选**: {len(cand)} | **周线闸门**: {len(cand2)} | **总信号**: {len(results)}\n",
-         f"**⭐月线反转**: {rev_cnt} 只 | **📊三线相对强度(个>行>大)**: {st_cnt} 只 | **双共振**: {both_cnt} 只\n"]
+         f"**⭐月线反转**: {rev_cnt} 只 | **📊RSV50三线强度(个>行>大)**: {st_cnt} 只 | **双共振**: {both_cnt} 只\n"]
     for stars in (5, 4, 3):
         grp = [r for r in results if r["stars"] == stars]
         label = {5: "★五星共振（日+周+60m）", 4: "☆四星（日+周）", 3: "☆三星（日线建仓区）"}[stars]
         L.append(f"\n## {label}（{len(grp)}只）\n")
         if grp:
-            L.append("| 代码 | 名称 | 日线建仓日 | 乖离低买 | 当前建仓区 | 月线反转 | 三线强度 | 说明 |")
+            L.append("| 代码 | 名称 | 日线建仓日 | 乖离低买 | 当前建仓区 | 月线反转 | RSV50强度 | 说明 |")
             L.append("|------|------|----------|:---:|:---:|:---:|:---:|------|")
             for r in grp:
                 L.append(f"| {r['code']} | {r['name']} | {r['entry']} | {'✅' if r['guaili'] else '—'} | {'✅' if r['in_now'] else '—'} | {r.get('reversal') or '—'} | {r.get('strength') or '—'} | {r['note']} |")
         else:
             L.append("📭 无信号")
-    # 建仓区 × 月线反转 / 三线强度 专表
-    best_grp = [r for r in results if r.get("reversal") or r.get("strength")]
-    L.append(f"\n## ⭐建仓区 × 月线反转/三线强度（{len(best_grp)}只）\n")
+    # 建仓区 + RSV50三线强度 专表（回测最强组合）
+    best_grp = [r for r in results if r.get("strength")]
+    L.append(f"\n## ⭐建仓区 + RSV50三线强度（{len(best_grp)}只）｜回测最强组合·20日超额+5.87pct\n")
     if best_grp:
-        L.append("| 代码 | 名称 | 星级 | 月线反转 | 三线强度 | 说明 |")
+        L.append("| 代码 | 名称 | 星级 | RSV50强度(个>行>大) | 月线反转 | 说明 |")
         L.append("|------|------|:---:|:---:|:---:|------|")
         for r in best_grp:
-            L.append(f"| {r['code']} | {r['name']} | {'★'*r['stars']} | {r.get('reversal') or '—'} | {r.get('strength') or '—'} | {r['note']} |")
+            L.append(f"| {r['code']} | {r['name']} | {'★'*r['stars']} | {r.get('strength')} | {r.get('reversal') or '—'} | {r['note']} |")
+    else:
+        L.append("📭 无")
+    # 月线反转 + RSV50 双共振
+    dual = [r for r in results if r.get("reversal") and r.get("strength")]
+    L.append(f"\n## 🔥月线反转 + RSV50 双共振（{len(dual)}只）\n")
+    if dual:
+        L.append("| 代码 | 名称 | 星级 | 月线反转 | RSV50强度 | 说明 |")
+        L.append("|------|------|:---:|:---:|:---:|------|")
+        for r in dual:
+            L.append(f"| {r['code']} | {r['name']} | {'★'*r['stars']} | {r['reversal']} | {r['strength']} | {r['note']} |")
     else:
         L.append("📭 无")
     report = "\n".join(L)
@@ -343,8 +354,14 @@ def main():
     # 股池配置（供跟踪）
     with open("/sandbox/workspace/yitong_pool.txt", "w", encoding="utf-8") as f:
         f.write(f"# 一统天下建仓区股池 {date_str}\n")
+        f.write(f"# 统计: 总信号{len(results)}只 | 月线反转{rev_cnt}只 | RSV50三线强度{st_cnt}只 | 双共振{both_cnt}只\n")
         for r in results:
-            f.write(f"{r['code']} # {r['name']}（{'★'*r['stars']}建仓区）\n")
+            tags = f"{'★'*r['stars']}建仓区"
+            if r.get("reversal"):
+                tags += f"+反转({r['reversal']})"
+            if r.get("strength"):
+                tags += "+RSV50强"
+            f.write(f"{r['code']} # {r['name']}（{tags}）\n")
     print(report)
     print(f"\n[OK] 报告: {md_path}\n[OK] 股池: /sandbox/workspace/yitong_pool.txt")
 
