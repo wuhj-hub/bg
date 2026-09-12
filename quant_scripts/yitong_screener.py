@@ -24,6 +24,8 @@ BJ = timezone(timedelta(hours=8))
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 BATCH = 20
 WORKERS = 4
+# 路径兼容：沙箱用 /sandbox/workspace，GitHub runner 用仓库根(cwd)
+BASE = "/sandbox/workspace" if os.path.isdir("/sandbox/workspace") else os.getcwd()
 
 def cli(cmd, timeout=180):
     full = WESTOCK + cmd.split()
@@ -161,7 +163,7 @@ def main():
 
     # Step0: 股票池
     pool = []
-    with open("/sandbox/workspace/all_mainboard.csv", encoding="utf-8-sig") as f:
+    with open(f"{BASE}/all_mainboard.csv", encoding="utf-8-sig") as f:
         next(f)
         for ln in f:
             parts = ln.strip().split(",")
@@ -306,8 +308,8 @@ def main():
     except Exception as e:
         print(f"[WARN] st_guard 校验失败: {e}", flush=True)
     # 输出
-    os.makedirs("/sandbox/workspace/outputs", exist_ok=True)
-    md_path = f"/sandbox/workspace/outputs/一统天下建仓区股池_{date_str}.md"
+    os.makedirs(f"{BASE}/outputs", exist_ok=True)
+    md_path = f"{BASE}/outputs/一统天下建仓区股池_{date_str}.md"
     rev_cnt = sum(1 for r in results if r.get("reversal"))
     st_cnt = sum(1 for r in results if r.get("strength"))
     both_cnt = sum(1 for r in results if r.get("reversal") and r.get("strength"))
@@ -348,11 +350,11 @@ def main():
     report = "\n".join(L)
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(report)
-    json_path = f"/sandbox/workspace/outputs/一统天下建仓区股池_{date_str}.json"
+    json_path = f"{BASE}/outputs/一统天下建仓区股池_{date_str}.json"
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump({"date": date_str, "total": len(results), "results": results}, f, ensure_ascii=False, indent=2)
     # 股池配置（供跟踪）
-    with open("/sandbox/workspace/yitong_pool.txt", "w", encoding="utf-8") as f:
+    with open(f"{BASE}/yitong_pool.txt", "w", encoding="utf-8") as f:
         f.write(f"# 一统天下建仓区股池 {date_str}\n")
         f.write(f"# 统计: 总信号{len(results)}只 | 月线反转{rev_cnt}只 | RSV50三线强度{st_cnt}只 | 双共振{both_cnt}只\n")
         for r in results:
@@ -363,7 +365,7 @@ def main():
                 tags += "+RSV50强"
             f.write(f"{r['code']} # {r['name']}（{tags}）\n")
     print(report)
-    print(f"\n[OK] 报告: {md_path}\n[OK] 股池: /sandbox/workspace/yitong_pool.txt")
+    print(f"\n[OK] 报告: {md_path}\n[OK] 股池: {BASE}/yitong_pool.txt")
 
 if __name__ == "__main__":
     main()
