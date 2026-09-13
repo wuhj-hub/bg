@@ -1,0 +1,77 @@
+name: 市场状态判定（三级别力量）
+
+on:
+  # 每日盘后运行（UTC 09:30 = 北京时间 17:30，周一至周五）
+  schedule:
+    - cron: "30 9 * * 1-5"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: market-regime
+  cancel-in-progress: false
+
+jobs:
+  regime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: pip install --quiet pandas numpy
+
+      - name: 预热 westock 数据包
+        run: npx -y westock-data-skillhub@1.0.3 hot board --limit 3
+
+      - name: 生成市场状态判定（长期/中期/短期力量 + 宽度 + 情绪）
+        run: python3 quant_scripts/market_regime.py
+
+      - name: 提交判定结果到仓库
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 git_api_commit.py --msg "chore: market regime ($(date +%Y-%m-%d))" \
+            market_regime_latest.json market_regime_latest.md \
+            "outputs/市场状态判定_$(date +%Y%m%d).md"
+
+      - name: 推送微信
+        if: always()
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.parse, urllib.request
+          token = os.environ.get("PUSH_TOKEN", "")
+          if not token:
+              print("no PUSH_TOKEN"); raise SystemExit(0)
+          d = json.load(open("market_regime_latest.json", encoding="utf-8"))
+          title = f"[市场状态] {d['verdict']} · {d['date']}"
+          body = (f"**结论：{d['verdict']}**（综合分 {d['score']}）\n\n"
+                  f"- 长期力量(月线)：{d['long']['state']} ({d['long']['score']})\n"
+                  f"- 中期力量(周线)：{d['mid']['state']} ({d['mid']['score']})\n"
+                  f"- 短期力量(日线)：{d['short']['state']} ({d['short']['score']})\n"
+                  f"- 宽度：站上年线 {d['width']['above250']*100:.1f}% / 上涨占比 {d['width']['up_ratio']*100:.1f}%\n"
+                  f"- 情绪：涨停 {d['emotion']['limit_up']} / 跌停 {d['emotion']['limit_down']}\n")
+          data = urllib.parse.urlencode({"token": token, "title": title,
+                                         "content": body, "template": "markdown"}).encode()
+          try:
+              r = urllib.request.urlopen("http://www.pushplus.plus/send", data=data, timeout=20)
+              print(r.read().decode()[:200])
+          except Exception as e:
+              print("push failed:", e)
+          PY
