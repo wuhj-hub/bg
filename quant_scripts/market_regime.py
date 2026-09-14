@@ -148,6 +148,26 @@ def main():
     above250 = float((S["last"] > S["ma250"]).mean())
     chg = S["last"] / S["prev"] - 1
     nzt = int((chg >= 0.098).sum()); ndt = int((chg <= -0.098).sum())
+    # 2026-09-15 统一涨停口径：优先复用 market_width 当日产物（同一 westock 口径）。
+    # 背景：同一交易日曾出现 3 个涨停数（market_width 48 / market_regime 47 / hot_emotion 41），
+    #      口径不一让「情绪」维度在报告间自相矛盾。
+    try:
+        _t = datetime.date.today().strftime("%Y%m%d")
+        for _p in (os.path.join(ROOT, "outputs", "market_width_latest.json"),
+                   os.path.join(ROOT, "market_width_latest.json")):
+            if not os.path.exists(_p):
+                continue
+            _d = json.load(open(_p, encoding="utf-8"))
+            if str(_d.get("date", "")).replace("-", "") != _t:
+                continue
+            if _d.get("limitup") is not None:
+                nzt = int(_d["limitup"])
+                if _d.get("limitdown") is not None:
+                    ndt = int(_d["limitdown"])
+                print(f"[INFO] 涨停口径统一→market_width: 涨停{nzt} 跌停{ndt}", flush=True)
+            break
+    except Exception as _e:
+        print(f"[WARN] 涨停口径统一失败(回退自算): {_e}", flush=True)
     last_date = datetime.date.today().strftime("%Y%m%d")
 
     width_score = (above250 > .5) * .4 + (above60 > .5) * .3 + (above20 > .5) * .2 + (up_ratio > .5) * .1
