@@ -88,8 +88,10 @@ jobs:
           # 先拉取仓库根现有 history 作为累积起点（防 runner 空 history 断链/覆盖丢失，2026-09-03 修复）
           curl -sL --retry 2 "https://raw.githubusercontent.com/wuhj-hub/bg/main/hot_emotion_history.json" -o outputs/hot_emotion_history.json || echo "{}" > outputs/hot_emotion_history.json
           python3 quant_scripts/fetch_hot_kline.py --limit 25 --out outputs/hot_kline.txt --batch 100 --workers 4 --csv all_mainboard.csv
+          # ⚠️ 2026-09-15：显式传 --name-file（此前未传且脚本默认路径层数错误 → 连板梯队只剩代码）
           python3 quant_scripts/hot_emotion.py --date "$(date +%Y-%m-%d)" --westock \
             --kline-file outputs/hot_kline.txt --end-date "$(date +%Y-%m-%d)" \
+            --name-file all_mainboard.csv \
             --outdir outputs --history-file outputs/hot_emotion_history.json
           cp outputs/hot_emotion_latest.json hot_emotion_latest.json 2>/dev/null || true
           echo "情绪: $(python3 -c "import json;d=json.load(open('outputs/hot_emotion_latest.json'));print(str(d['score']['score'])+'/'+d['score']['level']+' 涨停'+str(d['total'])+' 连板'+str(d['lianban_cnt'])+' 最高'+str(d['max_lb'])+'板')" 2>/dev/null || echo '计算失败')"
