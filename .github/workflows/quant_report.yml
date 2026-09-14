@@ -252,6 +252,14 @@ jobs:
           python3 quant_scripts/execution_card.py --holdings --merge-holdings --pool --total 1000000 --out outputs
           echo "执行卡: $(python3 -c "import json;d=json.load(open('outputs/execution_cards_latest.json'));print(str(len(d['cards']))+'张 | '+','.join(('NEW:' if c.get('is_new') else '')+c['code']+':'+c['verdict'] for c in d['cards']))" 2>/dev/null || echo '无输出')"
 
+      # ─── 第五.4.8步：一统天下·乖离低买 扫描（20年长样本唯一 6/6 环境全显著正）───
+      - name: 乖离低买扫描（一统天下·跌破MA5>7%）
+        continue-on-error: true
+        timeout-minutes: 20
+        run: |
+          python3 quant_scripts/yitong_guaili_screener.py --out outputs
+          echo "乖离低买: $(python3 -c "import json;d=json.load(open('outputs/乖离低买_latest.json'));print(str(d['total'])+'只')" 2>/dev/null || echo '无输出')"
+
       # ─── 第三步.6：提交报告阶段产物（供次日盘前报告引用）───
       - name: 提交报告产物到仓库（供盘前报告引用）
         continue-on-error: true
@@ -268,11 +276,12 @@ jobs:
           cp outputs/执行纪律_latest.json 执行纪律_latest.json 2>/dev/null || true
           cp outputs/execution_cards_latest.json execution_cards_latest.json 2>/dev/null || true
           cp outputs/一统天下建仓区股池_$(date +%Y-%m-%d).json 一统天下建仓区股池_latest.json 2>/dev/null || true
+          cp outputs/乖离低买_latest.json 乖离低买_latest.json 2>/dev/null || true
           python3 git_api_commit.py --msg "chore: report results ($(date +%Y-%m-%d))" \
             market_style_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json \
             ai_chokepoint_watch_latest.json \
             四维共振_chinext_kcb_latest.json 组合风控_latest.json 执行纪律_latest.json execution_cards_latest.json \
-            一统天下建仓区股池_latest.json \
+            一统天下建仓区股池_latest.json 乖离低买_latest.json \
             quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
             pools/pool_$(date +%Y-%m).json || true
 
