@@ -1,61 +1,29 @@
 {
   "market_temp": {
-    "temp": 45,
+    "temp": 50,
     "level": "中性",
-    "idx": "3888.11"
+    "idx": "3885.33"
   },
   "signals": [
     {
-      "code": "sz003816",
-      "name": "中国广核",
+      "code": "sz002839",
+      "name": "张家港行",
       "pattern": "MACD空中加油",
       "raw_score": 100,
-      "final_score": 75,
-      "multi_score": 55,
+      "final_score": 79,
+      "multi_score": 77,
       "resonance": "共振向下",
-      "price": 4.33,
+      "price": 4.47,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.09)>=DEA(0.08)金叉",
-        "MACD柱0.030刚翻红加油成功",
-        "收盘4.33>MA54.31",
+        "DIF(0.03)>=DEA(0.02)金叉",
+        "MACD柱0.020刚翻红加油成功",
+        "收盘4.47>MA54.46",
         "MA20>MA60多头排列",
-        "KDJ_J=21未超买"
+        "KDJ_J=82未超买"
       ],
-      "stop_loss": "4.09",
-      "target": "4.98",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": null,
-      "rsg_dev": 142.2,
-      "rsg_strong": true
-    },
-    {
-      "code": "sz003035",
-      "name": "南网能源",
-      "pattern": "MACD空中加油",
-      "raw_score": 95,
-      "final_score": 75,
-      "multi_score": 78,
-      "resonance": "共振向下",
-      "price": 5.98,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.06)>=DEA(0.03)金叉",
-        "MACD柱0.060刚翻红加油成功",
-        "收盘5.98>MA55.77",
-        "MA20>MA60多头排列"
-      ],
-      "stop_loss": "5.48",
-      "target": "6.88",
+      "stop_loss": "4.24",
+      "target": "5.14",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
@@ -67,28 +35,287 @@
       "month_trend": "纠缠",
       "month_gate": "WARN",
       "month_reversal": null,
-      "rsg_dev": 49.2,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz003035",
+      "name": "南网能源",
+      "pattern": "MACD空中加油",
+      "raw_score": 100,
+      "final_score": 77,
+      "multi_score": 66,
+      "resonance": "共振向下",
+      "price": 5.92,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.07)>=DEA(0.04)金叉",
+        "MACD柱0.070刚翻红加油成功",
+        "收盘5.92>MA55.82",
+        "MA20>MA60多头排列",
+        "KDJ_J=66未超买"
+      ],
+      "stop_loss": "5.53",
+      "target": "6.81",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": 35.5,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002918",
+      "name": "蒙娜丽莎",
+      "pattern": "MACD空中加油",
+      "raw_score": 100,
+      "final_score": 77,
+      "multi_score": 65,
+      "resonance": "共振向下",
+      "price": 11.7,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.33)>=DEA(0.31)金叉",
+        "MACD柱0.040刚翻红加油成功",
+        "收盘11.7>MA511.06",
+        "MA20>MA60多头排列",
+        "KDJ_J=67未超买"
+      ],
+      "stop_loss": "10.51",
+      "target": "13.45",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": -65.8,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz003816",
+      "name": "中国广核",
+      "pattern": "MACD空中加油",
+      "raw_score": 100,
+      "final_score": 75,
+      "multi_score": 59,
+      "resonance": "共振向下",
+      "price": 4.34,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.09)>=DEA(0.08)金叉",
+        "MACD柱0.020刚翻红加油成功",
+        "收盘4.34>MA54.32",
+        "MA20>MA60多头排列",
+        "KDJ_J=23未超买"
+      ],
+      "stop_loss": "4.10",
+      "target": "4.99",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": null,
+      "rsg_dev": 141.5,
+      "rsg_strong": true
+    },
+    {
+      "code": "sz002807",
+      "name": "江阴银行",
+      "pattern": "MACD空中加油",
+      "raw_score": 100,
+      "final_score": 75,
+      "multi_score": 57,
+      "resonance": "共振向下",
+      "price": 4.29,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.07)>=DEA(0.06)金叉",
+        "MACD柱0.030刚翻红加油成功",
+        "收盘4.29>MA54.25",
+        "MA20>MA60多头排列",
+        "KDJ_J=82未超买"
+      ],
+      "stop_loss": "4.04",
+      "target": "4.93",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002728",
+      "name": "特一药业",
+      "pattern": "MACD空中加油",
+      "raw_score": 95,
+      "final_score": 73,
+      "multi_score": 68,
+      "resonance": "共振向下",
+      "price": 9.4,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.04)>=DEA(0.01)金叉",
+        "MACD柱0.060刚翻红加油成功",
+        "收盘9.4>MA59.35",
+        "KDJ_J=50未超买"
+      ],
+      "stop_loss": "8.88",
+      "target": "10.81",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002925",
+      "name": "盈趣科技",
+      "pattern": "MACD空中加油",
+      "raw_score": 95,
+      "final_score": 72,
+      "multi_score": 63,
+      "resonance": "共振向下",
+      "price": 24.54,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.25)>=DEA(0.20)金叉",
+        "MACD柱0.110刚翻红加油成功",
+        "收盘24.54>MA523.38",
+        "MA20>MA60多头排列"
+      ],
+      "stop_loss": "22.21",
+      "target": "28.22",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002893",
+      "name": "京能热力",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 71,
+      "multi_score": 76,
+      "resonance": "共振向下",
+      "price": 10.61,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.27)>=DEA(0.24)金叉",
+        "MACD柱0.070刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=21未超买"
+      ],
+      "stop_loss": "10.27",
+      "target": "12.20",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002983",
+      "name": "芯瑞达",
+      "pattern": "MACD空中加油",
+      "raw_score": 95,
+      "final_score": 70,
+      "multi_score": 51,
+      "resonance": "共振向下",
+      "price": 21.35,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.33)>=DEA(0.28)金叉",
+        "MACD柱0.110刚翻红加油成功",
+        "收盘21.35>MA521.13",
+        "KDJ_J=31未超买"
+      ],
+      "stop_loss": "20.07",
+      "target": "24.55",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
       "rsg_strong": false
     },
     {
       "code": "sz002966",
       "name": "苏州银行",
       "pattern": "MACD空中加油",
-      "raw_score": 100,
-      "final_score": 73,
+      "raw_score": 95,
+      "final_score": 69,
       "multi_score": 47,
       "resonance": "共振向下",
-      "price": 9.3,
+      "price": 9.35,
       "reasons": [
         "DIF/DEA在0轴上方",
         "DIF(0.25)>=DEA(0.23)金叉",
         "MACD柱0.040刚翻红加油成功",
-        "收盘9.3>MA59.17",
-        "MA20>MA60多头排列",
-        "KDJ_J=85未超买"
+        "收盘9.35>MA59.24",
+        "MA20>MA60多头排列"
       ],
-      "stop_loss": "8.71",
-      "target": "10.70",
+      "stop_loss": "8.78",
+      "target": "10.75",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
@@ -104,87 +331,23 @@
       "rsg_strong": false
     },
     {
-      "code": "sz002807",
-      "name": "江阴银行",
-      "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 70,
-      "multi_score": 74,
-      "resonance": "共振向下",
-      "price": 4.22,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.07)>=DEA(0.05)金叉",
-        "MACD柱0.030刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=71未超买"
-      ],
-      "stop_loss": "4.01",
-      "target": "4.85",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 97.0,
-      "rsg_strong": true
-    },
-    {
-      "code": "sz002752",
-      "name": "昇兴股份",
-      "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 70,
-      "multi_score": 71,
-      "resonance": "共振向下",
-      "price": 6.33,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.11)>=DEA(0.07)金叉",
-        "MACD柱0.070刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=60未超买"
-      ],
-      "stop_loss": "6.04",
-      "target": "7.28",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 56.8,
-      "rsg_strong": true
-    },
-    {
-      "code": "sz002839",
-      "name": "张家港行",
+      "code": "sz002819",
+      "name": "东方中科",
       "pattern": "MACD空中加油",
       "raw_score": 90,
       "final_score": 69,
-      "multi_score": 67,
+      "multi_score": 68,
       "resonance": "共振向下",
-      "price": 4.42,
+      "price": 21.67,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.03)>=DEA(0.02)金叉",
-        "MACD柱0.020刚翻红加油成功",
+        "DIF(0.29)>=DEA(0.27)金叉",
+        "MACD柱0.050刚翻红加油成功",
         "MA20>MA60多头排列",
-        "KDJ_J=82未超买"
+        "KDJ_J=27未超买"
       ],
-      "stop_loss": "4.21",
-      "target": "5.08",
+      "stop_loss": "20.89",
+      "target": "24.92",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
@@ -193,30 +356,30 @@
         "resonance": "共振向下",
         "score": 20
       },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
+      "month_trend": "空头",
+      "month_gate": "BLOCK",
       "month_reversal": null,
-      "rsg_dev": 70.2,
-      "rsg_strong": true
+      "rsg_dev": null,
+      "rsg_strong": false
     },
     {
-      "code": "sz002999",
-      "name": "天禾股份",
+      "code": "sz002911",
+      "name": "佛燃能源",
       "pattern": "MACD空中加油",
       "raw_score": 90,
       "final_score": 68,
-      "multi_score": 59,
+      "multi_score": 62,
       "resonance": "共振向下",
-      "price": 6.61,
+      "price": 11.57,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.31)>=DEA(0.29)金叉",
-        "MACD柱0.040刚翻红加油成功",
+        "DIF(0.19)>=DEA(0.16)金叉",
+        "MACD柱0.060刚翻红加油成功",
         "MA20>MA60多头排列",
-        "KDJ_J=24未超买"
+        "KDJ_J=33未超买"
       ],
-      "stop_loss": "6.66",
-      "target": "7.60",
+      "stop_loss": "11.09",
+      "target": "13.31",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
@@ -228,27 +391,92 @@
       "month_trend": "纠缠",
       "month_gate": "WARN",
       "month_reversal": null,
-      "rsg_dev": 47.8,
+      "rsg_dev": 8.1,
       "rsg_strong": false
     },
     {
-      "code": "sz002893",
-      "name": "京能热力",
+      "code": "sz002771",
+      "name": "真视通",
       "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 68,
-      "multi_score": 59,
+      "raw_score": 85,
+      "final_score": 66,
+      "multi_score": 71,
       "resonance": "共振向下",
-      "price": 10.75,
+      "price": 14.82,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.29)>=DEA(0.23)金叉",
-        "MACD柱0.120刚翻红加油成功",
+        "DIF(0.49)>=DEA(0.40)金叉",
+        "MACD柱0.18>0但已走高",
+        "收盘14.82>MA514.42",
         "MA20>MA60多头排列",
-        "KDJ_J=41未超买"
+        "KDJ_J=45未超买"
       ],
-      "stop_loss": "10.26",
-      "target": "12.36",
+      "stop_loss": "13.70",
+      "target": "17.04",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002752",
+      "name": "昇兴股份",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 66,
+      "multi_score": 48,
+      "resonance": "共振向下",
+      "price": 6.32,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.10)>=DEA(0.08)金叉",
+        "MACD柱0.050刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=48未超买"
+      ],
+      "stop_loss": "6.06",
+      "target": "7.27",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股弱势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": 53.2,
+      "rsg_strong": true
+    },
+    {
+      "code": "sz002702",
+      "name": "海欣食品",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 66,
+      "multi_score": 50,
+      "resonance": "共振向下",
+      "price": 5.3,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.26)>=DEA(0.26)金叉",
+        "MACD柱0.010刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=2未超买"
+      ],
+      "stop_loss": "5.70",
+      "target": "6.09",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
@@ -264,24 +492,560 @@
       "rsg_strong": false
     },
     {
-      "code": "sz002819",
-      "name": "东方中科",
+      "code": "sz003002",
+      "name": "壶化股份",
       "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 68,
-      "multi_score": 60,
+      "raw_score": 85,
+      "final_score": 65,
+      "multi_score": 65,
       "resonance": "共振向下",
-      "price": 21.81,
+      "price": 20.1,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.32)>=DEA(0.27)金叉",
-        "MACD柱0.110刚翻红加油成功",
+        "DIF(0.78)>=DEA(0.38)金叉",
+        "MACD柱0.80>0但已走高",
+        "收盘20.1>MA519.55",
         "MA20>MA60多头排列",
-        "KDJ_J=62未超买"
+        "KDJ_J=83未超买"
       ],
-      "stop_loss": "20.88",
-      "target": "25.08",
+      "stop_loss": "18.57",
+      "target": "23.11",
       "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002790",
+      "name": "瑞尔特",
+      "pattern": "MACD空中加油",
+      "raw_score": 85,
+      "final_score": 65,
+      "multi_score": 67,
+      "resonance": "共振向下",
+      "price": 8.38,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.66)>=DEA(0.39)金叉",
+        "MACD柱0.54>0但已走高",
+        "收盘8.38>MA58.17",
+        "MA20>MA60多头排列",
+        "KDJ_J=70未超买"
+      ],
+      "stop_loss": "7.76",
+      "target": "9.64",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002905",
+      "name": "金逸影视",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 63,
+      "multi_score": 35,
+      "resonance": "共振向下",
+      "price": 8.45,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.29)>=DEA(0.27)金叉",
+        "MACD柱0.040刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=16未超买"
+      ],
+      "stop_loss": "8.35",
+      "target": "9.72",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股弱势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002815",
+      "name": "崇达技术",
+      "pattern": "MACD空中加油",
+      "raw_score": 80,
+      "final_score": 63,
+      "multi_score": 79,
+      "resonance": "共振向下",
+      "price": 21.12,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(1.54)>=DEA(0.83)金叉",
+        "MACD柱1.41>0但已走高",
+        "收盘21.12>MA518.92",
+        "MA20>MA60多头排列"
+      ],
+      "stop_loss": "17.97",
+      "target": "24.29",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "平台突破(12月新高)",
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002735",
+      "name": "王子新材",
+      "pattern": "MACD空中加油",
+      "raw_score": 80,
+      "final_score": 62,
+      "multi_score": 69,
+      "resonance": "共振向下",
+      "price": 12.88,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.20)>=DEA(0.04)金叉",
+        "MACD柱0.32>0但已走高",
+        "收盘12.88>MA512.45",
+        "KDJ_J=64未超买"
+      ],
+      "stop_loss": "11.83",
+      "target": "14.81",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "空头",
+      "month_gate": "BLOCK",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz003035",
+      "name": "南网能源",
+      "pattern": "箱体突破",
+      "raw_score": 80,
+      "final_score": 61,
+      "multi_score": 66,
+      "resonance": "共振向下",
+      "price": 5.92,
+      "reasons": [
+        "MA20(5.64)>MA60(5.60)",
+        "MACD金叉(DIF=0.07)",
+        "KDJ向上(J=66)",
+        "收盘5.92>MA55.82",
+        "突破验证通过：量2.4倍/回踩守住/位置-9%"
+      ],
+      "stop_loss": "5.41",
+      "target": "6.81",
+      "mode": 3,
+      "tag": "有效突破",
+      "breakout": {
+        "valid": true,
+        "reason": "量2.4倍/回踩守住/位置-9%",
+        "checks": {
+          "volume": true,
+          "pullback": true,
+          "position": true,
+          "pullback_state": "hold"
+        },
+        "box": {
+          "top": 5.83,
+          "bottom": 5.12,
+          "height": 13.9,
+          "break_date": "2026-09-11",
+          "vol_ratio": 2.41,
+          "pos_dev": -9.4
+        }
+      },
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": 35.5,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz003002",
+      "name": "壶化股份",
+      "pattern": "箱体突破",
+      "raw_score": 80,
+      "final_score": 61,
+      "multi_score": 65,
+      "resonance": "共振向下",
+      "price": 20.1,
+      "reasons": [
+        "MA20(17.43)>MA60(16.96)",
+        "MACD金叉(DIF=0.78)",
+        "KDJ向上(J=83)",
+        "收盘20.1>MA519.55",
+        "突破验证通过：量4.3倍/回踩守住/位置-18%"
+      ],
+      "stop_loss": "18.18",
+      "target": "23.11",
+      "mode": 3,
+      "tag": "有效突破",
+      "breakout": {
+        "valid": true,
+        "reason": "量4.3倍/回踩守住/位置-18%",
+        "checks": {
+          "volume": true,
+          "pullback": true,
+          "position": true,
+          "pullback_state": "hold"
+        },
+        "box": {
+          "top": 19.19,
+          "bottom": 14.49,
+          "height": 32.4,
+          "break_date": "2026-09-10",
+          "vol_ratio": 4.29,
+          "pos_dev": -17.6
+        }
+      },
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002925",
+      "name": "盈趣科技",
+      "pattern": "箱体突破",
+      "raw_score": 80,
+      "final_score": 61,
+      "multi_score": 63,
+      "resonance": "共振向下",
+      "price": 24.54,
+      "reasons": [
+        "MA20(23.12)>MA60(22.78)",
+        "MACD金叉(DIF=0.25)",
+        "KDJ向上(J=87)",
+        "收盘24.54>MA523.38",
+        "突破验证通过：量1.8倍/回踩待确认/位置-19%"
+      ],
+      "stop_loss": "21.74",
+      "target": "28.22",
+      "mode": 3,
+      "tag": "突破待回踩确认",
+      "breakout": {
+        "valid": true,
+        "reason": "量1.8倍/回踩待确认/位置-19%",
+        "checks": {
+          "volume": true,
+          "pullback": true,
+          "position": true,
+          "pullback_state": "pending"
+        },
+        "box": {
+          "top": 24.1,
+          "bottom": 18.76,
+          "height": 28.5,
+          "break_date": "2026-09-14",
+          "vol_ratio": 1.77,
+          "pos_dev": -19.2
+        }
+      },
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002839",
+      "name": "张家港行",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 59,
+      "multi_score": 77,
+      "resonance": "共振向下",
+      "price": 4.47,
+      "reasons": [
+        "MA20(4.38)>MA60(4.30)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离1.1%)",
+        "收盘4.47>MA54.46",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "4.16",
+      "target": "5.01",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002771",
+      "name": "真视通",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 58,
+      "multi_score": 71,
+      "resonance": "共振向下",
+      "price": 14.82,
+      "reasons": [
+        "MA20(13.47)>MA60(12.86)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离3.7%)",
+        "收盘14.82>MA514.42",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "12.80",
+      "target": "16.60",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz003035",
+      "name": "南网能源",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 57,
+      "multi_score": 66,
+      "resonance": "共振向下",
+      "price": 5.92,
+      "reasons": [
+        "MA20(5.64)>MA60(5.60)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离2.6%)",
+        "收盘5.92>MA55.82",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "5.36",
+      "target": "6.63",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": 35.5,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002976",
+      "name": "瑞玛精密",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 57,
+      "multi_score": 65,
+      "resonance": "共振向下",
+      "price": 25.72,
+      "reasons": [
+        "MA20(24.24)>MA60(23.38)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离4.3%)",
+        "收盘25.72>MA524.67",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "23.03",
+      "target": "28.81",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": 231.9,
+      "rsg_strong": true
+    },
+    {
+      "code": "sz002925",
+      "name": "盈趣科技",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 57,
+      "multi_score": 63,
+      "resonance": "共振向下",
+      "price": 24.54,
+      "reasons": [
+        "MA20(23.12)>MA60(22.78)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离4.9%)",
+        "收盘24.54>MA523.38",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "21.96",
+      "target": "27.48",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz003816",
+      "name": "中国广核",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 56,
+      "multi_score": 59,
+      "resonance": "共振向下",
+      "price": 4.34,
+      "reasons": [
+        "MA20(4.17)>MA60(4.02)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离0.2%)",
+        "收盘4.34>MA54.32",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "3.96",
+      "target": "4.86",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": null,
+      "rsg_dev": 141.5,
+      "rsg_strong": true
+    },
+    {
+      "code": "sz002807",
+      "name": "江阴银行",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 56,
+      "multi_score": 57,
+      "resonance": "共振向下",
+      "price": 4.29,
+      "reasons": [
+        "MA20(4.12)>MA60(4.00)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离1.7%)",
+        "收盘4.29>MA54.25",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "3.91",
+      "target": "4.80",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz003028",
+      "name": "振邦智能",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 55,
+      "multi_score": 51,
+      "resonance": "共振向下",
+      "price": 23.2,
+      "reasons": [
+        "MA20(22.92)>MA60(22.35)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离0.1%)",
+        "收盘23.2>MA523.04",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "21.77",
+      "target": "25.98",
+      "mode": 2,
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
@@ -296,461 +1060,24 @@
       "rsg_strong": false
     },
     {
-      "code": "sz002702",
-      "name": "海欣食品",
+      "code": "sz002980",
+      "name": "华盛昌",
       "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 68,
-      "multi_score": 61,
-      "resonance": "共振向下",
-      "price": 5.42,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.32)>=DEA(0.26)金叉",
-        "MACD柱0.120刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=26未超买"
-      ],
-      "stop_loss": "5.86",
-      "target": "6.23",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz002911",
-      "name": "佛燃能源",
-      "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 67,
-      "multi_score": 57,
-      "resonance": "共振向下",
-      "price": 11.53,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.19)>=DEA(0.15)金叉",
-        "MACD柱0.090刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=50未超买"
-      ],
-      "stop_loss": "11.04",
-      "target": "13.26",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 5.1,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz002905",
-      "name": "金逸影视",
-      "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 66,
-      "multi_score": 52,
-      "resonance": "共振向下",
-      "price": 8.57,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.32)>=DEA(0.27)金叉",
-        "MACD柱0.110刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=42未超买"
-      ],
-      "stop_loss": "8.40",
-      "target": "9.86",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz002852",
-      "name": "道道全",
-      "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 66,
-      "multi_score": 48,
-      "resonance": "共振向下",
-      "price": 8.6,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.33)>=DEA(0.31)金叉",
-        "MACD柱0.050刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=27未超买"
-      ],
-      "stop_loss": "8.73",
-      "target": "9.89",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz003002",
-      "name": "壶化股份",
-      "pattern": "MACD空中加油",
-      "raw_score": 80,
-      "final_score": 64,
-      "multi_score": 82,
-      "resonance": "共振向下",
-      "price": 20.41,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.68)>=DEA(0.28)金叉",
-        "MACD柱0.79>0但已走高",
-        "收盘20.41>MA519.05",
-        "MA20>MA60多头排列"
-      ],
-      "stop_loss": "18.10",
-      "target": "23.47",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz003002",
-      "name": "壶化股份",
-      "pattern": "箱体突破",
-      "raw_score": 80,
-      "final_score": 64,
-      "multi_score": 82,
-      "resonance": "共振向下",
-      "price": 20.41,
-      "reasons": [
-        "MA20(17.27)>MA60(16.96)",
-        "MACD金叉(DIF=0.68)",
-        "KDJ向上(J=91)",
-        "收盘20.41>MA519.05",
-        "突破验证通过：量4.6倍/回踩守住/位置-19%"
-      ],
-      "stop_loss": "17.72",
-      "target": "23.47",
-      "mode": 3,
-      "tag": "有效突破",
-      "breakout": {
-        "valid": true,
-        "reason": "量4.6倍/回踩守住/位置-19%",
-        "checks": {
-          "volume": true,
-          "pullback": true,
-          "position": true,
-          "pullback_state": "hold"
-        },
-        "box": {
-          "top": 19.19,
-          "bottom": 14.49,
-          "height": 32.4,
-          "break_date": "2026-09-10",
-          "vol_ratio": 4.61,
-          "pos_dev": -18.6
-        }
-      },
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz003035",
-      "name": "南网能源",
-      "pattern": "箱体突破",
-      "raw_score": 80,
-      "final_score": 63,
-      "multi_score": 78,
-      "resonance": "共振向下",
-      "price": 5.98,
-      "reasons": [
-        "MA20(5.61)>MA60(5.60)",
-        "MACD金叉(DIF=0.06)",
-        "KDJ向上(J=96)",
-        "收盘5.98>MA55.77",
-        "突破验证通过：量2.4倍/回踩待确认/位置-10%"
-      ],
-      "stop_loss": "5.37",
-      "target": "6.88",
-      "mode": 3,
-      "tag": "突破待回踩确认",
-      "breakout": {
-        "valid": true,
-        "reason": "量2.4倍/回踩待确认/位置-10%",
-        "checks": {
-          "volume": true,
-          "pullback": true,
-          "position": true,
-          "pullback_state": "pending"
-        },
-        "box": {
-          "top": 5.83,
-          "bottom": 5.12,
-          "height": 13.9,
-          "break_date": "2026-09-11",
-          "vol_ratio": 2.43,
-          "pos_dev": -10.2
-        }
-      },
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 49.2,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz002815",
-      "name": "崇达技术",
-      "pattern": "MACD空中加油",
-      "raw_score": 80,
-      "final_score": 63,
-      "multi_score": 79,
-      "resonance": "共振向下",
-      "price": 20.08,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(1.26)>=DEA(0.66)金叉",
-        "MACD柱1.20>0但已走高",
-        "收盘20.08>MA517.9",
-        "MA20>MA60多头排列"
-      ],
-      "stop_loss": "17.00",
-      "target": "23.09",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz002790",
-      "name": "瑞尔特",
-      "pattern": "MACD空中加油",
-      "raw_score": 80,
-      "final_score": 63,
-      "multi_score": 79,
-      "resonance": "共振向下",
-      "price": 9.31,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.61)>=DEA(0.32)金叉",
-        "MACD柱0.58>0但已走高",
-        "收盘9.31>MA57.76",
-        "MA20>MA60多头排列"
-      ],
-      "stop_loss": "7.37",
-      "target": "10.71",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 294.3,
-      "rsg_strong": true
-    },
-    {
-      "code": "sz002790",
-      "name": "瑞尔特",
-      "pattern": "箱体突破",
-      "raw_score": 80,
-      "final_score": 63,
-      "multi_score": 79,
-      "resonance": "共振向下",
-      "price": 9.31,
-      "reasons": [
-        "MA20(6.54)>MA60(5.90)",
-        "MACD金叉(DIF=0.61)",
-        "KDJ向上(J=107)",
-        "收盘9.31>MA57.76",
-        "突破验证通过：量4.4倍/回踩守住/位置-6%"
-      ],
-      "stop_loss": "7.22",
-      "target": "10.71",
-      "mode": 3,
-      "tag": "有效突破",
-      "breakout": {
-        "valid": true,
-        "reason": "量4.4倍/回踩守住/位置-6%",
-        "checks": {
-          "volume": true,
-          "pullback": true,
-          "position": true,
-          "pullback_state": "hold"
-        },
-        "box": {
-          "top": 6.99,
-          "bottom": 5.2,
-          "height": 34.4,
-          "break_date": "2026-09-09",
-          "vol_ratio": 4.41,
-          "pos_dev": -6.3
-        }
-      },
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 294.3,
-      "rsg_strong": true
-    },
-    {
-      "code": "sz002983",
-      "name": "芯瑞达",
-      "pattern": "MACD空中加油",
-      "raw_score": 85,
-      "final_score": 60,
-      "multi_score": 33,
-      "resonance": "共振向下",
-      "price": 20.97,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.33)>=DEA(0.26)金叉",
-        "MACD柱0.130刚翻红加油成功",
-        "KDJ_J=25未超买"
-      ],
-      "stop_loss": "20.06",
-      "target": "24.12",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": -5.5,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz003035",
-      "name": "南网能源",
-      "pattern": "均线回踩支撑",
       "raw_score": 75,
-      "final_score": 59,
-      "multi_score": 78,
+      "final_score": 55,
+      "multi_score": 51,
       "resonance": "共振向下",
-      "price": 5.98,
+      "price": 123.48,
       "reasons": [
-        "MA20(5.61)>MA60(5.60)多头",
-        "MACD在0轴上方",
-        "在MA10附近(偏离4.0%)",
-        "收盘5.98>MA55.77",
-        "站在布林中轨上方"
+        "DIF/DEA在0轴上方",
+        "DIF(9.83)>=DEA(7.29)金叉",
+        "MACD柱5.07>0但已走高",
+        "MA20>MA60多头排列",
+        "KDJ_J=73未超买"
       ],
-      "stop_loss": "5.33",
-      "target": "6.70",
-      "mode": 2,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 49.2,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz003816",
-      "name": "中国广核",
-      "pattern": "均线回踩支撑",
-      "raw_score": 75,
-      "final_score": 56,
-      "multi_score": 55,
-      "resonance": "共振向下",
-      "price": 4.33,
-      "reasons": [
-        "MA20(4.15)>MA60(4.01)多头",
-        "MACD在0轴上方",
-        "在MA10附近(偏离0.2%)",
-        "收盘4.33>MA54.31",
-        "站在布林中轨上方"
-      ],
-      "stop_loss": "3.94",
-      "target": "4.85",
-      "mode": 2,
+      "stop_loss": "123.08",
+      "target": "142.00",
+      "mode": 1,
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
@@ -760,39 +1087,7 @@
       },
       "month_trend": "多头",
       "month_gate": "PASS",
-      "month_reversal": null,
-      "rsg_dev": 142.2,
-      "rsg_strong": true
-    },
-    {
-      "code": "sz003002",
-      "name": "壶化股份",
-      "pattern": "高阳强势",
-      "raw_score": 70,
-      "final_score": 56,
-      "multi_score": 82,
-      "resonance": "共振向下",
-      "price": 20.41,
-      "reasons": [
-        "MA20(17.27)>MA60(16.96)多头",
-        "近3日涨幅10.5%（高阳）",
-        "收盘20.41>MA519.05",
-        "MACD金叉0轴上"
-      ],
-      "stop_loss": "17.72",
-      "target": "23.47",
-      "mode": 4,
-      "tag": "高阳强势",
-      "trend_exit": "趋势跟踪止盈：MA20破位或MACD死叉（不等回落）",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
+      "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": null,
       "rsg_strong": false
     },
@@ -804,16 +1099,16 @@
       "final_score": 55,
       "multi_score": 47,
       "resonance": "共振向下",
-      "price": 9.3,
+      "price": 9.35,
       "reasons": [
-        "MA20(8.87)>MA60(8.19)多头",
+        "MA20(8.91)>MA60(8.22)多头",
         "MACD在0轴上方",
-        "在MA10附近(偏离2.1%)",
-        "收盘9.3>MA59.17",
+        "在MA10附近(偏离2.2%)",
+        "收盘9.35>MA59.24",
         "站在布林中轨上方"
       ],
-      "stop_loss": "8.43",
-      "target": "10.42",
+      "stop_loss": "8.46",
+      "target": "10.47",
       "mode": 2,
       "tag": "",
       "resonance_detail": {
@@ -829,38 +1124,6 @@
       "rsg_strong": false
     },
     {
-      "code": "sz002925",
-      "name": "盈趣科技",
-      "pattern": "均线回踩支撑",
-      "raw_score": 75,
-      "final_score": 55,
-      "multi_score": 49,
-      "resonance": "共振向下",
-      "price": 23.51,
-      "reasons": [
-        "MA20(23.10)>MA60(22.75)多头",
-        "MACD在0轴上方",
-        "在MA10附近(偏离1.0%)",
-        "收盘23.51>MA523.1",
-        "站在布林中轨上方"
-      ],
-      "stop_loss": "21.95",
-      "target": "26.33",
-      "mode": 2,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": 220.4,
-      "rsg_strong": true
-    },
-    {
       "code": "sz002815",
       "name": "崇达技术",
       "pattern": "高阳强势",
@@ -868,15 +1131,15 @@
       "final_score": 55,
       "multi_score": 79,
       "resonance": "共振向下",
-      "price": 20.08,
+      "price": 21.12,
       "reasons": [
-        "MA20(14.99)>MA60(14.57)多头",
-        "近3日涨幅11.2%（高阳）",
-        "收盘20.08>MA517.9",
+        "MA20(15.37)>MA60(14.59)多头",
+        "近3日涨幅15.7%（高阳）",
+        "收盘21.12>MA518.92",
         "MACD金叉0轴上"
       ],
-      "stop_loss": "16.65",
-      "target": "23.09",
+      "stop_loss": "17.60",
+      "target": "24.29",
       "mode": 4,
       "tag": "高阳强势",
       "trend_exit": "趋势跟踪止盈：MA20破位或MACD死叉（不等回落）",
@@ -888,41 +1151,9 @@
       },
       "month_trend": "多头",
       "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
+      "month_reversal": "平台突破(12月新高)",
       "rsg_dev": null,
       "rsg_strong": false
-    },
-    {
-      "code": "sz002790",
-      "name": "瑞尔特",
-      "pattern": "高阳强势",
-      "raw_score": 70,
-      "final_score": 55,
-      "multi_score": 79,
-      "resonance": "共振向下",
-      "price": 9.31,
-      "reasons": [
-        "MA20(6.54)>MA60(5.90)多头",
-        "近3日涨幅21.1%（高阳）",
-        "收盘9.31>MA57.76",
-        "MACD金叉0轴上"
-      ],
-      "stop_loss": "7.22",
-      "target": "10.71",
-      "mode": 4,
-      "tag": "高阳强势",
-      "trend_exit": "趋势跟踪止盈：MA20破位或MACD死叉（不等回落）",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 294.3,
-      "rsg_strong": true
     }
   ]
 }
