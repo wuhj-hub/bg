@@ -463,7 +463,22 @@ def main():
         total_hint = len(rows)
         # 名称填充（A：all_mainboard.csv 100%覆盖主板）+ 板块归属（B：sector_component.json）
         name_map, sector_map = {}, {}
-        nf = args.name_file or os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "all_mainboard.csv")
+        # ⚠️ 2026-09-15 修复：原默认路径层数错误（指向仓库外）→ 名称/板块全空，连板梯队只剩代码
+        #    （9/14 盘后观察到的现象）。改为多候选鲁棒查找（脚本在 quant_scripts/，仓库根=上一级）。
+        if args.name_file:
+            nf = args.name_file
+        else:
+            _base = os.path.dirname(os.path.abspath(__file__))
+            nf = "all_mainboard.csv"
+            for _c in (os.path.join(_base, "..", "all_mainboard.csv"),
+                       os.path.join(_base, "..", "..", "all_mainboard.csv"),
+                       "all_mainboard.csv",
+                       "/sandbox/workspace/all_mainboard.csv"):
+                if os.path.exists(_c):
+                    nf = os.path.normpath(_c)
+                    break
+        if not os.path.exists(nf) and os.path.exists("all_mainboard.csv"):
+            nf = "all_mainboard.csv"          # 兜底：cwd 即仓库根
         if os.path.exists(nf):
             try:
                 with open(nf, encoding="utf-8") as f2:
