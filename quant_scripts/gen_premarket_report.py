@@ -593,6 +593,14 @@ def gen_report(today_str):
     except Exception as e:
         lines.append(f"- 一统天下RSV50：读取失败({e})")
 
+    # ③.6 一统天下·乖离低买（20年验证唯一6/6环境全显著正）
+    try:
+        _gl = render_guaili()
+        if _gl:
+            lines.append(_gl)
+    except Exception as e:
+        lines.append(f"- 乖离低买：读取失败({e})")
+
     lines.append("\n## ④ 个股定点\n")
     lines.append("⏳ 每日量化数据由15:30全盘量化扫描生成，盘前时段引用昨日数据。\n")
     
@@ -1097,6 +1105,33 @@ def render_env_switch():
              "一统·日周双共振 2/6｜猛兽RS_D 1/6；**鱼身·均线回踩/箱体突破、猛兽·伏击线、猛兽Setup≥50、123买入 "
              "在全部6环境显著为负**（t≈-4~-10）。数值为日均超额，受右尾影响偏大（中位约为其1/3）。"
              "详见技能《板块个股入牛时点》第九节。\n")
+    return "\n".join(L)
+
+
+def read_guaili():
+    """读一统天下·乖离低买扫描产物（盘后产出）"""
+    for pth in ("乖离低买_latest.json", "outputs/乖离低买_latest.json",
+                "/sandbox/workspace/github_bg/乖离低买_latest.json",
+                "/sandbox/workspace/github_bg/outputs/乖离低买_latest.json"):
+        try:
+            return json.load(open(pth, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def render_guaili():
+    """③.6 一统天下·乖离低买（20年验证唯一 6/6 环境全显著正的信号）"""
+    d = read_guaili()
+    if not d or not d.get("hits"):
+        return None
+    hs = d["hits"]
+    L = ["\n### ③.6 🎯 一统天下·乖离低买（跌破MA5>7% · 20年验证6/6环境全显著正）\n",
+         f"> {d.get('date', '')} 盘后扫描 ｜ 命中 **{len(hs)}** 只 ｜ 中位超额 +2.56%/20日 · 胜率 59%（全环境 t>6）\n"]
+    top = hs[:10]
+    L.append("- **乖离最深 10 只**：" + " ｜ ".join(
+        f"{h['name']}({h['code'][2:]}) {h['bias']}%" for h in top))
+    L.append(f"- 说明：急跌乖离低吸信号，须配合 **2×ATR 止损**；完整名单见盘后《乖离低买》报告。")
     return "\n".join(L)
 
 
