@@ -298,7 +298,7 @@ def load_pool_candidates(min_star=1):
                 continue
             src = r.get("src") or []
             out.append({"code": c, "name": names.get(c, "") or c,
-                        "signal": lv + "｜" + "·".join(str(x)[:14] for x in src[:2]),
+                        "signal": lv + "｜" + "·".join(str(x)[:26] for x in src[:2]),
                         "from_pool": True, "pool_date": d.get("date", "")})
         return out
     return []
