@@ -382,6 +382,68 @@ def detect_trend_anomaly(history, current_checks):
 
 # ─── 综合评分 ───
 
+def check_products(date=None):
+    """检查5: 盘后产物有效性（2026-09-14 加固）
+
+    背景：9/14 盘后 job 全绿但数据全空（才哥战法「有效 0 只」，9/11-9/12 均 3051 只；
+    执行卡 7/7「日线数据不足」），而 self_check 只审 panhou_lianghua.csv（scan job 产物，
+    当天健康）→ 仍评 100/100 健康，属漏检。故新增本项：直接审「数据获取」本身。
+    """
+    if not date:
+        date = time.strftime("%Y-%m-%d")
+    import os as _os, json as _json
+
+    issues, details, status = [], {}, "PASS"
+    max_sev = 0   # 0=PASS 1=WARN 2=FAIL
+
+    # ① 前置数据源探针结果（report job 的 data_guard.py 产出）
+    dg = None
+    for cand in ("outputs/data_guard.json", "data_guard.json"):
+        if _os.path.exists(cand):
+            try:
+                dg = _json.load(open(cand, encoding="utf-8"))
+            except Exception:
+                dg = None
+            break
+    if dg:
+        ratio = dg.get("ratio", 1.0)
+        details["数据源探针"] = f"{dg.get('ok_count')}/{dg.get('total')} = {ratio:.0%}"
+        if ratio < 0.5:
+            issues.append(f"❌ 数据源连通性故障：探针成功率仅 {ratio:.0%}（{dg.get('status')}）——本轮盘后扫描结果不可信")
+            max_sev = max(max_sev, 2)
+        elif ratio < 1.0:
+            issues.append(f"⚠️ 数据源探针部分失败：{ratio:.0%}")
+            max_sev = max(max_sev, 1)
+    else:
+        details["数据源探针"] = "未运行（无 data_guard.json）"
+
+    # ② 个股执行卡：有卡但全部取数失败 = 数据层断裂
+    for cand in ("outputs/execution_cards_latest.json", "execution_cards_latest.json"):
+        if not _os.path.exists(cand):
+            continue
+        try:
+            cards = _json.load(open(cand, encoding="utf-8")).get("cards", [])
+        except Exception:
+            continue
+        if cards:
+            bad = sum(1 for c in cards if c.get("error"))
+            details["执行卡"] = f"{len(cards) - bad}/{len(cards)} 张有效"
+            if bad == len(cards):
+                issues.append(f"❌ 个股执行卡 {len(cards)} 张全部取数失败（示例：{cards[0].get('error')}）")
+                max_sev = max(max_sev, 2)
+            elif bad / len(cards) > 0.5:
+                issues.append(f"⚠️ 个股执行卡 {bad}/{len(cards)} 张取数失败")
+                max_sev = max(max_sev, 1)
+        break
+
+    if max_sev == 2:
+        status = "FAIL"
+    elif max_sev == 1:
+        status = "WARN"
+
+    return {"name": "盘后产物有效性", "status": status, "details": details, "issues": issues}
+
+
 def compute_health_score(checks):
     """计算综合健康评分 0-100"""
     score = 100.0
@@ -403,6 +465,11 @@ def compute_health_score(checks):
         "freshness": {
             "FAIL": 20,
             "WARN": 8,
+        },
+        # 2026-09-14 新增：盘后产物有效性（数据源断裂是最高危，扣分最重）
+        "products": {
+            "FAIL": 40,
+            "WARN": 12,
         },
     }
 
@@ -565,6 +632,9 @@ def main():
         "issues": trend_issues,
     }
 
+    # 3.5 盘后产物有效性（2026-09-14：堵「全绿但数据全空」假绿）
+    checks["products"] = check_products(today)
+
     # 4. 计算健康评分
     health_score = compute_health_score(checks)
     health_grade = grade_health(health_score)
@@ -585,7 +655,7 @@ def main():
             print(f"   ⚠️ 游资情绪占比偏高: {regime_detail['speculative_pct']}%，市场情绪驱动")
 
     print(f"\n✅ 检查项明细:")
-    for check_name in ["coverage", "signal", "reasonability", "freshness", "market_regime", "trend"]:
+    for check_name in ["coverage", "signal", "reasonability", "freshness", "products", "market_regime", "trend"]:
         c = checks.get(check_name)
         if not c:
             continue
