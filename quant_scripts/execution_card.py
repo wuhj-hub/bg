@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-execution_card.py —— 个股执行卡 v1.0（张穗鸿「卷钱机器」周期级联机制落地）
+execution_card.py —— 个股执行卡 v1.1（张穗鸿「卷钱机器」周期级联机制落地）
+  v1.1: 新增 --pool（并入当日信号池 ★及以上候选）+ 🆕 新上卡标记 + 修复 summary 渲染
 ====================================================================
 将「指导周期×操作周期」机构分仓思想融入现有体系，给候选信号强制生成执行卡：
 
@@ -19,7 +20,8 @@ execution_card.py —— 个股执行卡 v1.0（张穗鸿「卷钱机器」周�
   python3 execution_card.py --codes sh600797,sz000839 --total 1000000
   python3 execution_card.py --file signals.json --total 1000000
   signals.json: {"stocks":[{"code":"sh600797","name":"浙大网新","signal":"月线反转"}]}
-  python3 execution_card.py --holdings --total 1000000   # 读 holdings.txt
+  python3 execution_card.py --holdings --pool --total 1000000   # 持仓 + 当日信号池（推荐）
+  python3 execution_card.py --holdings --merge-holdings --pool   # 同上（显式写法）
 输出：outputs/execution_cards_latest.json + outputs/execution_cards_{date}.md
 """
 import json, os, sys, re
@@ -203,7 +205,7 @@ def exec_card(code, name="", signal="", total_capital=1000000):
         final_loss = round(total_b / 100 * total_capital * risk_pct / 100)
         card["verdict"] = gate["level"]
         card["max_loss_final"] = final_loss
-        card["summary"] = (f"{gate['level']} {budget['status']} | 分批合计{total_b}%"
+        card["summary"] = (f"{budget['status']} | 分批合计{total_b}%"
                            f"（单票上限{MAX_SINGLE_POS:.0f}%×门禁{gate_mult:.1f}）"
                            f"实际最大亏损≈{final_loss}元")
     except Exception as e:
@@ -216,11 +218,12 @@ def render_md(cards, total_capital):
          f"> 三层检查：①上级周期门禁(月+周) ②资金预算(2×ATR止损/盈亏比≥2/单票≤{MAX_SINGLE_POS:.0f}%) "
          f"③分批执行(5:3:2)。总资金基准：{total_capital/10000:.0f}万。\n"]
     for c in cards:
+        tag = "🆕 " if c.get("is_new") else ""
         if "error" in c:
-            L.append(f"- {c['code']} {c['name']}：⚠️ {c['error']}")
+            L.append(f"- {tag}{c['code']} {c['name']}：⚠️ {c['error']}")
             continue
         up = c.get("upper", {})
-        L.append(f"\n### {c['verdict']} {c['name']}({c['code']}) · {c.get('signal') or '候选'}")
+        L.append(f"\n### {tag}{c['verdict']} {c['name']}({c['code']}) · {c.get('signal') or '候选'}")
         L.append(f"- **上级门禁**：月线{up.get('month_trend')}({up.get('month_gate')}) / "
                  f"周线{up.get('week_trend')}({up.get('week_gate')}) → {up.get('verdict')}")
         if c.get("action"):
@@ -250,6 +253,71 @@ def load_holdings():
     return out
 
 
+def load_names():
+    """代码→名称（all_mainboard.csv，6位码无前缀）"""
+    import csv
+    for pth in ("all_mainboard.csv", os.path.join(os.path.dirname(BASE), "all_mainboard.csv"),
+                os.path.join(BASE, "all_mainboard.csv")):
+        if os.path.exists(pth):
+            out = {}
+            try:
+                for r in csv.DictReader(open(pth, encoding="utf-8-sig")):
+                    c = (r.get("code") or "").strip()
+                    if re.match(r"^\d{6}$", c):
+                        out[("sh" if c[0] in "69" else "sz") + c] = re.sub(r"\s+", "", r.get("name") or "")
+            except Exception:
+                return {}
+            return out
+    return {}
+
+
+def load_pool_candidates(min_star=1):
+    """从当日信号池读候选：信号仲裁_latest.json 的 ranked（★ 及以上，排除"观察"）
+    返回 [{code,name,signal,from_pool,pool_date}]
+    """
+    for pth in ("outputs/信号仲裁_latest.json", "信号仲裁_latest.json",
+                "/sandbox/workspace/github_bg/outputs/信号仲裁_latest.json",
+                "/sandbox/workspace/github_bg/信号仲裁_latest.json"):
+        if not os.path.exists(pth):
+            continue
+        try:
+            d = json.load(open(pth, encoding="utf-8"))
+        except Exception:
+            continue
+        ranked = d.get("ranked") or []
+        if not ranked:
+            continue
+        names = load_names()
+        out = []
+        for r in ranked:
+            lv = (r.get("level") or "").strip()
+            if lv.count("★") < min_star:          # 只取 ★ 及以上
+                continue
+            c = (r.get("code") or "").strip()
+            if not re.match(r"^(sh|sz)\d{6}$", c):
+                continue
+            src = r.get("src") or []
+            out.append({"code": c, "name": names.get(c, "") or c,
+                        "signal": lv + "｜" + "·".join(str(x)[:14] for x in src[:2]),
+                        "from_pool": True, "pool_date": d.get("date", "")})
+        return out
+    return []
+
+
+def load_prev_codes(out_dir):
+    """上一期执行卡的代码集合（用于 🆕 标记）"""
+    for pth in (os.path.join(out_dir, "execution_cards_latest.json"),
+                "execution_cards_latest.json", "outputs/execution_cards_latest.json"):
+        if os.path.exists(pth):
+            try:
+                d = json.load(open(pth, encoding="utf-8"))
+                if d.get("date") != datetime.now().strftime("%Y-%m-%d"):
+                    return {c.get("code") for c in d.get("cards", [])}, d.get("date", "")
+            except Exception:
+                continue
+    return set(), ""
+
+
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
@@ -257,32 +325,55 @@ if __name__ == "__main__":
     ap.add_argument("--names", help="逗号分隔名称（与codes对应，可选）")
     ap.add_argument("--file", help="JSON文件: {\"stocks\":[{code,name,signal}]}")
     ap.add_argument("--holdings", action="store_true", help="读持仓")
+    ap.add_argument("--pool", action="store_true", help="并入当日信号池（信号仲裁 ★及以上候选）")
+    ap.add_argument("--merge-holdings", action="store_true", help="与持仓合并（配合 --pool 用）")
     ap.add_argument("--total", type=float, default=1000000, help="总资金（默认100万）")
     ap.add_argument("--out", default=OUT_DIR, help="输出目录")
     args = ap.parse_args()
 
-    stocks = []
+    nmap = load_names()
+    stocks, seen = [], set()
+
+    def _add(items):
+        for it in items:
+            c = it.get("code")
+            if not c or c in seen:
+                continue
+            seen.add(c)
+            if not it.get("name"):
+                it["name"] = nmap.get(c, c)
+            stocks.append(it)
+
+    if args.holdings or args.merge_holdings:
+        _add(load_holdings())
     if args.file:
-        data = json.load(open(args.file, encoding="utf-8"))
-        stocks = data.get("stocks", data if isinstance(data, list) else [])
-    elif args.holdings:
-        stocks = load_holdings()
-    elif args.codes:
-        codes = [c.strip() for c in args.codes.split(",") if c.strip()]
-        names = [n.strip() for n in args.names.split(",")] if args.names else []
-        for i, c in enumerate(codes):
-            stocks.append({"code": c, "name": names[i] if i < len(names) else "", "signal": ""})
+        _d = json.load(open(args.file, encoding="utf-8"))
+        _add(_d.get("stocks", _d if isinstance(_d, list) else []))
+    if args.pool:
+        _p = load_pool_candidates()
+        _add(_p)
+        print(f"信号池候选 {len(_p)} 只（★及以上，来源 信号仲裁_latest.json）")
+    if args.codes:
+        _cs = [c.strip() for c in args.codes.split(",") if c.strip()]
+        _ns = [n.strip() for n in args.names.split(",")] if args.names else []
+        _add([{"code": c, "name": _ns[i] if i < len(_ns) else "", "signal": ""} for i, c in enumerate(_cs)])
     if not stocks:
         print(__doc__)
         sys.exit(1)
 
+    prev_codes, prev_date = load_prev_codes(args.out)
+    if prev_codes:
+        print(f"上期执行卡({prev_date})共 {len(prev_codes)} 只，本期新上卡标的将标记 🆕")
     print(f"生成执行卡：{len(stocks)}只 | 总资金 {args.total/10000:.0f}万")
     cards = []
     for s in stocks:
         card = exec_card(s["code"], s.get("name", ""), s.get("signal", ""), args.total)
+        card["is_new"] = card["code"] not in prev_codes
+        if s.get("from_pool"):
+            card["from_pool"] = True
         cards.append(card)
         v = card.get("verdict", card.get("error", "?"))
-        print(f"  {card['code']} {card['name']}: {v}")
+        print(f"  {'🆕' if card['is_new'] else '  '} {card['code']} {card['name']}: {v}")
 
     os.makedirs(args.out, exist_ok=True)
     date = datetime.now().strftime("%Y-%m-%d")
