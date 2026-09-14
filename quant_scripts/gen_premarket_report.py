@@ -540,6 +540,15 @@ def gen_report(today_str):
         lines.append("")
     except Exception as e:
         lines.append(f"- 量价时空：计算失败({e})")
+
+    # ②.7 环境切换决策表（用哪套·关哪套）
+    try:
+        _es = render_env_switch()
+        if _es:
+            lines.append(_es)
+    except Exception as e:
+        lines.append(f"- 环境切换：计算失败({e})")
+
     lines.append("\n## ③ 板块排行\n")
     board = get_board_data()
     if board:
@@ -986,23 +995,99 @@ def read_execution_cards():
     return None
 
 
+# ══════════ ②.7 环境切换决策表（用哪套·关哪套）══════════
+# 数据来源：3,051 只主板股 × 1,700 日、241 万个信号观测，按 market_regime.py 精确口径
+# （长期力量=月线 MA5/10/20/30+DIF；短期力量=日线同口径）分层的【20日超额收益】
+# 每项 = {"熊/震荡/牛": (长期力量口径超额, 短期力量口径超额)}，单位 %
+ENV_SWITCH = {
+    "S1 超跌(RSI<25)":          {"熊": (18.39, 9.48),  "震荡": (11.22, 17.99), "牛": (6.00, 17.82)},
+    "RSV启动(RSV均<20拐头↑)":    {"熊": (4.69, 2.02),   "震荡": (1.58, 1.16),   "牛": (0.23, 3.83)},
+    "RSV半启动(20-40+涨停)":     {"熊": (6.01, -0.23),  "震荡": (-4.50, 0.0),   "牛": (-1.88, 0.07)},
+    "武威G1·双阴(阳2阴2缩量)":   {"熊": (3.69, 0.88),   "震荡": (-1.04, 2.58),  "牛": (2.79, 0.97)},
+    "武威G1·一阴(阳1阴2缩量)":   {"熊": (1.73, 5.64),   "震荡": (2.84, 0.0),    "牛": (1.57, 2.64)},
+    "2B买入(20日新低收回2%)":    {"熊": (0.53, 0.18),   "震荡": (-0.49, -0.90), "牛": (-0.92, -0.14)},
+    "RSV周线破50":              {"熊": (-1.23, -0.81), "震荡": (-3.40, 0.0),   "牛": (-2.47, -2.20)},
+    "123买入(突破次高+回踩)":    {"熊": (-3.66, -2.45), "震荡": (-3.98, 0.0),   "牛": (-2.59, -4.23)},
+}
+ENV_BUCKET = {"强势向上": "牛", "向上": "牛", "纠缠": "震荡", "向下": "熊", "弱势向下": "熊"}
+
+
+def read_market_regime():
+    """读 market_regime.py 产出（三级别力量判定），失败返回 None"""
+    for p in ("market_regime_latest.json", "outputs/market_regime_latest.json",
+              "/sandbox/workspace/github_bg/market_regime_latest.json",
+              "/sandbox/workspace/github_bg/outputs/market_regime_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def render_env_switch():
+    """②.7 环境切换决策表：按当日长期/短期力量，给出每个信号"主用/可用/中性/关闭" """
+    g = read_market_regime()
+    if not g:
+        return None
+    lb = ENV_BUCKET.get((g.get("long") or {}).get("state", ""), "震荡")
+    sb = ENV_BUCKET.get((g.get("short") or {}).get("state", ""), "震荡")
+    L = ["\n### ②.7 🧭 环境切换决策表（今天用哪套 · 关掉哪套）\n",
+         f"> 口径=`market_regime` 三级别力量（月线/周线/日线各5根线方向）："
+         f"**长期力量(月线)** = {lb}（{(g.get('long') or {}).get('state', '—')}） · "
+         f"**短期力量(日线)** = {sb}（{(g.get('short') or {}).get('state', '—')}） · "
+         f"综合 **{g.get('verdict', '—')}**（{g.get('date', '')}）。"
+         "超额=241万信号观测的20日收益−同期全市场等权。\n"]
+    rows = []
+    for nm, m in ENV_SWITCH.items():
+        lv = m[lb][0]
+        sv = m[sb][1]
+        worst = min(lv, sv)
+        if worst >= 3.0:
+            tag = "✅ 主用"
+        elif worst > 0:
+            tag = "🟡 可用"
+        elif worst > -1.5:
+            tag = "➖ 中性"
+        else:
+            tag = "⛔ 关闭"
+        rows.append((tag, nm, lv, sv, worst))
+    rows.sort(key=lambda r: -r[4])
+    L.append("| 判定 | 工具 | 长期口径超额 | 短期口径超额 |")
+    L.append("|---|---|---|---|")
+    for tag, nm, lv, sv, _ in rows:
+        L.append(f"| {tag} | {nm} | {lv:+.2f}% | {sv:+.2f}% |")
+    main = [r[1].split("(")[0] for r in rows if r[0] == "✅ 主用"]
+    off = [r[1].split("(")[0] for r in rows if r[0] == "⛔ 关闭"]
+    L.append("")
+    L.append(f"- **今日执行**：主用 → {'、'.join(main) if main else '无'}；"
+             f"{'关闭 → ' + '、'.join(off) if off else '无必须关闭项'}")
+    L.append("- 说明：口径来自「弱市体系复测」（`rsv_strength.py`/`scan_123_2b.py`/`wuwei_scan_month.py` 原始逻辑）。"
+             "趋势型体系（强势突破/猛兽/月线入牛）在熊市须关闭，详见技能《板块个股入牛时点》第九节。\n")
+    return "\n".join(L)
+
+
 def render_execution_cards():
-    """④.1 个股执行卡紧凑渲染（卷钱机器·周期级联：月/周门禁→预算→5:3:2分批）"""
+    """④.1 个股执行卡紧凑渲染 v1.1
+    改动：① 🆕 新上卡标记 ② summary 内联进卡片行（修复"孤立半截行"） ③ 持仓/新增候选/延续候选 分组
+    """
     d = read_execution_cards()
     if not d or not d.get("cards"):
         return ""
     cards = d["cards"]
     total = d.get("total_capital", 1000000)
     L = ["\n### ④.1 个股执行卡（卷钱机器·周期级联）\n",
-         f"> 昨日盘后 execution_card 输出 · 基准{total/10000:.0f}万：①月/周上级门禁 ②2×ATR止损·盈亏比≥2·单票≤30% ③5:3:2分批。\n"]
-    for c in cards:
+         f"> {d.get('date', '')} 盘后 execution_card 输出 · 基准{total/10000:.0f}万："
+         "①月/周上级门禁 ②2×ATR止损·盈亏比≥2·单票≤30% ③5:3:2分批。"
+         "🆕 = 首次上卡（含当日信号仲裁 ★ 及以上候选）。\n"]
+
+    def line(c):
+        tag = "🆕 " if c.get("is_new") else ""
         nm = f"{c['name']}({c['code']})"
         if c.get("signal"):
             nm += f"·{c['signal']}"
         v = c.get("verdict", "?")
         if c.get("action"):
-            L.append(f"- {v} **{nm}**：{c['action']}")
-            continue
+            return [f"- {tag}{v} **{nm}**：{c['action']}"]
         up = c.get("upper", {})
         b = c.get("budget", {})
         parts = []
@@ -1011,12 +1096,31 @@ def render_execution_cards():
             if tr.startswith("信号确认位附近(≈"):
                 tr = "≈" + tr.split("(≈")[1].rstrip(")")
             parts.append(f"{x['batch']} {x.get('pct')}%@{tr}")
-        bs = " → ".join(parts)
-        L.append(f"- {v} **{nm}**：月{up.get('month_trend')}({up.get('month_gate')})/"
-                 f"周{up.get('week_trend')}({up.get('week_gate')}) | 止损{b.get('stop')} "
-                 f"目标{b.get('target')} 盈亏比{b.get('rr')} | {bs}")
+        out = [f"- {tag}{v} **{nm}**：月{up.get('month_trend')}({up.get('month_gate')})/"
+               f"周{up.get('week_trend')}({up.get('week_gate')}) | 止损{b.get('stop')} "
+               f"目标{b.get('target')} 盈亏比{b.get('rr')} | " + " → ".join(parts)]
         if c.get("summary"):
-            L.append(f"  - {c['summary']}")
+            out.append(f"  ↳ {c['summary']}")
+        return out
+
+    holds = [c for c in cards if (c.get("signal") or "").startswith("持仓")]
+    cands = [c for c in cards if c not in holds]
+    if holds:
+        L.append("**持仓卡**")
+        for c in holds:
+            L.extend(line(c))
+    newc = [c for c in cands if c.get("is_new")]
+    if newc:
+        L.append("")
+        L.append(f"**🆕 今日新上卡候选（{len(newc)}只）**")
+        for c in newc:
+            L.extend(line(c))
+    oldc = [c for c in cands if not c.get("is_new")]
+    if oldc:
+        L.append("")
+        L.append(f"**延续候选（{len(oldc)}只）**")
+        for c in oldc:
+            L.extend(line(c))
     L.append("")
     return "\n".join(L)
 
