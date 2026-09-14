@@ -243,14 +243,14 @@ def load_reversal():
 SYSTEM_REGISTRY = {
     "四维共振":   {"weight": 3, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
                    "note": "证据链闭合（政策/资金/筹码/关联方），≥7分高置信，否决-3"},
-    "猛兽Setup":  {"weight": 3, "winrate": "74.3%", "rr": "2.4", "verified": True, "freq": "日",
-                   "note": "强度刻度，Setup≥60一档；三阶共振E方法回测（1500只×2批一致）"},
+    "猛兽Setup":  {"weight": 3, "winrate": "—", "rr": "—", "verified": True, "freq": "日",
+                   "note": "2026-09-14 20年长样本：≥60仅长期牛市显著(+4.20/t2.8)、≥50全环境显著负(t≈-4~-6)、≥40无区分度；≥50/≥40已降级不计分"},
     "乾坤A级":    {"weight": 2, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
                    "note": "资金强攻+业绩共振"},
     "鱼身空中加油": {"weight": 2, "winrate": "65.8%", "rr": "2.74", "verified": True, "freq": "日",
                    "note": "买点时机；武威G1∩月线反转回测（336样本）"},
-    "鱼身回踩/突破": {"weight": 1, "winrate": "65.8%", "rr": "2.74", "verified": True, "freq": "日",
-                   "note": "均线回踩/箱体突破（箱体突破已加有效性三条件）"},
+    "鱼身回踩/突破": {"weight": 0, "winrate": "—", "rr": "—", "verified": True, "freq": "日",
+                   "note": "⚠️2026-09-14 20年长样本：回踩/箱体突破在6/6环境显著为负(t≈-5~-10)→已降级为仅标注不计分"},
     "武威G1":     {"weight": 2, "winrate": "65.4%", "rr": "2.88", "verified": True, "freq": "月",
                    "note": "月线双阴/一阴缩量低吸；∩支撑≥5%回测280样本"},
     "双弦共振":    {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
@@ -259,8 +259,8 @@ SYSTEM_REGISTRY = {
                    "note": "周线反转持4周最优（300只×5级别回测）；红柱环境过滤+4.6倍"},
     "月线反转":    {"weight": 1, "winrate": "54.8%", "rr": "2.08", "verified": True, "freq": "月",
                    "note": "趋势确认（24188样本）；平台突破/均线金叉/趋势确立"},
-    "123/2B反转":  {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
-                   "note": "斯波朗迪结构确认；123法则/2B假突破/ABC末端"},
+    "123/2B反转":  {"weight": 0, "winrate": "—", "rr": "—", "verified": True, "freq": "日",
+                   "note": "⚠️2026-09-14 20年长样本：123买入6/6环境显著负(t≈-7~-10)→已降级为仅标注不计分；仅作风险提示"},
     "RSV均":      {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
                    "note": "腰缠万贯144日RSV均；启动/持有/离场刻度"},
     "强势体系":    {"weight": 1, "winrate": "—", "rr": "—", "verified": False, "freq": "日",
@@ -462,20 +462,33 @@ def main():
             scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 1
             scores[code]["src"].append(f"四维{t}分")
     for code, info in fish.items():
-        pts = 2 if ("加油" in info["pattern"] and info["final"] >= 70) else 1
-        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
-        scores[code]["src"].append(f"鱼身{info['pattern']}({info['final']})")
+        # 2026-09-14 20年长样本：鱼身·均线回踩/箱体突破 在 6/6 环境显著为负(t≈-5~-10) → 降级为仅标注
+        if "加油" in info["pattern"] and info["final"] >= 70:
+            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 2
+            scores[code]["src"].append(f"鱼身{info['pattern']}({info['final']})")
+        else:
+            scores.setdefault(code, {"pts": 0, "src": []})
+            scores[code]["src"].append(f"⚠️鱼身{info['pattern']}({info['final']})·验证为负不计分")
     for code, info in beast.items():
         s = info["setup"]
-        pts = 3 if s >= 60 else (2 if s >= 50 else (1 if s >= 40 else 0))
+        # 2026-09-14 20年长样本：Setup≥60 仅长期牛显著(+4.20/t2.8)；≥50 全环境显著负(t≈-4~-6)；≥40 无区分度
+        pts = 3 if s >= 60 else (1 if s >= 50 else 0)
         if pts:
             scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
             scores[code]["src"].append(f"猛兽Setup{s:.0f}")
-        for tag, kw in (("伏击", "伏击"), ("RS_D", "RS_D"), ("G点", "G点")):
-            if kw in info.get("fujie", "") or kw in info.get("rsd", "") or kw in info.get("gpoint", ""):
-                scores[code]["pts"] += 1
-                scores[code]["src"].append(f"猛兽{kw}")
-                break
+        elif s >= 40:
+            scores.setdefault(code, {"pts": 0, "src": []})
+            scores[code]["src"].append(f"⚠️猛兽Setup{s:.0f}·初选档验证为负不计分")
+        # 伏击线 6/6 环境显著负 → 移除加分；RS_D（长期熊 +1.30/t3.2 显著）/ G点 保留
+        if "RS_D" in info.get("rsd", "") or "RS_D" in info.get("fujie", ""):
+            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 1
+            scores[code]["src"].append("猛兽RS_D")
+        elif "G点" in info.get("gpoint", ""):
+            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 1
+            scores[code]["src"].append("猛兽G点")
+        if "伏击" in info.get("fujie", ""):
+            scores.setdefault(code, {"pts": 0, "src": []})
+            scores[code]["src"].append("⚠️猛兽伏击线·验证为负不计分")
     for code, info in sx.items():
         scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 1
         scores[code]["src"].append(f"双弦共振({info.get('score', 0)})")
@@ -488,9 +501,16 @@ def main():
     for code, pts in reversal.items():  # 反转数值周线（2026-08-11接入）
         scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
         scores[code]["src"].append(f"反转数值(+{pts})")
-    for code, info in t2b.items():  # 123/2B反转（P0-1接入：buy+2/risk+1/abc+1）
-        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += info["pts"]
-        scores[code]["src"].append(f"123/2B-{info['tag']}({info['pts']:+d})")
+    for code, info in t2b.items():
+        # 2026-09-14 20年长样本：123买入 6/6 环境显著负(t≈-7~-10)、2B 2/6 显著负 → 全部降级为仅标注
+        scores.setdefault(code, {"pts": 0, "src": []})
+        tag = info["tag"]
+        if tag == "buy":
+            scores[code]["src"].append("⚠️123/2B买入·验证为负不计分")
+        elif tag == "risk":
+            scores[code]["src"].append("123/2B风险提示")
+        else:
+            scores[code]["src"].append("123/2B-ABC末端")
     for code, info in rsv.items():  # RSV均（P0-1接入：launch+2/hold+1/exit-1）
         scores.setdefault(code, {"pts": 0, "src": []})["pts"] += info["pts"]
         scores[code]["src"].append(f"RSV-{info['tag']}({info['pts']:+d})")
