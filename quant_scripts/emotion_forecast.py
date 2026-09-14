@@ -56,12 +56,19 @@ def cli(cmd, timeout=180):
 
 def get_limitup_from_width():
     """读 market_width_latest.json 涨停数（本地→GitHub）"""
-    for p in ("/sandbox/workspace/market_width_latest.json",
-              "/sandbox/workspace/outputs/market_width_latest.json",
+    # ⚠️ 2026-09-14 修复：outputs/ 必须优先于仓库根（根目录副本要等 workflow 末尾 cp 才更新），
+    #    并新增「当日日期校验」——旧文件不再是沉默回退到错误值。
+    _today = datetime.now(BJ).strftime("%Y%m%d")
+    for p in ("/sandbox/workspace/outputs/market_width_latest.json",
+              "/sandbox/workspace/market_width_latest.json",
               "/sandbox/workspace/bg/market_width_latest.json"):
         if os.path.exists(p):
             try:
                 d = json.load(open(p, encoding="utf-8"))
+                _dt = str(d.get("date", "")).replace("-", "")
+                if _dt and _dt != _today:
+                    print(f"[WARN] 跳过跨日旧文件 {p}（date={d.get('date')}）", flush=True)
+                    continue
                 lu = d.get("limitup") or d.get("limit_up") or (d.get("limitup_stats") or {}).get("limitup")
                 if lu is not None:
                     return int(lu), d.get("date", "?")
