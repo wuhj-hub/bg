@@ -82,6 +82,19 @@ jobs:
       - name: 市场宽度扫描（全主板涨跌家数分布）
         run: python3 market_width.py all_mainboard.csv
 
+      # ─── 第二步.1.3a：板块成分映射（东财·仅 runner 可达；2026-09-15 接入缺口修复）───
+      # 背景：sector_component_em.json 自 9/3 起是空壳（sectors:{}）且从未接入 workflow，
+      #      导致「板块归属/主线题材」维度长期失效（hot_emotion 里"主线判定：无显著题材"实为常态）。
+      #      该脚本用 push2.eastmoney.com，沙箱被拦、runner 可达，故只能在此（runner）执行。
+      - name: 板块成分映射（东财·runner 可达）
+        continue-on-error: true
+        timeout-minutes: 20
+        run: |
+          python3 quant_scripts/runner_fetch_em_sectors.py --out outputs/sector_component_em.json \
+            || echo "⚠️ 板块成分映射失败（非致命：hot_emotion 将退化为无题材）"
+          cp outputs/sector_component_em.json sector_component_em.json 2>/dev/null || true
+          python3 -c "import json;d=json.load(open('outputs/sector_component_em.json'));print('板块映射:',len(d.get('sectors',{})),'板块 |',len(d.get('code_sector',{})),'只有题材')" 2>/dev/null || echo "板块映射: 无输出"
+
       # ─── 第二步.1.3b：热点情绪扫描（hot_emotion 连板梯队+情绪温度+退潮预警，westock自算42s，供次日盘前②.5/②.6引用；2026-09-03接入消除手动漏跑断链）───
       - name: 热点情绪扫描（hot_emotion 连板梯队+情绪温度）
         run: |
@@ -92,6 +105,7 @@ jobs:
           python3 quant_scripts/hot_emotion.py --date "$(date +%Y-%m-%d)" --westock \
             --kline-file outputs/hot_kline.txt --end-date "$(date +%Y-%m-%d)" \
             --name-file all_mainboard.csv \
+            --sector-file outputs/sector_component_em.json \
             --outdir outputs --history-file outputs/hot_emotion_history.json
           cp outputs/hot_emotion_latest.json hot_emotion_latest.json 2>/dev/null || true
           echo "情绪: $(python3 -c "import json;d=json.load(open('outputs/hot_emotion_latest.json'));print(str(d['score']['score'])+'/'+d['score']['level']+' 涨停'+str(d['total'])+' 连板'+str(d['lianban_cnt'])+' 最高'+str(d['max_lb'])+'板')" 2>/dev/null || echo '计算失败')"
@@ -299,7 +313,8 @@ jobs:
               liangxue_month_join_latest.json liangxue_minute_check_latest.json \
               hot_emotion_latest.json hot_emotion_history.json hot_emotion_latest.md \
               pools/pool_$(date +%Y-%m).json \
-              一统天下建仓区股池_latest.json 一统天下建仓区股池_latest.md yitong_pool.txt
+              一统天下建仓区股池_latest.json 一统天下建仓区股池_latest.md yitong_pool.txt \
+              sector_component_em.json
           fi
 
       # ─── 关键产物完整性检查（2026-08-28：任一关键步骤失败→微信告警明细）───
@@ -310,7 +325,7 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           MISSING=""
-          for f in panhou_lianghua.csv market_width_latest.json yearline_breadth_latest.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 板块共振_latest.json liangxue_latest.json liangxue_month_join_latest.json hot_emotion_latest.json hot_emotion_history.json; do
+          for f in panhou_lianghua.csv market_width_latest.json yearline_breadth_latest.json sector_component_em.json 123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 板块共振_latest.json liangxue_latest.json liangxue_month_join_latest.json hot_emotion_latest.json hot_emotion_history.json; do
             if [ ! -f "$f" ] && [ ! -f "outputs/$f" ]; then
               MISSING="$MISSING $f"
             fi
