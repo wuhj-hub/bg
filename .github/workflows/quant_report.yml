@@ -246,11 +246,11 @@ jobs:
           echo "执行纪律: $(python3 -c "import json;d=json.load(open('执行纪律_latest.json'));print('买入'+str(d['buy_rate'])+'% 卖出'+str(d['sell_rate'])+'%')" 2>/dev/null || echo '无数据')"
 
       # ─── 第五.4.7步：个股执行卡（张穗鸿卷钱机器·周期级联：月/周门禁→ATR预算→5:3:2分批，供次日盘前④.1引用）───
-      - name: 个股执行卡生成（卷钱机器·周期级联）
+      - name: 个股执行卡生成（持仓 + 当日信号仲裁候选）
         continue-on-error: true
         run: |
-          python3 quant_scripts/execution_card.py --holdings --total 1000000 --out outputs
-          echo "执行卡: $(python3 -c "import json;d=json.load(open('outputs/execution_cards_latest.json'));print(','.join(c['code']+':'+c['verdict'] for c in d['cards']))" 2>/dev/null || echo '无输出')"
+          python3 quant_scripts/execution_card.py --holdings --merge-holdings --pool --total 1000000 --out outputs
+          echo "执行卡: $(python3 -c "import json;d=json.load(open('outputs/execution_cards_latest.json'));print(str(len(d['cards']))+'张 | '+','.join(('NEW:' if c.get('is_new') else '')+c['code']+':'+c['verdict'] for c in d['cards']))" 2>/dev/null || echo '无输出')"
 
       # ─── 第三步.6：提交报告阶段产物（供次日盘前报告引用）───
       - name: 提交报告产物到仓库（供盘前报告引用）
