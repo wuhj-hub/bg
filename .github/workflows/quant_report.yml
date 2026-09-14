@@ -43,6 +43,32 @@ jobs:
         run: |
           pip install pandas numpy matplotlib
 
+      # ─── 数据源连通性预检 + 股池文件备份（2026-09-14 加固）───
+      # 背景：9/14 盘后 job 全绿但数据全空（才哥战法「有效 0 只」，9/11-9/12 均 3051 只），
+      #      且将 quant_scripts/*_pool.txt 覆盖为空池。根因指向数据源侧限流，故增设本闸门。
+      - name: 数据源连通性预检 + 股池备份
+        id: dataguard
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          mkdir -p /tmp/pool_bak
+          for f in caige_pool yitong_pool yao_pool longtou_pool; do
+            cp "quant_scripts/$f.txt" "/tmp/pool_bak/$f.txt" 2>/dev/null || true
+          done
+          set +e
+          python3 quant_scripts/data_guard.py --probe --json outputs/data_guard.json
+          RC=$?
+          set -e
+          if [ "$RC" = "0" ]; then
+            echo "data_ok=true" >> $GITHUB_OUTPUT
+            echo "✅ 数据源预检通过，允许更新股池"
+          else
+            echo "data_ok=false" >> $GITHUB_OUTPUT
+            echo "::warning::数据源预检失败 → 本轮扫描结果不可信，将保护历史股池不被覆盖"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️数据源故障&content=盘后报告:westock数据源连通性预检失败,本轮扫描结果不可信,已启用股池保护,请检查数据源&template=txt" > /dev/null || true
+          fi
+
       # ─── 上游扫描结果检查：扫描workflow失败则不生成报告（避免基于旧数据误导）───
       - name: 上游扫描结果检查（失败则告警退出）
         if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success'
@@ -261,6 +287,48 @@ jobs:
           echo "乖离低买: $(python3 -c "import json;d=json.load(open('outputs/乖离低买_latest.json'));print(str(d['total'])+'只')" 2>/dev/null || echo '无输出')"
 
       # ─── 第三步.6：提交报告阶段产物（供次日盘前报告引用）───
+      # ─── 市场状态判定（三级别力量）内联刷新（2026-09-14 加固）───
+      # 背景：独立 workflow 的原生 cron 从未触发（运行史仅 1 次手动），
+      #      market_regime_latest.json 长期停更 → 盘前 ②.7 环境判定滞后。
+      # 此处内联为主通道；仅在数据源探针通过时刷新，避免故障态覆盖好的旧判定。
+      - name: 市场状态判定（三级别力量·内联刷新）
+        continue-on-error: true
+        if: steps.dataguard.outputs.data_ok == 'true'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 quant_scripts/market_regime.py || echo "market_regime 生成失败(非致命)"
+          python3 git_api_commit.py --msg "chore: market regime ($(date +%Y-%m-%d))" \
+            market_regime_latest.json market_regime_latest.md \
+            "outputs/市场状态判定_$(date +%Y%m%d).md" || echo "market_regime 提交失败(非致命)"
+
+      # ─── 股池守护：数据源故障时恢复历史股池，拒绝被空扫描覆盖（2026-09-14）───
+      - name: 股池守护（数据源故障则不覆盖历史股池）
+        continue-on-error: true
+        if: steps.dataguard.outputs.data_ok != 'true'
+        run: |
+          for f in caige_pool yitong_pool yao_pool longtou_pool; do
+            if [ -f "/tmp/pool_bak/$f.txt" ]; then
+              cp "/tmp/pool_bak/$f.txt" "quant_scripts/$f.txt"
+              echo "↩️ 已恢复 quant_scripts/$f.txt（拒绝空扫描覆盖）"
+            fi
+          done
+
+      # ─── 盘后数据健康审计：空壳产物告警（9/14 故障暴露自检盲区）───
+      - name: 盘后数据健康审计
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set +e
+          python3 quant_scripts/data_guard.py --audit --pool quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::盘后产物存在空壳（疑似数据源故障）"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️盘后产物空壳&content=检测到空壳股池产物,疑似数据源故障,详见 outputs/data_guard_$(date +%Y-%m-%d).md&template=txt" > /dev/null || true
+          fi
+
       - name: 提交报告产物到仓库（供盘前报告引用）
         continue-on-error: true
         env:
