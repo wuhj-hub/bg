@@ -1058,17 +1058,29 @@ def render_env_switch():
             tag = "➖ 中性"
         rows.append((tag, nm, lv, sv, avg))
     rows.sort(key=lambda r: (-{"✅ 主用": 3, "🟡 可用": 2, "➖ 中性": 1, "⛔ 关闭": 0}[r[0]], -r[4]))
+    act = [r for r in rows if r[0] in ("✅ 主用", "🟡 可用")]
+    neu = [r for r in rows if r[0] == "➖ 中性"]
+    off = [r for r in rows if r[0] == "⛔ 关闭"]
+    short = lambda nm: nm.split("(")[0]
     L.append("| 判定 | 工具 | 长期口径超额 | 短期口径超额 |")
     L.append("|---|---|---|---|")
-    for tag, nm, lv, sv, _ in rows:
-        L.append(f"| {tag} | {nm} | {lv:+.2f}% | {sv:+.2f}% |")
-    main = [r[1].split("(")[0] for r in rows if r[0] == "✅ 主用"]
-    ok = [r[1].split("(")[0] for r in rows if r[0] == "🟡 可用"]
-    off = [r[1].split("(")[0] for r in rows if r[0] == "⛔ 关闭"]
+    if act:
+        for tag, nm, lv, sv, _ in act:
+            L.append(f"| {tag} | {nm} | {lv:+.2f}% | {sv:+.2f}% |")
+    else:
+        L.append("| — | *今日无 ✅主用/🟡可用 项* | — | — |")
+    if neu:
+        L.append("")
+        L.append(f"- ➖ **中性**（长期/短期两口径一正一负 · {len(neu)}项）："
+                 + " ｜ ".join(f"{short(r[1])}（{r[2]:+.2f}/{r[3]:+.2f}）" for r in neu))
+    if off:
+        L.append(f"- ⛔ **关闭**（两口径均为负 · {len(off)}项）：" + "、".join(short(r[1]) for r in off))
+    main = [short(r[1]) for r in act if r[0] == "✅ 主用"]
+    ok = [short(r[1]) for r in act if r[0] == "🟡 可用"]
     L.append("")
     L.append(f"- **今日执行**：主用 → {'、'.join(main) if main else '无'}；"
              f"{'可用 → ' + '、'.join(ok) + '；' if ok else ''}"
-             f"{('关闭 → ' + '、'.join(off[:4]) + (f' 等{len(off)}项' if len(off) > 4 else '')) if off else '无必须关闭项'}")
+             f"{'关闭 → ' + '、'.join(short(r[1]) for r in off[:3]) + (f' 等{len(off)}项' if len(off) > 3 else '') if off else '无必须关闭项'}")
     L.append("- 说明：口径来自 3,051 只 × 1,700 日历史回测（`rsv_strength.py`/`scan_123_2b.py`/`wuwei_scan_month.py`/"
              "`fish_body_enhanced.py`/`beast_screener.py` 原始逻辑）。"
              "**猛兽 Setup≥60 已完成历史复现**（每日约3只，与体系实盘主池一致，评分单调有效）。"
