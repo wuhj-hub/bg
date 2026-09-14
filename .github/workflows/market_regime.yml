@@ -2,8 +2,12 @@ name: 市场状态判定（三级别力量）
 
 on:
   # 每日盘后运行（UTC 09:30 = 北京时间 17:30，周一至周五）
+  # ⚠️ 2026-09-14：原生 cron 从未成功触发过（运行史仅 1 次手动）。已改为「report job 内联」
+  #    为主通道，此处保留原生 cron 兜底，并新增 repository_dispatch 供 cron-job.org 精确触发。
   schedule:
     - cron: "30 9 * * 1-5"
+  repository_dispatch:
+    types: [market-regime-run]
   workflow_dispatch: {}
 
 permissions:
