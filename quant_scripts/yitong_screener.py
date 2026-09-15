@@ -370,6 +370,16 @@ def main():
             if r.get("strength"):
                 tags += "+RSV50强"
             f.write(f"{r['code']} # {r['name']}（{tags}）\n")
+    # ⚠️ 2026-09-15 修复：原只写 {BASE}（=仓库根），而 workflow 提交的是 quant_scripts/yitong_pool.txt
+    #    → 提交的一直是旧文件（股池实际自 2026-08-14 起断更）。此处同步一份到脚本目录，两处保持一致。
+    try:
+        import shutil as _sh
+        _alt = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yitong_pool.txt")
+        if os.path.abspath(_alt) != os.path.abspath(f"{BASE}/yitong_pool.txt"):
+            _sh.copyfile(f"{BASE}/yitong_pool.txt", _alt)
+            print(f"[OK] 股池(同步): {_alt}")
+    except Exception as _e:
+        print(f"[WARN] 股池同步失败: {_e}")
     print(report)
     print(f"\n[OK] 报告: {md_path}\n[OK] 股池: {BASE}/yitong_pool.txt")
 
