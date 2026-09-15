@@ -1,0 +1,52 @@
+name: 涨停型王者跟踪
+
+on:
+  schedule:
+    # 交易日盘后 15:35（北京）= UTC 07:35。⚠️ GitHub 免费版 cron 会降频/延迟 → 以 dispatch 为主通道
+    - cron: '35 7 * * 1-5'
+  repository_dispatch:
+    types: [wangzhe-track-run]
+  workflow_dispatch:
+
+jobs:
+  wangzhe-track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # 脚本内引用 /sandbox/workspace 兼容路径（与体系其他脚本保持一致）
+      - name: 沙箱路径兼容层
+        run: |
+          sudo mkdir -p /sandbox
+          sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
+          ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪"
+
+      - name: 设置 Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安装依赖
+        run: pip install pandas numpy -q
+
+      # ① 筛选：抓当日实时涨停池 → 涨停型王者信号（首板+换手>5%+价<10元+未炸板）
+      # ② 跟踪：用 westock 更新近 45 日信号的 5/10/20 日收益
+      # ③ 统计成功率 + 生成报告 + 推送
+      - name: 筛选 + 跟踪 + 成功率统计
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/wangzhe_track.py --scan --update-live --stats --report --push
+
+      - name: 提交信号库与报告入库
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 quant_scripts/wangzhe_commit.py
