@@ -2,10 +2,14 @@ name: 盘中监控
 
 on:
   schedule:
-    # 交易日 09:00~15:30 北京时间每15分钟 = UTC 01:00~07:30
-    # 使用 */15 1-7 覆盖，脚本内判断交易时段
-    # 说明: GitHub Actions免费版schedule触发不稳定（延迟/丢单），加密到15分钟提高覆盖率
+    # 交易日 09:00~15:45 北京时间每15分钟 = UTC 01:00~07:45（脚本内判断交易时段）
+    # ⚠️ 2026-09-15 实测：GitHub 免费版 schedule 对低活跃 repo **降频 + 随机延迟数小时**——
+    #    理论应 28 次/交易日，实际仅 4.2 次/日、落在盘中的仅 2.3 次（覆盖率≈8%），
+    #    且从无 09:40-09:55 触发（导致开盘八法扫描阶段从未运行）。保留本 cron 作兜底。
     - cron: '*/15 1-7 * * 1-5'
+  # 外部精确触发（cron-job.org → repository_dispatch）—— 主通道，规避原生 cron 降频/丢单
+  repository_dispatch:
+    types: [intraday-monitor-run]
   workflow_dispatch:
 
 jobs:
