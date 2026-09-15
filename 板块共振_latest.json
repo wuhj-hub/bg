@@ -1,7 +1,7 @@
 {
  "date": "2026-09-15",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 45,
+ "pool_size": 39,
  "resonance_boards": [
   {
    "name": "风电设备",
@@ -44,16 +44,6 @@
     "进场",
     "吸筹"
    ]
-  },
-  {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "zdf": 0.18,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
   }
  ],
  "grab_top": [
@@ -88,11 +78,6 @@
    "name": "塑料",
    "code": "pt01801036",
    "value": 5.4
-  },
-  {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "value": 2.0
   }
  ],
  "absorption_top": [
@@ -105,11 +90,6 @@
    "name": "风电设备",
    "code": "pt01801736",
    "value": 2.22
-  },
-  {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "value": 1.52
   },
   {
    "name": "PCB概念",
