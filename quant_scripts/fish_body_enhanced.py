@@ -40,7 +40,15 @@ def sf(v):
 
 # === 模块A: 大盘择时 ===
 def get_market_temp():
-    raw=run(f"{WESTOCK_CMD} kline sh000001 --period day --limit 60 2>/dev/null")
+    # ⚠️ 2026-09-15 修复：这是鱼身**第 1 个** westock 调用，runner 上首调易冷启动失败
+    #    （当日 09:32 出现 temp=0/数据缺失 → 阶段1 直接退出 → 「未生成鱼身结果文件」）。
+    #    加重试 + 报错重试间隔，避免单次抖动就让整个鱼身系统失效。
+    raw=""
+    for _try in range(3):
+        raw=run(f"{WESTOCK_CMD} kline sh000001 --period day --limit 60", timeout=90)
+        if raw and parse_table(raw):
+            break
+        time.sleep(3)
     rows=parse_table(raw)
     if not rows:
         # ⚠️ 2026-09-15 加固：原 50（中性）会掩盖数据源故障 → 改为 0（保守）
