@@ -14,7 +14,8 @@ import urllib.request
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-WORKERS = 8          # 并发拉板块成分（2026-09-15：串行 486 板块 >20min 超时，改并发）
+# ⚠️ 2026-09-16：8 并发招致东财限流（实测覆盖 64 只 < 串行版 302 只）→ 降到 3 并保留请求间隔
+WORKERS = 3
 
 API = "https://push2.eastmoney.com/api/qt/clist/get"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36"
@@ -35,7 +36,7 @@ def get(params, retries=3):
     return None
 
 
-def fetch_board_list(fs, pz=200):
+def fetch_board_list(fs, pz=100):
     """拉板块列表, 返回 [(code, name)]"""
     out = []
     pn = 1
@@ -50,14 +51,16 @@ def fetch_board_list(fs, pz=200):
         for item in diff:
             out.append((item.get("f12", ""), item.get("f14", "")))
         total = d.get("total", 0)
-        if pn * pz >= total or len(diff) < pz:
+        # ⚠️ 2026-09-16 修复：原判断 `len(diff) < pz` 在东财单页上限(100) < pz(200) 时恒为真
+        #    → 永远只取第 1 页（行业/概念各只 100 个）。改为按 total 翻页、以空页为终止。
+        if not diff or pn * pz >= total:
             break
         pn += 1
         time.sleep(0.2)
     return out
 
 
-def fetch_board_stocks(board_code, pz=200):
+def fetch_board_stocks(board_code, pz=100):
     """拉板块成分, 返回 [(code, name)]"""
     out = []
     pn = 1
@@ -72,7 +75,8 @@ def fetch_board_stocks(board_code, pz=200):
         for item in diff:
             out.append((item.get("f12", ""), item.get("f14", "")))
         total = d.get("total", 0)
-        if pn * pz >= total or len(diff) < pz:
+        # ⚠️ 2026-09-16 同上：去掉 `len(diff) < pz` 的伪终止条件
+        if not diff or pn * pz >= total:
             break
         pn += 1
         time.sleep(0.15)
@@ -106,6 +110,7 @@ def main():
             stocks = fetch_board_stocks(bcode)
         except Exception:
             stocks = []
+        time.sleep(0.15)          # 请求间隔，降低被限流概率
         codes = [sc for sc, sn in stocks if sc and sn]
         names = {sc: sn for sc, sn in stocks if sc and sn}
         return bname, codes, names
