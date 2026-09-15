@@ -196,19 +196,34 @@ def main():
     args = ap.parse_args()
     date_str = datetime.now(BJ).strftime("%Y-%m-%d")
     now_bj = datetime.now(BJ)
+    _then_monitor = False      # 补算扫描后是否紧接着监控一次
     if args.auto:
-        # 自动分阶段：9:40-9:55 扫描；9:55+ 监控；非交易时段跳过
+        # 自动分阶段（2026-09-15 修复）
+        # 原设计：9:40-9:55 扫描 → 9:55+ 监控。但实测 GitHub cron 在 9:40-9:55 几乎从不触发
+        # （97 次运行 / 23 个交易日，平均仅 4.2 次/日、落在盘中的仅 2.3 次），导致强形态池
+        # 从未生成、监控阶段永远打印"无当日强形态数据，跳过"——该功能上线以来从未生效。
+        # 形态判定用的是 9:30-9:45 分钟K线，**属于历史数据、任何时间都能取**，
+        # 故改为「当日缺强形态池就先补算」，并在补算后立即监控一次。
         hm = now_bj.hour * 100 + now_bj.minute
+        jpath = f"/sandbox/workspace/outputs/开盘强形态_{date_str}.json"
+        have_pool = os.path.exists(jpath)
+        if now_bj.weekday() >= 5:
+            print(f"[auto] {hm} 非交易日，跳过")
+            return
         if 940 <= hm <= 955:
             args.monitor = False
             print(f"[auto] {hm} 扫描阶段")
-        elif 955 < hm <= 1430:
+        elif not have_pool and hm <= 1505:
+            args.monitor = False
+            _then_monitor = True
+            print(f"[auto] {hm} 无当日强形态池 → 补算扫描（用 9:30-9:45 历史分钟K线）")
+        elif 955 < hm <= 1505:
             args.monitor = True
             print(f"[auto] {hm} 监控阶段")
             monitor_once(date_str)
             return
         else:
-            print(f"[auto] {hm} 非交易时段，跳过")
+            print(f"[auto] {hm} 跳过（非交易时段/已收盘）")
             return
     if args.monitor:
         monitor_once(date_str)
@@ -249,7 +264,9 @@ def main():
                 results.append(r)
     results.sort(key=lambda r: -r["strength"])
     elapsed = time.time() - t0
-    print(f"[INFO] 判定完成 {len(results)} 只，总耗时 {elapsed:.0f}s（{elapsed/len(results):.1f}s/只）", flush=True)
+    # ⚠️ 2026-09-15 修复：候选池为空时 elapsed/len(results) 会 ZeroDivisionError 直接崩溃
+    _per = f"{elapsed/len(results):.1f}s/只" if results else "—"
+    print(f"[INFO] 判定完成 {len(results)} 只，总耗时 {elapsed:.0f}s（{_per}）", flush=True)
 
     # Step2: 输出
     strong = [r for r in results if r["strength"] >= 3]
@@ -288,6 +305,11 @@ def main():
         for r in strong[:12]:
             lines.append(f"- {r['code']} {r['name']} **{r['pattern']}** 突破位{r['h3']:.2f}")
         push_alert("🌅开盘强形态", "\n".join(lines))
+
+    # 2026-09-15：补算场景下，紧接着做一次突破监控（触发稀少，一次运行把两件事都做完）
+    if _then_monitor:
+        print("[auto] 补算完成 → 继续突破监控")
+        monitor_once(date_str)
 
 if __name__ == "__main__":
     main()
