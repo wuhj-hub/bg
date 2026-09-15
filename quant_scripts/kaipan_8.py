@@ -148,10 +148,23 @@ def judge_8(rows, prev_close):
                 "多空胶着": 0, "短兵相接": 0, "上档卖压": -3, "三低盘": -5}
     h3 = max(seg["3"]); l3 = min(seg["3"])
     h1 = max(seg["1"]); l1 = min(seg["1"])
+    # 三段量能（2026-09-15：与价格形态同为「三个5分钟」口径）
+    #   分钟 amount 是「当日累计成交额」→ 段量用差分：v1=amt@0934, v2=amt@0939-amt@0934,
+    #   v3=amt@0944-amt@0939。量能形态 = 后一段 vs 前一段的增减（两段比较，对应价格的两次转折）。
+    def _amt_at(tt):
+        v = [r["amt"] for r in rows if r["time"] <= tt and r.get("amt")]
+        return v[-1] if v else 0.0
+    a1, a2, a3 = _amt_at("0934"), _amt_at("0939"), _amt_at("0944")
+    v1, v2, v3 = a1, max(a2 - a1, 0.0), max(a3 - a2, 0.0)
+    vol_pattern = f"{'增' if v2 > v1 else '减'}{'增' if v3 > v2 else '减'}"
+    # 末段量能保持度 = v3/v2（相对中段）。注意：正常形态是逐段递减（开盘量最大），
+    # 故不能用"末段最大"这类绝对判据（会把所有票都滤掉），必须走相对分位（见下方 Step1.5）。
+    tail_ratio = round(v3 / v2, 3) if v2 else None
     return {"pattern": names[pattern], "code3": f"{up1}{up2}{up3}",
             "h3": h3, "l3": l3, "h1": h1, "l1": l1,
             "strength": strength[names[pattern]], "prev_close": prev_close,
-            "c3": c3}
+            "c3": c3, "v1": v1, "v2": v2, "v3": v3,
+            "vol_pattern": vol_pattern, "tail_ratio": tail_ratio}
 
 def analyze(code, name, prev_close_map):
     got = prev_close_map.get(code)
@@ -310,26 +323,38 @@ def main():
     # Step1.5 放量确认（2026-09-15 新增）：治「173 只强形态 / 35 只突破」的推送噪声
     #   量比 = 开盘15分钟成交额 ÷ 近5日全天平均成交额（均匀分布下 15/240 = 6.25%，开盘通常更高）
     #   用**当日前 40% 分位（P60）自适应阈值**——不拍固定值、随市况自适应；样本不足则不过滤（防误杀）。
+    # 两把相对标尺（均取当日分位，自适应、不拍固定值）：
+    #   ① 整体量比 = 开盘15min成交额 ÷ (当日累计额×15/240)   —— 「相对放量」
+    #   ② 末段保持度 = v3/v2（第3个5分钟 ÷ 第2个5分钟）      —— 「尾段量能不衰减」
     _vr = sorted(r["vol_ratio"] for r in results if r.get("vol_ratio"))
+    _tr = sorted(r["tail_ratio"] for r in results if r.get("tail_ratio"))
     THR = _vr[int(len(_vr) * 0.6)] if len(_vr) >= 20 else 0
+    TTH = _tr[int(len(_tr) * 0.5)] if len(_tr) >= 20 else 0
     _med = _vr[len(_vr) // 2] if _vr else 0
-    print(f"[INFO] 量比分布: 样本{len(_vr)} 中位{_med:.3f} → P60阈值 {THR:.3f}", flush=True)
+    _tmed = _tr[len(_tr) // 2] if _tr else 0
+    print(f"[INFO] 量比分布: 样本{len(_vr)} 中位{_med:.2f} → P60阈值 {THR:.2f} | "
+          f"末段保持度(v3/v2) 中位{_tmed:.2f} → P50阈值 {TTH:.2f}", flush=True)
 
     # Step2: 输出
+    # 量能确认 = 相对放量(P60) + 尾段不衰减(P50)，均基于「三个5分钟」的口径
     strong = [r for r in results if r["strength"] >= 3
-              and (not THR or (r.get("vol_ratio") or 0) >= THR)]
+              and (not THR or (r.get("vol_ratio") or 0) >= THR)
+              and (not TTH or (r.get("tail_ratio") or 0) >= TTH)]
+    _s3 = [r for r in results if r["strength"] >= 3]
+    print(f"[INFO] 量能过滤: 形态达标 {len(_s3)} 只 → 过「放量+尾段」双标尺 {len(strong)} 只", flush=True)
     watch = [r for r in results if r["strength"] == 2]
     weak = [r for r in results if r["strength"] < 0]
     os.makedirs("/sandbox/workspace/outputs", exist_ok=True)
     md = [f"# 🌅 开盘八法·强形态扫描 {date_str}\n",
           f"**候选**: {len(pool)} | **有效判定**: {len(results)} | **耗时**: {elapsed:.0f}s\n"]
-    md.append(f"\n## 🔥 强形态（{len(strong)}只·已过量能确认 P60≥{THR:.3f}）→ 突破预警位 = 9:45高点\n")
+    md.append(f"\n## 🔥 强形态（{len(strong)}只·量能确认：放量P60≥{THR:.2f} 且 末段保持度P50≥{TTH:.2f}）→ 突破预警位 = 9:45高点\n")
     if strong:
-        md.append("| 代码 | 名称 | 形态 | 现价 | 9:45高 | 9:45低 | 预警位 | 量比 |")
-        md.append("|------|------|------|------|--------|--------|--------|------|")
+        md.append("| 代码 | 名称 | 形态 | 量能(末段保持度) | 现价 | 9:45高 | 9:45低 | 预警位 | 量比 |")
+        md.append("|------|------|------|------|------|--------|--------|--------|------|")
         for r in strong:
             _v = f"{r['vol_ratio']:.3f}" if r.get('vol_ratio') else "—"
-            md.append(f"| {r['code']} | {r['name']} | **{r['pattern']}** | {r['price']:.2f} | {r['h3']:.2f} | {r['l3']:.2f} | **{r['h3']:.2f}** | {_v} |")
+            _t = f"{r['tail_ratio']:.2f}" if r.get('tail_ratio') is not None else "—"
+            md.append(f"| {r['code']} | {r['name']} | **{r['pattern']}** | {r.get('vol_pattern','')}({_t}) | {r['price']:.2f} | {r['h3']:.2f} | {r['l3']:.2f} | **{r['h3']:.2f}** | {_v} |")
     else:
         md.append("📭 无强形态")
     md.append(f"\n## 👀 观察（{len(watch)}只）\n")
