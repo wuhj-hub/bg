@@ -148,7 +148,8 @@ def thermometer() -> tuple[int, str]:
         raw = cli("kline sh000001 --period day --limit 10")
         rows = parse_table(raw)
         if len(rows) < 3:
-            return 50, "数据不足"
+            # ⚠️ 2026-09-15 加固：原 50（中性）会掩盖数据源故障 → 改为 0（保守，门控不通过）
+            return 0, "⚠️数据缺失"
         closes = []
         for r in rows:
             for key in ["last", "最新", "收盘", "最新价", "收盘价"]:
@@ -158,7 +159,7 @@ def thermometer() -> tuple[int, str]:
                         break
                     except: pass
         if len(closes) < 3:
-            return 50, "数据不足"
+            return 0, "⚠️数据缺失"
         latest = closes[0]
         low_10d = min(closes)
         high_10d = max(closes)
