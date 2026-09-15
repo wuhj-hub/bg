@@ -37,7 +37,8 @@ SIG = os.path.join(OUT, "wangzhe_signals.csv")
 BENCH = os.path.join(OUT, "wangzhe_benchmark.json")
 HOLD = [5, 10, 20]
 FIELDS = ["signal_date", "code", "name", "price", "vol_ratio", "turnover", "lbc",
-          "fbt", "hybk", "source", "r5", "r10", "r20", "b5", "b10", "b20", "ex5", "ex10", "ex20"]
+          "fbt", "hybk", "source", "variant", "limit_date", "r5", "r10", "r20",
+          "b5", "b10", "b20", "ex5", "ex10", "ex20"]
 
 
 def log(m):
@@ -121,8 +122,7 @@ def backfill(by, bench):
             vr = vol[t] / vol[t - 1] if vol[t - 1] else 0
             if not (1.5 <= vr <= 4):
                 continue
-            if close[t] >= 10:
-                continue                                # 价格 < 10 元
+            # ⚠️ 2026-09-15 复核：才哥正版无价格限制，故移除「价<10元」过滤
             key = f"{bars[t][0]}_{code}"
             if key in seen:
                 continue
@@ -131,7 +131,55 @@ def backfill(by, bench):
             r.update({"signal_date": bars[t][0], "code": code, "name": "",
                       "price": round(close[t], 2), "vol_ratio": round(vr, 2),
                       "turnover": "", "lbc": 1, "fbt": "", "hybk": "",
-                      "source": "backfill"})
+                      "source": "backfill", "variant": "day1", "limit_date": bars[t][0]})
+            rows.append(r)
+    return rows
+
+
+def backfill_full(by, bench):
+    """才哥正版「涨停王者倍量柱」完整确认信号（涨停日 T-3 / 信号日 T+3），不限价"""
+    rows, seen = [], set()
+    for code, bars in by.items():
+        if not code.startswith(("sh600", "sh601", "sh603", "sh605",
+                                "sz000", "sz001", "sz002", "sz003")):
+            continue
+        close = np.array([b[4] for b in bars]); high = np.array([b[2] for b in bars])
+        low = np.array([b[3] for b in bars]); vol = np.array([b[5] for b in bars])
+        bars, close, vol, high = clean(bars, close, vol, high)
+        n = len(bars)
+        if n < 90:
+            continue
+        ma60 = np.full(n, np.nan)
+        for i in range(59, n):
+            ma60[i] = close[i - 59:i + 1].mean()
+        for t in range(25, n - 3):
+            if not is_limit_up(close[t], close[t - 1]):
+                continue
+            if high[t] == low[t]:
+                continue                       # 一字板（代理「换手>5%」过滤）
+            vr = vol[t] / vol[t - 1] if vol[t - 1] else 0
+            if not (1.5 <= vr <= 4):
+                continue
+            if min(close[t + 1], close[t + 2], close[t + 3]) <= close[t]:
+                continue
+            if not (vol[t + 3] < vol[t + 2] < vol[t + 1]):
+                continue
+            if max(high[t + 1], high[t + 2], high[t + 3]) / close[t] - 1 >= 0.09:
+                continue
+            if np.isnan(ma60[t + 3]) or np.isnan(ma60[t + 2]) or ma60[t + 3] < ma60[t + 2]:
+                continue
+            if (vol[t + 1] + vol[t + 2] + vol[t + 3]) / 3 >= vol[t]:
+                continue
+            key = f"{bars[t + 3][0]}_{code}"
+            if key in seen:
+                continue
+            seen.add(key)
+            r = {k: "" for k in FIELDS}
+            r.update({"signal_date": bars[t + 3][0], "code": code, "name": "",
+                      "price": round(close[t + 3], 2), "vol_ratio": round(vr, 2),
+                      "turnover": "", "lbc": 1, "fbt": "", "hybk": "",
+                      "source": "backfill", "variant": "full",
+                      "limit_date": bars[t][0]})
             rows.append(r)
     return rows
 
@@ -208,21 +256,24 @@ def scan(live=True):
             continue
         if "ST" in name.upper():
             continue
-        if lbc != 1 or hs <= 5 or price >= 10 or zbc > 0:
+        # ⚠️ 2026-09-15 复核：才哥正版定义**不含价格限制**，故去掉「价<10元」（回测亦显示不限价更优）
+        if lbc != 1 or hs <= 5 or zbc > 0:
             continue
         pre = "sh" if code[0] == "6" else "sz"
         r = {k: "" for k in FIELDS}
         r.update({"signal_date": ds, "code": pre + code, "name": name,
                   "price": round(price, 2), "vol_ratio": "", "turnover": round(hs, 2),
-                  "lbc": lbc, "fbt": fbt, "hybk": it.get("hybk", ""), "source": "live"})
+                  "lbc": lbc, "fbt": fbt, "hybk": it.get("hybk", ""), "source": "live",
+                  "variant": "day1", "limit_date": ds})
         rows.append(r)
     rows.sort(key=lambda x: x["fbt"])
     return rows
 
 
 def merge(new_rows, old_rows):
-    seen = {f"{r['signal_date']}_{r['code']}" for r in old_rows}
-    add = [r for r in new_rows if f"{r['signal_date']}_{r['code']}" not in seen]
+    seen = {f"{r['signal_date']}_{r['code']}_{r.get('variant','day1')}" for r in old_rows}
+    add = [r for r in new_rows
+           if f"{r['signal_date']}_{r['code']}_{r.get('variant','day1')}" not in seen]
     return old_rows + add, len(add)
 
 
@@ -410,8 +461,13 @@ def write_report(rows, st_all, st_year, st_recent, by):
              "| ① | 涨停（主板 10% 幅度） |",
              "| ② | **首板**（前一日未涨停） |",
              "| ③ | 量能：历史口径「量比 1.5~4」／实盘口径「换手率 > 5%」 |",
-             "| ④ | **价格 < 10 元** |",
-             "| ⑤ | 实盘追加：未炸板（东财 `zbc==0`） |", "",
+             "| ④ | 实盘追加：未炸板（东财 `zbc==0`） |",
+             "",
+             "> ⚠️ **2026-09-15 复核**：才哥（刘骥才）正版定义**不含价格限制**，原「价<10元」已移除。",
+             "> 另：才哥正版为**涨停后第 3 天确认**（T+3），本工具另保留「涨停日触发 day1」口径用于对比。", "",
+             "**两种口径**：",
+             "- `day1`：涨停日当天触发（实盘可判定）",
+             "- `full`：才哥正版完整确认（8 条件，T+3 确认）", "",
              "## 二、成功率总览（全样本）", "",
              "| 持有 | 有效样本 | 均值 | 中位 | **胜率** | 超额胜率 | 平均超额 | t | 独立日 |",
              "|---|---|---|---|---|---|---|---|---|"]
@@ -452,6 +508,7 @@ def write_report(rows, st_all, st_year, st_recent, by):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--backfill", action="store_true")
+    ap.add_argument("--backfill-full", action="store_true")
     ap.add_argument("--scan", action="store_true")
     ap.add_argument("--update", action="store_true")
     ap.add_argument("--update-live", action="store_true")
@@ -459,7 +516,8 @@ def main():
     ap.add_argument("--report", action="store_true")
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
-    if not any([a.backfill, a.scan, a.update, getattr(a, "update_live"), a.stats, a.report, a.push]):
+    if not any([a.backfill, getattr(a, "backfill_full"), a.scan, a.update,
+                getattr(a, "update_live"), a.stats, a.report, a.push]):
         a.stats = True
 
     by = load_kline()
@@ -478,6 +536,11 @@ def main():
         new = backfill(by, bench)
         rows, n = merge(new, rows)
         log(f"回填 {len(new)} 条，新增 {n} 条")
+    if a.backfill_full:
+        log("回填才哥正版「涨停王者倍量柱」完整确认信号（不限价）…")
+        new = backfill_full(by, bench)
+        rows, n = merge(new, rows)
+        log(f"正版确认 {len(new)} 条，新增 {n} 条")
     if a.scan:
         log("扫描当日实时涨停池（换手口径）…")
         new = scan()
@@ -485,11 +548,11 @@ def main():
         log(f"当日命中 {len(new)} 条，新增 {n} 条")
     if a.update_live:
         update_live(rows)
-    if a.backfill or a.scan or a.update:
+    if a.backfill or getattr(a, "backfill_full") or a.scan or a.update:
         log("更新后续收益（本地日线）…")
         hit = fill_returns(rows, by, bench)
         log(f"已填收益 {hit} 条")
-    if a.backfill or a.scan or a.update or a.update_live:
+    if a.backfill or getattr(a, "backfill_full") or a.scan or a.update or a.update_live:
         save_rows(rows)
         log(f"信号库已保存: {SIG}（共 {len(rows)} 条）")
     if a.push and not (a.stats or a.report):
@@ -498,18 +561,23 @@ def main():
         push_summary(rows, st, [r for r in rows if r["source"] == "live" and r["signal_date"] == datetime.now(BJT).strftime("%Y-%m-%d")])
     if a.stats or a.report:
         out_all = stats(rows, bench, "涨停型王者 · 全部")
-        bf = [r for r in rows if r["source"] == "backfill"]
+        d1 = [r for r in rows if r.get("variant", "day1") == "day1"]
+        fu = [r for r in rows if r.get("variant") == "full"]
+        if d1:
+            stats(d1, bench, "口径A·涨停日触发 day1（不限价）")
+        if fu:
+            stats(fu, bench, "口径B·才哥正版确认 full（T+3·不限价）")
         lv = [r for r in rows if r["source"] == "live"]
-        if bf:
-            stats(bf, bench, "历史回填（量比口径）")
         if lv:
             stats(lv, bench, "实盘前瞻（换手口径）")
-        st_year = by_period(rows, lambda r: r["signal_date"][:4], "分年度（5日）")
+        st_year = by_period(d1, lambda r: r["signal_date"][:4], "分年度（day1口径·5日）")
         # 近 12 个月
         cutoff = (datetime.now(BJT) - timedelta(days=370)).strftime("%Y-%m")
-        st_recent = by_period([r for r in rows if r["signal_date"][:7] >= cutoff],
-                              lambda r: r["signal_date"][:7], "近 12 个月（5日）")
-        json.dump({"all": out_all, "year": st_year, "recent": st_recent, "n": len(rows)},
+        st_recent = by_period([r for r in d1 if r["signal_date"][:7] >= cutoff],
+                              lambda r: r["signal_date"][:7], "近 12 个月（day1口径·5日）")
+        json.dump({"all": out_all, "year": st_year, "recent": st_recent, "n": len(rows),
+                   "full": stats(fu, bench, "口径B·才哥正版确认 full（T+3·不限价）") if fu else None,
+                   "day1": out_all},
                   open(os.path.join(OUT, "wangzhe_stats.json"), "w", encoding="utf-8"),
                   ensure_ascii=False, indent=1, default=str)
         if a.report:
