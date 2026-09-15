@@ -8,6 +8,10 @@ on:
     types: [wangzhe-track-run]
   workflow_dispatch:
 
+# ⚠️ 必须显式声明写权限：github.token 默认只读，否则 commit 步骤 403 Forbidden
+permissions:
+  contents: write
+
 jobs:
   wangzhe-track:
     runs-on: ubuntu-latest
