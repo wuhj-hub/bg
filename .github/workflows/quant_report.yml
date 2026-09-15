@@ -41,7 +41,7 @@ jobs:
 
       - name: 安装 Python 依赖（pandas+numpy+matplotlib）
         run: |
-          pip install pandas numpy matplotlib
+          pip install pandas numpy matplotlib akshare
 
       # ─── 数据源连通性预检 + 股池文件备份（2026-09-14 加固）───
       # 背景：9/14 盘后 job 全绿但数据全空（才哥战法「有效 0 只」，9/11-9/12 均 3051 只），
@@ -142,6 +142,24 @@ jobs:
             python3 upload_ima.py --file "$T" --name "$(basename $T)" || echo "才哥跟踪报告上传失败"
             PUSH_REPORT="$T" python3 push_report.py || echo "才哥推送失败(非致命)"
           fi
+
+      # ─── 第三步.4.10b：龙头战法池（dragon_leader·100分五维·westock数据源；2026-09-15 接入，与 longtou.py 并行观察）───
+      # 背景：原 longtou.py 的 score5 为非标准量纲(上限≈102)且股池路径错位断更；本步并行产出可对比的 100 分制股池
+      - name: 龙头战法池扫描（dragon_leader·100分五维）
+        continue-on-error: true
+        timeout-minutes: 30
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          python3 quant_scripts/dragon_leader.py --date "$(date +%Y%m%d)" --threshold 70 || echo "龙头战法池扫描失败(非致命)"
+          F=$(ls outputs/龙头战法池_*.md 2>/dev/null | tail -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "龙头战法池上传失败(非致命)"
+          fi
+          echo "龙头战法池: $(python3 -c "t=open('quant_scripts/dragon_pool.txt',encoding='utf-8').read();print(str(len([l for l in t.splitlines() if l.strip() and not l.startswith('#')]))+'只')" 2>/dev/null || echo '无输出')"
 
       # ─── 第三步.4.8：一统天下多周期建仓区股池（周线闸门→日线建仓区→60分钟确认）───
       - name: 一统天下建仓区股池扫描+跟踪（多周期共振）
@@ -351,6 +369,7 @@ jobs:
             四维共振_chinext_kcb_latest.json 组合风控_latest.json 执行纪律_latest.json execution_cards_latest.json \
             一统天下建仓区股池_latest.json 乖离低买_latest.json \
             quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
+            quant_scripts/dragon_pool.txt \
             pools/pool_$(date +%Y-%m).json || true
 
       # ─── 第五.5步：自动生成复盘报告并上传（含③.5股池三阶漏斗状态引用 + 反转数值信号池）───
