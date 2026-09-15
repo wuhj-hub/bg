@@ -12,6 +12,9 @@ import os
 import time
 import urllib.request
 import urllib.parse
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+WORKERS = 8          # 并发拉板块成分（2026-09-15：串行 486 板块 >20min 超时，改并发）
 
 API = "https://push2.eastmoney.com/api/qt/clist/get"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36"
@@ -91,28 +94,42 @@ def main():
     groups.append(("概念", gn))
     print(f"概念板块: {len(gn)} 个", flush=True)
 
+    # ⚠️ 2026-09-15 改造：串行版 486 板块 × (请求+0.1s sleep) >20min 会被 timeout 砍掉
+    #    （当日仅跑到 302 只就被杀）。改为 8 并发，各 worker 返回结果后主线程合并。
+    tasks = [(bname, bcode) for gname, boards in groups for bcode, bname in boards if bcode.startswith("BK")]
+    total_boards = len(tasks)
+    print(f"共 {total_boards} 个板块待拉取（{WORKERS} 并发）", flush=True)
+
+    def _one(item):
+        bname, bcode = item
+        try:
+            stocks = fetch_board_stocks(bcode)
+        except Exception:
+            stocks = []
+        codes = [sc for sc, sn in stocks if sc and sn]
+        names = {sc: sn for sc, sn in stocks if sc and sn}
+        return bname, codes, names
+
     sectors = {}
     code_sector = {}
     code_name = {}
-    total_boards = sum(len(g[1]) for g in groups)
     done = 0
-    for gname, boards in groups:
-        for bcode, bname in boards:
-            if not bcode.startswith("BK"):
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        futs = {ex.submit(_one, t): t for t in tasks}
+        for fu in as_completed(futs):
+            try:
+                bname, codes, names = fu.result()
+            except Exception:
                 continue
-            stocks = fetch_board_stocks(bcode)
-            codes = []
-            for scode, sname in stocks:
-                if scode and sname:
-                    codes.append(scode)
-                    code_sector.setdefault(scode, []).append(bname)
-                    if scode not in code_name:
-                        code_name[scode] = sname
             sectors[bname] = codes
+            for sc in codes:
+                code_sector.setdefault(sc, []).append(bname)
+            for sc, sn in names.items():
+                if sc not in code_name:
+                    code_name[sc] = sn
             done += 1
-            if done % 25 == 0 or done == total_boards:
+            if done % 50 == 0 or done == total_boards:
                 print(f"  进度 {done}/{total_boards} 板块 | 已覆盖 {len(code_name)} 只", flush=True)
-            time.sleep(0.1)
 
     date = time.strftime("%Y-%m-%d")
     data = {"date": date, "sectors": sectors, "code_sector": code_sector, "code_name": code_name,
