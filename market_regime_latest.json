@@ -1,7 +1,7 @@
 {
  "date": "20260915",
  "verdict": "熊市",
- "score": 0.254,
+ "score": 0.286,
  "long": {
   "score": 0.489,
   "state": "纠缠"
@@ -21,8 +21,8 @@
   "up_ratio": 0.17
  },
  "emotion": {
-  "limit_up": 10,
-  "limit_down": 9
+  "limit_up": 32,
+  "limit_down": 29
  },
  "indices": [
   {
