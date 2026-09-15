@@ -57,6 +57,17 @@ jobs:
         with:
           python-version: '3.12'
 
+      # 恢复「王者信号当日去重状态」（2026-09-15 v2.0 新增）
+      # 背景：王者封板信号每次运行都会全量命中当日涨停池，需跨次运行去重，避免每 15 分钟重复推送同一批。
+      # 采用 restore+save 动态 key（GitHub cache 同 key 不可覆盖），restore-keys 前缀匹配取当日最新。
+      - name: 恢复王者信号去重状态
+        uses: actions/cache/restore@v4
+        with:
+          path: outputs/wangzhe_pushed.json
+          key: wangzhe-pushed-${{ steps.d.outputs.today }}-${{ github.run_number }}
+          restore-keys: |
+            wangzhe-pushed-${{ steps.d.outputs.today }}-
+
       - name: 运行盘中监控
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
@@ -70,6 +81,13 @@ jobs:
           RUN_NUMBER: ${{ github.run_number }}
         run: |
           python3 intraday_monitor.py
+
+      - name: 保存王者信号去重状态
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: outputs/wangzhe_pushed.json
+          key: wangzhe-pushed-${{ steps.d.outputs.today }}-${{ github.run_number }}
 
       # ─── 开盘八法：9:45扫描强形态 + 盘中突破监控（auto分阶段）───
       - name: 开盘八法强形态扫描+突破监控
