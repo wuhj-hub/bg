@@ -166,12 +166,18 @@ def analyze(code, name, prev_close_map):
     r = judge_8(rows, prev)
     if not r:
         return None
-    # 放量确认（2026-09-15）：开盘15分钟成交额（分钟 amount 为累计值，取 0944 那根）
-    # 占「近5日全天平均成交额」的比例。均匀分布下 15/240=6.25%，开盘通常更高。
+    # 放量确认（2026-09-15）：**纯分钟口径**，不依赖日线（单股 kline 接口间歇性返空）。
+    #   量比 = 开盘15分钟累计成交额 ÷ (当日累计成交额 × 15/240)
+    #   —— 含义：开盘 15 分钟的量强度相对「全天均匀节奏」的倍数（收盘口径下通常 5~10）。
+    #   分母固定用 240，故盘中会整体偏高，但**所有股票同分母 → 相对排序可比**，
+    #   而下游筛选用的是当日分位阈值（P60），系统性偏差不影响结果。
     amt15 = next((x["amt"] for x in rows if x["time"] >= "0944" and x["amt"]), None)
-    vol_ratio = round(amt15 / amt5, 4) if (amt15 and amt5) else None
+    amt_all = rows[-1]["amt"] if rows and rows[-1].get("amt") else None
+    vol_ratio = None
+    if amt15 and amt_all:
+        vol_ratio = round(amt15 / (amt_all * 15 / 240), 3)
     return {"code": code, "name": name, "price": rows[-1]["price"],
-            "vol_ratio": vol_ratio, "amt15": amt15, **r}
+            "vol_ratio": vol_ratio, "amt15": amt15, "amt_all": amt_all, **r}
 
 def push_alert(title, content):
     try:
