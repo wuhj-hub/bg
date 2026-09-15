@@ -366,10 +366,18 @@ def main():
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(report)
     # 跟踪池
-    with open("/sandbox/workspace/longtou_pool.txt", "w", encoding="utf-8") as f:
+    # ⚠️ 2026-09-15 修复：原写 "/sandbox/workspace/longtou_pool.txt"（=仓库根），而 workflow 提交的是
+    #    "quant_scripts/longtou_pool.txt" → 路径错位，导致股池实际自 2026-08-17 起断更近一个月（一直"假绿"）。
+    _pool_paths = (os.path.join(os.path.dirname(os.path.abspath(__file__)), "longtou_pool.txt"),
+                   "/sandbox/workspace/quant_scripts/longtou_pool.txt",
+                   "quant_scripts/longtou_pool.txt",
+                   "/sandbox/workspace/longtou_pool.txt")
+    _pp = next((x for x in _pool_paths if os.path.isdir(os.path.dirname(x))), _pool_paths[-1])
+    print(f"[INFO] 股池写出: {_pp}")
+    with open(_pp, "w", encoding="utf-8") as f:
         f.write(f"# 龙头池 {date_str}\n")
         for s in (zong + gaolb[:10] + jun_cand[:10]):
-            f.write(f"{s['code']} # {s['name']}（{s['boards']}板/{s['score5']}分）\n")
+            f.write(f"{s['code']} # {s['name']}（{s['boards']}板/{round(s['score5'], 1)}分）\n")
     print(report[:2500])
     print(f"\n[OK] 报告: {md_path}")
     with open(f"/sandbox/workspace/outputs/龙头定位_{date_str}.json", "w", encoding="utf-8") as f:
