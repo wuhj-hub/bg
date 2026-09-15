@@ -1,14 +1,14 @@
 {
  "date": "2026-09-15",
  "data_date": "2026-09-15",
- "style": "情绪市",
- "icon": "🔥",
- "score": 25,
+ "style": "均衡市",
+ "icon": "⚖️",
+ "score": 15,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 16,
-  "volume_structure": 7,
-  "sector_fund": 2
+  "volume_structure": 0,
+  "sector_fund": -1
  },
  "size_style": {
   "hs300_5d": -2.38,
@@ -33,8 +33,7 @@
  },
  "volume_structure": {
   "small_big_ratio_now": 1.354,
-  "small_big_ratio_5d": 1.373,
-  "small_vol_pulse": 84.54
+  "small_big_ratio_5d": 1.373
  },
  "sector_fund": {
   "sectors": [
@@ -44,13 +43,6 @@
     "main_net5d": 12.2,
     "retail_net": -11.3,
     "tag": "机构型"
-   },
-   {
-    "name": "半导体",
-    "zdf": "1.55",
-    "main_net5d": -269.3,
-    "retail_net": -43.6,
-    "tag": "游资型"
    },
    {
     "name": "元件",
@@ -65,6 +57,20 @@
     "main_net5d": 37.0,
     "retail_net": 10.9,
     "tag": "混合"
+   },
+   {
+    "name": "半导体",
+    "zdf": "1.55",
+    "main_net5d": -269.3,
+    "retail_net": -43.6,
+    "tag": "游资型"
+   },
+   {
+    "name": "PCB概念",
+    "zdf": "0.57",
+    "main_net5d": 136.1,
+    "retail_net": -46.2,
+    "tag": "机构型"
    }
   ]
  },
@@ -83,8 +89,8 @@
   "gpoints": {
    "欧马模式": 1
   },
-  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
+  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
- "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
+ "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
 }
