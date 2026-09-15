@@ -3,12 +3,12 @@
  "data_date": "2026-09-15",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 15,
+ "score": 4,
  "score_detail": {
   "size_style": 0,
-  "limitup_structure": 16,
+  "limitup_structure": 9,
   "volume_structure": 0,
-  "sector_fund": -1
+  "sector_fund": -5
  },
  "size_style": {
   "hs300_5d": -2.38,
@@ -21,15 +21,15 @@
   "zz500_5d": -2.69
  },
  "limitup_structure": {
-  "limitup": 52,
-  "strong": 79,
-  "width_score": 56.8,
-  "level": "偏强（涨多跌少）",
+  "limitup": 32,
+  "strong": 59,
+  "width_score": 47.3,
+  "level": "震荡（多空均衡）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 2.7,
-  "zhaban_rate": 40.2,
-  "lianban": 15
+  "strong_ratio": 1.9,
+  "zhaban_rate": 49.2,
+  "lianban": 6
  },
  "volume_structure": {
   "small_big_ratio_now": 1.354,
@@ -52,18 +52,18 @@
     "tag": "混合"
    },
    {
-    "name": "电力",
-    "zdf": "-0.63",
-    "main_net5d": 37.0,
-    "retail_net": 10.9,
-    "tag": "混合"
-   },
-   {
     "name": "半导体",
     "zdf": "1.55",
     "main_net5d": -269.3,
     "retail_net": -43.6,
     "tag": "游资型"
+   },
+   {
+    "name": "玻璃玻纤",
+    "zdf": "2.39",
+    "main_net5d": 46.5,
+    "retail_net": -15.4,
+    "tag": "机构型"
    },
    {
     "name": "PCB概念",
@@ -77,12 +77,11 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 11,
-   "欧马模式": 3,
-   "": 1
+   "堆量模式": 13,
+   "欧马模式": 2
   },
   "leaders": {
-   "堆量模式": 3,
+   "堆量模式": 5,
    "欧马模式": 1
   },
   "pullbacks": {},
