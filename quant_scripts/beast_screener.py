@@ -659,7 +659,9 @@ def _score_single_index(code: str, name: str) -> dict:
     """对单个指数进行安全评分 (0-100)"""
     df = parse_kline_df(code, 30)
     if df.empty or len(df) < 10:
-        return {"score": 50, "level": "数据不足", "close": 0, "df": df, "name": name}
+        # ⚠️ 2026-09-15 加固：原为 50（中性）→ 数据源故障时会"假装中性"掩盖风险（9/14 数据源事件暴露）。
+        #    改为 0 + 明确标注：大盘安全分因而不通过（保守方向），且不返回 None 以免下游崩溃。
+        return {"score": 0, "level": "⚠️数据缺失", "close": 0, "df": df, "name": name}
 
     closes = df["close"].values
     latest = closes[-1]
