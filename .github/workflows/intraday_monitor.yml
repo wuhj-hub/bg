@@ -31,6 +31,22 @@ jobs:
           sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
           ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪: /sandbox/workspace -> $GITHUB_WORKSPACE"
 
+      # 当日日期（用于缓存 key，保证同一天内命中、跨天自动失效）
+      - name: 取当日日期（北京时间）
+        id: d
+        run: echo "today=$(TZ=Asia/Shanghai date +%Y%m%d)" >> $GITHUB_OUTPUT
+
+      # 缓存「当日开盘强形态池」（2026-09-15 新增）
+      # 背景：强形态池此前不落库，每次触发都要重新补算（实测 649s）——按 28 次/日触发将浪费约 5 小时 runner。
+      #       按日缓存后，每天只有首次触发做补算，其余走轻量监控。
+      - name: 缓存当日开盘强形态池
+        uses: actions/cache@v4
+        with:
+          path: |
+            outputs/开盘强形态_*.json
+            outputs/开盘突破已推送_*.json
+          key: kaipan8-pool-${{ steps.d.outputs.today }}
+
       - name: 设置 Node.js（westock npx 依赖）
         uses: actions/setup-node@v4
         with:
