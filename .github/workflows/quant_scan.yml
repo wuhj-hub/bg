@@ -277,6 +277,22 @@ jobs:
           echo "IMA_CRED_EXPIRED=$IMA_CRED_EXPIRED" >> "$GITHUB_ENV"
 
       # ─── 提交扫描产物到仓库（供盘前报告引用 + 盘后报告workflow读取）───
+      # ─── 扫描产物可信度审计（2026-09-15 新增：抓"文件在但内容空/旧"的假绿）───
+      - name: 扫描产物可信度审计
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set +e
+          python3 quant_scripts/data_guard.py --audit-all
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::扫描产物可信度异常"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️扫描产物可信度异常&content=新鲜度/非空/字段完整率/样本率审计发现异常,详见 outputs/data_guard_audit_$(date +%Y-%m-%d).md&template=txt" > /dev/null || true
+          fi
+
       - name: 提交扫描产物到仓库（供盘前引用/报告workflow读取）
         continue-on-error: true
         env:
