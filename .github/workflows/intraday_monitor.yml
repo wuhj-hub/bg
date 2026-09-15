@@ -21,6 +21,14 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
+      # 沙箱路径兼容层（2026-09-15 补）：脚本内硬编码 /sandbox/workspace/...，
+      # 此前本 workflow 缺此步骤 → 池文件/输出路径全部失效（开盘八法候选池恒为 0）
+      - name: 沙箱路径兼容层（/sandbox/workspace → 仓库根）
+        run: |
+          sudo mkdir -p /sandbox
+          sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
+          ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪: /sandbox/workspace -> $GITHUB_WORKSPACE"
+
       - name: 设置 Node.js（westock npx 依赖）
         uses: actions/setup-node@v4
         with:
