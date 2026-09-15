@@ -73,19 +73,8 @@ jobs:
           npx -y westock-data-skillhub@1.0.3 hot board --limit 3 || true
           npx -y westock-data-skillhub@1.0.3 kline sh000001 --period day --limit 5 || true
 
-      # ─── 第二步：全量量化扫描 ───
-      - name: 全量量化扫描（盘后量化）
-        env:
-          SCAN_WORKERS: "16"
-        run: |
-          python3 full_market_dualdim.py all_mainboard.csv
-          # 归档资金快照（含资金行为四态phase，供按四态胜率跟踪）
-          cp panhou_lianghua.csv outputs/资金快照_$(date +%Y-%m-%d).csv || echo "归档失败(不影响扫描)"
-
-      # ─── 第二步.1：市场宽度指标（黑石marketChangeDist启发：全主板涨跌家数分布）───
-      - name: 市场宽度扫描（全主板涨跌家数分布）
-        run: python3 market_width.py all_mainboard.csv
-
+      # ⚠️ 2026-09-15 顺序优化：板块映射原排在 1-2h 的主扫描之后，一遇拖延就被挤压；
+      #    它本身独立（仅依赖东财接口），提前到预热后执行，既避免超时又让 hot_emotion 更早有数据。
       # ─── 第二步.1.3a：板块成分映射（东财·仅 runner 可达；2026-09-15 接入缺口修复）───
       # 背景：sector_component_em.json 自 9/3 起是空壳（sectors:{}）且从未接入 workflow，
       #      导致「板块归属/主线题材」维度长期失效（hot_emotion 里"主线判定：无显著题材"实为常态）。
@@ -100,6 +89,20 @@ jobs:
             || echo "⚠️ 板块成分映射失败（非致命：hot_emotion 将退化为无题材）"
           cp outputs/sector_component_em.json sector_component_em.json 2>/dev/null || true
           python3 -c "import json;d=json.load(open('outputs/sector_component_em.json'));print('板块映射:',len(d.get('sectors',{})),'板块 |',len(d.get('code_sector',{})),'只有题材')" 2>/dev/null || echo "板块映射: 无输出"
+
+
+      # ─── 第二步：全量量化扫描 ───
+      - name: 全量量化扫描（盘后量化）
+        env:
+          SCAN_WORKERS: "16"
+        run: |
+          python3 full_market_dualdim.py all_mainboard.csv
+          # 归档资金快照（含资金行为四态phase，供按四态胜率跟踪）
+          cp panhou_lianghua.csv outputs/资金快照_$(date +%Y-%m-%d).csv || echo "归档失败(不影响扫描)"
+
+      # ─── 第二步.1：市场宽度指标（黑石marketChangeDist启发：全主板涨跌家数分布）───
+      - name: 市场宽度扫描（全主板涨跌家数分布）
+        run: python3 market_width.py all_mainboard.csv
 
       # ─── 第二步.1.3b：热点情绪扫描（hot_emotion 连板梯队+情绪温度+退潮预警，westock自算42s，供次日盘前②.5/②.6引用；2026-09-03接入消除手动漏跑断链）───
       - name: 热点情绪扫描（hot_emotion 连板梯队+情绪温度）
