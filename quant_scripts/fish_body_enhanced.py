@@ -42,7 +42,9 @@ def sf(v):
 def get_market_temp():
     raw=run(f"{WESTOCK_CMD} kline sh000001 --period day --limit 60 2>/dev/null")
     rows=parse_table(raw)
-    if not rows: return {"temp":50,"level":"未知","idx":"--"}
+    if not rows:
+        # ⚠️ 2026-09-15 加固：原 50（中性）会掩盖数据源故障 → 改为 0（保守）
+        return {"temp":0,"level":"⚠️数据缺失","idx":"--"}
     closes=[float(r['last']) for r in rows]
     vols=[float(r['volume']) for r in rows]
     latest=closes[0]
