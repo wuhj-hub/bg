@@ -49,6 +49,11 @@ jobs:
         run: |
           python3 quant_scripts/wangzhe_track.py --scan --update-live --stats --report --push
 
+      # 才哥公众号跟踪：解析 caige_urls.txt 中尚未处理的新文章 → 存档 + 汇总
+      - name: 才哥公众号文章跟踪
+        continue-on-error: true
+        run: python3 quant_scripts/caige_track.py --sync --report
+
       - name: 提交信号库与报告入库
         if: always()
         env:
