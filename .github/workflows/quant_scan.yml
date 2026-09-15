@@ -67,7 +67,11 @@ jobs:
 
       # ─── 预热westock包（避免扫描时每只股票首次调用下载开销）───
       - name: 预热westock数据包
-        run: npx -y westock-data-skillhub@1.0.3 hot board --limit 3
+        # ⚠️ 2026-09-15：原只预热 hot board（板块接口），未预热 kline →
+        #    鱼身阶段1「上证指数K线」作为首个 kline 调用在 runner 上冷启动失败（temp=0/数据缺失）
+        run: |
+          npx -y westock-data-skillhub@1.0.3 hot board --limit 3 || true
+          npx -y westock-data-skillhub@1.0.3 kline sh000001 --period day --limit 5 || true
 
       # ─── 第二步：全量量化扫描 ───
       - name: 全量量化扫描（盘后量化）
@@ -88,7 +92,9 @@ jobs:
       #      该脚本用 push2.eastmoney.com，沙箱被拦、runner 可达，故只能在此（runner）执行。
       - name: 板块成分映射（东财·runner 可达）
         continue-on-error: true
-        timeout-minutes: 20
+        # ⚠️ 2026-09-15：串行版 486 板块 >20min 被 timeout 砍（仅跑到 302 只）→
+        #    脚本已改 8 并发（预计 1-2min 完成），同时把上限放宽到 40min 兜底
+        timeout-minutes: 40
         run: |
           python3 quant_scripts/runner_fetch_em_sectors.py --out outputs/sector_component_em.json \
             || echo "⚠️ 板块成分映射失败（非致命：hot_emotion 将退化为无题材）"
@@ -322,6 +328,9 @@ jobs:
             # 改用 Contents API 提交（git pull/push 浅克隆+并发冲突曾导致连续失败，API 绕开）
             python3 git_api_commit.py --msg "chore: scan results ($(date +%Y-%m-%d))" \
               quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
+              outputs/data_guard_audit_$(date +%Y-%m-%d).md \
+              outputs/sector_component_em.json \
+              outputs/market_width_latest.json \
               mode_aggregate_latest.json 板块共振_latest.json yearline_breadth_latest.json 双弦观察池_latest.json \
               123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json \
               top_signal_latest.json board_top_latest.json 情绪预判_latest.json panhou_lianghua.csv \
