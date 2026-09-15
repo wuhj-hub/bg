@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-盘中监控系统 v1.0
-================
+盘中监控系统 v2.0（2026-09-15 改造）
+=====================================
 基于全部量化体系的盘中实时监控：
 - 监控池：核心关注3只 + 28行业龙头 + 热搜股动态 + 板块异动
-- 信号规则：突破MA20/跌破MA20/大涨预警/大跌预警/板块异动/放量异动
+- 【v2.0 主推】王者封板信号：东财涨停池单请求 → 首板+换手>5%+价<10元+未炸板
+  回测依据（3.3万样本/11年）：该判据 5 日超额 +0.89%（t=5.0，胜率 56.1%）
+- 【v2.0 移除】突破MA20：回测超额 -0.42%（负贡献），已删除推送
+- 保留：跌破MA20（风控）/大涨/大跌预警/板块异动
 - 推送：PushPlus + 邮件
 
 运行时机：交易日 09:30~11:30, 13:00~15:00，每30分钟一次
@@ -50,6 +53,7 @@ WATCHLIST = [
 
 # 月度股池/鱼身信号股（每日由盘后流程更新此文件）
 SIGNAL_POOL_FILE = "signal_pool.json"  # 由盘后流程写入
+WANGZHE_STATE_FILE = "outputs/wangzhe_pushed.json"  # 王者信号当日去重状态
 
 # ── 工具 ──
 def log(msg):
@@ -174,6 +178,72 @@ def get_board_moves():
             moves.append({"name": name, "zdf": zdf_f})
     return moves
 
+def fetch_wangzhe_signals():
+    """王者封板扫描（v2.0）：东财涨停池单请求 → 筛「首板+换手>5%+价<10元+未炸板」
+
+    回测依据（bt_filters.py，2015-2026，13706 样本）：
+      首板+涨停+量比1.5~4+价<10元 → 5日超额 +0.89% (t=5.0)，胜率 56.1%，中位 +0.74%
+      对照：原「上穿MA20」超额 -0.42%（胜率49%）→ 无效；T+1开盘追入 -0.99% → 最差
+    东财涨停池字段：lbc连板数 / hs换手率 / zbc炸板次数 / fbt首次封板 / hybk行业
+    """
+    import urllib.request
+    date = datetime.now(BJT).strftime("%Y%m%d")
+    url = ("https://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989"
+           f"&dpt=wz.ztzt&Pageindex=0&pagesize=300&sort=fbt%3Aasc&date={date}")
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        raw = urllib.request.urlopen(req, timeout=20).read().decode("utf-8")
+        pool = (json.loads(raw).get("data") or {}).get("pool") or []
+    except Exception as e:
+        log(f"[WARN] 涨停池获取失败: {e}")
+        return []
+    out = []
+    for it in pool:
+        try:
+            code = str(it.get("c", ""))
+            name = str(it.get("n", "")).strip()
+            price = float(it.get("p", 0)) / 1000.0   # 东财价格字段 ×1000
+            hs = float(it.get("hs", 0))              # 换手率(%)
+            lbc = int(it.get("lbc") or 0)            # 连板数
+            zbc = int(it.get("zbc") or 0)            # 炸板次数
+            fbt = int(it.get("fbt") or 0)            # 首次封板 HHMMSS
+        except (ValueError, TypeError):
+            continue
+        if not code.startswith(("600", "601", "603", "605", "000", "001", "002", "003")):
+            continue                                  # 仅沪深主板
+        if "ST" in name.upper():
+            continue
+        if lbc != 1 or hs <= 5 or price >= 10 or zbc > 0:
+            continue                                  # 王者封板四条件
+        out.append({"code": code, "name": name, "price": price,
+                    "turnover": round(hs, 2), "fbt": fbt, "hybk": it.get("hybk", "")})
+    out.sort(key=lambda x: x["fbt"])
+    return out
+
+
+def load_pushed():
+    """读取当日已推送的王者信号（去重，供 GitHub Actions cache 跨次运行持久化）"""
+    try:
+        if os.path.exists(WANGZHE_STATE_FILE):
+            with open(WANGZHE_STATE_FILE, encoding="utf-8") as f:
+                d = json.load(f)
+            if d.get("date") == datetime.now(BJT).strftime("%Y-%m-%d"):
+                return set(d.get("pushed", []))
+    except Exception:
+        pass
+    return set()
+
+
+def save_pushed(pushed):
+    try:
+        os.makedirs(os.path.dirname(WANGZHE_STATE_FILE) or ".", exist_ok=True)
+        with open(WANGZHE_STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump({"date": datetime.now(BJT).strftime("%Y-%m-%d"),
+                       "pushed": sorted(pushed)}, f, ensure_ascii=False)
+    except Exception as e:
+        log(f"[WARN] 已推送状态保存失败: {e}")
+
+
 def push_message(title, content):
     """PushPlus + 邮件双通道"""
     results = []
@@ -245,6 +315,12 @@ def main():
 
     log(f"监控池: {len(unique_pool)} 只")
 
+    # ── 【v2.0 主推】王者封板扫描（首板+换手>5%+价<10元+未炸板）──
+    pushed = load_pushed()
+    wz_all = fetch_wangzhe_signals()
+    wz_new = [w for w in wz_all if f"{w['code']}_{w['fbt']}" not in pushed]
+    log(f"王者封板: 全市场涨停池命中 {len(wz_all)} 只，新增 {len(wz_new)} 只")
+
     # ── 板块异动检测 ──
     board_moves = get_board_moves()
     for m in board_moves:
@@ -252,7 +328,7 @@ def main():
         signals.append(f"{emoji} 板块异动: **{m['name']}** {m['zdf']:+.2f}%")
 
     # ── 个股监控 ──
-    breakouts, breakdowns, alerts = [], [], []
+    breakdowns, alerts = [], []   # v2.0: breakouts 已移除
     for code, name in unique_pool:
         daily = fetch_daily(code)
         if not daily:
@@ -263,11 +339,9 @@ def main():
         price = minute["price"]
         zdf = (price - daily["prev_close"]) / daily["prev_close"] * 100 if daily["prev_close"] else 0
 
-        # 突破MA20
-        if daily["ma20"] and price > daily["ma20"] and daily["prev_close"] <= daily["ma20"]:
-            breakouts.append(f"🚀 {name}({code}) 突破MA20 {price:.2f} > {daily['ma20']:.2f} ({zdf:+.2f}%)")
-        # 跌破MA20
-        elif daily["ma20"] and price < daily["ma20"] and daily["prev_close"] >= daily["ma20"]:
+        # 【v2.0】突破MA20 已移除：回测 5日超额 -0.42%、胜率49%（负贡献），改由王者封板信号替代
+        # 跌破MA20（保留：风控警示）
+        if daily["ma20"] and price < daily["ma20"] and daily["prev_close"] >= daily["ma20"]:
             breakdowns.append(f"🛑 {name}({code}) 跌破MA20 {price:.2f} < {daily['ma20']:.2f} ({zdf:+.2f}%)")
         # 大涨预警
         if zdf >= 8:
@@ -277,20 +351,25 @@ def main():
             alerts.append(f"⚠️ {name}({code}) 大跌 {zdf:+.2f}% @{price:.2f}")
 
     # 汇总信号
-    all_sigs = breakouts + breakdowns + alerts + board_moves[:0]  # board已加入signals
-    if not all_sigs:
-        log(f"无触发信号（扫描{len(unique_pool)}只）")
+    all_sigs = breakdowns + alerts + board_moves[:0]  # board已加入signals（v2.0 移除 breakouts）
+    if not all_sigs and not wz_new:
+        log(f"无触发信号（扫描{len(unique_pool)}只 | 王者新封板0只）")
         return
 
     # 构建推送内容（限制9000字符）
     content_lines = [f"# ⚡ 盘中监控 {now.strftime('%H:%M')}"]
+    if wz_new:
+        content_lines.append("\n## 👑 王者封板信号（首板+换手>5%+价<10元）")
+        content_lines.append("> 持有周期 **5日**（回测5日超额+0.89%/胜率56.1%，10日衰减）")
+        for w in wz_new[:20]:
+            t = f"{w['fbt']//10000:02d}:{w['fbt']//100%100:02d}" if w["fbt"] else "--:--"
+            content_lines.append(
+                f"👑 **{w['name']}**({w['code']}) {w['price']:.2f}元 换手{w['turnover']:.1f}% "
+                f"封板{t} · {w['hybk']}")
     if board_moves:
         content_lines.append("\n## 📊 板块异动")
         for s in signals[:10]:
             content_lines.append(s)
-    if breakouts:
-        content_lines.append("\n## 🚀 突破信号")
-        content_lines.extend(breakouts[:10])
     if breakdowns:
         content_lines.append("\n## 🛑 破位信号")
         content_lines.extend(breakdowns[:10])
@@ -301,11 +380,15 @@ def main():
     if len(content) > 9000:
         content = content[:9000] + "\n\n> ...（截断）"
 
-    title = f"⚡盘中监控 {now.strftime('%H:%M')} ({len(breakouts)}突破/{len(breakdowns)}破位)"
+    title = f"⚡盘中监控 {now.strftime('%H:%M')} (👑王者{len(wz_new)}/{len(breakdowns)}破位)"
     log(f"推送: {title}")
     results = push_message(title, content)
     for ch, ok in results:
         log(f"  {ch}: {'✅' if ok is True else ok}")
+    # 记录已推送（跨次运行去重，由 workflow 的 actions/cache 持久化）
+    if any(ok is True for _, ok in results) and wz_new:
+        pushed |= {f"{w['code']}_{w['fbt']}" for w in wz_new}
+        save_pushed(pushed)
 
 if __name__ == "__main__":
     main()
