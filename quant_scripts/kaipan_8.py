@@ -40,8 +40,15 @@ def cli(cmd, timeout=60):
 def load_pool():
     """合并多个股池 txt → {code: name}"""
     pool = {}
-    paths = ["/sandbox/workspace/yao_pool.txt", "/sandbox/workspace/caige_pool.txt",
-             "/sandbox/workspace/yitong_pool.txt", "/sandbox/workspace/holdings.txt"]
+    # ⚠️ 2026-09-15 修复：原只查 /sandbox/workspace/*.txt（=仓库根），但股池实际写在 quant_scripts/
+    #    → 候选池恒为 0 只（开盘八法即使补算也无输入）。改为多候选：根目录 + quant_scripts/ + 脚本同级。
+    _base = os.path.dirname(os.path.abspath(__file__))
+    paths = []
+    for _fn in ("yao_pool.txt", "caige_pool.txt", "yitong_pool.txt", "longtou_pool.txt", "holdings.txt"):
+        for _d in ("/sandbox/workspace/quant_scripts", _base, "/sandbox/workspace"):
+            _c = os.path.join(_d, _fn)
+            if _c not in paths:
+                paths.append(_c)
     for p in paths:
         if not os.path.exists(p):
             continue
