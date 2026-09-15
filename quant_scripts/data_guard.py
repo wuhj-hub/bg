@@ -168,13 +168,31 @@ def _bj_today():
 
 
 def _load_json(paths):
+    """多候选路径 → 返回『最新/最完整』的那一份。
+
+    ⚠️ 2026-09-15 修复：原先「取第一个存在者」，而仓库里 outputs/ 是过时快照、
+    仓库根才是 workflow cp 出来的新产物（反之在 scan job 内 outputs/ 又更新），
+    两处并存时取第一个会误报「内容陈旧」。改为按 (date, 结构规模) 取优。
+    """
+    best, best_path, best_key = None, None, None
     for p in paths:
-        if os.path.exists(p):
-            try:
-                return json.load(open(p, encoding="utf-8")), p
-            except Exception:
-                return None, p
-    return None, None
+        if not os.path.exists(p):
+            continue
+        try:
+            d = json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+        if not isinstance(d, dict):
+            continue
+        size = 0
+        for k in ("code_sector", "sectors", "code_name", "stocks", "data", "lianban_rows"):
+            v = d.get(k)
+            if isinstance(v, (dict, list)):
+                size += len(v)
+        key = (str(d.get("date") or d.get("qdate") or ""), size)
+        if best is None or key > best_key:
+            best, best_path, best_key = d, p, key
+    return best, best_path
 
 
 def _get(d, key):
