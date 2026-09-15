@@ -32,18 +32,18 @@
    "score": 95
   },
   {
-   "code": "sz002362",
+   "code": "sz001228",
    "ok": true,
-   "close": 17.5,
-   "vwap": 17.13,
-   "dev_pct": 2.2,
-   "pos_pct": 100.0,
-   "tail_slope": 0.0,
-   "volatility": 2.23,
-   "wave": "4G边缘·谨慎",
+   "close": 32.24,
+   "vwap": 31.84,
+   "dev_pct": 1.3,
+   "pos_pct": 95.0,
+   "tail_slope": 0.34,
+   "volatility": 0.7,
+   "wave": "天人和谐·续原势",
    "kline": "上绿下红·必然上攻",
-   "name": "汉王科技",
-   "score": 87
+   "name": "永泰运",
+   "score": 92
   },
   {
    "code": "sz002242",
@@ -74,18 +74,18 @@
    "score": 95
   },
   {
-   "code": "sh600956",
+   "code": "sh601615",
    "ok": true,
-   "close": 7.28,
-   "vwap": 7.23,
-   "dev_pct": 0.6,
-   "pos_pct": 88.0,
-   "tail_slope": 0.41,
-   "volatility": 0.48,
+   "close": 9.82,
+   "vwap": 9.78,
+   "dev_pct": 0.4,
+   "pos_pct": 71.0,
+   "tail_slope": 0.0,
+   "volatility": 1.11,
    "wave": "天人和谐·续原势",
    "kline": "上绿下红·必然上攻",
-   "name": "新天绿能",
-   "score": 87
+   "name": "明阳智能",
+   "score": 90
   },
   {
    "code": "sz002549",
@@ -116,6 +116,20 @@
    "score": 98
   },
   {
+   "code": "sh600900",
+   "ok": true,
+   "close": 28.5,
+   "vwap": 28.51,
+   "dev_pct": -0.0,
+   "pos_pct": 35.0,
+   "tail_slope": 0.0,
+   "volatility": 0.15,
+   "wave": "天人和谐·续原势",
+   "kline": "上红下绿·注意回落",
+   "name": "长江电力",
+   "score": 99
+  },
+  {
    "code": "sh601901",
    "ok": true,
    "close": 6.8,
@@ -130,18 +144,18 @@
    "score": 95
   },
   {
-   "code": "sh603097",
+   "code": "sz002966",
    "ok": true,
-   "close": 18.65,
-   "vwap": 18.65,
-   "dev_pct": 0.0,
-   "pos_pct": 58.0,
-   "tail_slope": -0.11,
-   "volatility": 0.5,
+   "close": 9.2,
+   "vwap": 9.21,
+   "dev_pct": -0.1,
+   "pos_pct": 30.0,
+   "tail_slope": 0.0,
+   "volatility": 0.26,
    "wave": "天人和谐·续原势",
-   "kline": "上绿下红·必然上攻",
-   "name": "江苏华辰",
-   "score": 88
+   "kline": "上红下绿·注意回落",
+   "name": "苏州银行",
+   "score": 100
   },
   {
    "code": "sz002441",
@@ -186,34 +200,6 @@
    "score": 95
   },
   {
-   "code": "sh603389",
-   "ok": true,
-   "close": 45.71,
-   "vwap": 46.1,
-   "dev_pct": -0.9,
-   "pos_pct": 10.0,
-   "tail_slope": -0.02,
-   "volatility": 0.45,
-   "wave": "天人和谐·续原势",
-   "kline": "上红下绿·注意回落",
-   "name": "亚振家居",
-   "score": 86
-  },
-  {
-   "code": "sz002366",
-   "ok": true,
-   "close": 5.7,
-   "vwap": 5.75,
-   "dev_pct": -0.9,
-   "pos_pct": 0.0,
-   "tail_slope": 0.0,
-   "volatility": 0.46,
-   "wave": "天人和谐·续原势",
-   "kline": "上红下绿·注意回落",
-   "name": "融发核电",
-   "score": 85
-  },
-  {
    "code": "sz002174",
    "ok": true,
    "close": 13.52,
@@ -226,20 +212,6 @@
    "kline": "上红下绿·注意回落",
    "name": "游族网络",
    "score": 100
-  },
-  {
-   "code": "sh603966",
-   "ok": true,
-   "close": 7.29,
-   "vwap": 7.37,
-   "dev_pct": -1.2,
-   "pos_pct": 12.0,
-   "tail_slope": 0.14,
-   "volatility": 0.68,
-   "wave": "天人和谐·续原势",
-   "kline": "上红下绿·注意回落",
-   "name": "法兰泰克",
-   "score": 86
   },
   {
    "code": "sh603712",
@@ -256,6 +228,20 @@
    "score": 93
   },
   {
+   "code": "sh600876",
+   "ok": true,
+   "close": 8.99,
+   "vwap": 9.11,
+   "dev_pct": -1.3,
+   "pos_pct": 19.0,
+   "tail_slope": 0.78,
+   "volatility": 1.55,
+   "wave": "天人和谐·续原势",
+   "kline": "上红下绿·注意回落",
+   "name": "凯盛新能",
+   "score": 92
+  },
+  {
    "code": "sz002973",
    "ok": true,
    "close": 12.51,
@@ -268,6 +254,20 @@
    "kline": "上绿下红·必然上攻",
    "name": "侨银股份",
    "score": 100
+  },
+  {
+   "code": "sz000532",
+   "ok": true,
+   "close": 11.59,
+   "vwap": 11.82,
+   "dev_pct": -1.9,
+   "pos_pct": 2.0,
+   "tail_slope": 0.09,
+   "volatility": 1.11,
+   "wave": "天人和谐·续原势",
+   "kline": "上红下绿·注意回落",
+   "name": "华金资本",
+   "score": 88
   },
   {
    "code": "sh603151",
