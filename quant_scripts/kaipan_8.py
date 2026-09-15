@@ -63,8 +63,14 @@ def load_pool():
     return pool
 
 def fetch_prev_close(code):
-    """批量拉昨收（day kline limit 2 最新两根）"""
-    md = cli(f"kline {code} --period day --limit 2 --fq qfq")
+    """拉昨收 + 近5日平均成交额（2026-09-15：用于「放量确认」量比计算）
+    返回 (prev_close, amt5avg) 或 None"""
+    # ⚠️ 2026-09-15：单股 kline 接口间歇性返空（已知 flakiness），增加去复权回退
+    md = cli(f"kline {code} --period day --limit 7 --fq qfq")
+    if not any(x.strip().startswith("|") and re.match(r"^\|\s*\d{4}-\d{2}-\d{2}", x.strip()) for x in md.splitlines()):
+        _md2 = cli(f"kline {code} --period day --limit 7")
+        if any(x.strip().startswith("|") and re.match(r"^\|\s*\d{4}-\d{2}-\d{2}", x.strip()) for x in _md2.splitlines()):
+            md = _md2
     rows = []
     has_symbol = "| symbol |" in md
     for ln in md.splitlines():
@@ -76,15 +82,23 @@ def fetch_prev_close(code):
             if has_symbol:
                 if parts[0] in ("symbol", "---"):
                     continue
-                rows.append((parts[1], float(parts[3])))
+                _amt = float(parts[7]) if len(parts) > 7 else 0.0
+                rows.append((parts[1], float(parts[3]), _amt))
             else:
                 if not re.match(r"\d{4}-\d{2}-\d{2}", parts[0]):
                     continue
-                rows.append((parts[0], float(parts[2])))
+                _amt = float(parts[6]) if len(parts) > 6 else 0.0
+                rows.append((parts[0], float(parts[2]), _amt))
         except (ValueError, IndexError):
             continue
     rows.sort()
-    return rows[-2][1] if len(rows) >= 2 else None  # 倒数第二根=昨收
+    if len(rows) < 2:
+        return None
+    prev_close = rows[-2][1]                      # 倒数第二根=昨收
+    # 近5日平均成交额（不含今日，取倒数第2~6根）
+    _amts = [a for _, _, a in rows[-6:-1] if a]
+    amt5 = (sum(_amts) / len(_amts)) if len(_amts) >= 3 else None
+    return (prev_close, amt5)
 
 def fetch_minute(code):
     """当日分时 → [{time, price}]"""
@@ -97,7 +111,11 @@ def fetch_minute(code):
         parts = [p.strip() for p in s.strip("|").split("|")]
         if len(parts) >= 3 and re.match(r"\d{4}", parts[1]):
             try:
-                rows.append({"time": parts[1], "price": float(parts[2])})
+                amt = float(parts[4]) if len(parts) > 4 else 0.0   # 分钟 amount 为「当日累计成交额」
+            except ValueError:
+                amt = 0.0
+            try:
+                rows.append({"time": parts[1], "price": float(parts[2]), "amt": amt})
             except ValueError:
                 continue
     return rows
@@ -136,16 +154,24 @@ def judge_8(rows, prev_close):
             "c3": c3}
 
 def analyze(code, name, prev_close_map):
-    prev = prev_close_map.get(code)
-    if prev is None:
-        prev = fetch_prev_close(code)
+    got = prev_close_map.get(code)
+    if not got:
+        got = fetch_prev_close(code)
+    if not got:
+        return None
+    prev, amt5 = got if isinstance(got, tuple) else (got, None)
     rows = fetch_minute(code)
     if len(rows) < 16 or not prev:
         return None
     r = judge_8(rows, prev)
     if not r:
         return None
-    return {"code": code, "name": name, "price": rows[-1]["price"], **r}
+    # 放量确认（2026-09-15）：开盘15分钟成交额（分钟 amount 为累计值，取 0944 那根）
+    # 占「近5日全天平均成交额」的比例。均匀分布下 15/240=6.25%，开盘通常更高。
+    amt15 = next((x["amt"] for x in rows if x["time"] >= "0944" and x["amt"]), None)
+    vol_ratio = round(amt15 / amt5, 4) if (amt15 and amt5) else None
+    return {"code": code, "name": name, "price": rows[-1]["price"],
+            "vol_ratio": vol_ratio, "amt15": amt15, **r}
 
 def push_alert(title, content):
     try:
@@ -275,19 +301,29 @@ def main():
     _per = f"{elapsed/len(results):.1f}s/只" if results else "—"
     print(f"[INFO] 判定完成 {len(results)} 只，总耗时 {elapsed:.0f}s（{_per}）", flush=True)
 
+    # Step1.5 放量确认（2026-09-15 新增）：治「173 只强形态 / 35 只突破」的推送噪声
+    #   量比 = 开盘15分钟成交额 ÷ 近5日全天平均成交额（均匀分布下 15/240 = 6.25%，开盘通常更高）
+    #   用**当日前 40% 分位（P60）自适应阈值**——不拍固定值、随市况自适应；样本不足则不过滤（防误杀）。
+    _vr = sorted(r["vol_ratio"] for r in results if r.get("vol_ratio"))
+    THR = _vr[int(len(_vr) * 0.6)] if len(_vr) >= 20 else 0
+    _med = _vr[len(_vr) // 2] if _vr else 0
+    print(f"[INFO] 量比分布: 样本{len(_vr)} 中位{_med:.3f} → P60阈值 {THR:.3f}", flush=True)
+
     # Step2: 输出
-    strong = [r for r in results if r["strength"] >= 3]
+    strong = [r for r in results if r["strength"] >= 3
+              and (not THR or (r.get("vol_ratio") or 0) >= THR)]
     watch = [r for r in results if r["strength"] == 2]
     weak = [r for r in results if r["strength"] < 0]
     os.makedirs("/sandbox/workspace/outputs", exist_ok=True)
     md = [f"# 🌅 开盘八法·强形态扫描 {date_str}\n",
           f"**候选**: {len(pool)} | **有效判定**: {len(results)} | **耗时**: {elapsed:.0f}s\n"]
-    md.append(f"\n## 🔥 强形态（{len(strong)}只）→ 突破预警位 = 9:45高点\n")
+    md.append(f"\n## 🔥 强形态（{len(strong)}只·已过量能确认 P60≥{THR:.3f}）→ 突破预警位 = 9:45高点\n")
     if strong:
-        md.append("| 代码 | 名称 | 形态 | 现价 | 9:45高 | 9:45低 | 预警位 |")
-        md.append("|------|------|------|------|--------|--------|--------|")
+        md.append("| 代码 | 名称 | 形态 | 现价 | 9:45高 | 9:45低 | 预警位 | 量比 |")
+        md.append("|------|------|------|------|--------|--------|--------|------|")
         for r in strong:
-            md.append(f"| {r['code']} | {r['name']} | **{r['pattern']}** | {r['price']:.2f} | {r['h3']:.2f} | {r['l3']:.2f} | **{r['h3']:.2f}** |")
+            _v = f"{r['vol_ratio']:.3f}" if r.get('vol_ratio') else "—"
+            md.append(f"| {r['code']} | {r['name']} | **{r['pattern']}** | {r['price']:.2f} | {r['h3']:.2f} | {r['l3']:.2f} | **{r['h3']:.2f}** | {_v} |")
     else:
         md.append("📭 无强形态")
     md.append(f"\n## 👀 观察（{len(watch)}只）\n")
@@ -310,7 +346,8 @@ def main():
     if strong:
         lines = [f"🌅 开盘强形态 {date_str}（{len(strong)}只）\n"]
         for r in strong[:12]:
-            lines.append(f"- {r['code']} {r['name']} **{r['pattern']}** 突破位{r['h3']:.2f}")
+            _v = f" 量比{r['vol_ratio']:.2f}" if r.get('vol_ratio') else ""
+            lines.append(f"- {r['code']} {r['name']} **{r['pattern']}** 突破位{r['h3']:.2f}{_v}")
         push_alert("🌅开盘强形态", "\n".join(lines))
 
     # 2026-09-15：补算场景下，紧接着做一次突破监控（触发稀少，一次运行把两件事都做完）
