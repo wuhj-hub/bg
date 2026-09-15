@@ -1,23 +1,12 @@
 {
- "date": "2026-09-14",
+ "date": "2026-09-15",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 48,
+ "pool_size": 45,
  "resonance_boards": [
   {
-   "name": "橡胶",
-   "code": "pt01801037",
-   "zdf": 2.84,
-   "strength": 8,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "靶材",
-   "code": "pt02011037",
-   "zdf": 5.38,
+   "name": "风电设备",
+   "code": "pt01801736",
+   "zdf": 2.36,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -28,7 +17,7 @@
   {
    "name": "塑料",
    "code": "pt01801036",
-   "zdf": 1.34,
+   "zdf": 1.17,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -39,28 +28,8 @@
   {
    "name": "玻璃玻纤",
    "code": "pt01801712",
-   "zdf": 1.06,
+   "zdf": 2.39,
    "strength": 6,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "摩托车及其他",
-   "code": "pt01801881",
-   "zdf": 3.15,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "电力",
-   "code": "pt01801161",
-   "zdf": 0.32,
-   "strength": 5,
    "factors": [
     "进场",
     "吸筹"
@@ -69,7 +38,7 @@
   {
    "name": "PCB概念",
    "code": "pt02101284",
-   "zdf": 2.03,
+   "zdf": 0.57,
    "strength": 5,
    "factors": [
     "进场",
@@ -77,9 +46,9 @@
    ]
   },
   {
-   "name": "风电设备",
-   "code": "pt01801736",
-   "zdf": 0.23,
+   "name": "非白酒",
+   "code": "pt01801126",
+   "zdf": 0.18,
    "strength": 5,
    "factors": [
     "进场",
@@ -89,13 +58,8 @@
  ],
  "grab_top": [
   {
-   "name": "橡胶",
-   "code": "pt01801037",
-   "value": 8
-  },
-  {
-   "name": "靶材",
-   "code": "pt02011037",
+   "name": "风电设备",
+   "code": "pt01801736",
    "value": 7
   },
   {
@@ -108,105 +72,73 @@
   {
    "name": "PCB概念",
    "code": "pt02101284",
-   "value": 270.9
-  },
-  {
-   "name": "元件",
-   "code": "pt01801083",
-   "value": 145.4
+   "value": 136.1
   },
   {
    "name": "玻璃玻纤",
    "code": "pt01801712",
-   "value": 42.0
-  },
-  {
-   "name": "电力",
-   "code": "pt01801161",
-   "value": 18.4
+   "value": 64.9
   },
   {
    "name": "风电设备",
    "code": "pt01801736",
-   "value": 9.3
-  },
-  {
-   "name": "橡胶",
-   "code": "pt01801037",
-   "value": 7.3
-  },
-  {
-   "name": "靶材",
-   "code": "pt02011037",
-   "value": 2.9
+   "value": 12.2
   },
   {
    "name": "塑料",
    "code": "pt01801036",
-   "value": 2.7
+   "value": 5.4
   },
   {
-   "name": "摩托车及其他",
-   "code": "pt01801881",
-   "value": 0.3
+   "name": "非白酒",
+   "code": "pt01801126",
+   "value": 2.0
   }
  ],
  "absorption_top": [
   {
-   "name": "橡胶",
-   "code": "pt01801037",
-   "value": 3.36
-  },
-  {
    "name": "玻璃玻纤",
    "code": "pt01801712",
-   "value": 3.05
+   "value": 4.18
   },
   {
    "name": "风电设备",
    "code": "pt01801736",
-   "value": 2.06
+   "value": 2.22
+  },
+  {
+   "name": "非白酒",
+   "code": "pt01801126",
+   "value": 1.52
   },
   {
    "name": "PCB概念",
    "code": "pt02101284",
-   "value": 1.94
-  },
-  {
-   "name": "元件",
-   "code": "pt01801083",
-   "value": 1.91
-  },
-  {
-   "name": "电力",
-   "code": "pt01801161",
-   "value": 0.82
-  },
-  {
-   "name": "靶材",
-   "code": "pt02011037",
-   "value": 0.74
-  },
-  {
-   "name": "摩托车及其他",
-   "code": "pt01801881",
-   "value": 0.34
+   "value": 0.95
   },
   {
    "name": "塑料",
    "code": "pt01801036",
-   "value": 0.25
+   "value": 0.48
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "摩托车及其他",
-   "stock": "征和工业",
-   "code": "sz003033",
-   "zdf": "7.39",
-   "main1": 0.31,
-   "main5": 0.04
+   "board": "玻璃玻纤",
+   "stock": "宏和科技",
+   "code": "sh603256",
+   "zdf": "5.79",
+   "main1": 5.86,
+   "main5": 1.65
+  },
+  {
+   "board": "塑料",
+   "stock": "浙江众成",
+   "code": "sz002522",
+   "zdf": "10.04",
+   "main1": 0.83,
+   "main5": -0.23
   }
  ]
 }
