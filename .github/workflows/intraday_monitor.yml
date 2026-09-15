@@ -15,7 +15,9 @@ on:
 jobs:
   intraday-monitor:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # ⚠️ 2026-09-15：原 15min 不够——开盘八法"补算扫描"实测耗时 649s(11min)+ 盘中监控 3.5min
+    #    会正好撞上超时被 cancelled（首次补算当日尤其明显）。补算每日只发生一次，之后走监控(快)。
+    timeout-minutes: 30
     
     steps:
       - name: 检出代码
