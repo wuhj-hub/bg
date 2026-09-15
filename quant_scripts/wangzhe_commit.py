@@ -15,7 +15,11 @@ tok = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN", "")
 br = os.environ.get("TARGET_BRANCH", "main")
 d = datetime.now(BJT).strftime("%Y-%m-%d")
 files = ["outputs/wangzhe_signals.csv", "outputs/wangzhe_stats.json",
-         f"outputs/涨停型王者_成功率报告_{d}.md"]
+         f"outputs/涨停型王者_成功率报告_{d}.md",
+         "outputs/caige_track.json"]
+# 才哥文章存档目录（逐篇提交）
+import glob
+files += sorted(glob.glob("outputs/caige_articles/*.md")) + sorted(glob.glob("outputs/caige_articles/*.json"))
 
 if not tok:
     print("[ERR] 未设置 GH_TOKEN")
