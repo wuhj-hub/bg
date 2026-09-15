@@ -1843,7 +1843,8 @@ def main():
                   f"{level}{gap_mark}{gpoint_mark}")
     else:
         print(f"  ⚠️ 当前无符合条件的领先股")
-        print(f"  说明: 大盘危险区(安全评分23.6)，强势突破信号难以形成")
+        # ⚠️ 2026-09-16 修复：原硬编码「安全评分23.6」与实况（当日 11.6）不符
+        print(f"  说明: 大盘{safety.get('level','—')}(安全评分{safety.get('score',0):.1f})，强势突破信号难以形成")
 
     # ====== 三、回调股（基底回撤末期 + 低吸信号） ======
     # 条件: VCP收缩 + 缩量 + 伏击线低吸 or RS_D背离 → 回调低吸
@@ -1897,7 +1898,14 @@ def main():
                   f"{' '.join(notes)}")
     else:
         print(f"  ⚠️ 当前无符合条件的回调股")
-        print(f"  说明: 大盘处于上涨波段，多数股票振幅在扩大而非收缩")
+        # ⚠️ 2026-09-16 修复：原硬编码「大盘处于上涨波段」与实况（当日为熊市/上涨占比17%）相反。
+        #    改为按大盘安全评分分支：弱势→下跌放量致振幅扩大；强势→上涨波段致振幅扩大。
+        _sc = safety.get("score", 0.0)
+        _lv = safety.get("level", "—")
+        if _sc < 50:
+            print(f"  说明: 大盘{_lv}({_sc:.1f}分)，个股放量下挫致振幅扩大而非收缩，未见典型基底回撤末期形态")
+        else:
+            print(f"  说明: 大盘{_lv}({_sc:.1f}分)处于强势波段，多数股票振幅在扩大而非收缩")
 
     # ====== 四、综合评分表 ======
     print(f"\n{'=' * 90}")
@@ -2002,8 +2010,9 @@ def main():
                   f"跳空:{'是' if d.get('gap_detected') else '否'}")
 
     if not leaders and not pullbacks:
-        print(f"\n  ⚠️  当前市场环境危险(安全评分23.6), 无明确信号")
-        print(f"     建议等待大盘企稳后再关注")
+        print(f"\n  ⚠️  当前市场环境{safety.get('level','—')}(安全评分{safety.get('score',0):.1f}), 无明确信号")
+        if safety.get("score", 0) < 50:
+            print(f"     建议等待大盘企稳后再关注")
 
     # ---- 综合总结 ----
     print(f"\n{'=' * 90}")
