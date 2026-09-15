@@ -327,6 +327,16 @@ def main():
         f.write(f"# 妖股池 {date_str}\n")
         for r in results:
             f.write(f"{r['code']} # {r['name']}（{r['level']}）\n")
+    # ⚠️ 2026-09-15 修复：原只写仓库根，而 workflow 提交的是 quant_scripts/yao_pool.txt
+    #    → 提交的一直是旧文件（股池实际自 2026-08-15 起断更）。此处同步一份到脚本目录。
+    try:
+        import shutil as _sh
+        _alt = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yao_pool.txt")
+        if os.path.abspath(_alt) != os.path.abspath("/sandbox/workspace/yao_pool.txt"):
+            _sh.copyfile("/sandbox/workspace/yao_pool.txt", _alt)
+            print(f"[OK] 池(同步): {_alt}")
+    except Exception as _e:
+        print(f"[WARN] 池同步失败: {_e}")
     print(report)
     print(f"\n[OK] 报告: {md_path}\n[OK] 池: /sandbox/workspace/yao_pool.txt")
 
