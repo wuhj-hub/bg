@@ -9,15 +9,23 @@ data_guard.py —— 盘后数据源连通性预检（分步熔断 + 股池文�
       并把 quant_scripts/*_pool.txt 覆盖为空池。根因指向数据源侧限流，
       但自检仍评 100/100 健康 → 漏检。
 
-本脚本提供两道闸门：
-  ① --probe  ：跑前探针。抽样拉取基准标的日线，判定数据源是否可用。
-               返回码 0=健康 / 1=故障，供 workflow 决定是否允许覆盖股池文件。
-  ② --audit  ：跑后审计。检查关键产物是否为「空壳」（规模骤降/全部 0），
-               输出 outputs/data_guard_{date}.md 供告警引用。
+本脚本提供三道闸门：
+  ① --probe    ：跑前探针。抽样拉取基准标的日线，判定数据源是否可用。
+                 返回码 0=健康 / 1=故障，供 workflow 决定是否允许覆盖股池文件。
+  ② --audit    ：跑后审计（旧版）。检查股池文件是否为空壳。
+  ③ --audit-all：跑后【产物可信度审计】（2026-09-15 新增，推荐）。
+                 对关键产物做五类校验：新鲜度(日期) / 非空(结构长度) /
+                 关键字段完整率 / 样本覆盖率(valid÷total) / 静默失败(stderr)，
+                 并校验 5 个股池文件的内容日期与条数。
+                 输出 outputs/data_guard_audit_{date}.md；返回码非0表示有异常。
+
+设计动机：体系里的"坏"往往不报错——而是「文件在、内容是空的/旧的/字段缺失的」，
+          workflow 全绿却无用（即"假绿"）。本模块专门抓这类问题。
 
 用法：
   python3 data_guard.py --probe
   python3 data_guard.py --probe --json outputs/data_guard.json
+  python3 data_guard.py --audit-all
   python3 data_guard.py --audit --pool quant_scripts/caige_pool.txt ...
 """
 import os
