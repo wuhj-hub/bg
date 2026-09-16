@@ -99,6 +99,9 @@ jobs:
           python3 full_market_dualdim.py all_mainboard.csv
           # 归档资金快照（含资金行为四态phase，供按四态胜率跟踪）
           cp panhou_lianghua.csv outputs/资金快照_$(date +%Y-%m-%d).csv || echo "归档失败(不影响扫描)"
+          # ⚠️ 2026-09-16 修复：乾坤A产物自 8/25 起从未提交（quant_scan 零引用 qiankun），
+          #    导致复盘④/信号仲裁读到 3 周前的陈旧快照。此处补 cp 到仓库根，并纳入提交列表。
+          cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || echo "乾坤A产物缺失(不影响扫描)"
 
       # ─── 第二步.1：市场宽度指标（黑石marketChangeDist启发：全主板涨跌家数分布）───
       - name: 市场宽度扫描（全主板涨跌家数分布）
@@ -334,6 +337,8 @@ jobs:
               outputs/data_guard_audit_$(date +%Y-%m-%d).md \
               outputs/sector_component_em.json \
               outputs/market_width_latest.json \
+              outputs/qiankun_a_latest.json qiankun_a_latest.json \
+              outputs/资金快照_$(date +%Y-%m-%d).csv \
               mode_aggregate_latest.json 板块共振_latest.json yearline_breadth_latest.json 双弦观察池_latest.json \
               123_2b_latest.json rsv_strength_latest.json monthly_macd_latest.json 断档分歧_latest.json \
               top_signal_latest.json board_top_latest.json 情绪预判_latest.json panhou_lianghua.csv \
