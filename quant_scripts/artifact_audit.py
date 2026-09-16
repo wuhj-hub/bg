@@ -36,6 +36,10 @@ WHITELIST = (
     "bt_filters", "bt_intraday_vs_wangzhe", "bt_variants", "vcp_backtest",
     "wangzhe_confirm_stats", "anti_resilience", "execution_cards_", "market_style_",
     "hot_emotion_2", "rsv_strength_2", "market_width_2", "123_2b反转信号_",
+    # 2026-09-16 二轮降噪：历史归档脚本、技能备份、审计自身产物
+    "docs/", "skills_backup/", "backtest.py", "backtest_", "bt_2b", "bt_30m",
+    "bt_divergence", "bt_results", "combo_results", "_d.csv", "_m30.csv",
+    "artifact_audit", "000001.json",
 )
 # 已知由「非 git_api_commit」方式提交的（如 wangzhe_commit.py / intraday cache）
 ALT_COMMIT = {
