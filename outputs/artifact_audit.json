@@ -21,39 +21,32 @@
   ],
   "信号仲裁_latest.json": [
    ".github/workflows/quant_report.yml",
-   "quant_scripts/signal_arbiter.py",
    "quant_scripts/trade_journal.py",
    "signal_arbiter.py"
   ],
   "信号仲裁_{var}.md": [
-   "quant_scripts/signal_arbiter.py",
    "signal_arbiter.py"
   ],
   "自选清单_{var}.txt": [
-   "quant_scripts/signal_arbiter.py",
    "signal_arbiter.py"
   ],
   "仲裁信号日志.csv": [
-   "quant_scripts/signal_arbiter.py",
    "quant_scripts/trade_journal.py",
    "signal_arbiter.py"
   ],
   "market_width_{var}.md": [
-   "market_width.py",
-   "quant_scripts/market_width.py"
+   "market_width.py"
   ],
   "market_width_latest.json": [
    ".github/workflows/quant_scan.yml",
    "market_width.py",
-   "quant_scripts/market_regime.py",
-   "quant_scripts/market_width.py"
+   "quant_scripts/market_regime.py"
   ],
   "all_mainboard.csv": [
    ".github/workflows/quant_scan.yml",
    "gen_mainboard.py",
    "quant_scripts/execution_card.py",
    "quant_scripts/fetch_mainboard_data.py",
-   "quant_scripts/gen_mainboard.py",
    "quant_scripts/hot_emotion.py",
    "quant_scripts/market_regime.py",
    "quant_scripts/yitong_guaili_screener.py",
@@ -89,7 +82,6 @@
    "premarket_scripts/premarket_pool.py",
    "quant_scripts/monthly_pool.py",
    "quant_scripts/monthly_review.py",
-   "skills_backup/双弦投资系统-月度股池/scripts/monthly_pool.py",
    "skills_backup/双弦投资系统/scripts/monthly_pool.py",
    "skills_backup/双弦投资系统/scripts/monthly_review.py",
    "skills_backup/盘前市场报告/scripts/premarket_pool.py"
@@ -147,9 +139,6 @@
   "{var}.json": [
    "skills_backup/强势体系/backtest.py"
   ],
-  "000001.json": [
-   "skills_backup/强势体系/backtest.py"
-  ],
   "samples.json": [
    "skills_backup/强势体系/wuwei_verify.py"
   ],
@@ -189,6 +178,9 @@
   "rsv_strength_{var}.md": [
    "quant_scripts/rsv_strength.py"
   ],
+  "wangzhe_golden_bt.json": [
+   "quant_scripts/bt_wangzhe_golden.py"
+  ],
   "mode_aggregate_latest.json": [
    ".github/workflows/quant_scan.yml",
    "quant_scripts/beast_screener.py"
@@ -205,6 +197,9 @@
   ],
   "evidence_review_{var}.md": [
    "quant_scripts/evidence_review.py"
+  ],
+  "wangzhe_three_tier.json": [
+   "quant_scripts/bt_three_tier.py"
   ],
   "yao_pool.txt": [
    "quant_scripts/yao_gu_pool.py"
@@ -258,6 +253,12 @@
    ".github/workflows/quant_scan.yml",
    "quant_scripts/monthly_macd_monitor.py"
   ],
+  "wangzhe_case_review.json": [
+   "quant_scripts/wangzhe_case_review.py"
+  ],
+  "wangzhe_golden_combo.json": [
+   "quant_scripts/bt_golden_combo.py"
+  ],
   "wangzhe_signals.csv": [
    "quant_scripts/wangzhe_track.py"
   ],
@@ -281,6 +282,9 @@
   "ai_chokepoint_watch_{var}.md": [
    "quant_scripts/ai_chokepoint_guard.py"
   ],
+  "wangzhe_entry_bt.json": [
+   "quant_scripts/bt_wangzhe_entry.py"
+  ],
   "乖离低买_{var}.md": [
    "quant_scripts/yitong_guaili_screener.py"
   ],
@@ -288,8 +292,20 @@
    ".github/workflows/quant_report.yml",
    "quant_scripts/yitong_guaili_screener.py"
   ],
+  "wangzhe_two_lines.json": [
+   "quant_scripts/bt_two_lines.py"
+  ],
+  "wangzhe_exit_bt_v2.json": [
+   "quant_scripts/bt_wangzhe_exit_v2.py"
+  ],
+  "wangzhe_ma_exit_bt.json": [
+   "quant_scripts/bt_wangzhe_ma_exit.py"
+  ],
   "回测卡_猛兽技术代理_持{var}周_{var}.md": [
    "quant_scripts/beast_tech_backtest.py"
+  ],
+  "caige_zxz_increment_bt.json": [
+   "quant_scripts/bt_caige_increment.py"
   ],
   "猛兽股池_{var}.md": [
    "quant_scripts/monthly_pool_sync.py"
@@ -335,21 +351,14 @@
   "才哥战法股池_{var}.json": [
    "quant_scripts/caige_pool.py"
   ],
-  "{var}_d.csv": [
-   "docs/backtests_archive/backtest_reversal_levels.py",
-   "quant_scripts/fetch_mainboard_data.py"
+  "反转数值融合股池.csv": [
+   "quant_scripts/reversal_fusion_scan.py"
   ],
-  "{var}_m30.csv": [
-   "quant_scripts/fetch_mainboard_data.py"
+  "wangzhe_combo_bt.json": [
+   "quant_scripts/bt_wangzhe_combo.py"
   ],
   "premarket_judgment_latest.json": [
    "quant_scripts/gen_premarket_report.py"
-  ],
-  "artifact_audit_{var}.md": [
-   "quant_scripts/artifact_audit.py"
-  ],
-  "artifact_audit.json": [
-   "quant_scripts/artifact_audit.py"
   ],
   "回测卡_鱼身{var}_持{var}日_{var}.md": [
    "quant_scripts/fish3_backtest.py"
@@ -368,37 +377,10 @@
    "docs/backtests_archive/backtest_reversal_funnel.py",
    "docs/backtests_archive/backtest_reversal_levels.py"
   ],
-  "_d.csv": [
-   "docs/backtests_archive/backtest_2b_mainboard.py",
-   "docs/backtests_archive/backtest_2b_mainboard_m30.py",
-   "docs/backtests_archive/backtest_30m_divergence_opt.py",
-   "docs/backtests_archive/backtest_reversal_divergence.py"
-  ],
-  "bt_30m_div_opt.json": [
-   "docs/backtests_archive/backtest_30m_divergence_opt.py"
-  ],
-  "bt_divergence.json": [
-   "docs/backtests_archive/backtest_reversal_divergence.py"
-  ],
-  "bt_2b_combo.json": [
-   "docs/backtests_archive/backtest_reversal_2b_combo.py"
-  ],
-  "_m30.csv": [
-   "docs/backtests_archive/backtest_2b_mainboard_m30.py"
-  ],
-  "bt_2b_results.json": [
-   "docs/backtests_archive/backtest_reversal_2b.py"
-  ],
-  "combo_results.json": [
-   "docs/backtests_archive/backtest_reversal_combo.py"
-  ],
   "funnel_results.json": [
    "docs/backtests_archive/backtest_reversal_funnel.py"
   ],
   "{var}_w.csv": [
-   "docs/backtests_archive/backtest_reversal_levels.py"
-  ],
-  "bt_results.json": [
    "docs/backtests_archive/backtest_reversal_levels.py"
   ],
   "sector_component_em.json": [
@@ -700,21 +682,11 @@
  },
  "high_risk": [],
  "missing": [
-  "000001.json",
-  "_d.csv",
-  "_m30.csv",
   "ai_chain_pool.json",
   "ai_chokepoint_watch_{var}.md",
-  "artifact_audit.json",
-  "artifact_audit_{var}.md",
   "beast_results.txt",
-  "bt_2b_combo.json",
-  "bt_2b_results.json",
-  "bt_30m_div_opt.json",
-  "bt_divergence.json",
-  "bt_results.json",
   "caige_urls.txt",
-  "combo_results.json",
+  "caige_zxz_increment_bt.json",
   "evidence_review_{var}.md",
   "finance.json",
   "fish_body_enhanced_.json",
@@ -731,10 +703,17 @@
   "samples.json",
   "system_temp_history.json",
   "wangzhe_benchmark.json",
+  "wangzhe_case_review.json",
+  "wangzhe_combo_bt.json",
+  "wangzhe_entry_bt.json",
+  "wangzhe_exit_bt_v2.json",
+  "wangzhe_golden_bt.json",
+  "wangzhe_golden_combo.json",
+  "wangzhe_ma_exit_bt.json",
+  "wangzhe_three_tier.json",
+  "wangzhe_two_lines.json",
   "wuwei_verify_result.json",
-  "{var}_d.csv",
   "{var}_day.json",
-  "{var}_m30.csv",
   "{var}_month.json",
   "{var}_w.csv",
   "乖离低买_{var}.md",
@@ -742,6 +721,7 @@
   "入牛时点扫描_{var}.md",
   "双弦本月股池_{var}.md",
   "反转数值周线信号_{var}.md",
+  "反转数值融合股池.csv",
   "回测卡_{var}_{var}.json",
   "回测卡_猛兽技术代理_持{var}周_{var}.md",
   "回测卡_鱼身{var}_持{var}日_{var}.md",
