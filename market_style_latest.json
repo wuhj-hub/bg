@@ -1,68 +1,76 @@
 {
  "date": "2026-09-16",
- "data_date": "2026-09-15",
+ "data_date": "2026-09-16",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 7,
+ "score": 17,
  "score_detail": {
   "size_style": 0,
-  "limitup_structure": 9,
-  "volume_structure": 0,
-  "sector_fund": -2
+  "limitup_structure": 7,
+  "volume_structure": 7,
+  "sector_fund": 3
  },
  "size_style": {
-  "hs300_5d": -2.38,
-  "hs300_10d": -3.5,
-  "zz1000_5d": -2.9,
-  "zz1000_10d": -3.3,
-  "rel_5d": -0.51,
-  "rel_10d": 0.2,
-  "rel_20d": -0.56,
-  "zz500_5d": -2.69
+  "hs300_5d": -2.03,
+  "hs300_10d": -1.5,
+  "zz1000_5d": -0.68,
+  "zz1000_10d": 0.18,
+  "rel_5d": 1.36,
+  "rel_10d": 1.68,
+  "rel_20d": 3.43,
+  "zz500_5d": -1.06
  },
  "limitup_structure": {
-  "limitup": 32,
-  "strong": 59,
-  "width_score": 47.3,
+  "limitup": 10,
+  "strong": 22,
+  "width_score": 53.7,
   "level": "震荡（多空均衡）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 1.9,
-  "zhaban_rate": 49.2,
-  "lianban": 6
+  "strong_ratio": 0.7,
+  "zhaban_rate": 0.0,
+  "lianban": 7
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.354,
-  "small_big_ratio_5d": 1.373
+  "small_big_ratio_now": 1.309,
+  "small_big_ratio_5d": 1.362,
+  "small_vol_pulse": 59.6
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "风电设备",
-    "zdf": "2.36",
-    "main_net5d": 12.2,
-    "retail_net": -11.3,
-    "tag": "机构型"
+    "name": "通信设备",
+    "zdf": "6.04",
+    "main_net5d": -27.3,
+    "retail_net": -103.1,
+    "tag": "游资型"
    },
    {
-    "name": "PCB概念",
-    "zdf": "0.57",
-    "main_net5d": 136.1,
-    "retail_net": -46.2,
-    "tag": "机构型"
+    "name": "半导体",
+    "zdf": "4.95",
+    "main_net5d": -215.3,
+    "retail_net": -90.1,
+    "tag": "游资型"
    },
    {
     "name": "元件",
-    "zdf": "0.46",
-    "main_net5d": 145.4,
-    "retail_net": 17.6,
-    "tag": "混合"
+    "zdf": "3.41",
+    "main_net5d": 136.4,
+    "retail_net": -7.7,
+    "tag": "机构型"
    },
    {
-    "name": "固态电池",
-    "zdf": "-0.05",
-    "main_net5d": -30.8,
-    "retail_net": -4.5,
+    "name": "黄酒概念",
+    "zdf": "7.77",
+    "main_net5d": 3.8,
+    "retail_net": -2.6,
+    "tag": "机构型"
+   },
+   {
+    "name": "电池",
+    "zdf": "-1.12",
+    "main_net5d": -16.1,
+    "retail_net": 26.8,
     "tag": "游资型"
    }
   ]
@@ -70,16 +78,15 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 13,
-   "欧马模式": 2
+   "欧马模式": 4,
+   "堆量模式": 11
   },
   "leaders": {
-   "堆量模式": 5,
-   "欧马模式": 1
+   "堆量模式": 6
   },
   "pullbacks": {},
   "gpoints": {
-   "欧马模式": 1
+   "欧马模式": 2
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
