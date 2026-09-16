@@ -523,6 +523,9 @@ def by_period(rows, key_fn, label, min_n=30):
 def write_report(rows, st_all, st_year, st_recent, by):
     """生成 Markdown 报告"""
     lines = ["# 涨停型王者 · T日首板候选 筛选与成功率跟踪报告", "",
+             "> **生成器**：`quant_scripts/wangzhe_track.py`（本报告由它生成）",
+             "> ⚠️ 知识库中部分扫描报告标注「数据来源：wangbei_scanner.py」，该文件在仓库中**不存在**，"
+             "无法复现 —— 如需统一，请以本脚本为准。", "",
              f"**生成**：{datetime.now(BJT).strftime('%Y-%m-%d %H:%M')}（北京时间）",
              f"**信号库**：`outputs/wangzhe_signals.csv`（{len(rows)} 条）", "",
              "## 一、信号定义（T日首板候选）", "",
