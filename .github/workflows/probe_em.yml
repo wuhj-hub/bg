@@ -17,6 +17,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      # ⚠️ 2026-09-16 新增：系统性探测东财板块接口当前可用参数（治 sector_component_em 空壳）
+      - name: 东财板块接口参数探测（找可用 fs/ 端点）
+        continue-on-error: true
+        run: python3 quant_scripts/probe_em_params.py
+
       - name: 同花顺页面数据内容验证（防hexin-v反爬空表）
         run: |
           UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36"
