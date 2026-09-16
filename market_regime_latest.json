@@ -16,9 +16,9 @@
  },
  "width": {
   "above250": 0.235,
-  "above60": 0.492,
-  "above20": 0.252,
-  "up_ratio": 0.673
+  "above60": 0.493,
+  "above20": 0.253,
+  "up_ratio": 0.674
  },
  "emotion": {
   "limit_up": 80,
@@ -134,5 +134,5 @@
    "短分": 0.2
   }
  ],
- "n_stocks": 3018
+ "n_stocks": 3001
 }
