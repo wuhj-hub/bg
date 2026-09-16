@@ -12,6 +12,9 @@
 【用法】
   --backfill   用本地日线全历史回填信号（量比口径，2015-2026）
   --scan       抓当日实时涨停池 → 追加候选（换手>5% + 量比1.5~4，含行业）
+               ★ 2026-09-16 新增：同时对 T-3~T-6 的候选做「正版 T+3 确认」
+                 （A2 后3日最低收盘>涨停日收盘 / A3 后2日量递减 / A4 涨幅<9%+MA60向上 / A5 后3日均量<涨停日量）
+                 → confirmed 字段：Y=已确认(真·王者倍量柱) / N=未确认 / 空=未满3日
   --update     更新未到期信号的后续 5/10/20 日收益
   --stats      输出成功率统计（默认）
   --report     生成 Markdown 报告
@@ -36,7 +39,7 @@ DATA = os.path.join(BASE, "data", "kline_daily_vol.csv")
 SIG = os.path.join(OUT, "wangzhe_signals.csv")
 BENCH = os.path.join(OUT, "wangzhe_benchmark.json")
 HOLD = [5, 10, 20]
-FIELDS = ["signal_date", "code", "name", "price", "vol_ratio", "turnover", "vr_checked", "lbc",
+FIELDS = ["signal_date", "code", "name", "price", "vol_ratio", "turnover", "vr_checked", "confirmed", "lbc",
           "fbt", "hybk", "source", "variant", "limit_date", "r5", "r10", "r20",
           "b5", "b10", "b20", "ex5", "ex10", "ex20"]
 
@@ -280,6 +283,102 @@ def fetch_vol_ratios(codes, chunk=40):
     return out
 
 
+
+def fetch_bars_batch(codes, limit=65, chunk=20):
+    """批量拉 N 日日线 → {code: [(date, open, close, high, low, volume), ...] 日期升序}
+
+    列序（westock 批量）：symbol|date|open|last|high|low|volume|amount|exchange
+    ⚠️ volume 在 index 6（index 5 是 low）。
+    """
+    out = {}
+    if not codes:
+        return out
+    for k in range(0, len(codes), chunk):
+        batch = codes[k:k + chunk]
+        cmd = ["npx", "-y", "westock-data-skillhub@1.0.3", "kline",
+               ",".join(batch), "--period", "day", "--limit", str(limit)]
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+            txt = r.stdout or ""
+        except Exception as e:
+            log(f"[WARN] 日线批量拉取失败（第{k//chunk+1}批）: {e}")
+            continue
+        for line in txt.splitlines():
+            if not line.strip().startswith("|"):
+                continue
+            p = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(p) < 9 or not re.match(r"^(sh|sz)\d{6}$", p[0]):
+                continue
+            try:
+                out.setdefault(p[0], []).append(
+                    (p[1], float(p[2]), float(p[3]), float(p[4]), float(p[5]), float(p[6])))
+            except (ValueError, TypeError):
+                continue
+        for c in out:
+            out[c].sort(key=lambda x: x[0])
+    return out
+
+
+def confirm_pending(rows, lookback_days=6):
+    """对 T-3 及更早（lookback 日内）的 live 候选，校验才哥正版「王者倍量柱」确认条件。
+
+    正版定义（出处：知识库「王者倍量柱（正版选股指标）」通达信源码）：
+      信号 = REF(A1,3) AND A2 AND A3 AND A4 AND A5   （在涨停后第 3 天确认，无未来函数）
+        A1 涨停 + 换手>5% + 量比 1.5~4        ← scan 阶段已验
+        A2 后三天最低收盘价 > 涨停日收盘价
+        A3 后两天量能依次递减
+        A4 后三天最高价较涨停价涨幅 <9% + MA60 向上
+        A5 后三天平均量能 < 涨停日量能
+    → 写入 confirmed 字段：Y=已确认（真·王者倍量柱）/ N=未确认 / 空=尚未满 3 日
+    """
+    today = datetime.now(BJT).date()
+    pend = []
+    for r in rows:
+        if r.get("source") != "live" or r.get("variant") != "day1":
+            continue
+        sd = r.get("signal_date") or ""
+        if not re.match(r"^\d{4}-\d{2}-\d{2}$", sd):
+            continue
+        try:
+            dd = (today - datetime.strptime(sd, "%Y-%m-%d").date()).days
+        except ValueError:
+            continue
+        if 3 <= dd <= lookback_days:
+            pend.append((r, sd))
+    if not pend:
+        log("确认检查：无待确认候选（T-3~T-%d 无 live 信号）" % lookback_days)
+        return 0
+    log(f"确认检查：{len(pend)} 条候选（T-3~T-{lookback_days}）…")
+    bars_map = fetch_bars_batch(sorted({r["code"] for r, _ in pend}))
+    done = 0
+    for r, sd in pend:
+        b = bars_map.get(r["code"])
+        if not b:
+            continue
+        dates = [x[0] for x in b]
+        if sd not in dates:
+            continue
+        t = dates.index(sd)
+        if t + 3 >= len(b) or t < 60:
+            continue
+        c_t = b[t][2]; v_t = b[t][5]
+        c13 = [b[t + 1][2], b[t + 2][2], b[t + 3][2]]
+        h13 = [b[t + 1][3], b[t + 2][3], b[t + 3][3]]
+        v13 = [b[t + 1][5], b[t + 2][5], b[t + 3][5]]
+        a2 = min(c13) > c_t                                    # 后三天最低收盘 > 涨停日收盘
+        a3 = v13[2] < v13[1] < v13[0]                          # 后两天量能递减
+        a4a = max(h13) / c_t - 1 < 0.09                        # 后三天最高涨幅 <9%
+        ma60_t = sum(b[i][2] for i in range(t - 59, t + 1)) / 60
+        ma60_t3 = sum(b[i][2] for i in range(t - 56, t + 4)) / 60
+        a4b = ma60_t3 >= ma60_t                                # MA60 向上
+        a5 = (v13[0] + v13[1] + v13[2]) / 3 < v_t              # 后三天平均量 < 涨停日量
+        ok = a2 and a3 and (a4a and a4b) and a5
+        r["confirmed"] = "Y" if ok else "N"
+        done += 1
+    log(f"确认检查完成：{done} 条已判定（Y={sum(1 for r,_ in pend if r.get('confirmed')=='Y')}）")
+    return done
+
+
 def scan(live=True):
     """抓当日实时涨停池 → 涨停型王者（换手口径）"""
     date = datetime.now(BJT).strftime("%Y%m%d")
@@ -464,7 +563,7 @@ def push_summary(rows, st, new_live):
         return
     d = datetime.now(BJT).strftime("%Y-%m-%d")
     v = st.get(5) or st.get("5") or {}
-    lines = [f"# 👑 涨停型王者·T日首板候选 {d}", ""]
+    lines = [f"# 👑 涨停型王者 {d}", ""]
     if new_live:
         lines.append(f"## 当日 T 日首板候选 {len(new_live)} 只（待 T+1~T+3 缩量站稳确认）")
         for w in new_live[:20]:
@@ -477,6 +576,18 @@ def push_summary(rows, st, new_live):
     else:
         lines += ["## 当日候选 0 只（无符合「首板 + 换手>5% + 量比1.5~4 + 未炸板」）",
                       "", "> 注：本信号是「T日首板候选」，需 T+1~T+3 缩量站稳才升级为王者倍量柱", ""]
+    # ── T+3 已确认（真·王者倍量柱）──
+    done = [r for r in rows if r.get("source") == "live" and r.get("confirmed") == "Y"]
+    undone = [r for r in rows if r.get("source") == "live" and r.get("confirmed") == "N"]
+    if done or undone:
+        lines.append(f"## ✅ T+3 已确认（真·王者倍量柱）{len(done)} 只")
+        for w in done[:10]:
+            lines.append(f"👑 **{w['name']}**({w['code']}) {w['price']}元 换手{w['turnover']}% "
+                         f"量比{w.get('vol_ratio','')} · 信号日 {w['signal_date']}")
+        if undone:
+            lines.append(f"\n> 未通过确认 {len(undone)} 只："
+                         + "、".join(f"{w['name']}" for w in undone[:8]))
+        lines.append("")
     if v:
         lines += ["## 历史成功率（全样本）",
                   f"- 5日胜率 **{v.get('win', 0):.1f}%**（超额胜率 {v.get('ex_win', 0):.1f}%）",
@@ -534,6 +645,7 @@ def write_report(rows, st_all, st_year, st_recent, by):
              "| ① | 涨停（主板 10% 幅度） |",
              "| ② | **首板**（前一日未涨停） |",
              "| ③ | 量能（**双条件**）：换手率 > 5% **且** 量比 1.5~4<sup>†</sup> |",
+             "| ④ | **T+3 确认**（成为「王者倍量柱」）：后3日最低收盘>涨停日收盘 且 后2日量能递减 且 后3日最高涨幅<9% 且 MA60向上 且 后3日均量<涨停日量 |",
              "| ④ | 实盘追加：未炸板（东财 `zbc==0`） |",
              "",
              "> ⚠️ **2026-09-15 复核**：才哥（刘骥才）正版定义**不含价格限制**，原「价<10元」已移除。",
@@ -615,10 +727,15 @@ def main():
         rows, n = merge(new, rows)
         log(f"正版确认 {len(new)} 条，新增 {n} 条")
     if a.scan:
-        log("扫描当日实时涨停池（换手口径）…")
+        log("扫描当日实时涨停池（换手>5% + 量比1.5~4）…")
         new = scan()
         rows, n = merge(new, rows)
         log(f"当日命中 {len(new)} 条，新增 {n} 条")
+        # T+3 确认：回看 3~6 天前的候选，用正版 A2~A5 判定是否已成「王者倍量柱」
+        try:
+            confirm_pending(rows)
+        except Exception as e:
+            log(f"[WARN] 确认检查失败（不阻断）: {e}")
     if a.update_live:
         update_live(rows)
     if a.backfill or getattr(a, "backfill_full") or a.scan or a.update:
@@ -631,7 +748,8 @@ def main():
     if a.push and not (a.stats or a.report):
         st = json.load(open(os.path.join(OUT, "wangzhe_stats.json"), encoding="utf-8")).get("all", {}) \
             if os.path.exists(os.path.join(OUT, "wangzhe_stats.json")) else {}
-        push_summary(rows, st, [r for r in rows if r["source"] == "live" and r["signal_date"] == datetime.now(BJT).strftime("%Y-%m-%d")])
+        push_summary(rows, st, [r for r in rows if r["source"] == "live"
+                                and r["signal_date"] == datetime.now(BJT).strftime("%Y-%m-%d")])
     if a.stats or a.report:
         out_all = stats(rows, bench, "涨停型王者 · 全部")
         d1 = [r for r in rows if r.get("variant", "day1") == "day1"]
