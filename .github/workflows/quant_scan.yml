@@ -78,7 +78,8 @@ jobs:
       # ─── 第二步.1.3a：板块成分映射（东财·仅 runner 可达；2026-09-15 接入缺口修复）───
       # 背景：sector_component_em.json 自 9/3 起是空壳（sectors:{}）且从未接入 workflow，
       #      导致「板块归属/主线题材」维度长期失效（hot_emotion 里"主线判定：无显著题材"实为常态）。
-      #      该脚本用 push2.eastmoney.com，沙箱被拦、runner 可达，故只能在此（runner）执行。
+      #      2026-09-16 更正：push2.eastmoney.com 主域已 502，脚本改用 push2delay（多端点回退）；
+      #      push2delay 沙箱亦可达，故本地也能调试，不必只靠 runner。
       - name: 板块成分映射（东财·runner 可达）
         continue-on-error: true
         # ⚠️ 2026-09-15：串行版 486 板块 >20min 被 timeout 砍（仅跑到 302 只）→
