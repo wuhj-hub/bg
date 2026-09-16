@@ -1,7 +1,33 @@
 {
   "date": "2026-09-16",
-  "total": 370,
+  "total": 520,
   "results": [
+    {
+      "code": "sz000521",
+      "name": "长虹美菱",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-14",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线+60m"
+    },
+    {
+      "code": "sz000559",
+      "name": "万向钱潮",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16+周线+60m"
+    },
     {
       "code": "sz000681",
       "name": "视觉中国",
@@ -16,12 +42,77 @@
       "note": "日线建仓2026-09-15+周线+60m"
     },
     {
+      "code": "sz000858",
+      "name": "五 粮 液",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
+    },
+    {
       "code": "sz000958",
       "name": "电投产融",
       "entry": "2026-09-14",
       "guaili": false,
       "in_now": true,
       "week": "2026-07-31",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14+周线+60m"
+    },
+    {
+      "code": "sz001221",
+      "name": "悍高集团",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14+周线+60m"
+    },
+    {
+      "code": "sz002020",
+      "name": "京新药业",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
+    },
+    {
+      "code": "sz002031",
+      "name": "巨轮智能",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线+60m"
+    },
+    {
+      "code": "sz002036",
+      "name": "联创电子",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
       "m60": true,
       "stars": 5,
       "reversal": null,
@@ -68,6 +159,19 @@
       "note": "日线建仓2026-09-14+周线+60m"
     },
     {
+      "code": "sz002085",
+      "name": "万丰奥威",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16+周线+60m"
+    },
+    {
       "code": "sz002152",
       "name": "广电运通",
       "entry": "2026-09-16",
@@ -81,12 +185,64 @@
       "note": "日线建仓2026-09-16+周线+60m"
     },
     {
+      "code": "sz002249",
+      "name": "大洋电机",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-28",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14+周线+60m"
+    },
+    {
+      "code": "sz002294",
+      "name": "信立泰",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-28",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
+    },
+    {
       "code": "sz002318",
       "name": "久立特材",
       "entry": "2026-09-15",
       "guaili": false,
       "in_now": true,
       "week": "2026-09-16",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线+60m"
+    },
+    {
+      "code": "sz002370",
+      "name": "亚太药业",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16+周线+60m"
+    },
+    {
+      "code": "sz002393",
+      "name": "力生制药",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
       "m60": true,
       "stars": 5,
       "reversal": null,
@@ -198,6 +354,19 @@
       "note": "日线建仓2026-09-16+周线+60m"
     },
     {
+      "code": "sz002887",
+      "name": "绿茵生态",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线+60m"
+    },
+    {
       "code": "sz002940",
       "name": "昂利康",
       "entry": "2026-09-15",
@@ -226,6 +395,19 @@
     {
       "code": "sz002970",
       "name": "锐明技术",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14+周线+60m"
+    },
+    {
+      "code": "sz002984",
+      "name": "森麒麟",
       "entry": "2026-09-14",
       "guaili": false,
       "in_now": true,
@@ -276,6 +458,19 @@
       "note": "日线建仓2026-09-10+周线+60m"
     },
     {
+      "code": "sh600132",
+      "name": "重庆啤酒",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-28",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
+    },
+    {
       "code": "sh600221",
       "name": "海航控股",
       "entry": "2026-09-14",
@@ -298,7 +493,7 @@
       "m60": true,
       "stars": 5,
       "reversal": null,
-      "strength": "+7.0>+1.1>-2.0",
+      "strength": "+7.0>+0.7>-2.0",
       "note": "日线建仓2026-09-16+周线+60m"
     },
     {
@@ -313,6 +508,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-16+周线+60m"
+    },
+    {
+      "code": "sh600376",
+      "name": "首开股份",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
     },
     {
       "code": "sh600456",
@@ -363,7 +571,7 @@
       "m60": true,
       "stars": 5,
       "reversal": null,
-      "strength": null,
+      "strength": "+0.7>+0.7>-2.0",
       "note": "日线建仓2026-09-16+周线+60m"
     },
     {
@@ -378,6 +586,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-15+周线+60m"
+    },
+    {
+      "code": "sh600733",
+      "name": "北汽蓝谷",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
     },
     {
       "code": "sh600761",
@@ -471,6 +692,19 @@
       "note": "日线建仓2026-09-11+周线+60m"
     },
     {
+      "code": "sh601669",
+      "name": "中国电建",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-14",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14+周线+60m"
+    },
+    {
       "code": "sh601689",
       "name": "拓普集团",
       "entry": "2026-09-11",
@@ -497,6 +731,45 @@
       "note": "日线建仓2026-09-10+周线+60m"
     },
     {
+      "code": "sh601865",
+      "name": "福莱特",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
+    },
+    {
+      "code": "sh601888",
+      "name": "中国中免",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-14",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线+60m"
+    },
+    {
+      "code": "sh603035",
+      "name": "常熟汽饰",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线+60m"
+    },
+    {
       "code": "sh603057",
       "name": "紫燕食品",
       "entry": "2026-09-14",
@@ -508,6 +781,32 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-14+周线+60m"
+    },
+    {
+      "code": "sh603171",
+      "name": "税友股份",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14+周线+60m"
+    },
+    {
+      "code": "sh603187",
+      "name": "海容冷链",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-28",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
     },
     {
       "code": "sh603309",
@@ -547,6 +846,45 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-11+周线+60m"
+    },
+    {
+      "code": "sh603392",
+      "name": "万泰生物",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
+    },
+    {
+      "code": "sh603402",
+      "name": "陕西旅游",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16+周线+60m"
+    },
+    {
+      "code": "sh603515",
+      "name": "欧普照明",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-04",
+      "m60": true,
+      "stars": 5,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线+60m"
     },
     {
       "code": "sh603589",
@@ -692,6 +1030,19 @@
       "note": "日线建仓2026-09-10+周线"
     },
     {
+      "code": "sz000551",
+      "name": "创元科技",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
       "code": "sz000600",
       "name": "建投能源",
       "entry": "2026-09-10",
@@ -740,8 +1091,60 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+11.6>+4.6>-2.0",
+      "strength": "+11.6>+5.0>-2.0",
       "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sz000786",
+      "name": "北新建材",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-28",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sz000799",
+      "name": "酒鬼酒",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14+周线"
+    },
+    {
+      "code": "sz000818",
+      "name": "航锦科技",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sz000885",
+      "name": "城发环境",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11+周线"
     },
     {
       "code": "sz000935",
@@ -770,6 +1173,45 @@
       "note": "日线建仓2026-09-10+周线"
     },
     {
+      "code": "sz001203",
+      "name": "大中矿业",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11+周线"
+    },
+    {
+      "code": "sz001233",
+      "name": "海安集团",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-07",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": "+1.1>-1.2>-2.0",
+      "note": "日线建仓2026-09-11+周线"
+    },
+    {
+      "code": "sz001238",
+      "name": "浙江正特",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线"
+    },
+    {
       "code": "sz001332",
       "name": "锡装股份",
       "entry": "2026-09-10",
@@ -796,6 +1238,19 @@
       "note": "日线建仓2026-09-10+周线"
     },
     {
+      "code": "sz001396",
+      "name": "誉帆科技",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线"
+    },
+    {
       "code": "sz002009",
       "name": "天奇股份",
       "entry": "2026-09-10",
@@ -815,6 +1270,19 @@
       "guaili": false,
       "in_now": true,
       "week": "2026-09-16",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sz002028",
+      "name": "思源电气",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
       "m60": false,
       "stars": 4,
       "reversal": null,
@@ -846,6 +1314,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sz002075",
+      "name": "沙钢股份",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": "+6.9>+5.0>-2.0",
+      "note": "日线建仓2026-09-16+周线"
     },
     {
       "code": "sz002115",
@@ -913,6 +1394,19 @@
       "note": "日线建仓2026-09-10+周线"
     },
     {
+      "code": "sz002230",
+      "name": "科大讯飞",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
       "code": "sz002248",
       "name": "华东数控",
       "entry": "2026-09-15",
@@ -924,6 +1418,58 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sz002271",
+      "name": "东方雨虹",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-21",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sz002304",
+      "name": "洋河股份",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-28",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11+周线"
+    },
+    {
+      "code": "sz002340",
+      "name": "格林美",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sz002405",
+      "name": "四维图新",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
     },
     {
       "code": "sz002459",
@@ -1156,8 +1702,21 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+0.4>+0.3>-2.0",
+      "strength": null,
       "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sz002892",
+      "name": "科力尔",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14+周线"
     },
     {
       "code": "sz002922",
@@ -1251,6 +1810,19 @@
       "note": "日线建仓2026-09-11+周线"
     },
     {
+      "code": "sh600143",
+      "name": "金发科技",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
       "code": "sh600151",
       "name": "航天机电",
       "entry": "2026-09-15",
@@ -1303,6 +1875,45 @@
       "note": "日线建仓2026-09-10+周线"
     },
     {
+      "code": "sh600363",
+      "name": "联创光电",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sh600418",
+      "name": "江淮汽车",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sh600438",
+      "name": "通威股份",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": "+0.8>-0.8>-2.0",
+      "note": "日线建仓2026-09-15+周线"
+    },
+    {
       "code": "sh600446",
       "name": "金证股份",
       "entry": "2026-09-15",
@@ -1312,7 +1923,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+3.1>+0.3>-2.0",
+      "strength": "+3.1>+0.7>-2.0",
       "note": "日线建仓2026-09-15+周线"
     },
     {
@@ -1338,7 +1949,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+0.3>-0.3>-2.0",
+      "strength": "+0.3>-0.8>-2.0",
       "note": "日线建仓2026-09-15+周线"
     },
     {
@@ -1394,6 +2005,19 @@
       "note": "日线建仓2026-09-14+周线"
     },
     {
+      "code": "sh600732",
+      "name": "爱旭股份",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
       "code": "sh600779",
       "name": "水井坊",
       "entry": "2026-09-11",
@@ -1420,6 +2044,71 @@
       "note": "日线建仓2026-09-14+周线"
     },
     {
+      "code": "sh600850",
+      "name": "电科数字",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11+周线"
+    },
+    {
+      "code": "sh600860",
+      "name": "京城股份",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16+周线"
+    },
+    {
+      "code": "sh600875",
+      "name": "东方电气",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-28",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sh600884",
+      "name": "杉杉股份",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sh600905",
+      "name": "三峡能源",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-04",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11+周线"
+    },
+    {
       "code": "sh601117",
       "name": "中国化学",
       "entry": "2026-09-15",
@@ -1431,6 +2120,32 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sh601126",
+      "name": "四方股份",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sh601127",
+      "name": "赛力斯",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
     },
     {
       "code": "sh601369",
@@ -1455,7 +2170,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+3.6>-0.3>-2.0",
+      "strength": "+3.6>-0.8>-2.0",
       "note": "日线建仓2026-09-10+周线"
     },
     {
@@ -1494,8 +2209,21 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": null,
+      "strength": "+3.0>+2.4>-2.0",
       "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sh601868",
+      "name": "中国能建",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-04",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14+周线"
     },
     {
       "code": "sh603013",
@@ -1550,6 +2278,19 @@
       "note": "日线建仓2026-09-16+周线"
     },
     {
+      "code": "sh603092",
+      "name": "德力佳",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
       "code": "sh603108",
       "name": "润达医疗",
       "entry": "2026-09-15",
@@ -1587,6 +2328,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sh603185",
+      "name": "弘元绿能",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11+周线"
     },
     {
       "code": "sh603196",
@@ -1637,7 +2391,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+1.6>-0.3>-2.0",
+      "strength": "+1.6>-0.8>-2.0",
       "note": "日线建仓2026-09-10+周线"
     },
     {
@@ -1650,7 +2404,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "-0.9>-1.1>-2.0",
+      "strength": "-0.9>-1.2>-2.0",
       "note": "日线建仓2026-09-15+周线"
     },
     {
@@ -1663,7 +2417,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+6.4>-0.3>-2.0",
+      "strength": "+6.4>-0.8>-2.0",
       "note": "日线建仓2026-09-10+周线"
     },
     {
@@ -1771,6 +2525,58 @@
       "note": "日线建仓2026-09-16+周线"
     },
     {
+      "code": "sh603496",
+      "name": "恒为科技",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-11",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sh603501",
+      "name": "豪威集团",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-08-21",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sh603508",
+      "name": "思维列控",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-09-16",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sh603516",
+      "name": "淳中科技",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10+周线"
+    },
+    {
       "code": "sh603568",
       "name": "伟明环保",
       "entry": "2026-09-10",
@@ -1821,6 +2627,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-10+周线"
+    },
+    {
+      "code": "sh603680",
+      "name": "今创集团",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线"
     },
     {
       "code": "sh603733",
@@ -2001,7 +2820,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+6.7>+5.4>-2.0",
+      "strength": "+6.7>+5.1>-2.0",
       "note": "日线建仓2026-09-15+周线"
     },
     {
@@ -2040,7 +2859,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+13.7>-0.3>-2.0",
+      "strength": "+13.7>-0.8>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -2105,7 +2924,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+0.8>-0.3>-2.0",
+      "strength": "+0.8>-0.8>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -2118,8 +2937,99 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+10.7>+4.6>-2.0",
+      "strength": "+10.7>+5.0>-2.0",
       "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz000404",
+      "name": "长虹华意",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sz000408",
+      "name": "藏格矿业",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+3.9>+3.9>-2.0",
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz000423",
+      "name": "东阿阿胶",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz000429",
+      "name": "粤高速Ａ",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz000566",
+      "name": "海南海药",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz000568",
+      "name": "泸州老窖",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sz000571",
+      "name": "新大洲A",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
     },
     {
       "code": "sz000595",
@@ -2157,12 +3067,38 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+9.0>+4.6>-2.0",
+      "strength": "+9.0>+5.0>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
       "code": "sz000688",
       "name": "国城矿业",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz000725",
+      "name": "京东方Ａ",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14"
+    },
+    {
+      "code": "sz000729",
+      "name": "燕京啤酒",
       "entry": "2026-09-10",
       "guaili": false,
       "in_now": true,
@@ -2187,6 +3123,136 @@
       "note": "日线建仓2026-09-16"
     },
     {
+      "code": "sz000779",
+      "name": "甘咨询",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sz000792",
+      "name": "盐湖股份",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14"
+    },
+    {
+      "code": "sz000795",
+      "name": "英洛华",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sz000802",
+      "name": "北京文化",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz000815",
+      "name": "美利云",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+13.9>+0.7>-2.0",
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz000837",
+      "name": "秦川机床",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sz000848",
+      "name": "承德露露",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16"
+    },
+    {
+      "code": "sz000893",
+      "name": "亚钾国际",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sz000895",
+      "name": "双汇发展",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz000908",
+      "name": "石药景峰",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
       "code": "sz000913",
       "name": "钱江摩托",
       "entry": "2026-09-11",
@@ -2196,7 +3262,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+3.7>-1.1>-2.0",
+      "strength": "+3.7>-1.2>-2.0",
       "note": "日线建仓2026-09-11"
     },
     {
@@ -2222,7 +3288,7 @@
       "m60": false,
       "stars": 3,
       "reversal": "趋势确立",
-      "strength": "+1.1>+0.3>-2.0",
+      "strength": "+1.1>+0.7>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -2235,7 +3301,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+4.6>+0.3>-2.0",
+      "strength": "+4.6>+0.7>-2.0",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -2278,8 +3344,73 @@
       "note": "日线建仓2026-09-10"
     },
     {
+      "code": "sz000977",
+      "name": "浪潮信息",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz001215",
+      "name": "千味央厨",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz001230",
+      "name": "劲旅环境",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": "趋势确立",
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz001237",
+      "name": "惠康科技",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
       "code": "sz001248",
       "name": "华润新能源",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz001256",
+      "name": "炜冈科技",
       "entry": "2026-09-10",
       "guaili": false,
       "in_now": true,
@@ -2313,7 +3444,7 @@
       "m60": false,
       "stars": 3,
       "reversal": "趋势确立",
-      "strength": "+69.1>+8.4>-2.0",
+      "strength": "+69.1>+8.6>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -2328,6 +3459,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sz001282",
+      "name": "三联锻造",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16"
     },
     {
       "code": "sz001333",
@@ -2367,6 +3511,110 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz001393",
+      "name": "维通利",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sz001399",
+      "name": "惠科股份",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002023",
+      "name": "海特高新",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz002027",
+      "name": "分众传媒",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sz002030",
+      "name": "达安基因",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16"
+    },
+    {
+      "code": "sz002032",
+      "name": "苏 泊 尔",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002035",
+      "name": "华帝股份",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz002038",
+      "name": "双鹭药业",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
     },
     {
       "code": "sz002043",
@@ -2417,7 +3665,20 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+2.5>-0.3>-2.0",
+      "strength": "+2.5>-0.8>-2.0",
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002083",
+      "name": "孚日股份",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+5.4>+4.5>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -2456,7 +3717,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+2.4>-0.3>-2.0",
+      "strength": "+2.4>-0.8>-2.0",
       "note": "日线建仓2026-09-11"
     },
     {
@@ -2509,6 +3770,32 @@
       "stars": 3,
       "reversal": null,
       "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002173",
+      "name": "创新医疗",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+5.7>+5.0>-2.0",
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002180",
+      "name": "奔图科技",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+2.6>+0.7>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -2603,6 +3890,84 @@
       "note": "日线建仓2026-09-15"
     },
     {
+      "code": "sz002250",
+      "name": "联化科技",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz002256",
+      "name": "兆新股份",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz002273",
+      "name": "水晶光电",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz002275",
+      "name": "桂林三金",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002283",
+      "name": "天润工业",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002287",
+      "name": "奇正藏药",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
       "code": "sz002311",
       "name": "海大集团",
       "entry": "2026-09-11",
@@ -2668,6 +4033,19 @@
       "note": "日线建仓2026-09-11"
     },
     {
+      "code": "sz002333",
+      "name": "罗普斯金",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+7.3>+0.7>-2.0",
+      "note": "日线建仓2026-09-15"
+    },
+    {
       "code": "sz002345",
       "name": "潮宏基",
       "entry": "2026-09-10",
@@ -2690,7 +4068,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+3.6>-0.3>-2.0",
+      "strength": "+3.6>-0.8>-2.0",
       "note": "日线建仓2026-09-11"
     },
     {
@@ -2718,6 +4096,97 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002353",
+      "name": "杰瑞股份",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002364",
+      "name": "中恒电气",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz002371",
+      "name": "北方华创",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002372",
+      "name": "伟星新材",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16"
+    },
+    {
+      "code": "sz002399",
+      "name": "海普瑞",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz002414",
+      "name": "高德红外",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+1.2>+1.0>-2.0",
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sz002416",
+      "name": "爱施德",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
     },
     {
       "code": "sz002422",
@@ -2820,7 +4289,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+4.5>-0.3>-2.0",
+      "strength": "+4.5>-0.8>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -2846,7 +4315,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+2.5>-0.3>-2.0",
+      "strength": "+2.5>-0.8>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -2885,7 +4354,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+9.9>+5.4>-2.0",
+      "strength": "+9.9>+5.1>-2.0",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -2937,7 +4406,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+1.8>-0.3>-2.0",
+      "strength": "+1.8>-0.8>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -2976,7 +4445,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+11.3>+0.3>-2.0",
+      "strength": "+11.3>+0.7>-2.0",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -3015,7 +4484,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+10.1>+3.0>-2.0",
+      "strength": "+10.1>+3.2>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -3041,7 +4510,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+4.9>+4.6>-2.0",
+      "strength": null,
       "note": "日线建仓2026-09-10"
     },
     {
@@ -3162,6 +4631,32 @@
       "note": "日线建仓2026-09-10"
     },
     {
+      "code": "sz002889",
+      "name": "东方嘉盛",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sz002891",
+      "name": "中宠股份",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
       "code": "sz002896",
       "name": "中大力德",
       "entry": "2026-09-10",
@@ -3184,7 +4679,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+20.6>+4.6>-2.0",
+      "strength": "+20.6>+5.0>-2.0",
       "note": "日线建仓2026-09-11"
     },
     {
@@ -3279,6 +4774,19 @@
       "note": "日线建仓2026-09-14"
     },
     {
+      "code": "sz002979",
+      "name": "雷赛智能",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
       "code": "sz003000",
       "name": "劲仔食品",
       "entry": "2026-09-15",
@@ -3301,7 +4809,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+6.8>+4.6>-2.0",
+      "strength": "+6.8>+5.0>-2.0",
       "note": "日线建仓2026-09-16"
     },
     {
@@ -3314,7 +4822,7 @@
       "m60": false,
       "stars": 3,
       "reversal": "趋势确立",
-      "strength": "+67.4>+7.9>-2.0",
+      "strength": "+67.4>+7.6>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -3405,7 +4913,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+5.3>+4.6>-2.0",
+      "strength": "+5.3>+5.0>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -3420,6 +4928,32 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh600131",
+      "name": "国网信通",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+3.5>+0.7>-2.0",
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sh600133",
+      "name": "东湖高新",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
     },
     {
       "code": "sh600160",
@@ -3496,7 +5030,7 @@
       "m60": false,
       "stars": 3,
       "reversal": "趋势确立",
-      "strength": "+8.4>+4.6>-2.0",
+      "strength": "+8.4>+5.0>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -3550,6 +5084,84 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sh600350",
+      "name": "山东高速",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh600352",
+      "name": "浙江龙盛",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-16"
+    },
+    {
+      "code": "sh600406",
+      "name": "国电南瑞",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh600420",
+      "name": "国药现代",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sh600422",
+      "name": "昆药集团",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sh600436",
+      "name": "片仔癀",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+6.0>+5.0>-2.0",
+      "note": "日线建仓2026-09-10"
     },
     {
       "code": "sh600502",
@@ -3691,7 +5303,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+3.0>+0.3>-2.0",
+      "strength": "+3.0>+0.7>-2.0",
       "note": "日线建仓2026-09-11"
     },
     {
@@ -3743,7 +5355,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+4.6>-1.1>-2.0",
+      "strength": "+4.6>-1.2>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -3756,7 +5368,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+4.4>+0.3>-2.0",
+      "strength": "+4.4>+0.7>-2.0",
       "note": "日线建仓2026-09-11"
     },
     {
@@ -3808,7 +5420,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+3.4>+0.3>-2.0",
+      "strength": "+3.4>+0.7>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -3834,7 +5446,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+4.8>+0.3>-2.0",
+      "strength": "+4.8>+0.7>-2.0",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -3847,8 +5459,125 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+11.3>+5.4>-2.0",
+      "strength": "+11.3>+5.1>-2.0",
       "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sh600829",
+      "name": "人民同泰",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+16.3>+5.0>-2.0",
+      "note": "日线建仓2026-09-16"
+    },
+    {
+      "code": "sh600839",
+      "name": "四川长虹",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sh600845",
+      "name": "宝信软件",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh600867",
+      "name": "通化东宝",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sh600872",
+      "name": "中炬高新",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh600882",
+      "name": "妙可蓝多",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sh600895",
+      "name": "张江高科",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh600925",
+      "name": "苏能股份",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sh600927",
+      "name": "永安期货",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14"
     },
     {
       "code": "sh600976",
@@ -3929,6 +5658,32 @@
       "note": "日线建仓2026-09-14"
     },
     {
+      "code": "sh601163",
+      "name": "三角轮胎",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14"
+    },
+    {
+      "code": "sh601179",
+      "name": "中国西电",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
       "code": "sh601339",
       "name": "百隆东方",
       "entry": "2026-09-10",
@@ -3940,6 +5695,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh601456",
+      "name": "国联民生",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
     },
     {
       "code": "sh601668",
@@ -3977,7 +5745,20 @@
       "m60": false,
       "stars": 3,
       "reversal": "趋势确立",
-      "strength": "+39.3>-0.3>-2.0",
+      "strength": "+39.3>-0.8>-2.0",
+      "note": "日线建仓2026-09-16"
+    },
+    {
+      "code": "sh601816",
+      "name": "京沪高铁",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
       "note": "日线建仓2026-09-16"
     },
     {
@@ -3990,7 +5771,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+22.0>+10.9>-2.0",
+      "strength": "+22.0>+11.0>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -4029,7 +5810,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+9.5>-1.1>-2.0",
+      "strength": "+9.5>-1.2>-2.0",
       "note": "日线建仓2026-09-16"
     },
     {
@@ -4044,6 +5825,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sh601992",
+      "name": "金隅集团",
+      "entry": "2026-09-16",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+3.0>+0.7>-2.0",
+      "note": "日线建仓2026-09-16"
     },
     {
       "code": "sh601995",
@@ -4085,6 +5879,19 @@
       "note": "日线建仓2026-09-10"
     },
     {
+      "code": "sh603025",
+      "name": "大豪科技",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
       "code": "sh603039",
       "name": "泛微网络",
       "entry": "2026-09-11",
@@ -4094,7 +5901,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+2.5>+0.3>-2.0",
+      "strength": "+2.5>+0.7>-2.0",
       "note": "日线建仓2026-09-11"
     },
     {
@@ -4211,7 +6018,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+6.8>-1.1>-2.0",
+      "strength": "+6.8>-1.2>-2.0",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -4293,6 +6100,32 @@
       "note": "日线建仓2026-09-10"
     },
     {
+      "code": "sh603298",
+      "name": "杭叉集团",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sh603300",
+      "name": "海南华铁",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+4.5>+0.2>-2.0",
+      "note": "日线建仓2026-09-15"
+    },
+    {
       "code": "sh603311",
       "name": "金海高科",
       "entry": "2026-09-15",
@@ -4304,6 +6137,32 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sh603315",
+      "name": "福鞍股份",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15"
+    },
+    {
+      "code": "sh603317",
+      "name": "天味食品",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
     },
     {
       "code": "sh603327",
@@ -4410,6 +6269,84 @@
       "note": "日线建仓2026-09-14"
     },
     {
+      "code": "sh603399",
+      "name": "永杉锂业",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh603407",
+      "name": "长裕集团",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh603456",
+      "name": "九洲药业",
+      "entry": "2026-09-11",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+8.0>+5.0>-2.0",
+      "note": "日线建仓2026-09-11"
+    },
+    {
+      "code": "sh603486",
+      "name": "科沃斯",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh603507",
+      "name": "振江股份",
+      "entry": "2026-09-10",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": "+0.7>-0.8>-2.0",
+      "note": "日线建仓2026-09-10"
+    },
+    {
+      "code": "sh603519",
+      "name": "立霸股份",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": "趋势确立",
+      "strength": null,
+      "note": "日线建仓2026-09-14"
+    },
+    {
       "code": "sh603538",
       "name": "美诺华",
       "entry": "2026-09-15",
@@ -4432,7 +6369,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+6.5>-0.3>-2.0",
+      "strength": "+6.5>-0.8>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -4445,7 +6382,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+12.6>+4.6>-2.0",
+      "strength": "+12.6>+5.0>-2.0",
       "note": "日线建仓2026-09-11"
     },
     {
@@ -4485,6 +6422,19 @@
       "stars": 3,
       "reversal": null,
       "strength": null,
+      "note": "日线建仓2026-09-14"
+    },
+    {
+      "code": "sh603682",
+      "name": "锦和商管",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": "趋势确立",
+      "strength": "+22.8>+8.0>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -4614,7 +6564,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+18.3>+4.6>-2.0",
+      "strength": "+18.3>+5.0>-2.0",
       "note": "日线建仓2026-09-10"
     },
     {
@@ -4666,7 +6616,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+17.6>-0.3>-2.0",
+      "strength": "+17.6>-0.8>-2.0",
       "note": "日线建仓2026-09-14"
     },
     {
