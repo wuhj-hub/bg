@@ -1,6 +1,35 @@
 {
  "date": "2026-09-16",
  "desc": "量学PASS股分时量波验证（人线为王/4G为皇/天人和谐）",
- "total": 0,
- "check": []
+ "total": 2,
+ "check": [
+  {
+   "code": "sh600088",
+   "ok": true,
+   "close": 15.05,
+   "vwap": 14.6,
+   "dev_pct": 3.1,
+   "pos_pct": 68.0,
+   "tail_slope": 1.07,
+   "volatility": 3.33,
+   "wave": "4G边缘·谨慎",
+   "kline": "上绿下红·必然上攻",
+   "name": "中视传媒",
+   "score": 92
+  },
+  {
+   "code": "sh600207",
+   "ok": true,
+   "close": 4.87,
+   "vwap": 4.85,
+   "dev_pct": 0.5,
+   "pos_pct": 67.0,
+   "tail_slope": 0.21,
+   "volatility": 0.48,
+   "wave": "天人和谐·续原势",
+   "kline": "上绿下红·必然上攻",
+   "name": "安彩高科",
+   "score": 87
+  }
+ ]
 }
