@@ -225,6 +225,8 @@ jobs:
         continue-on-error: true
         run: python3 market_style.py
 
+      # ⚠️ 路径规范（2026-09-16）：quad_resonance.py / signal_arbiter.py 真源在**仓库根目录**，workflow 一律以 `python3 xxx.py` 调用。
+      #    quant_scripts/ 下同名副本（如 signal_arbiter.py）已于 2026-09-16 删除。勿再建根目录副本。
       # ─── 第三步.5b：四维共振评分（政策/资金/筹码/关联方，依赖扫描workflow提交的panhou_lianghua.csv）───
       - name: 四维共振评分（政策/资金/筹码/关联方四维证据链）
         continue-on-error: true
