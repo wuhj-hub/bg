@@ -16,7 +16,7 @@
   python3 caige_track.py --sync                   # 读取 caige_urls.txt 中的新增 URL 批量处理
   python3 caige_track.py --report                 # 汇总已有存档，生成跟踪报告
 """
-import csv, json, os, re, sys, hashlib, urllib.request, html as htmlmod
+import csv, json, os, re, sys, time, hashlib, subprocess, urllib.request, html as htmlmod
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
@@ -41,9 +41,35 @@ def log(m):
     print(f"[{datetime.now(BJT).strftime('%H:%M:%S')}] {m}", flush=True)
 
 
-def fetch(url):
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    return urllib.request.urlopen(req, timeout=40).read().decode("utf-8", errors="ignore")
+def fetch(url, tries=3):
+    """抓取文章 HTML。
+
+    ⚠️ 2026-09-16 加固：微信文章含大量图片时（单篇可达 3.5MB），
+    urllib 偶发 http.client.IncompleteRead（读了 2.4MB 还差 1.1MB）。
+    → 三级兜底：urllib 重试 3 次 → curl --compressed 重试 → 抛错。
+    """
+    last = None
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            data = urllib.request.urlopen(req, timeout=60).read()
+            if data and len(data) > 5000:
+                return data.decode("utf-8", errors="ignore")
+        except Exception as e:
+            last = e
+        time.sleep(2 * (i + 1))
+    # 兜底：curl（对大响应更稳健）
+    for i in range(2):
+        try:
+            r = subprocess.run(["curl", "-sL", "--compressed", "-A", UA,
+                                "--max-time", "120", url],
+                               capture_output=True, timeout=150)
+            if r.stdout and len(r.stdout) > 5000:
+                return r.stdout.decode("utf-8", errors="ignore")
+        except Exception as e:
+            last = e
+        time.sleep(3)
+    raise RuntimeError(f"抓取失败（urllib+curl 均未成功）: {last}")
 
 
 def to_text(raw):
