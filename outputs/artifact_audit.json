@@ -1,0 +1,836 @@
+{
+ "date": "2026-09-16",
+ "writes": {
+  "panhou_lianghua.md": [
+   "full_market_dualdim.py"
+  ],
+  "panhou_lianghua.csv": [
+   "full_market_dualdim.py"
+  ],
+  "qiankun_a_latest.json": [
+   ".github/workflows/quant_report.yml",
+   ".github/workflows/quant_scan.yml",
+   "full_market_dualdim.py"
+  ],
+  "板块共振_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "sector_resonance_local.py"
+  ],
+  "板块共振对照_{var}.md": [
+   "sector_resonance_local.py"
+  ],
+  "信号仲裁_latest.json": [
+   ".github/workflows/quant_report.yml",
+   "quant_scripts/signal_arbiter.py",
+   "quant_scripts/trade_journal.py",
+   "signal_arbiter.py"
+  ],
+  "信号仲裁_{var}.md": [
+   "quant_scripts/signal_arbiter.py",
+   "signal_arbiter.py"
+  ],
+  "自选清单_{var}.txt": [
+   "quant_scripts/signal_arbiter.py",
+   "signal_arbiter.py"
+  ],
+  "仲裁信号日志.csv": [
+   "quant_scripts/signal_arbiter.py",
+   "quant_scripts/trade_journal.py",
+   "signal_arbiter.py"
+  ],
+  "market_width_{var}.md": [
+   "market_width.py",
+   "quant_scripts/market_width.py"
+  ],
+  "market_width_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "market_width.py",
+   "quant_scripts/market_regime.py",
+   "quant_scripts/market_width.py"
+  ],
+  "all_mainboard.csv": [
+   ".github/workflows/quant_scan.yml",
+   "gen_mainboard.py",
+   "quant_scripts/execution_card.py",
+   "quant_scripts/fetch_mainboard_data.py",
+   "quant_scripts/gen_mainboard.py",
+   "quant_scripts/hot_emotion.py",
+   "quant_scripts/market_regime.py",
+   "quant_scripts/yitong_guaili_screener.py",
+   "skills_backup/板块个股入牛时点/scripts/scan_inbull.py"
+  ],
+  "{var}_latest.json": [
+   "quad_resonance.py"
+  ],
+  "{var}_{var}.md": [
+   "quad_resonance.py",
+   "quant_scripts/caige_track.py"
+  ],
+  "股池标的跟踪报告_{var}.md": [
+   "quant_scripts/pool_tracking_report.py",
+   "skills_backup/猛兽体系/scripts/pool_tracking_report.py"
+  ],
+  "hot_emotion_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/hot_emotion.py",
+   "quant_scripts/sync_hot_emotion.py",
+   "skills_backup/盘前市场报告/scripts/hot_emotion.py",
+   "skills_backup/盘前市场报告/scripts/sync_hot_emotion.py"
+  ],
+  "longtou_pool.txt": [
+   "quant_scripts/top_signal.py",
+   "skills_backup/盘前市场报告/scripts/longtou.py"
+  ],
+  "龙头定位_{var}.json": [
+   "quant_scripts/longtou.py",
+   "skills_backup/盘前市场报告/scripts/longtou.py"
+  ],
+  "pool_{var}.json": [
+   "premarket_scripts/premarket_pool.py",
+   "quant_scripts/monthly_pool.py",
+   "quant_scripts/monthly_review.py",
+   "skills_backup/双弦投资系统-月度股池/scripts/monthly_pool.py",
+   "skills_backup/双弦投资系统/scripts/monthly_pool.py",
+   "skills_backup/双弦投资系统/scripts/monthly_review.py",
+   "skills_backup/盘前市场报告/scripts/premarket_pool.py"
+  ],
+  "premarket_judgment_{var}.json": [
+   "quant_scripts/gen_judgment.py",
+   "skills_backup/盘前市场报告/scripts/gen_judgment.py"
+  ],
+  "fish_body_enhanced_.json": [
+   "premarket_scripts/premarket_fishbody.py",
+   "skills_backup/盘前市场报告/scripts/premarket_fishbody.py"
+  ],
+  "hot_emotion_history.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/hot_emotion.py",
+   "skills_backup/盘前市场报告/scripts/hot_emotion.py",
+   "skills_backup/盘前市场报告/scripts/market_charts.py"
+  ],
+  "hot_emotion_{var}.md": [
+   "quant_scripts/hot_emotion.py",
+   "skills_backup/盘前市场报告/scripts/hot_emotion.py"
+  ],
+  "system_temp_history.json": [
+   "skills_backup/盘前市场报告/scripts/market_charts.py"
+  ],
+  "quant_results_{var}.json": [
+   "skills_backup/盘前市场报告/scripts/market_charts.py"
+  ],
+  "data_guard_{var}.md": [
+   "quant_scripts/data_guard.py",
+   "skills_backup/盘前市场报告/scripts/data_guard.py"
+  ],
+  "data_guard_audit_{var}.md": [
+   "quant_scripts/data_guard.py",
+   "skills_backup/盘前市场报告/scripts/data_guard.py"
+  ],
+  "kline_month_adj.csv": [
+   "skills_backup/板块个股入牛时点/scripts/scan_inbull.py",
+   "skills_backup/板块个股入牛时点/scripts/ths_fetch.py"
+  ],
+  "pool.csv": [
+   "skills_backup/板块个股入牛时点/scripts/scan_inbull.py",
+   "skills_backup/板块个股入牛时点/scripts/ths_fetch.py",
+   "skills_backup/板块个股入牛时点/scripts/ths_fetch_week.py"
+  ],
+  "入牛时点扫描_{var}.md": [
+   "skills_backup/板块个股入牛时点/scripts/scan_inbull.py"
+  ],
+  "kline_week_adj.csv": [
+   "skills_backup/板块个股入牛时点/scripts/ths_fetch_week.py"
+  ],
+  "pool_51.txt": [
+   "skills_backup/强势体系/backtest.py"
+  ],
+  "{var}.json": [
+   "skills_backup/强势体系/backtest.py"
+  ],
+  "000001.json": [
+   "skills_backup/强势体系/backtest.py"
+  ],
+  "samples.json": [
+   "skills_backup/强势体系/wuwei_verify.py"
+  ],
+  "{var}_{var}.json": [
+   "skills_backup/强势体系/wuwei_verify.py"
+  ],
+  "finance.json": [
+   "skills_backup/强势体系/wuwei_verify.py"
+  ],
+  "{var}_month.json": [
+   "skills_backup/强势体系/wuwei_verify.py"
+  ],
+  "{var}_day.json": [
+   "skills_backup/强势体系/wuwei_verify.py"
+  ],
+  "wuwei_verify_result.json": [
+   "skills_backup/强势体系/wuwei_verify.py"
+  ],
+  "双弦本月股池_{var}.md": [
+   "quant_scripts/dual_pool_sync.py"
+  ],
+  "组合风控_latest.json": [
+   ".github/workflows/quant_report.yml",
+   "quant_scripts/portfolio_risk.py"
+  ],
+  "组合风控_{var}.md": [
+   "quant_scripts/portfolio_risk.py"
+  ],
+  "情绪预判_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/emotion_forecast.py"
+  ],
+  "rsv_strength_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/rsv_strength.py"
+  ],
+  "rsv_strength_{var}.md": [
+   "quant_scripts/rsv_strength.py"
+  ],
+  "mode_aggregate_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/beast_screener.py"
+  ],
+  "年线广度_{var}.md": [
+   "quant_scripts/yearline_breadth.py"
+  ],
+  "yearline_breadth_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/yearline_breadth.py"
+  ],
+  "ai_chain_pool.json": [
+   "quant_scripts/evidence_review.py"
+  ],
+  "evidence_review_{var}.md": [
+   "quant_scripts/evidence_review.py"
+  ],
+  "yao_pool.txt": [
+   "quant_scripts/yao_gu_pool.py"
+  ],
+  "yitong_pool.txt": [
+   "quant_scripts/yitong_screener.py"
+  ],
+  "liangxue_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/liangxue_screener.py"
+  ],
+  "执行纪律_latest.json": [
+   ".github/workflows/quant_report.yml",
+   "quant_scripts/trade_journal.py"
+  ],
+  "执行纪律_{var}.md": [
+   "quant_scripts/trade_journal.py"
+  ],
+  "holdings.txt": [
+   "quant_scripts/execution_card.py"
+  ],
+  "反转数值周线信号_{var}.md": [
+   "quant_scripts/gen_review_report.py",
+   "quant_scripts/reversal_funnel_screener.py"
+  ],
+  "caige_urls.txt": [
+   "quant_scripts/caige_track.py"
+  ],
+  "caige_track.json": [
+   "quant_scripts/caige_track.py"
+  ],
+  "board_top_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/top_signal.py"
+  ],
+  "top_signal_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/top_signal.py"
+  ],
+  "见顶五维监测_{}.md": [
+   "quant_scripts/top_signal.py"
+  ],
+  "断档分歧_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/sector_divergence.py"
+  ],
+  "断档分歧_{var}.md": [
+   "quant_scripts/sector_divergence.py"
+  ],
+  "monthly_macd_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/monthly_macd_monitor.py"
+  ],
+  "wangzhe_signals.csv": [
+   "quant_scripts/wangzhe_track.py"
+  ],
+  "wangzhe_benchmark.json": [
+   "quant_scripts/wangzhe_track.py"
+  ],
+  "wangzhe_stats.json": [
+   "quant_scripts/wangzhe_track.py"
+  ],
+  "liangxue_minute_check_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/liangxue_minute_check.py"
+  ],
+  "双弦观察池_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/run_shuangxian.py"
+  ],
+  "ai_chokepoint_watch_{var}.json": [
+   "quant_scripts/ai_chokepoint_guard.py"
+  ],
+  "ai_chokepoint_watch_{var}.md": [
+   "quant_scripts/ai_chokepoint_guard.py"
+  ],
+  "乖离低买_{var}.md": [
+   "quant_scripts/yitong_guaili_screener.py"
+  ],
+  "乖离低买_latest.json": [
+   ".github/workflows/quant_report.yml",
+   "quant_scripts/yitong_guaili_screener.py"
+  ],
+  "回测卡_猛兽技术代理_持{var}周_{var}.md": [
+   "quant_scripts/beast_tech_backtest.py"
+  ],
+  "猛兽股池_{var}.md": [
+   "quant_scripts/monthly_pool_sync.py"
+  ],
+  "beast_results.txt": [
+   "quant_scripts/monthly_pool_sync.py"
+  ],
+  "猛兽本月股池_{var}.md": [
+   "quant_scripts/monthly_pool_sync.py"
+  ],
+  "liangxue_month_join_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/liangxue_month_join.py"
+  ],
+  "回测卡_{var}_{var}.json": [
+   "quant_scripts/backtest_gate.py"
+  ],
+  "无为显性建仓标准_回测报告_{var}.md": [
+   "quant_scripts/wuwei_xianxing_report.py"
+  ],
+  "liangxue_winrate_latest.json": [
+   "quant_scripts/win_rate_liangxue.py"
+  ],
+  "123_2b_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/scan_123_2b.py"
+  ],
+  "开盘强形态_{var}.json": [
+   "quant_scripts/kaipan_8.py"
+  ],
+  "market_regime_latest.json": [
+   "quant_scripts/market_regime.py"
+  ],
+  "市场状态判定_{var}.md": [
+   "quant_scripts/market_regime.py"
+  ],
+  "market_regime_latest.md": [
+   "quant_scripts/market_regime.py"
+  ],
+  "才哥战法股池_{var}.md": [
+   "quant_scripts/caige_pool.py"
+  ],
+  "才哥战法股池_{var}.json": [
+   "quant_scripts/caige_pool.py"
+  ],
+  "{var}_d.csv": [
+   "docs/backtests_archive/backtest_reversal_levels.py",
+   "quant_scripts/fetch_mainboard_data.py"
+  ],
+  "{var}_m30.csv": [
+   "quant_scripts/fetch_mainboard_data.py"
+  ],
+  "premarket_judgment_latest.json": [
+   "quant_scripts/gen_premarket_report.py"
+  ],
+  "artifact_audit_{var}.md": [
+   "quant_scripts/artifact_audit.py"
+  ],
+  "artifact_audit.json": [
+   "quant_scripts/artifact_audit.py"
+  ],
+  "回测卡_鱼身{var}_持{var}日_{var}.md": [
+   "quant_scripts/fish3_backtest.py"
+  ],
+  "环境切换决策表_验证.md": [
+   "quant_scripts/research/regime_new.py"
+  ],
+  "{var}_{var}.csv": [
+   "docs/backtests_archive/backtest_2b_mainboard_m30.py",
+   "docs/backtests_archive/backtest_2b_strategy.py",
+   "docs/backtests_archive/backtest_30m_divergence_opt.py",
+   "docs/backtests_archive/backtest_reversal_2b.py",
+   "docs/backtests_archive/backtest_reversal_2b_combo.py",
+   "docs/backtests_archive/backtest_reversal_combo.py",
+   "docs/backtests_archive/backtest_reversal_divergence.py",
+   "docs/backtests_archive/backtest_reversal_funnel.py",
+   "docs/backtests_archive/backtest_reversal_levels.py"
+  ],
+  "_d.csv": [
+   "docs/backtests_archive/backtest_2b_mainboard.py",
+   "docs/backtests_archive/backtest_2b_mainboard_m30.py",
+   "docs/backtests_archive/backtest_30m_divergence_opt.py",
+   "docs/backtests_archive/backtest_reversal_divergence.py"
+  ],
+  "bt_30m_div_opt.json": [
+   "docs/backtests_archive/backtest_30m_divergence_opt.py"
+  ],
+  "bt_divergence.json": [
+   "docs/backtests_archive/backtest_reversal_divergence.py"
+  ],
+  "bt_2b_combo.json": [
+   "docs/backtests_archive/backtest_reversal_2b_combo.py"
+  ],
+  "_m30.csv": [
+   "docs/backtests_archive/backtest_2b_mainboard_m30.py"
+  ],
+  "bt_2b_results.json": [
+   "docs/backtests_archive/backtest_reversal_2b.py"
+  ],
+  "combo_results.json": [
+   "docs/backtests_archive/backtest_reversal_combo.py"
+  ],
+  "funnel_results.json": [
+   "docs/backtests_archive/backtest_reversal_funnel.py"
+  ],
+  "{var}_w.csv": [
+   "docs/backtests_archive/backtest_reversal_levels.py"
+  ],
+  "bt_results.json": [
+   "docs/backtests_archive/backtest_reversal_levels.py"
+  ],
+  "sector_component_em.json": [
+   ".github/workflows/probe_em.yml",
+   ".github/workflows/quant_scan.yml"
+  ],
+  "四维共振_latest.json": [
+   ".github/workflows/quant_report.yml"
+  ],
+  "四维共振_chinext_kcb_latest.json": [
+   ".github/workflows/quant_report.yml"
+  ],
+  "quant_results_latest.json": [
+   ".github/workflows/quant_scan.yml"
+  ],
+  "fish_body_latest.json": [
+   ".github/workflows/quant_scan.yml"
+  ],
+  "鱼身报告_latest.md": [
+   ".github/workflows/quant_scan.yml"
+  ]
+ },
+ "committed": {
+  "premarket_judgment_latest.json": [
+   "premarket_report.yml"
+  ],
+  "premarket_judgment_{var}.json": [
+   "premarket_report.yml"
+  ],
+  "盘前市场报告_{var}.md": [
+   "premarket_report.yml"
+  ],
+  "sector_component_em.json": [
+   "probe_em.yml",
+   "quant_scan.yml"
+  ],
+  "market_regime_latest.json": [
+   "market_regime.yml",
+   "quant_report.yml"
+  ],
+  "market_regime_latest.md": [
+   "market_regime.yml",
+   "quant_report.yml"
+  ],
+  "市场状态判定_{var}.md": [
+   "market_regime.yml",
+   "quant_report.yml"
+  ],
+  "market_style_latest.json": [
+   "quant_report.yml"
+  ],
+  "qiankun_a_latest.json": [
+   "quant_report.yml",
+   "quant_scan.yml"
+  ],
+  "四维共振_latest.json": [
+   "quant_report.yml"
+  ],
+  "信号仲裁_latest.json": [
+   "quant_report.yml"
+  ],
+  "ai_chokepoint_watch_latest.json": [
+   "quant_report.yml"
+  ],
+  "四维共振_chinext_kcb_latest.json": [
+   "quant_report.yml"
+  ],
+  "组合风控_latest.json": [
+   "quant_report.yml"
+  ],
+  "执行纪律_latest.json": [
+   "quant_report.yml"
+  ],
+  "execution_cards_latest.json": [
+   "quant_report.yml"
+  ],
+  "一统天下建仓区股池_latest.json": [
+   "quant_report.yml",
+   "quant_scan.yml"
+  ],
+  "乖离低买_latest.json": [
+   "quant_report.yml"
+  ],
+  "caige_pool.txt": [
+   "quant_report.yml"
+  ],
+  "yitong_pool.txt": [
+   "quant_report.yml",
+   "quant_scan.yml"
+  ],
+  "yao_pool.txt": [
+   "quant_report.yml"
+  ],
+  "longtou_pool.txt": [
+   "quant_report.yml"
+  ],
+  "dragon_pool.txt": [
+   "quant_report.yml"
+  ],
+  "四态胜率_{var}.md": [
+   "quant_report.yml"
+  ],
+  "仲裁信号日志.csv": [
+   "quant_report.yml"
+  ],
+  "data_guard_audit_{var}.md": [
+   "quant_report.yml",
+   "quant_scan.yml"
+  ],
+  "pool_{var}.json": [
+   "quant_report.yml",
+   "quant_scan.yml"
+  ],
+  "quant_results_latest.json": [
+   "quant_scan.yml"
+  ],
+  "fish_body_latest.json": [
+   "quant_scan.yml"
+  ],
+  "鱼身报告_latest.md": [
+   "quant_scan.yml"
+  ],
+  "market_width_latest.json": [
+   "quant_scan.yml"
+  ],
+  "资金快照_{var}.csv": [
+   "quant_scan.yml"
+  ],
+  "mode_aggregate_latest.json": [
+   "quant_scan.yml"
+  ],
+  "板块共振_latest.json": [
+   "quant_scan.yml"
+  ],
+  "yearline_breadth_latest.json": [
+   "quant_scan.yml"
+  ],
+  "双弦观察池_latest.json": [
+   "quant_scan.yml"
+  ],
+  "123_2b_latest.json": [
+   "quant_scan.yml"
+  ],
+  "rsv_strength_latest.json": [
+   "quant_scan.yml"
+  ],
+  "monthly_macd_latest.json": [
+   "quant_scan.yml"
+  ],
+  "断档分歧_latest.json": [
+   "quant_scan.yml"
+  ],
+  "top_signal_latest.json": [
+   "quant_scan.yml"
+  ],
+  "board_top_latest.json": [
+   "quant_scan.yml"
+  ],
+  "情绪预判_latest.json": [
+   "quant_scan.yml"
+  ],
+  "panhou_lianghua.csv": [
+   "quant_scan.yml"
+  ],
+  "all_mainboard.csv": [
+   "quant_scan.yml"
+  ],
+  "ima_cred_last_ok.json": [
+   "quant_scan.yml"
+  ],
+  "liangxue_latest.json": [
+   "quant_scan.yml"
+  ],
+  "liangxue_month_join_latest.json": [
+   "quant_scan.yml"
+  ],
+  "liangxue_minute_check_latest.json": [
+   "quant_scan.yml"
+  ],
+  "hot_emotion_latest.json": [
+   "quant_scan.yml"
+  ],
+  "hot_emotion_history.json": [
+   "quant_scan.yml"
+  ],
+  "hot_emotion_latest.md": [
+   "quant_scan.yml"
+  ],
+  "一统天下建仓区股池_latest.md": [
+   "quant_scan.yml"
+  ],
+  "wangzhe_signals.csv": [
+   "wangzhe_track.yml(via wangzhe_commit.py)"
+  ],
+  "wangzhe_stats.json": [
+   "wangzhe_track.yml(via wangzhe_commit.py)"
+  ],
+  "涨停型王者_成功率报告": [
+   "wangzhe_track.yml(via wangzhe_commit.py)"
+  ],
+  "caige_track.json": [
+   "wangzhe_track.yml(via wangzhe_commit.py)"
+  ],
+  "caige_articles": [
+   "wangzhe_track.yml(via wangzhe_commit.py)"
+  ]
+ },
+ "reads": {
+  "quant_results_latest.json": [
+   "gen_premarket_report.py",
+   "gen_review_report.py",
+   "signal_arbiter.py"
+  ],
+  "板块共振_latest.json": [
+   "gen_premarket_report.py",
+   "gen_review_report.py"
+  ],
+  "黑石板块共振_latest.json": [
+   "gen_premarket_report.py"
+  ],
+  "market_width_latest.json": [
+   "gen_premarket_report.py",
+   "gen_review_report.py",
+   "market_style.py",
+   "signal_arbiter.py"
+  ],
+  "ai_chokepoint_watch_latest.json": [
+   "gen_premarket_report.py",
+   "gen_review_report.py"
+  ],
+  "yearline_breadth_latest.json": [
+   "gen_premarket_report.py",
+   "gen_review_report.py",
+   "signal_arbiter.py"
+  ],
+  "rsv_strength_latest.json": [
+   "gen_premarket_report.py",
+   "gen_review_report.py",
+   "signal_arbiter.py"
+  ],
+  "monthly_macd_latest.json": [
+   "gen_premarket_report.py"
+  ],
+  "hot_emotion_latest.json": [
+   "gen_premarket_report.py"
+  ],
+  "premarket_judgment_latest.json": [
+   "gen_judgment.py",
+   "gen_premarket_report.py",
+   "gen_review_report.py"
+  ],
+  "market_regime_latest.json": [
+   "gen_premarket_report.py"
+  ],
+  "乖离低买_latest.json": [
+   "gen_premarket_report.py"
+  ],
+  "qiankun_a_latest.json": [
+   "gen_review_report.py",
+   "signal_arbiter.py"
+  ],
+  "panhou_lianghua.csv": [
+   "gen_review_report.py"
+  ],
+  "四维共振_latest.json": [
+   "gen_review_report.py",
+   "signal_arbiter.py"
+  ],
+  "信号仲裁_latest.json": [
+   "execution_card.py",
+   "gen_review_report.py",
+   "signal_arbiter.py"
+  ],
+  "all_mainboard.csv": [
+   "execution_card.py",
+   "signal_arbiter.py"
+  ],
+  "fish_body_latest.json": [
+   "signal_arbiter.py"
+  ],
+  "鱼身报告_latest.json": [
+   "signal_arbiter.py"
+  ],
+  "top_signal_latest.json": [
+   "signal_arbiter.py"
+  ],
+  "123_2b_latest.json": [
+   "signal_arbiter.py"
+  ],
+  "仲裁信号日志.csv": [
+   "signal_arbiter.py"
+  ],
+  "mode_aggregate_latest.json": [
+   "market_style.py"
+  ],
+  "组合风控_latest.json": [
+   "portfolio_risk.py"
+  ]
+ },
+ "high_risk": [],
+ "missing": [
+  "000001.json",
+  "_d.csv",
+  "_m30.csv",
+  "ai_chain_pool.json",
+  "ai_chokepoint_watch_{var}.md",
+  "artifact_audit.json",
+  "artifact_audit_{var}.md",
+  "beast_results.txt",
+  "bt_2b_combo.json",
+  "bt_2b_results.json",
+  "bt_30m_div_opt.json",
+  "bt_divergence.json",
+  "bt_results.json",
+  "caige_urls.txt",
+  "combo_results.json",
+  "evidence_review_{var}.md",
+  "finance.json",
+  "fish_body_enhanced_.json",
+  "funnel_results.json",
+  "holdings.txt",
+  "kline_month_adj.csv",
+  "kline_week_adj.csv",
+  "liangxue_winrate_latest.json",
+  "market_width_{var}.md",
+  "panhou_lianghua.md",
+  "pool.csv",
+  "pool_51.txt",
+  "rsv_strength_{var}.md",
+  "samples.json",
+  "system_temp_history.json",
+  "wangzhe_benchmark.json",
+  "wuwei_verify_result.json",
+  "{var}_d.csv",
+  "{var}_day.json",
+  "{var}_m30.csv",
+  "{var}_month.json",
+  "{var}_w.csv",
+  "乖离低买_{var}.md",
+  "信号仲裁_{var}.md",
+  "入牛时点扫描_{var}.md",
+  "双弦本月股池_{var}.md",
+  "反转数值周线信号_{var}.md",
+  "回测卡_{var}_{var}.json",
+  "回测卡_猛兽技术代理_持{var}周_{var}.md",
+  "回测卡_鱼身{var}_持{var}日_{var}.md",
+  "年线广度_{var}.md",
+  "开盘强形态_{var}.json",
+  "才哥战法股池_{var}.json",
+  "才哥战法股池_{var}.md",
+  "执行纪律_{var}.md",
+  "断档分歧_{var}.md",
+  "无为显性建仓标准_回测报告_{var}.md",
+  "板块共振对照_{var}.md",
+  "猛兽本月股池_{var}.md",
+  "猛兽股池_{var}.md",
+  "环境切换决策表_验证.md",
+  "组合风控_{var}.md",
+  "股池标的跟踪报告_{var}.md",
+  "自选清单_{var}.txt",
+  "见顶五维监测_{}.md",
+  "龙头定位_{var}.json"
+ ],
+ "ok": [
+  "123_2b_latest.json",
+  "ai_chokepoint_watch_{var}.json",
+  "all_mainboard.csv",
+  "board_top_latest.json",
+  "caige_track.json",
+  "data_guard_audit_{var}.md",
+  "data_guard_{var}.md",
+  "fish_body_latest.json",
+  "hot_emotion_history.json",
+  "hot_emotion_latest.json",
+  "hot_emotion_{var}.md",
+  "liangxue_latest.json",
+  "liangxue_minute_check_latest.json",
+  "liangxue_month_join_latest.json",
+  "longtou_pool.txt",
+  "market_regime_latest.json",
+  "market_regime_latest.md",
+  "market_width_latest.json",
+  "mode_aggregate_latest.json",
+  "monthly_macd_latest.json",
+  "panhou_lianghua.csv",
+  "pool_{var}.json",
+  "premarket_judgment_latest.json",
+  "premarket_judgment_{var}.json",
+  "qiankun_a_latest.json",
+  "quant_results_latest.json",
+  "quant_results_{var}.json",
+  "rsv_strength_latest.json",
+  "sector_component_em.json",
+  "top_signal_latest.json",
+  "wangzhe_signals.csv",
+  "wangzhe_stats.json",
+  "yao_pool.txt",
+  "yearline_breadth_latest.json",
+  "yitong_pool.txt",
+  "{var}.json",
+  "{var}_latest.json",
+  "{var}_{var}.csv",
+  "{var}_{var}.json",
+  "{var}_{var}.md",
+  "乖离低买_latest.json",
+  "仲裁信号日志.csv",
+  "信号仲裁_latest.json",
+  "双弦观察池_latest.json",
+  "四维共振_chinext_kcb_latest.json",
+  "四维共振_latest.json",
+  "市场状态判定_{var}.md",
+  "情绪预判_latest.json",
+  "执行纪律_latest.json",
+  "断档分歧_latest.json",
+  "板块共振_latest.json",
+  "组合风控_latest.json",
+  "鱼身报告_latest.md"
+ ],
+ "orphan": [
+  "ai_chokepoint_watch_latest.json",
+  "caige_articles",
+  "caige_pool.txt",
+  "dragon_pool.txt",
+  "execution_cards_latest.json",
+  "hot_emotion_latest.md",
+  "ima_cred_last_ok.json",
+  "market_style_latest.json",
+  "一统天下建仓区股池_latest.json",
+  "一统天下建仓区股池_latest.md",
+  "四态胜率_{var}.md",
+  "涨停型王者_成功率报告",
+  "盘前市场报告_{var}.md",
+  "资金快照_{var}.csv"
+ ]
+}
