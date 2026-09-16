@@ -48,6 +48,8 @@ jobs:
           pip install pandas numpy
 
       # ─── 第一步：生成主板清单 ───
+      # ⚠️ 路径规范（2026-09-16）：gen_mainboard.py 真源在**仓库根目录**，workflow 一律以 `python3 gen_mainboard.py` 调用。
+      #    quant_scripts/ 下同名副本已于 2026-09-16 删除。新增脚本请放 quant_scripts/ 并以 `python3 quant_scripts/xxx.py` 调用。
       - name: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断）
         continue-on-error: true
         run: |
