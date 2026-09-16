@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""东财板块成分拉取（GitHub runner 执行——沙箱 push2.eastmoney.com 被拦截）。
+"""东财板块成分拉取。
+⚠️ 2026-09-16 更正：**push2delay.eastmoney.com 在沙箱也可达**（此前认知「东财在沙箱全不可达」已过时）；
+   而 push2.eastmoney.com 主域已全面 502 → 脚本改为多端点回退（push2delay 优先）。
 产出 code→行业/概念板块映射 + code→名称（覆盖全市场含次新，补新浪源 71% 短板）。
 输出: outputs/sector_component_em.json
   {"date":..., "sectors": {"板块名":[codes]}, "code_sector": {"code":[板块名...]}, "code_name": {...}}
