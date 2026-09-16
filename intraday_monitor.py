@@ -30,6 +30,10 @@ MAIL_USER = os.environ.get("MAIL_USER", "")
 MAIL_PASS = os.environ.get("MAIL_PASS", "")
 MAIL_TO = os.environ.get("MAIL_TO", "")
 
+# ⚠️ 2026-09-16：盘中预警限定价格上限（用户要求：只推 10 元以内的股票）
+#    覆盖：王者封板信号 + 个股预警（跌破MA20/大涨/大跌）+ 监控池预筛
+MAX_PRICE = float(os.environ.get("INTRADAY_MAX_PRICE", "10"))
+
 # 核心关注股票池（全盘量化主力信号）
 CORE_STOCKS = [
     ("000779", "甘咨询"), ("002596", "海南瑞泽"), ("600095", "湘财股份"),
@@ -213,8 +217,8 @@ def fetch_wangzhe_signals():
             continue                                  # 仅沪深主板
         if "ST" in name.upper():
             continue
-        if lbc != 1 or hs <= 5 or price >= 10 or zbc > 0:
-            continue                                  # 王者封板四条件
+        if lbc != 1 or hs <= 5 or price > MAX_PRICE or zbc > 0:
+            continue                                  # 王者封板四条件（含价格上限）
         out.append({"code": code, "name": name, "price": price,
                     "turnover": round(hs, 2), "fbt": fbt, "hybk": it.get("hybk", "")})
     out.sort(key=lambda x: x["fbt"])
@@ -313,7 +317,7 @@ def main():
             seen.add(code)
             unique_pool.append((code, name))
 
-    log(f"监控池: {len(unique_pool)} 只")
+    log(f"监控池: {len(unique_pool)} 只 | 价格上限: {MAX_PRICE:.2f} 元")
 
     # ── 【v2.0 主推】王者封板扫描（首板+换手>5%+价<10元+未炸板）──
     pushed = load_pushed()
@@ -333,10 +337,16 @@ def main():
         daily = fetch_daily(code)
         if not daily:
             continue
+        # ⚠️ 2026-09-16 价格上限预筛：昨收已超上限的标的直接跳过（省一次分时调用）
+        if daily.get("prev_close", 0) > MAX_PRICE:
+            continue
         minute = fetch_minute(code)
         if not minute:
             continue
         price = minute["price"]
+        # ⚠️ 2026-09-16：现价复核（防止盘中跳涨突破上限后仍被推送）
+        if price > MAX_PRICE:
+            continue
         zdf = (price - daily["prev_close"]) / daily["prev_close"] * 100 if daily["prev_close"] else 0
 
         # 【v2.0】突破MA20 已移除：回测 5日超额 -0.42%、胜率49%（负贡献），改由王者封板信号替代
@@ -357,7 +367,8 @@ def main():
         return
 
     # 构建推送内容（限制9000字符）
-    content_lines = [f"# ⚡ 盘中监控 {now.strftime('%H:%M')}"]
+    content_lines = [f"# ⚡ 盘中监控 {now.strftime('%H:%M')}",
+                     f"> 预警范围：价格 ≤ {MAX_PRICE:.0f} 元"]
     if wz_new:
         content_lines.append("\n## 👑 王者封板信号（首板+换手>5%+价<10元）")
         content_lines.append("> 持有周期 **5日**（回测5日超额+0.89%/胜率56.1%，10日衰减）")
