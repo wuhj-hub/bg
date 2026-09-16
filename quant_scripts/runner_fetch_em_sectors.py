@@ -17,12 +17,20 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # ⚠️ 2026-09-16：8 并发招致东财限流（实测覆盖 64 只 < 串行版 302 只）→ 降到 3 并保留请求间隔
 WORKERS = 3
 
-API = "https://push2.eastmoney.com/api/qt/clist/get"
+# ⚠️ 2026-09-16 关键修复：push2.eastmoney.com 已全面 502（主域挂），
+#    探测发现 push2delay.eastmoney.com 完全正常（概念 total=504、成分 total=42）。
+#    → 改为多端点依次回退，避免单域故障导致产物恒为空壳。
+HOSTS = [
+    "https://push2delay.eastmoney.com",
+    "https://push2.eastmoney.com",
+    "https://push2his.eastmoney.com",
+]
+API_PATH = "/api/qt/clist/get"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36"
 
 
-def get(params, retries=3):
-    url = API + "?" + urllib.parse.urlencode(params)
+def _try_host(host, params, retries=2):
+    url = host + API_PATH + "?" + urllib.parse.urlencode(params)
     for i in range(retries):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": UA, "Referer": "https://quote.eastmoney.com/"})
@@ -30,9 +38,18 @@ def get(params, retries=3):
                 d = json.loads(r.read().decode())
             if d and d.get("data") and d["data"].get("diff"):
                 return d["data"]
-            return None
+            return None                      # 该域可达但无数据
         except Exception:
-            time.sleep(1.5 * (i + 1))
+            time.sleep(1.0 * (i + 1))
+    return None
+
+
+def get(params, retries=3):
+    """多端点回退：任一域可用即返回"""
+    for host in HOSTS:
+        r = _try_host(host, params, retries=2)
+        if r:
+            return r
     return None
 
 
