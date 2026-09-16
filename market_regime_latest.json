@@ -1,7 +1,7 @@
 {
  "date": "20260916",
  "verdict": "弱势（偏熊）",
- "score": 0.351,
+ "score": 0.401,
  "long": {
   "score": 0.533,
   "state": "纠缠"
@@ -15,14 +15,14 @@
   "state": "向下"
  },
  "width": {
-  "above250": 0.234,
+  "above250": 0.235,
   "above60": 0.492,
-  "above20": 0.253,
-  "up_ratio": 0.672
+  "above20": 0.252,
+  "up_ratio": 0.673
  },
  "emotion": {
-  "limit_up": 26,
-  "limit_down": 3
+  "limit_up": 80,
+  "limit_down": 4
  },
  "indices": [
   {
@@ -134,5 +134,5 @@
    "短分": 0.2
   }
  ],
- "n_stocks": 3004
+ "n_stocks": 3018
 }
