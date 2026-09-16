@@ -1,14 +1,14 @@
 {
- "date": "2026-09-15",
+ "date": "2026-09-16",
  "data_date": "2026-09-15",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 4,
+ "score": 7,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 9,
   "volume_structure": 0,
-  "sector_fund": -5
+  "sector_fund": -2
  },
  "size_style": {
   "hs300_5d": -2.38,
@@ -45,6 +45,13 @@
     "tag": "机构型"
    },
    {
+    "name": "PCB概念",
+    "zdf": "0.57",
+    "main_net5d": 136.1,
+    "retail_net": -46.2,
+    "tag": "机构型"
+   },
+   {
     "name": "元件",
     "zdf": "0.46",
     "main_net5d": 145.4,
@@ -52,25 +59,11 @@
     "tag": "混合"
    },
    {
-    "name": "半导体",
-    "zdf": "1.55",
-    "main_net5d": -269.3,
-    "retail_net": -43.6,
+    "name": "固态电池",
+    "zdf": "-0.05",
+    "main_net5d": -30.8,
+    "retail_net": -4.5,
     "tag": "游资型"
-   },
-   {
-    "name": "玻璃玻纤",
-    "zdf": "2.39",
-    "main_net5d": 46.5,
-    "retail_net": -15.4,
-    "tag": "机构型"
-   },
-   {
-    "name": "PCB概念",
-    "zdf": "0.57",
-    "main_net5d": 136.1,
-    "retail_net": -46.2,
-    "tag": "机构型"
    }
   ]
  },
