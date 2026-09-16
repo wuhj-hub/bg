@@ -1,30 +1,43 @@
 {
  "date": "2026-09-16",
- "total": 6,
- "lianban_cnt": 4,
- "max_lb": 2,
- "shouban": 2,
+ "total": 22,
+ "lianban_cnt": 3,
+ "max_lb": 4,
+ "shouban": 19,
  "by_lb": {
-  "2": 4,
-  "1": 2
+  "4": 1,
+  "2": 2,
+  "1": 19
  },
  "score": {
-  "score": 42,
-  "level": "中性",
+  "score": 39,
+  "level": "低迷",
   "parts": {
-   "涨停家数": 2,
-   "连板高度": 5,
-   "连板占比": 35
+   "涨停家数": 5,
+   "连板高度": 18,
+   "连板占比": 16
   }
  },
  "persistence": [],
- "alerts": [
-  "⚠️ 高度退潮：最高板从5板降至2板（昨2026-09-15）"
- ],
+ "alerts": [],
  "lianban_rows": [
   {
-   "code": "sz001216",
-   "name": "华瓷股份",
+   "code": "sh605058",
+   "name": "澳弘电子",
+   "price": "",
+   "chg": "",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sz002631",
+   "name": "德尔未来",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -39,34 +52,6 @@
   {
    "code": "sz002846",
    "name": "英联股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sz002882",
-   "name": "金龙羽",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sh601218",
-   "name": "吉鑫科技",
    "price": "",
    "chg": "",
    "lianban": 2,
