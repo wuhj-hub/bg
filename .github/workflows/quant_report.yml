@@ -370,6 +370,7 @@ jobs:
             一统天下建仓区股池_latest.json 乖离低买_latest.json \
             quant_scripts/caige_pool.txt quant_scripts/yitong_pool.txt quant_scripts/yao_pool.txt quant_scripts/longtou_pool.txt \
             quant_scripts/dragon_pool.txt \
+            outputs/四态胜率_$(date +%Y-%m-%d).md \
             outputs/data_guard_audit_$(date +%Y-%m-%d).md \
             pools/pool_$(date +%Y-%m).json || true
 
@@ -412,6 +413,16 @@ jobs:
           python3 quant_scripts/win_rate_tracker.py --min-days 3
           if [ -f "outputs/股池信号胜率跟踪报告_$(date +%Y-%m-%d).md" ]; then
             python3 upload_ima.py --file "outputs/股池信号胜率跟踪报告_$(date +%Y-%m-%d).md" --name "股池信号胜率跟踪报告_$(date +%Y-%m-%d).md"
+          fi
+          # ── 四态胜率（资金行为：抢筹/进场/控盘/观望）2026-09-16 接入 ──
+          # 该机制早已存在（win_rate_tracker.py --by-phase）但从未被调用；
+          # 且其输入 outputs/资金快照_*.csv 此前不入库 → 归档永远只有 1 天，永远算不出胜率。
+          # 现已：①scan 提交资金快照 ②此处调用并限流（--top 50 --max-snaps 10）避免拖垮 job。
+          python3 quant_scripts/win_rate_tracker.py --by-phase --min-days 5 --top 50 --max-snaps 10 \
+            > "outputs/四态胜率_$(date +%Y-%m-%d).md" 2>&1 || echo "四态胜率统计失败(非致命)"
+          if [ -f "outputs/四态胜率_$(date +%Y-%m-%d).md" ]; then
+            head -20 "outputs/四态胜率_$(date +%Y-%m-%d).md" || true
+            python3 upload_ima.py --file "outputs/四态胜率_$(date +%Y-%m-%d).md" --name "四态胜率_$(date +%Y-%m-%d).md" || true
           fi
 
       # ─── 第五.7步：纸面组合跟踪（信号→虚拟持仓→每日盈亏，按方法分组对比）───
