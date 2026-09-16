@@ -74,10 +74,14 @@ def signal_return(code, signal_date):
     days = (datetime.strptime(rows[-1][0], "%Y-%m-%d") - datetime.strptime(signal_date, "%Y-%m-%d")).days
     return (cur / entry - 1) * 100, days
 
-def by_phase(min_days=3, workers=8):
-    """按资金行为四态分组统计胜率（读 outputs/资金快照_*.csv 归档）"""
+def by_phase(min_days=3, workers=8, top=50, max_snaps=10):
+    """按资金行为四态分组统计胜率（读 outputs/资金快照_*.csv 归档）
+
+    ⚠️ 2026-09-16 加限流参数：快照是全市场 3000+ 只/天，逐只取行情会拖垮 workflow
+       → top= 每态按沉淀率取前 N 只；max_snaps= 只用最近 N 个交易日快照。
+    """
     import glob
-    snaps = sorted(glob.glob("outputs/资金快照_*.csv"))
+    snaps = sorted(glob.glob("outputs/资金快照_*.csv"))[-max_snaps:]
     if not snaps:
         print("❌ 无资金快照归档（workflow全量扫描后自动生成）")
         return
@@ -86,9 +90,18 @@ def by_phase(min_days=3, workers=8):
     for fp in snaps:
         d = os.path.basename(fp).replace("资金快照_", "").replace(".csv", "")
         with open(fp, encoding="utf-8") as f:
+            rows_ph = {}
             for row in csv.DictReader(f):
                 ph = row.get("phase", "观望")
-                groups.setdefault(ph, []).append((d, row["code"], row.get("name", "")))
+                try:
+                    pr = float(row.get("precip", 0) or 0)
+                except (ValueError, TypeError):
+                    pr = 0.0
+                rows_ph.setdefault(ph, []).append((pr, row["code"], row.get("name", "")))
+            for ph, lst in rows_ph.items():
+                lst.sort(key=lambda x: -x[0])          # 沉淀率高者优先
+                for pr, code, name in lst[:top]:
+                    groups.setdefault(ph, []).append((d, code, name))
     results = {}
     for ph, items in groups.items():
         rets = []
@@ -126,9 +139,11 @@ def main():
     ap.add_argument("--min-days", type=int, default=3, help="信号后最少观察天数")
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--by-phase", action="store_true", help="按资金行为四态分组统计(读资金快照)")
+    ap.add_argument("--top", type=int, default=50, help="--by-phase 时每态取沉淀率前 N 只")
+    ap.add_argument("--max-snaps", type=int, default=10, help="--by-phase 时只用最近 N 个交易日快照")
     a = ap.parse_args()
     if a.by_phase:
-        return by_phase(a.min_days, a.workers)
+        return by_phase(a.min_days, a.workers, a.top, a.max_snaps)
 
     if not os.path.exists(a.log):
         print(f"❌ 信号日志不存在: {a.log}\n提示: 先运行 pool_tracking_report.py 累积日志")
