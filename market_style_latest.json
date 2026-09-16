@@ -3,12 +3,12 @@
  "data_date": "2026-09-16",
  "style": "情绪市",
  "icon": "🔥",
- "score": 37,
+ "score": 40,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 33,
   "volume_structure": 7,
-  "sector_fund": -3
+  "sector_fund": 0
  },
  "size_style": {
   "hs300_5d": -2.02,
@@ -21,15 +21,15 @@
   "zz500_5d": -1.09
  },
  "limitup_structure": {
-  "limitup": 26,
-  "strong": 53,
-  "width_score": 96.6,
+  "limitup": 80,
+  "strong": 153,
+  "width_score": 97.2,
   "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
   "strong_ratio": 5.0,
-  "zhaban_rate": 35.0,
-  "lianban": 3
+  "zhaban_rate": 23.1,
+  "lianban": 11
  },
  "volume_structure": {
   "small_big_ratio_now": 1.263,
@@ -60,17 +60,10 @@
     "tag": "机构型"
    },
    {
-    "name": "黄酒概念",
-    "zdf": "7.65",
-    "main_net5d": 3.8,
-    "retail_net": -2.9,
-    "tag": "机构型"
-   },
-   {
-    "name": "电力",
-    "zdf": "0.23",
-    "main_net5d": 21.5,
-    "retail_net": -7.0,
+    "name": "PCB概念",
+    "zdf": "3.16",
+    "main_net5d": 179.4,
+    "retail_net": -61.2,
     "tag": "机构型"
    }
   ]
@@ -78,16 +71,16 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 6,
-   "欧马模式": 6,
-   "": 3
+   "堆量模式": 9,
+   "欧马模式": 6
   },
   "leaders": {
-   "堆量模式": 3,
+   "堆量模式": 5,
    "欧马模式": 3
   },
   "pullbacks": {},
   "gpoints": {
+   "堆量模式": 1,
    "欧马模式": 2
   },
   "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
