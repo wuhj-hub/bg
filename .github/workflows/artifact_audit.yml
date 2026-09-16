@@ -1,0 +1,65 @@
+name: 产物入库审计
+
+# 根治「脚本写了、但从不提交」的静默断链（2026-09-16 建立）
+# 背景：连续出现三类同源故障 —— sector_component_em 空壳未入库、
+#       market_width 路径分裂、乾坤A产物与资金快照从不提交（消费方读 3 周旧数据）。
+# 本 workflow 每日静态比对「脚本写出的产物路径」与「workflow 提交列表」，
+# 并把「被消费方读取却没提交」的列为高危告警。
+
+on:
+  schedule:
+    # 每日 06:00 北京（UTC 22:00），在盘后链路跑完之后、盘前之前
+    - cron: '0 22 * * *'
+  repository_dispatch:
+    types: [artifact-audit-run]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # 提交审计报告
+
+jobs:
+  artifact-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 运行产物入库审计
+        id: audit
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set +e
+          python3 quant_scripts/artifact_audit.py --repo . --out outputs --strict > /tmp/audit.log 2>&1
+          RC=$?
+          set -e
+          cat /tmp/audit.log
+          echo "rc=$RC" >> $GITHUB_OUTPUT
+          # 统计高危数（用于告警文案）
+          HR=$(python3 -c "import json;print(len(json.load(open('outputs/artifact_audit.json')).get('high_risk',[])))" 2>/dev/null || echo 0)
+          echo "hr=$HR" >> $GITHUB_OUTPUT
+          if [ "$RC" != "0" ]; then
+            curl -s "https://pushplus.plus/send" \
+              -d "token=${PUSH_TOKEN}&title=🔴产物入库审计发现高危断链&content=有${HR}个产物被消费方读取但从未提交,详见 outputs/artifact_audit_$(date +%Y-%m-%d).md&template=txt" > /dev/null || true
+            echo "::warning::产物入库审计发现 ${HR} 个高危断链"
+          fi
+
+      - name: 提交审计报告
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          cp "outputs/artifact_audit_$(date +%Y-%m-%d).md" outputs/artifact_audit_latest.md 2>/dev/null || true
+          git add outputs/artifact_audit*.md outputs/artifact_audit.json 2>/dev/null || true
+          git diff --cached --quiet && echo "无变更" || {
+            git commit -m "chore: 产物入库审计 ($(date +%Y-%m-%d))"
+            git push
+          }
