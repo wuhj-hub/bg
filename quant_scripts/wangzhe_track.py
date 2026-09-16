@@ -5,13 +5,13 @@
 【信号定义】涨停型王者（v2.0）：
   ① 涨停（主板 10% 幅度）
   ② 首板（前一日未涨停）
-  ③ 量能：历史口径「量比 1.5~4」（当日量/前日量）；实盘口径「换手率 > 5%」
+  ③ 量能（双条件）：换手率 > 5% 且 量比 1.5~4（2026-09-16 修正，原仅用换手率）
   ④ 价格 < 10 元
   ⑤ 实盘追加：未炸板（东财 zbc == 0）
 
 【用法】
   --backfill   用本地日线全历史回填信号（量比口径，2015-2026）
-  --scan       抓当日实时涨停池 → 追加信号（换手口径，含行业）
+  --scan       抓当日实时涨停池 → 追加候选（换手>5% + 量比1.5~4，含行业）
   --update     更新未到期信号的后续 5/10/20 日收益
   --stats      输出成功率统计（默认）
   --report     生成 Markdown 报告
@@ -21,7 +21,7 @@
   实时：东财涨停池 push2ex（沙箱可直连）
   信号库：outputs/wangzhe_signals.csv（唯一真源，只增不改，推 GitHub）
 """
-import csv, json, os, sys, re, argparse, urllib.request
+import csv, json, os, sys, re, argparse, subprocess, urllib.request
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 import numpy as np
@@ -36,7 +36,7 @@ DATA = os.path.join(BASE, "data", "kline_daily_vol.csv")
 SIG = os.path.join(OUT, "wangzhe_signals.csv")
 BENCH = os.path.join(OUT, "wangzhe_benchmark.json")
 HOLD = [5, 10, 20]
-FIELDS = ["signal_date", "code", "name", "price", "vol_ratio", "turnover", "lbc",
+FIELDS = ["signal_date", "code", "name", "price", "vol_ratio", "turnover", "vr_checked", "lbc",
           "fbt", "hybk", "source", "variant", "limit_date", "r5", "r10", "r20",
           "b5", "b10", "b20", "ex5", "ex10", "ex20"]
 
@@ -230,6 +230,56 @@ def load_rows():
     return out
 
 
+
+def fetch_vol_ratios(codes, chunk=40):
+    """批量拉近 2 日日线，算「量比 = 当日量 / 前一日量」。
+
+    用途：实盘 scan 的量能确认 —— 原实现只用「换手率>5%」，
+          但换手率高 ≠ 放量（可能是流通盘小或抛压大）。
+          ⚠️ 2026-09-16 修正：改为「换手>5% AND 量比1.5~4」双条件。
+    返回 {code: vol_ratio}；拉取失败的 code 不出现（调用方按"未校验"处理）。
+    """
+    out = {}
+    if not codes:
+        return out
+    for k in range(0, len(codes), chunk):
+        batch = codes[k:k + chunk]
+        cmd = ["npx", "-y", "westock-data-skillhub@1.0.3", "kline",
+               ",".join(batch), "--period", "day", "--limit", "3"]
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
+            txt = r.stdout or ""
+        except Exception as e:
+            log(f"[WARN] 量比批量拉取失败（第{k//chunk+1}批）: {e}")
+            continue
+        vols = {}
+        for line in txt.splitlines():
+            if not line.strip().startswith("|"):
+                continue
+            parts = [p.strip() for p in line.strip().strip("|").split("|")]
+            if len(parts) < 8:
+                continue
+            # 批量输出首列=code(symbol)，单股输出首列=date → 两种都兼容
+            if re.match(r"^(sh|sz)\d{6}$", parts[0]):
+                # 列序 symbol|date|open|last|high|low|volume|amount|exchange
+                # ⚠️ volume 在 index 6（index 5 是 low，2026-09-16 修）
+                code, vol_s = parts[0], parts[6]
+            elif re.match(r"^\d{4}-\d{2}-\d{2}$", parts[0]):
+                continue          # 无代码列，本批不可用
+            else:
+                continue
+            try:
+                vol = float(vol_s)
+            except (ValueError, TypeError):
+                continue
+            vols.setdefault(code, []).append(vol)
+        for c, arr in vols.items():
+            # 表按日期降序（最新在前）→ arr[0]=当日, arr[1]=前一日
+            if len(arr) >= 2 and arr[1] > 0:
+                out[c] = arr[0] / arr[1]
+    return out
+
+
 def scan(live=True):
     """抓当日实时涨停池 → 涨停型王者（换手口径）"""
     date = datetime.now(BJT).strftime("%Y%m%d")
@@ -244,6 +294,7 @@ def scan(live=True):
         return []
     ds = datetime.now(BJT).strftime("%Y-%m-%d")
     rows = []
+    cand = []
     for it in pool:
         try:
             code = str(it.get("c", "")); name = str(it.get("n", "")).strip()
@@ -260,10 +311,21 @@ def scan(live=True):
         if lbc != 1 or hs <= 5 or zbc > 0:
             continue
         pre = "sh" if code[0] == "6" else "sz"
+        cand.append((pre + code, code, name, price, hs, lbc, fbt, it.get("hybk", "")))
+    # ── 量能二次确认（2026-09-16 修正）─────────────────────────────
+    # 原实现仅用「换手率>5%」，会把「高换手但未放量」的票误判为倍量柱
+    # （如 600103 青山纸业：换手 11.88% 但量比仅 1.02）。
+    # 现改为：换手>5%（初筛）AND 量比 1.5~4（确认）；拉取失败的保留并标注未校验。
+    vr_map = fetch_vol_ratios([c[0] for c in cand])
+    for code_s, code, name, price, hs, lbc, fbt, hybk in cand:
+        vr = vr_map.get(code_s)
+        if vr is not None and not (1.5 <= vr <= 4):
+            continue                                  # 量比不符 → 剔除
         r = {k: "" for k in FIELDS}
-        r.update({"signal_date": ds, "code": pre + code, "name": name,
-                  "price": round(price, 2), "vol_ratio": "", "turnover": round(hs, 2),
-                  "lbc": lbc, "fbt": fbt, "hybk": it.get("hybk", ""), "source": "live",
+        r.update({"signal_date": ds, "code": code_s, "name": name,
+                  "price": round(price, 2), "vol_ratio": (round(vr, 2) if vr is not None else ""),
+                  "turnover": round(hs, 2), "vr_checked": ("Y" if vr is not None else "N"),
+                  "lbc": lbc, "fbt": fbt, "hybk": hybk, "source": "live",
                   "variant": "day1", "limit_date": ds})
         rows.append(r)
     rows.sort(key=lambda x: x["fbt"])
@@ -391,23 +453,30 @@ def update_live(rows, lookback=45):
 
 
 def push_summary(rows, st, new_live):
-    """PushPlus 推送：当日新增信号 + 5日成功率摘要"""
+    """PushPlus 推送：当日新增候选 + 5日成功率摘要
+
+    ⚠️ 2026-09-16：措辞修正 —— 输出的是「T日首板候选」（待 T+1~T+3 缩量站稳确认），
+       不是才哥原义的「王者倍量柱」（那是需 3 日确认的完整形态）。避免歧义。
+    """
     tok = os.environ.get("PUSH_TOKEN", "")
     if not tok:
         log("[WARN] 未设置 PUSH_TOKEN，跳过推送")
         return
     d = datetime.now(BJT).strftime("%Y-%m-%d")
     v = st.get(5) or st.get("5") or {}
-    lines = [f"# 👑 涨停型王者跟踪 {d}", ""]
+    lines = [f"# 👑 涨停型王者·T日首板候选 {d}", ""]
     if new_live:
-        lines.append(f"## 当日信号 {len(new_live)} 只")
+        lines.append(f"## 当日 T 日首板候选 {len(new_live)} 只（待 T+1~T+3 缩量站稳确认）")
         for w in new_live[:20]:
             ft = w.get("fbt") or ""
             t = f"{int(ft)//10000:02d}:{int(ft)//100%100:02d}" if ft else "--:--"
-            lines.append(f"👑 **{w['name']}**({w['code']}) {w['price']}元 换手{w['turnover']}% 封板{t} · {w['hybk']}")
+            vr = w.get("vol_ratio") or ""
+            vrs = f" 量比{vr}" if vr != "" else " 量比未校验"
+            lines.append(f"👑 **{w['name']}**({w['code']}) {w['price']}元 换手{w['turnover']}%{vrs} 封板{t} · {w['hybk']}")
         lines.append("")
     else:
-        lines += ["## 当日信号 0 只（无符合「首板+换手>5%+价<10元+未炸板」）", ""]
+        lines += ["## 当日候选 0 只（无符合「首板 + 换手>5% + 量比1.5~4 + 未炸板」）",
+                      "", "> 注：本信号是「T日首板候选」，需 T+1~T+3 缩量站稳才升级为王者倍量柱", ""]
     if v:
         lines += ["## 历史成功率（全样本）",
                   f"- 5日胜率 **{v.get('win', 0):.1f}%**（超额胜率 {v.get('ex_win', 0):.1f}%）",
@@ -453,14 +522,15 @@ def by_period(rows, key_fn, label, min_n=30):
 
 def write_report(rows, st_all, st_year, st_recent, by):
     """生成 Markdown 报告"""
-    lines = ["# 涨停型王者 · 信号筛选与成功率跟踪报告", "",
+    lines = ["# 涨停型王者 · T日首板候选 筛选与成功率跟踪报告", "",
              f"**生成**：{datetime.now(BJT).strftime('%Y-%m-%d %H:%M')}（北京时间）",
              f"**信号库**：`outputs/wangzhe_signals.csv`（{len(rows)} 条）", "",
-             "## 一、信号定义（涨停型王者）", "",
+             "## 一、信号定义（T日首板候选）", "",
+             "> ⚠️ 本报告输出的是 **T日（首板涨停当天）候选**，**不是**才哥原义的「王者倍量柱」。\n> 王者倍量柱需在 T 日之后 **T+1~T+3 三日内缩量且平均收盘站稳 T 日收盘** 才成立（需 3 日确认）。", "",
              "| # | 条件 |", "|---|---|",
              "| ① | 涨停（主板 10% 幅度） |",
              "| ② | **首板**（前一日未涨停） |",
-             "| ③ | 量能：历史口径「量比 1.5~4」／实盘口径「换手率 > 5%」 |",
+             "| ③ | 量能（**双条件**）：换手率 > 5% **且** 量比 1.5~4<sup>†</sup> |",
              "| ④ | 实盘追加：未炸板（东财 `zbc==0`） |",
              "",
              "> ⚠️ **2026-09-15 复核**：才哥（刘骥才）正版定义**不含价格限制**，原「价<10元」已移除。",
@@ -493,7 +563,7 @@ def write_report(rows, st_all, st_year, st_recent, by):
         lines.append(f"| {k} | {v['n']} | {v['mean']:+.2f}% | {v['median']:+.2f}% | "
                      f"{v['win']:.1f}% | {v['ex_win']:.1f}% | {v['ex_mean']:+.2f}% |")
     lines += ["", "## 五、口径说明与局限", "",
-              "1. **历史回填用「量比 1.5~4」**（本地日线无流通股本，无法算换手率）；**实盘记录用「换手率 > 5%」**——两者近似等价，统计时按 `source` 字段分开标注。",
+              "1. **量能双条件（2026-09-16 修正）**：实盘原仅用「换手率>5%」，会把「高换手但未放量」误判为倍量柱（案例：600103 青山纸业 换手 11.88% 但量比仅 1.02）。现改为「换手>5% **且** 量比 1.5~4」；`vr_checked=N` 表示该条量比未校验（拉取失败，保留并标注）。",
               "2. 首板判定基于前一日收盘价，与实盘「前一日未涨停」一致；ST 股涨停幅度为 5%，用 10% 判据不会误判。",
               "3. 信号收益按**信号日收盘价**为基准计算（实盘即封板价）。",
               "4. 回填样本天然排除「盘中封板后炸板」的标的（轻微生存偏差）。",
