@@ -1,87 +1,93 @@
 {
- "date": "2026-09-16",
- "data_date": "2026-09-16",
+ "date": "2026-09-17",
+ "data_date": "2026-09-17",
  "style": "情绪市",
  "icon": "🔥",
- "score": 40,
+ "score": 27,
  "score_detail": {
   "size_style": 0,
-  "limitup_structure": 33,
-  "volume_structure": 7,
-  "sector_fund": 0
+  "limitup_structure": 21,
+  "volume_structure": -1,
+  "sector_fund": 7
  },
  "size_style": {
-  "hs300_5d": -2.02,
-  "hs300_10d": -1.49,
-  "zz1000_5d": -0.8,
-  "zz1000_10d": 0.05,
-  "rel_5d": 1.22,
-  "rel_10d": 1.54,
-  "rel_20d": 3.29,
-  "zz500_5d": -1.09
+  "hs300_5d": -1.94,
+  "hs300_10d": -2.03,
+  "zz1000_5d": -0.51,
+  "zz1000_10d": -0.67,
+  "rel_5d": 1.43,
+  "rel_10d": 1.36,
+  "rel_20d": 2.35,
+  "zz500_5d": -0.81
  },
  "limitup_structure": {
-  "limitup": 80,
-  "strong": 153,
-  "width_score": 97.2,
+  "limitup": 23,
+  "strong": 51,
+  "width_score": 76.6,
   "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 5.0,
-  "zhaban_rate": 23.1,
-  "lianban": 11
+  "strong_ratio": 2.9,
+  "zhaban_rate": 43.9,
+  "lianban": 6
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.263,
-  "small_big_ratio_5d": 1.362,
-  "small_vol_pulse": 94.57
+  "small_big_ratio_now": 1.184,
+  "small_big_ratio_5d": 1.318,
+  "vol_shift": "资金回流大盘",
+  "small_vol_pulse": 94.67
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "半导体",
-    "zdf": "4.44",
-    "main_net5d": -215.3,
-    "retail_net": -136.0,
+    "name": "昨日连板",
+    "zdf": "4.13",
+    "main_net5d": -25.2,
+    "retail_net": 8.6,
     "tag": "游资型"
    },
    {
-    "name": "通信设备",
-    "zdf": "5.18",
-    "main_net5d": -27.3,
-    "retail_net": -107.5,
+    "name": "汽车零部件",
+    "zdf": "2.03",
+    "main_net5d": -43.8,
+    "retail_net": -29.9,
     "tag": "游资型"
+   },
+   {
+    "name": "风电设备",
+    "zdf": "1.02",
+    "main_net5d": 18.1,
+    "retail_net": -3.3,
+    "tag": "机构型"
    },
    {
     "name": "元件",
-    "zdf": "2.63",
-    "main_net5d": 136.4,
-    "retail_net": -28.9,
-    "tag": "机构型"
+    "zdf": "-2.41",
+    "main_net5d": 115.9,
+    "retail_net": 77.6,
+    "tag": "混合"
    },
    {
-    "name": "PCB概念",
-    "zdf": "3.16",
-    "main_net5d": 179.4,
-    "retail_net": -61.2,
-    "tag": "机构型"
+    "name": "半导体",
+    "zdf": "-0.57",
+    "main_net5d": -16.6,
+    "retail_net": 49.3,
+    "tag": "游资型"
    }
   ]
  },
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 9,
-   "欧马模式": 6
+   "堆量模式": 13,
+   "欧马模式": 2
   },
   "leaders": {
-   "堆量模式": 5,
-   "欧马模式": 3
+   "堆量模式": 4
   },
   "pullbacks": {},
   "gpoints": {
-   "堆量模式": 1,
-   "欧马模式": 2
+   "堆量模式": 2
   },
   "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
   "total_scored": 15
