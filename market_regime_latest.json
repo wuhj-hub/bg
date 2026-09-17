@@ -15,10 +15,10 @@
   "state": "向下"
  },
  "width": {
-  "above250": 0.235,
-  "above60": 0.497,
+  "above250": 0.234,
+  "above60": 0.496,
   "above20": 0.25,
-  "up_ratio": 0.465
+  "up_ratio": 0.466
  },
  "emotion": {
   "limit_up": 44,
@@ -134,5 +134,5 @@
    "短分": 0.2
   }
  ],
- "n_stocks": 3008
+ "n_stocks": 3018
 }
