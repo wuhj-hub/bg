@@ -4,6 +4,8 @@ on:
   schedule:
     # 北京时间 09:30（UTC 01:30），每日检查备份完整性（避开15:30全盘扫描）
     - cron: "30 1 * * *"
+  repository_dispatch:
+    types: [guard-selfcheck-run]
   workflow_dispatch: {}
 
 permissions:
