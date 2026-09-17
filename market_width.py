@@ -7,12 +7,12 @@ import csv, json, os, re, subprocess, sys, time
 from datetime import datetime
 
 POOL = "all_mainboard.csv"
-BATCH = 100
+BATCH = 50        # ⚠️ 2026-09-17：100→50，runner 上大批次返回不全
 OUT_DIR = "outputs"
 
 
-def run(args, timeout=120):
-    for i in range(3):
+def run(args, timeout=150):
+    for i in range(4):
         try:
             r = subprocess.run(["npx", "-y", "westock-data-skillhub@1.0.3"] + args,
                                capture_output=True, text=True, timeout=timeout)
@@ -20,7 +20,7 @@ def run(args, timeout=120):
                 return r.stdout
         except Exception:
             pass
-        time.sleep(2)
+        time.sleep(3 * (i + 1))
     return ""
 
 
@@ -91,9 +91,9 @@ def main():
                             zhaban.append(c["code"])
                     # S4 连板高度（2026-08-11）：limit 10 算连续涨停天数
                     days_lb = 0
-                    for i in range(len(kl) - 1):
-                        _, c0, _ = kl[i]
-                        _, c1, _ = kl[i + 1]
+                    for j in range(len(kl) - 1):      # ⚠️ 用 j 不用 i：曾因同名覆盖外层循环变量
+                        _, c0, _ = kl[j]
+                        _, c1, _ = kl[j + 1]
                         if c1 > 0 and (c0 - c1) / c1 * 100 >= 9.8:
                             days_lb += 1
                         else:
@@ -104,7 +104,8 @@ def main():
                             lianban.append(c["code"])
                         if days_lb >= 3:
                             lianban3.append(c["code"])
-        print(f"[{i + len(chunk)}/{total}] 已处理", flush=True)
+        got = sum(1 for c in codes if len(data.get(c, [])) >= 2)
+        print(f"[{i + len(chunk)}/{total}] 已处理 本批返回 {len(data)} 只 / 有效 {got} 只", flush=True)
 
     n = len(chg)
     up = [x for x in chg if x[2] > 0]
