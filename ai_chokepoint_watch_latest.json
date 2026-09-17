@@ -29,7 +29,7 @@
    "relabel": 10,
    "chokepoint": 82,
    "evidence": "strong",
-   "four_dim_total": 0,
+   "four_dim_total": 3,
    "four_dim_level": "无共振",
    "chg120": "+99%",
    "note": "A股最正宗InP衬底标的",
@@ -102,6 +102,23 @@
    "chg120": "-31%",
    "note": "纯固态材料弹性标的",
    "evidence_note": "中试试产+小批量订单(公司口径/集邦)；购有研稀土硫化锂资产+合资安石固锂82.5%；26H1新能源子公司仍中试亏损,无公告级量产/大单；等量产与订单公告"
+  },
+  {
+   "code": "603667",
+   "name": "五洲新春",
+   "chain": "具身智能",
+   "segment": "行星滚柱丝杠",
+   "tier": "芯片器件",
+   "coef": 0.78,
+   "base": 60,
+   "relabel": 18,
+   "chokepoint": 78,
+   "evidence": "medium",
+   "four_dim_total": 3,
+   "four_dim_level": "无共振",
+   "chg120": "-24%",
+   "note": "丝杠国产化率低、弹性大",
+   "evidence_note": "⚠️中报称丝杠仍处验证期未量产；'小鹏订单'仅自媒体无公告，不可作为升级依据"
   },
   {
    "code": "603662",
@@ -206,6 +223,40 @@
    "evidence_note": "互动易6/22官方: ⚠️26H1航天领域订单与去年同期持平(卫星批产爆发叙事不成立);增长来自高速互连新域；等卫星批产大单"
   },
   {
+   "code": "002463",
+   "name": "沪电股份",
+   "chain": "光互连算力",
+   "segment": "AI服务器高速PCB",
+   "tier": "模块子系统",
+   "coef": 0.62,
+   "base": 60,
+   "relabel": 14,
+   "chokepoint": 74,
+   "evidence": "strong",
+   "four_dim_total": 6,
+   "four_dim_level": "★ 弱共振",
+   "chg120": "+57%",
+   "note": "PCB环节中卡位相对强",
+   "evidence_note": "投关记录确认泰国基地规模化运营、400G交换机批量量产；订单排至2027"
+  },
+  {
+   "code": "002156",
+   "name": "通富微电",
+   "chain": "光互连算力",
+   "segment": "先进封装(CoWoS类)",
+   "tier": "制程封装",
+   "coef": 0.92,
+   "base": 60,
+   "relabel": 14,
+   "chokepoint": 74,
+   "evidence": "strong",
+   "four_dim_total": 5,
+   "four_dim_level": "★ 弱共振",
+   "chg120": "+37%",
+   "note": "",
+   "evidence_note": "44亿定增已注册扩产；半年报净利+317%绑定AMD主供"
+  },
+  {
    "code": "603267",
    "name": "鸿远电子",
    "chain": "商业航天",
@@ -221,40 +272,6 @@
    "chg120": "+0%",
    "note": "MLCC缺口环节",
    "evidence_note": "投关记录(9月官方口径): 卫星陶瓷管壳批量供货但H1收入仅0.11亿;⚠️8亿订单/市占60%仅自媒体无公告；等专项订单公告"
-  },
-  {
-   "code": "002156",
-   "name": "通富微电",
-   "chain": "光互连算力",
-   "segment": "先进封装(CoWoS类)",
-   "tier": "制程封装",
-   "coef": 0.92,
-   "base": 60,
-   "relabel": 14,
-   "chokepoint": 74,
-   "evidence": "strong",
-   "four_dim_total": 0,
-   "four_dim_level": "无共振",
-   "chg120": "+37%",
-   "note": "",
-   "evidence_note": "44亿定增已注册扩产；半年报净利+317%绑定AMD主供"
-  },
-  {
-   "code": "002463",
-   "name": "沪电股份",
-   "chain": "光互连算力",
-   "segment": "AI服务器高速PCB",
-   "tier": "模块子系统",
-   "coef": 0.62,
-   "base": 60,
-   "relabel": 14,
-   "chokepoint": 74,
-   "evidence": "strong",
-   "four_dim_total": 0,
-   "four_dim_level": "无共振",
-   "chg120": "+57%",
-   "note": "PCB环节中卡位相对强",
-   "evidence_note": "投关记录确认泰国基地规模化运营、400G交换机批量量产；订单排至2027"
   },
   {
    "code": "601100",
@@ -614,6 +631,23 @@
    "evidence_note": "⚠️互动易4/1明确固态为聚合物/凝胶体系;6N硫化锂3000吨量产仅自媒体无公告,硫化物叙事与官方口径相悖；降级观察"
   },
   {
+   "code": "002916",
+   "name": "深南电路",
+   "chain": "光互连算力",
+   "segment": "PCB/FCBGA封装基板",
+   "tier": "模块子系统",
+   "coef": 0.62,
+   "base": 58,
+   "relabel": 10,
+   "chokepoint": 68,
+   "evidence": "strong",
+   "four_dim_total": 7,
+   "four_dim_level": "★★ 高置信",
+   "chg120": "+67%",
+   "note": "",
+   "evidence_note": "投关9月确认FC-BGA基板多客户规模化量产；H1净利+66%"
+  },
+  {
    "code": "002167",
    "name": "东方锆业",
    "chain": "固态电池",
@@ -629,23 +663,6 @@
    "chg120": "+31%",
    "note": "氧化物路线",
    "evidence_note": "⚠️互动7/29仅氧化锆样品获研发试用初步认可,无订单/中试;扩产为通用电池级原料非电解质产线；降级观察"
-  },
-  {
-   "code": "002916",
-   "name": "深南电路",
-   "chain": "光互连算力",
-   "segment": "PCB/FCBGA封装基板",
-   "tier": "模块子系统",
-   "coef": 0.62,
-   "base": 58,
-   "relabel": 10,
-   "chokepoint": 68,
-   "evidence": "strong",
-   "four_dim_total": 0,
-   "four_dim_level": "无共振",
-   "chg120": "+67%",
-   "note": "",
-   "evidence_note": "投关9月确认FC-BGA基板多客户规模化量产；H1净利+66%"
   },
   {
    "code": "600990",
@@ -726,11 +743,28 @@
    "relabel": 6,
    "chokepoint": 66,
    "evidence": "strong",
-   "four_dim_total": 0,
+   "four_dim_total": 3,
    "four_dim_level": "无共振",
    "chg120": "+167%",
    "note": "CCL为PCB上游材料",
    "evidence_note": "4/24公告52亿投建高性能覆铜板扩产；26H1预告净利+117~131%"
+  },
+  {
+   "code": "002465",
+   "name": "海格通信",
+   "chain": "商业航天",
+   "segment": "卫星通信终端/北斗",
+   "tier": "模块子系统",
+   "coef": 0.62,
+   "base": 48,
+   "relabel": 18,
+   "chokepoint": 66,
+   "evidence": "medium",
+   "four_dim_total": 1,
+   "four_dim_level": "无共振",
+   "chg120": "-31%",
+   "note": "",
+   "evidence_note": "半年报: 北斗短报文套片首个规模化合同+中石化北斗主力供应商;⚠️卫星互联网无实质订单,主业由盈转亏；等低轨终端订单"
   },
   {
    "code": "600577",
@@ -784,23 +818,6 @@
    "evidence_note": "无人机产线满产600架/年+临港扩至2000架+飞腾航空CAAC培训资质;⚠️无低空订单金额披露；等无人机订单公告"
   },
   {
-   "code": "002465",
-   "name": "海格通信",
-   "chain": "商业航天",
-   "segment": "卫星通信终端/北斗",
-   "tier": "模块子系统",
-   "coef": 0.62,
-   "base": 48,
-   "relabel": 18,
-   "chokepoint": 66,
-   "evidence": "medium",
-   "four_dim_total": 0,
-   "four_dim_level": "无共振",
-   "chg120": "-31%",
-   "note": "",
-   "evidence_note": "半年报: 北斗短报文套片首个规模化合同+中石化北斗主力供应商;⚠️卫星互联网无实质订单,主业由盈转亏；等低轨终端订单"
-  },
-  {
    "code": "600118",
    "name": "中国卫星",
    "chain": "商业航天",
@@ -816,6 +833,23 @@
    "chg120": "-27%",
    "note": "整星龙头但宁静逻辑卡位低",
    "evidence_note": "半年报: H1发射11颗追平25全年,合同负债+69.45%,扭亏为盈;⚠️'300亿订单/540-720颗'仅自媒体非公告；整星集成层低卡位参照"
+  },
+  {
+   "code": "600206",
+   "name": "有研新材",
+   "chain": "光互连算力",
+   "segment": "靶材/化合物材料",
+   "tier": "材料耗材",
+   "coef": 1.0,
+   "base": 58,
+   "relabel": 6,
+   "chokepoint": 64,
+   "evidence": "strong",
+   "four_dim_total": 8,
+   "four_dim_level": "★★ 高置信",
+   "chg120": "+154%",
+   "note": "材料平台型",
+   "evidence_note": "7/30董事会公告靶材二期扩产4.86亿(3万块/年)，半年报电板块营收49亿"
   },
   {
    "code": "601869",
@@ -884,23 +918,6 @@
    "chg120": "-7%",
    "note": "",
    "evidence_note": "董秘互动平台: eVTOL分系统/整机模拟器战略合作已形成收入;⚠️无金额+8月海威华芯股东纠纷；等模拟器订单公告"
-  },
-  {
-   "code": "600206",
-   "name": "有研新材",
-   "chain": "光互连算力",
-   "segment": "靶材/化合物材料",
-   "tier": "材料耗材",
-   "coef": 1.0,
-   "base": 58,
-   "relabel": 6,
-   "chokepoint": 64,
-   "evidence": "strong",
-   "four_dim_total": 0,
-   "four_dim_level": "无共振",
-   "chg120": "+154%",
-   "note": "材料平台型",
-   "evidence_note": "7/30董事会公告靶材二期扩产4.86亿(3万块/年)，半年报电板块营收49亿"
   },
   {
    "code": "002466",
@@ -1003,23 +1020,6 @@
    "chg120": "-4%",
    "note": "弹性小票",
    "evidence_note": "⚠️仅2020年共建中科丰元研究院(研究层)+参股4%;流传中试线/量产无公司确认,主业磷酸铁锂；纯研究属性,建议移出候选"
-  },
-  {
-   "code": "603667",
-   "name": "五洲新春",
-   "chain": "具身智能",
-   "segment": "行星滚柱丝杠",
-   "tier": "芯片器件",
-   "coef": 0.78,
-   "base": 60,
-   "relabel": null,
-   "chokepoint": null,
-   "evidence": "medium",
-   "four_dim_total": 3,
-   "four_dim_level": "无共振",
-   "chg120": "N/A",
-   "note": "丝杠国产化率低、弹性大",
-   "evidence_note": "⚠️中报称丝杠仍处验证期未量产；'小鹏订单'仅自媒体无公告，不可作为升级依据"
   }
  ]
 }
