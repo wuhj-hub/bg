@@ -375,8 +375,8 @@
       "month_trend": "多头",
       "month_gate": "PASS",
       "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": null,
-      "rsg_strong": false
+      "rsg_dev": 256.6,
+      "rsg_strong": true
     },
     {
       "code": "sz002815",
@@ -535,8 +535,8 @@
       "month_trend": "多头",
       "month_gate": "PASS",
       "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": null,
-      "rsg_strong": false
+      "rsg_dev": 256.6,
+      "rsg_strong": true
     },
     {
       "code": "sz002836",
@@ -631,8 +631,8 @@
       "month_trend": "多头",
       "month_gate": "PASS",
       "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": null,
-      "rsg_strong": false
+      "rsg_dev": 188.8,
+      "rsg_strong": true
     }
   ]
 }
