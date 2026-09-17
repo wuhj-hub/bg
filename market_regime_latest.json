@@ -1,7 +1,7 @@
 {
  "date": "20260917",
  "verdict": "弱势（偏熊）",
- "score": 0.308,
+ "score": 0.338,
  "long": {
   "score": 0.511,
   "state": "纠缠"
@@ -21,8 +21,8 @@
   "up_ratio": 0.465
  },
  "emotion": {
-  "limit_up": 23,
-  "limit_down": 0
+  "limit_up": 44,
+  "limit_down": 1
  },
  "indices": [
   {
