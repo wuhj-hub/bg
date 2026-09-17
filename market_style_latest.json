@@ -21,15 +21,15 @@
   "zz500_5d": -0.81
  },
  "limitup_structure": {
-  "limitup": 23,
-  "strong": 51,
+  "limitup": 44,
+  "strong": 95,
   "width_score": 76.6,
   "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 2.9,
-  "zhaban_rate": 43.9,
-  "lianban": 6
+  "strong_ratio": 3.1,
+  "zhaban_rate": 43.6,
+  "lianban": 9
  },
  "volume_structure": {
   "small_big_ratio_now": 1.184,
@@ -40,17 +40,24 @@
  "sector_fund": {
   "sectors": [
    {
-    "name": "昨日连板",
-    "zdf": "4.13",
-    "main_net5d": -25.2,
-    "retail_net": 8.6,
-    "tag": "游资型"
-   },
-   {
     "name": "汽车零部件",
     "zdf": "2.03",
     "main_net5d": -43.8,
     "retail_net": -29.9,
+    "tag": "游资型"
+   },
+   {
+    "name": "元件",
+    "zdf": "-2.41",
+    "main_net5d": 115.9,
+    "retail_net": 77.6,
+    "tag": "混合"
+   },
+   {
+    "name": "昨日连板",
+    "zdf": "4.13",
+    "main_net5d": -25.2,
+    "retail_net": 8.6,
     "tag": "游资型"
    },
    {
@@ -61,17 +68,10 @@
     "tag": "机构型"
    },
    {
-    "name": "元件",
-    "zdf": "-2.41",
-    "main_net5d": 115.9,
-    "retail_net": 77.6,
-    "tag": "混合"
-   },
-   {
-    "name": "半导体",
-    "zdf": "-0.57",
-    "main_net5d": -16.6,
-    "retail_net": 49.3,
+    "name": "种植业",
+    "zdf": "3.83",
+    "main_net5d": -20.0,
+    "retail_net": -1.8,
     "tag": "游资型"
    }
   ]
@@ -79,10 +79,11 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 13,
-   "欧马模式": 2
+   "堆量模式": 12,
+   "欧马模式": 3
   },
   "leaders": {
+   "欧马模式": 1,
    "堆量模式": 4
   },
   "pullbacks": {},
