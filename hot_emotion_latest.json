@@ -1,68 +1,30 @@
 {
- "date": "2026-09-16",
- "total": 80,
- "lianban_cnt": 11,
- "max_lb": 6,
- "shouban": 69,
+ "date": "2026-09-17",
+ "total": 14,
+ "lianban_cnt": 1,
+ "max_lb": 2,
+ "shouban": 13,
  "by_lb": {
-  "6": 1,
-  "4": 1,
-  "2": 9,
-  "1": 69
+  "2": 1,
+  "1": 13
  },
  "score": {
-  "score": 68,
-  "level": "活跃",
+  "score": 15,
+  "level": "冰点",
   "parts": {
-   "涨停家数": 16,
-   "连板高度": 36,
-   "连板占比": 16
+   "涨停家数": 2,
+   "连板高度": 5,
+   "连板占比": 8
   }
  },
  "persistence": [],
- "alerts": [],
+ "alerts": [
+  "⚠️ 高度退潮：最高板从6板降至2板（昨2026-09-16）"
+ ],
  "lianban_rows": [
   {
-   "code": "sz000993",
-   "name": "闽东电力",
-   "price": "",
-   "chg": "",
-   "lianban": 6,
-   "ji_ji_ban": "6天6板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "水力发电",
-    "电力",
-    "公用事业",
-    "昨日涨停_含一字"
-   ]
-  },
-  {
-   "code": "sh605058",
-   "name": "澳弘电子",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "印制电路板",
-    "元件",
-    "电子",
-    "昨日涨停_含一字"
-   ]
-  },
-  {
-   "code": "sz001216",
-   "name": "华瓷股份",
+   "code": "sz003001",
+   "name": "中岩大地",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -73,162 +35,10 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "其他家居用品",
-    "轻工制造",
-    "家居用品",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sz002491",
-   "name": "通鼎互联",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通信线缆及配套",
-    "通信设备",
-    "通信",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sz002584",
-   "name": "西陇科学",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "电子化学品Ⅲ",
-    "电子化学品Ⅱ",
-    "电子",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sz002631",
-   "name": "德尔未来",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "轻工制造",
-    "家居用品",
-    "定制家居",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sz002846",
-   "name": "英联股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "金属包装",
-    "包装印刷",
-    "轻工制造",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sz003026",
-   "name": "中晶科技",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "半导体材料",
-    "半导体",
-    "电子",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sh601579",
-   "name": "会稽山",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "其他酒类",
-    "非白酒",
-    "食品饮料",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sh603082",
-   "name": "北自科技",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "自动化设备",
-    "其他自动化设备",
-    "机械设备",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sh603248",
-   "name": "锡华科技",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "电力设备",
-    "风电零部件",
-    "风电设备",
-    "昨日首板"
+    "建筑装饰",
+    "专业工程",
+    "其他专业工程",
+    "题材股"
    ]
   }
  ],
