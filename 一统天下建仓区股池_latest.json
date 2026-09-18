@@ -1,6 +1,6 @@
 {
   "date": "2026-09-18",
-  "total": 565,
+  "total": 569,
   "results": [
     {
       "code": "sz000157",
@@ -519,7 +519,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+9.7>-0.2>-2.1",
+      "strength": "+9.7>-0.1>-2.1",
       "note": "日线建仓2026-09-14+周线"
     },
     {
@@ -534,6 +534,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-09-15+周线"
+    },
+    {
+      "code": "sz001277",
+      "name": "速达股份",
+      "entry": "2026-09-17",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-17+周线"
     },
     {
       "code": "sz001289",
@@ -909,7 +922,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+0.9>-0.6>-2.1",
+      "strength": "+0.9>-0.4>-2.1",
       "note": "日线建仓2026-09-17+周线"
     },
     {
@@ -1199,6 +1212,19 @@
       "note": "日线建仓2026-09-14+周线"
     },
     {
+      "code": "sz002685",
+      "name": "华东重机",
+      "entry": "2026-09-15",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-07-31",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-15+周线"
+    },
+    {
       "code": "sz002706",
       "name": "良信股份",
       "entry": "2026-09-16",
@@ -1299,7 +1325,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+0.1>-0.5>-2.1",
+      "strength": "+0.1>-0.4>-2.1",
       "note": "日线建仓2026-09-15+周线"
     },
     {
@@ -1715,7 +1741,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "-0.1>-0.6>-2.1",
+      "strength": "-0.1>-0.4>-2.1",
       "note": "日线建仓2026-09-15+周线"
     },
     {
@@ -1728,7 +1754,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+3.0>-0.5>-2.1",
+      "strength": "+3.0>-0.4>-2.1",
       "note": "日线建仓2026-09-15+周线"
     },
     {
@@ -2027,7 +2053,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+1.2>-0.2>-2.1",
+      "strength": "+1.2>-0.1>-2.1",
       "note": "日线建仓2026-09-15+周线"
     },
     {
@@ -2443,7 +2469,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+1.5>-0.6>-2.1",
+      "strength": "+1.5>-0.4>-2.1",
       "note": "日线建仓2026-09-14+周线"
     },
     {
@@ -2469,7 +2495,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+25.7>-0.6>-2.1",
+      "strength": "+25.7>-0.4>-2.1",
       "note": "日线建仓2026-09-14+周线"
     },
     {
@@ -2599,7 +2625,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "-0.4>-0.6>-2.1",
+      "strength": "-0.4>-0.4>-2.1",
       "note": "日线建仓2026-09-15+周线"
     },
     {
@@ -2612,7 +2638,7 @@
       "m60": false,
       "stars": 4,
       "reversal": null,
-      "strength": "+12.6>+4.6>-2.1",
+      "strength": "+12.6>+4.5>-2.1",
       "note": "日线建仓2026-09-16+周线"
     },
     {
@@ -3002,7 +3028,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+14.0>-0.6>-2.1",
+      "strength": "+14.0>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -3067,7 +3093,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+0.4>-0.6>-2.1",
+      "strength": "+0.4>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -3106,7 +3132,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+5.7>+4.6>-2.1",
+      "strength": "+5.7>+4.5>-2.1",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -3366,7 +3392,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+10.5>-0.5>-2.1",
+      "strength": "+10.5>-0.4>-2.1",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -3444,7 +3470,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+3.3>-0.2>-2.1",
+      "strength": "+3.3>-0.1>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -3483,7 +3509,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+0.5>-0.5>-2.1",
+      "strength": "+0.5>-0.4>-2.1",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -3627,6 +3653,19 @@
       "stars": 3,
       "reversal": null,
       "strength": null,
+      "note": "日线建仓2026-09-14"
+    },
+    {
+      "code": "sz001258",
+      "name": "立新能源",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": "趋势确立",
+      "strength": "+65.3>+6.6>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -4458,7 +4497,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+4.0>-0.6>-2.1",
+      "strength": "+4.0>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -4614,12 +4653,25 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+12.3>-0.5>-2.1",
+      "strength": "+12.3>-0.4>-2.1",
       "note": "日线建仓2026-09-15"
     },
     {
       "code": "sz002674",
       "name": "兴业科技",
+      "entry": "2026-09-14",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-09-14"
+    },
+    {
+      "code": "sz002677",
+      "name": "浙江美大",
       "entry": "2026-09-14",
       "guaili": false,
       "in_now": true,
@@ -5342,7 +5394,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+0.0>-0.6>-2.1",
+      "strength": "+0.0>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -5524,7 +5576,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "-0.1>-0.6>-2.1",
+      "strength": "-0.1>-0.4>-2.1",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -5615,7 +5667,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "-0.3>-0.5>-2.1",
+      "strength": "-0.3>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -5667,7 +5719,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+5.7>-0.2>-2.1",
+      "strength": "+5.7>-0.1>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -5810,7 +5862,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+2.0>-0.5>-2.1",
+      "strength": "+2.0>-0.4>-2.1",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -5862,7 +5914,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+33.6>+4.6>-2.1",
+      "strength": "+33.6>+4.5>-2.1",
       "note": "日线建仓2026-09-18"
     },
     {
@@ -6018,7 +6070,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+14.4>+4.6>-2.1",
+      "strength": "+14.4>+4.5>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -6161,7 +6213,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+10.3>+4.6>-2.1",
+      "strength": "+10.3>+4.5>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -6187,7 +6239,7 @@
       "m60": false,
       "stars": 3,
       "reversal": "趋势确立",
-      "strength": "+42.1>-0.6>-2.1",
+      "strength": "+42.1>-0.4>-2.1",
       "note": "日线建仓2026-09-16"
     },
     {
@@ -6200,7 +6252,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+0.1>-0.2>-2.1",
+      "strength": "+0.1>-0.1>-2.1",
       "note": "日线建仓2026-09-18"
     },
     {
@@ -6291,7 +6343,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+2.7>-0.2>-2.1",
+      "strength": "+2.7>-0.1>-2.1",
       "note": "日线建仓2026-09-16"
     },
     {
@@ -6382,7 +6434,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+6.5>-0.5>-2.1",
+      "strength": "+6.5>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -6434,7 +6486,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+10.4>-0.6>-2.1",
+      "strength": "+10.4>-0.4>-2.1",
       "note": "日线建仓2026-09-17"
     },
     {
@@ -6551,7 +6603,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+11.0>-0.2>-2.1",
+      "strength": "+11.0>-0.1>-2.1",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -6642,7 +6694,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+3.1>+0.8>-2.1",
+      "strength": "+3.1>+0.7>-2.1",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -6746,7 +6798,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+1.5>-0.2>-2.1",
+      "strength": "+1.5>-0.1>-2.1",
       "note": "日线建仓2026-09-15"
     },
     {
@@ -6785,7 +6837,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "-0.1>-0.5>-2.1",
+      "strength": "-0.1>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -6850,7 +6902,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+2.7>-0.6>-2.1",
+      "strength": "+2.7>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -6863,7 +6915,7 @@
       "m60": false,
       "stars": 3,
       "reversal": "趋势确立",
-      "strength": "+5.6>+4.4>-2.1",
+      "strength": "+5.6>+3.8>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -6889,7 +6941,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+2.8>-0.6>-2.1",
+      "strength": "+2.8>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
@@ -7045,7 +7097,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+0.9>-0.6>-2.1",
+      "strength": "+0.9>-0.4>-2.1",
       "note": "日线建仓2026-09-17"
     },
     {
@@ -7188,7 +7240,7 @@
       "m60": false,
       "stars": 3,
       "reversal": null,
-      "strength": "+13.3>-0.6>-2.1",
+      "strength": "+13.3>-0.4>-2.1",
       "note": "日线建仓2026-09-14"
     },
     {
