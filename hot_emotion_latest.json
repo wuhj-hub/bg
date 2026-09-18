@@ -1,28 +1,103 @@
 {
  "date": "2026-09-18",
- "total": 41,
- "lianban_cnt": 4,
- "max_lb": 2,
- "shouban": 37,
+ "total": 75,
+ "lianban_cnt": 12,
+ "max_lb": 4,
+ "shouban": 63,
  "by_lb": {
-  "2": 4,
-  "1": 37
+  "4": 2,
+  "3": 2,
+  "2": 8,
+  "1": 63
  },
  "score": {
-  "score": 21,
-  "level": "冰点",
+  "score": 54,
+  "level": "中性",
   "parts": {
-   "涨停家数": 8,
-   "连板高度": 5,
-   "连板占比": 8
+   "涨停家数": 12,
+   "连板高度": 18,
+   "连板占比": 24
   }
  },
  "persistence": [],
- "alerts": [
-  "⚠️ 退潮预警：涨停41只但连板家数4，仅为昨日(2026-09-17)9的一半 → 情绪退潮，谨慎接力",
-  "⚠️ 高度退潮：最高板从5板降至2板（昨2026-09-17）"
- ],
+ "alerts": [],
  "lianban_rows": [
+  {
+   "code": "sz001216",
+   "name": "华瓷股份",
+   "price": "",
+   "chg": "",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他家居用品",
+    "家居用品",
+    "轻工制造",
+    "昨日打二板以上表现"
+   ]
+  },
+  {
+   "code": "sh603248",
+   "name": "锡华科技",
+   "price": "",
+   "chg": "",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "电力设备",
+    "风电设备",
+    "风电零部件",
+    "昨日打二板以上表现"
+   ]
+  },
+  {
+   "code": "sz002285",
+   "name": "世联行",
+   "price": "",
+   "chg": "",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "房产租赁经纪",
+    "房地产",
+    "房地产服务",
+    "昨日连板_含一字"
+   ]
+  },
+  {
+   "code": "sh603230",
+   "name": "内蒙新华",
+   "price": "",
+   "chg": "",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "大众出版",
+    "出版",
+    "传媒",
+    "昨日连板_含一字"
+   ]
+  },
   {
    "code": "sz000504",
    "name": "南华生物",
@@ -97,6 +172,82 @@
     "农产品加工",
     "农林牧渔",
     "昨日首板"
+   ]
+  },
+  {
+   "code": "sh600448",
+   "name": "华纺股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "印染",
+    "纺织制造",
+    "纺织服饰",
+    "昨日首板"
+   ]
+  },
+  {
+   "code": "sh600630",
+   "name": "龙头股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "服装家纺",
+    "纺织服饰",
+    "非运动服装",
+    "昨日首板"
+   ]
+  },
+  {
+   "code": "sh601091",
+   "name": "C沈鼓",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他通用设备",
+    "通用设备",
+    "机械设备",
+    "次新股"
+   ]
+  },
+  {
+   "code": "sh603626",
+   "name": "科森科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "电子",
+    "消费电子零部件及组装",
+    "消费电子",
+    "昨日涨停_含一字"
    ]
   }
  ],
