@@ -1,106 +1,88 @@
 {
- "date": "2026-09-17",
- "total": 45,
- "lianban_cnt": 9,
- "max_lb": 5,
- "shouban": 36,
+ "date": "2026-09-18",
+ "total": 41,
+ "lianban_cnt": 4,
+ "max_lb": 2,
+ "shouban": 37,
  "by_lb": {
-  "5": 1,
-  "3": 3,
-  "2": 5,
-  "1": 36
+  "2": 4,
+  "1": 37
  },
  "score": {
-  "score": 66,
-  "level": "活跃",
+  "score": 21,
+  "level": "冰点",
   "parts": {
    "涨停家数": 8,
-   "连板高度": 28,
-   "连板占比": 30
+   "连板高度": 5,
+   "连板占比": 8
   }
  },
  "persistence": [],
- "alerts": [],
+ "alerts": [
+  "⚠️ 退潮预警：涨停41只但连板家数4，仅为昨日(2026-09-17)9的一半 → 情绪退潮，谨慎接力",
+  "⚠️ 高度退潮：最高板从5板降至2板（昨2026-09-17）"
+ ],
  "lianban_rows": [
   {
-   "code": "sh605058",
-   "name": "澳弘电子",
+   "code": "sz000504",
+   "name": "南华生物",
    "price": "",
    "chg": "",
-   "lianban": 5,
-   "ji_ji_ban": "5天5板",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "电子",
-    "元件",
-    "印制电路板",
-    "昨日打二板以上表现"
+    "其他医疗服务",
+    "医疗服务",
+    "医药生物",
+    "昨日首板"
    ]
   },
   {
-   "code": "sz001216",
-   "name": "华瓷股份",
+   "code": "sz002453",
+   "name": "华软科技",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "其他家居用品",
+    "其他化学制品",
+    "化学制品",
+    "基础化工",
+    "国产芯片"
+   ]
+  },
+  {
+   "code": "sz002836",
+   "name": "新宏泽",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
     "轻工制造",
-    "家居用品",
-    "昨日连板_含一字"
+    "纸包装",
+    "包装印刷",
+    "昨日首板"
    ]
   },
   {
-   "code": "sz003026",
-   "name": "中晶科技",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "半导体",
-    "电子",
-    "半导体材料",
-    "昨日连板_含一字"
-   ]
-  },
-  {
-   "code": "sh603248",
-   "name": "锡华科技",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "风电设备",
-    "风电零部件",
-    "电力设备",
-    "昨日连板_含一字"
-   ]
-  },
-  {
-   "code": "sz002285",
-   "name": "世联行",
+   "code": "sh600127",
+   "name": "金健米业",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -111,86 +93,10 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "房产租赁经纪",
-    "房地产服务",
-    "房地产",
-    "共享经济"
-   ]
-  },
-  {
-   "code": "sz002655",
-   "name": "共达电声",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "消费电子",
-    "消费电子零部件及组装",
-    "电子",
-    "电子烟"
-   ]
-  },
-  {
-   "code": "sz003001",
-   "name": "中岩大地",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "建筑装饰",
-    "专业工程",
-    "其他专业工程",
-    "题材股"
-   ]
-  },
-  {
-   "code": "sh600371",
-   "name": "万向德农",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "种子",
-    "种植业",
+    "粮油加工",
+    "农产品加工",
     "农林牧渔",
-    "转基因"
-   ]
-  },
-  {
-   "code": "sh603230",
-   "name": "内蒙新华",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "大众出版",
-    "出版",
-    "传媒",
-    "百日新高"
+    "昨日首板"
    ]
   }
  ],
