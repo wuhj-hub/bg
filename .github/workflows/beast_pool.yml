@@ -1,0 +1,78 @@
+name: 猛兽突破池扫描
+
+on:
+  # 盘后 16:00（北京）= 08:00 UTC，周一至周五
+  schedule:
+    - cron: "0 8 * * 1-5"
+  repository_dispatch:
+    types: [beast-pool-run]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beast-pool
+  cancel-in-progress: false
+
+jobs:
+  beast-pool:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 沙箱路径兼容层
+        run: |
+          sudo mkdir -p /sandbox
+          sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
+          ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪"
+
+      - name: Setup Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: pip install --quiet numpy
+
+      - name: 预热 westock 数据包
+        run: npx -y westock-data-skillhub@1.0.3 kline sh000001 --period day --limit 5 || true
+
+      # 候选池：优先用仓库里的 all_mainboard.csv（quant_scan 产出），缺失则回退
+      - name: 准备候选池
+        run: |
+          for f in all_mainboard.csv outputs/all_mainboard.csv; do
+            if [ -s "$f" ]; then cp "$f" /sandbox/workspace/all_mainboard.csv; echo "✅ 用 $f"; break; fi
+          done
+          ls -la /sandbox/workspace/all_mainboard.csv 2>/dev/null || echo "⚠️ 无候选池"
+
+      # 猛兽突破池扫描（RSV>74 且 RSV1>85 且 RSVHY>74 且 前置PV<6 且 PV3>12）
+      # 输出：命中清单 + 每只的分批减仓价位（+10% / +20% / 峰值回撤5%）
+      - name: 突破池扫描 + 生成操作单
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: python3 quant_scripts/beast_pool_screener.py --scan --push
+
+      - name: 提交产物
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          for f in outputs/beast_pool_latest.json outputs/猛兽突破池_$(date +%Y%m%d).md; do
+            [ -f "$f" ] && git add -f "$f"
+          done
+          if git diff --cached --quiet; then
+            echo "无变更"
+          else
+            git commit -m "chore: 猛兽突破池 ($(date +%Y-%m-%d))"
+            git push || echo "⚠️ push 失败"
+          fi
