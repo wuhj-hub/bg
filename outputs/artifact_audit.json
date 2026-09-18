@@ -1,5 +1,5 @@
 {
- "date": "2026-09-17",
+ "date": "2026-09-18",
  "writes": {
   "panhou_lianghua.md": [
    "full_market_dualdim.py"
@@ -45,6 +45,7 @@
   "all_mainboard.csv": [
    ".github/workflows/quant_scan.yml",
    "gen_mainboard.py",
+   "quant_scripts/beast_pool_screener.py",
    "quant_scripts/execution_card.py",
    "quant_scripts/fetch_mainboard_data.py",
    "quant_scripts/hot_emotion.py",
@@ -192,6 +193,15 @@
    ".github/workflows/quant_scan.yml",
    "quant_scripts/yearline_breadth.py"
   ],
+  "数据源交叉验证_{var}.md": [
+   "quant_scripts/cross_source_check.py"
+  ],
+  "cross_source_latest.json": [
+   "quant_scripts/cross_source_check.py"
+  ],
+  "beast_pool_latest.json": [
+   "quant_scripts/beast_pool_screener.py"
+  ],
   "ai_chain_pool.json": [
    "quant_scripts/evidence_review.py"
   ],
@@ -242,6 +252,12 @@
   "见顶五维监测_{}.md": [
    "quant_scripts/top_signal.py"
   ],
+  "beast_timing_exit.json": [
+   "quant_scripts/bt_beast_timing.py"
+  ],
+  "beast_hy_bt.json": [
+   "quant_scripts/bt_beast_hy.py"
+  ],
   "断档分歧_latest.json": [
    ".github/workflows/quant_scan.yml",
    "quant_scripts/sector_divergence.py"
@@ -284,6 +300,19 @@
   ],
   "wangzhe_entry_bt.json": [
    "quant_scripts/bt_wangzhe_entry.py"
+  ],
+  "{var}_{var}.csv": [
+   "docs/backtests_archive/backtest_2b_mainboard_m30.py",
+   "docs/backtests_archive/backtest_2b_strategy.py",
+   "docs/backtests_archive/backtest_30m_divergence_opt.py",
+   "docs/backtests_archive/backtest_reversal_2b.py",
+   "docs/backtests_archive/backtest_reversal_2b_combo.py",
+   "docs/backtests_archive/backtest_reversal_combo.py",
+   "docs/backtests_archive/backtest_reversal_divergence.py",
+   "docs/backtests_archive/backtest_reversal_funnel.py",
+   "docs/backtests_archive/backtest_reversal_levels.py",
+   "quant_scripts/backtest_reversal_combo.py",
+   "quant_scripts/backtest_reversal_levels.py"
   ],
   "乖离低买_{var}.md": [
    "quant_scripts/yitong_guaili_screener.py"
@@ -333,6 +362,12 @@
    ".github/workflows/quant_scan.yml",
    "quant_scripts/scan_123_2b.py"
   ],
+  "静默失败审计_{var}.md": [
+   "quant_scripts/silent_failure_audit.py"
+  ],
+  "silent_failure_audit.json": [
+   "quant_scripts/silent_failure_audit.py"
+  ],
   "开盘强形态_{var}.json": [
    "quant_scripts/kaipan_8.py"
   ],
@@ -360,28 +395,18 @@
   "premarket_judgment_latest.json": [
    "quant_scripts/gen_premarket_report.py"
   ],
+  "{var}_w.csv": [
+   "docs/backtests_archive/backtest_reversal_levels.py",
+   "quant_scripts/backtest_reversal_levels.py"
+  ],
   "回测卡_鱼身{var}_持{var}日_{var}.md": [
    "quant_scripts/fish3_backtest.py"
   ],
   "环境切换决策表_验证.md": [
    "quant_scripts/research/regime_new.py"
   ],
-  "{var}_{var}.csv": [
-   "docs/backtests_archive/backtest_2b_mainboard_m30.py",
-   "docs/backtests_archive/backtest_2b_strategy.py",
-   "docs/backtests_archive/backtest_30m_divergence_opt.py",
-   "docs/backtests_archive/backtest_reversal_2b.py",
-   "docs/backtests_archive/backtest_reversal_2b_combo.py",
-   "docs/backtests_archive/backtest_reversal_combo.py",
-   "docs/backtests_archive/backtest_reversal_divergence.py",
-   "docs/backtests_archive/backtest_reversal_funnel.py",
-   "docs/backtests_archive/backtest_reversal_levels.py"
-  ],
   "funnel_results.json": [
    "docs/backtests_archive/backtest_reversal_funnel.py"
-  ],
-  "{var}_w.csv": [
-   "docs/backtests_archive/backtest_reversal_levels.py"
   ],
   "sector_component_em.json": [
    ".github/workflows/probe_em.yml",
@@ -684,9 +709,13 @@
  "missing": [
   "ai_chain_pool.json",
   "ai_chokepoint_watch_{var}.md",
+  "beast_hy_bt.json",
+  "beast_pool_latest.json",
   "beast_results.txt",
+  "beast_timing_exit.json",
   "caige_urls.txt",
   "caige_zxz_increment_bt.json",
+  "cross_source_latest.json",
   "evidence_review_{var}.md",
   "finance.json",
   "fish_body_enhanced_.json",
@@ -701,6 +730,7 @@
   "pool_51.txt",
   "rsv_strength_{var}.md",
   "samples.json",
+  "silent_failure_audit.json",
   "system_temp_history.json",
   "wangzhe_benchmark.json",
   "wangzhe_case_review.json",
@@ -730,6 +760,7 @@
   "才哥战法股池_{var}.json",
   "才哥战法股池_{var}.md",
   "执行纪律_{var}.md",
+  "数据源交叉验证_{var}.md",
   "断档分歧_{var}.md",
   "无为显性建仓标准_回测报告_{var}.md",
   "板块共振对照_{var}.md",
@@ -740,6 +771,7 @@
   "股池标的跟踪报告_{var}.md",
   "自选清单_{var}.txt",
   "见顶五维监测_{}.md",
+  "静默失败审计_{var}.md",
   "龙头定位_{var}.json"
  ],
  "ok": [
