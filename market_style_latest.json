@@ -1,77 +1,77 @@
 {
- "date": "2026-09-17",
- "data_date": "2026-09-17",
+ "date": "2026-09-18",
+ "data_date": "2026-09-18",
  "style": "情绪市",
  "icon": "🔥",
- "score": 27,
+ "score": 57,
  "score_detail": {
-  "size_style": 0,
-  "limitup_structure": 21,
+  "size_style": 20,
+  "limitup_structure": 29,
   "volume_structure": -1,
-  "sector_fund": 7
+  "sector_fund": 9
  },
  "size_style": {
-  "hs300_5d": -1.94,
-  "hs300_10d": -2.03,
-  "zz1000_5d": -0.51,
-  "zz1000_10d": -0.67,
-  "rel_5d": 1.43,
-  "rel_10d": 1.36,
-  "rel_20d": 2.35,
-  "zz500_5d": -0.81
+  "hs300_5d": -0.06,
+  "hs300_10d": -0.89,
+  "zz1000_5d": 3.51,
+  "zz1000_10d": 2.39,
+  "rel_5d": 3.57,
+  "rel_10d": 3.28,
+  "rel_20d": 3.54,
+  "zz500_5d": 2.89
  },
  "limitup_structure": {
-  "limitup": 44,
-  "strong": 95,
-  "width_score": 76.6,
+  "limitup": 42,
+  "strong": 82,
+  "width_score": 100,
   "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 3.1,
-  "zhaban_rate": 43.6,
-  "lianban": 9
+  "strong_ratio": 4.9,
+  "zhaban_rate": 37.3,
+  "lianban": 8
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.184,
-  "small_big_ratio_5d": 1.318,
+  "small_big_ratio_now": 1.121,
+  "small_big_ratio_5d": 1.263,
   "vol_shift": "资金回流大盘",
-  "small_vol_pulse": 94.67
+  "small_vol_pulse": 101.6
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "汽车零部件",
-    "zdf": "2.03",
-    "main_net5d": -43.8,
-    "retail_net": -29.9,
+    "name": "半导体",
+    "zdf": "3.95",
+    "main_net5d": -44.4,
+    "retail_net": -187.5,
     "tag": "游资型"
    },
    {
-    "name": "元件",
-    "zdf": "-2.41",
-    "main_net5d": 115.9,
-    "retail_net": 77.6,
-    "tag": "混合"
-   },
-   {
-    "name": "昨日连板",
-    "zdf": "4.13",
-    "main_net5d": -25.2,
-    "retail_net": 8.6,
-    "tag": "游资型"
-   },
-   {
-    "name": "风电设备",
-    "zdf": "1.02",
-    "main_net5d": 18.1,
-    "retail_net": -3.3,
+    "name": "新股与次新股",
+    "zdf": "5.91",
+    "main_net5d": 5.1,
+    "retail_net": -31.1,
     "tag": "机构型"
    },
    {
-    "name": "种植业",
-    "zdf": "3.83",
-    "main_net5d": -20.0,
-    "retail_net": -1.8,
+    "name": "房地产",
+    "zdf": "3.38",
+    "main_net5d": -3.6,
+    "retail_net": -17.1,
+    "tag": "游资型"
+   },
+   {
+    "name": "房地产开发",
+    "zdf": "3.44",
+    "main_net5d": -3.5,
+    "retail_net": -15.8,
+    "tag": "游资型"
+   },
+   {
+    "name": "电力",
+    "zdf": "0.38",
+    "main_net5d": -14.9,
+    "retail_net": -5.6,
     "tag": "游资型"
    }
   ]
@@ -79,16 +79,18 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 12,
-   "欧马模式": 3
+   "堆量模式": 10,
+   "欧马模式": 4,
+   "": 1
   },
   "leaders": {
-   "欧马模式": 1,
-   "堆量模式": 4
+   "堆量模式": 4,
+   "欧马模式": 1
   },
   "pullbacks": {},
   "gpoints": {
-   "堆量模式": 2
+   "欧马模式": 1,
+   "堆量模式": 1
   },
   "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
   "total_scored": 15
