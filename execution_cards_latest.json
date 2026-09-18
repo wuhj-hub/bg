@@ -27,7 +27,7 @@
    },
    "verdict": "⛔拦截",
    "action": "不入场：月线空头(BLOCK) / 周线纠缠(WARN) —— 大方向向下，不入场 等待月线/周线转多(PASS)后重新出卡；若为持仓，按既有离场纪律管理。",
-   "is_new": false
+   "is_new": true
   },
   {
    "code": "sz000839",
@@ -54,7 +54,7 @@
    },
    "verdict": "⛔拦截",
    "action": "不入场：月线空头(BLOCK) / 周线多头(PASS) —— 大方向向下，不入场 等待月线/周线转多(PASS)后重新出卡；若为持仓，按既有离场纪律管理。",
-   "is_new": false
+   "is_new": true
   },
   {
    "code": "sh600863",
@@ -105,480 +105,64 @@
    "verdict": "🟡试仓",
    "max_loss_final": 9514,
    "summary": "✅预算达标 | 分批合计15.0%（单票上限30%×门禁0.5）实际最大亏损≈9514元",
-   "is_new": false
+   "is_new": true
   },
   {
-   "code": "sh600059",
-   "name": "古越龙山",
-   "signal": "★ 双信号｜四维8分·双弦共振(75)",
+   "code": "sz000506",
+   "name": "招金黄金",
+   "signal": "★ 双信号｜四维7分",
    "date": "2026-09-18",
    "upper": {
     "month_trend": "纠缠",
     "month_gate": "WARN",
-    "week_trend": "多头",
-    "week_gate": "PASS",
+    "week_trend": "纠缠",
+    "week_gate": "WARN",
     "verdict": "🟡试仓",
-    "desc": "月线纠缠(WARN) / 周线多头(PASS) —— 上级周期未共振，仅可试仓(仓位×0.5)"
+    "desc": "月线纠缠(WARN) / 周线纠缠(WARN) —— 上级周期未共振，仅可试仓(仓位×0.5)"
    },
    "budget": {
-    "price": 10.7,
-    "stop": 9.71,
-    "target": 11.56,
-    "rr": 0.86,
-    "pos_pct": 21.5,
-    "max_loss": 19984,
-    "status": "⚠️盈亏比不足",
-    "reason": "止损9.71(-9.3%) 目标11.56 盈亏比0.86 满仓建议21.5% 满仓最大亏损≈19984元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 5.5,
-     "trigger": "信号确认位附近(≈10.70)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标11.56止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 3.0,
-     "trigger": "回踩MA10(9.25)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标11.56或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
-     "pct": 2.0,
-     "trigger": "放量突破前高(11.56)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(8.82)或MACD死叉离场"
-    }
-   ],
-   "verdict": "🟡试仓",
-   "max_loss_final": 9715,
-   "summary": "⚠️盈亏比不足 | 分批合计10.5%（单票上限30%×门禁0.5）实际最大亏损≈9715元",
-   "is_new": false,
-   "from_pool": true
-  },
-  {
-   "code": "sh600400",
-   "name": "红豆股份",
-   "signal": "★ 双信号｜四维7分·双弦共振(70)",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "多头",
-    "month_gate": "PASS",
-    "week_trend": "多头",
-    "week_gate": "PASS",
-    "verdict": "✅放行",
-    "desc": "月线多头(PASS) + 周线多头(PASS) —— 大小周期共振，正常仓位"
-   },
-   "budget": {
-    "price": 3.46,
-    "stop": 3.13,
-    "target": 4.03,
-    "rr": 1.71,
-    "pos_pct": 20.7,
-    "max_loss": 19982,
-    "status": "⚠️盈亏比不足",
-    "reason": "止损3.13(-9.7%) 目标4.03 盈亏比1.71 满仓建议20.7% 满仓最大亏损≈19982元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 10.5,
-     "trigger": "信号确认位附近(≈3.46)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标4.03止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 6.0,
-     "trigger": "回踩MA10(3.19)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标4.03或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
-     "pct": 4.0,
-     "trigger": "放量突破前高(4.03)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(3.06)或MACD死叉离场"
-    }
-   ],
-   "verdict": "✅放行",
-   "max_loss_final": 19552,
-   "summary": "⚠️盈亏比不足 | 分批合计20.5%（单票上限30%×门禁1.0）实际最大亏损≈19552元",
-   "is_new": false,
-   "from_pool": true
-  },
-  {
-   "code": "sh600609",
-   "name": "金杯汽车",
-   "signal": "★ 双信号｜四维7分·双弦共振(67)",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "纠缠",
-    "month_gate": "WARN",
-    "week_trend": "多头",
-    "week_gate": "PASS",
-    "verdict": "🟡试仓",
-    "desc": "月线纠缠(WARN) / 周线多头(PASS) —— 上级周期未共振，仅可试仓(仓位×0.5)"
-   },
-   "budget": {
-    "price": 3.59,
-    "stop": 3.32,
-    "target": 5.47,
-    "rr": 6.86,
-    "pos_pct": 26.2,
-    "max_loss": 20006,
+    "price": 18.58,
+    "stop": 16.13,
+    "target": 28.52,
+    "rr": 4.05,
+    "pos_pct": 15.2,
+    "max_loss": 20061,
     "status": "✅预算达标",
-    "reason": "止损3.32(-7.6%) 目标5.47 盈亏比6.86 满仓建议26.2% 满仓最大亏损≈20006元"
+    "reason": "止损16.13(-13.2%) 目标28.52 盈亏比4.05 满仓建议15.2% 满仓最大亏损≈20061元"
    },
    "batches": [
     {
      "batch": "B1底仓",
-     "pct": 6.5,
-     "trigger": "信号确认位附近(≈3.59)",
+     "pct": 4.0,
+     "trigger": "信号确认位附近(≈18.58)",
      "note": "底分型/站上5日线确认",
-     "exit": "到目标5.47止盈"
+     "exit": "到目标28.52止盈"
     },
     {
      "batch": "B2加仓",
-     "pct": 4.0,
-     "trigger": "回踩MA10(3.42)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标5.47或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
      "pct": 2.5,
-     "trigger": "放量突破前高(5.47)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(3.38)或MACD死叉离场"
-    }
-   ],
-   "verdict": "🟡试仓",
-   "max_loss_final": 9777,
-   "summary": "✅预算达标 | 分批合计13.0%（单票上限30%×门禁0.5）实际最大亏损≈9777元",
-   "is_new": true,
-   "from_pool": true
-  },
-  {
-   "code": "sh600792",
-   "name": "云煤能源",
-   "signal": "★ 双信号｜四维8分·双弦共振(72)",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "纠缠",
-    "month_gate": "WARN",
-    "week_trend": "多头",
-    "week_gate": "PASS",
-    "verdict": "🟡试仓",
-    "desc": "月线纠缠(WARN) / 周线多头(PASS) —— 上级周期未共振，仅可试仓(仓位×0.5)"
-   },
-   "budget": {
-    "price": 5.3,
-    "stop": 4.52,
-    "target": 5.89,
-    "rr": 0.76,
-    "pos_pct": 13.6,
-    "max_loss": 20033,
-    "status": "⚠️盈亏比不足",
-    "reason": "止损4.52(-14.7%) 目标5.89 盈亏比0.76 满仓建议13.6% 满仓最大亏损≈20033元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 3.5,
-     "trigger": "信号确认位附近(≈5.30)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标5.89止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 2.0,
-     "trigger": "回踩MA10(4.97)不破",
+     "trigger": "回踩MA10(19.06)不破",
      "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标5.89或前高止盈"
+     "exit": "到目标28.52或前高止盈"
     },
     {
      "batch": "B3右侧",
      "pct": 1.5,
-     "trigger": "放量突破前高(5.89)",
+     "trigger": "放量突破前高(28.52)",
      "note": "或上级周期转多共振",
-     "exit": "跌破MA20(4.49)或MACD死叉离场"
+     "exit": "跌破MA20(20.02)或MACD死叉离场"
     }
    ],
    "verdict": "🟡试仓",
-   "max_loss_final": 10302,
-   "summary": "⚠️盈亏比不足 | 分批合计7.0%（单票上限30%×门禁0.5）实际最大亏损≈10302元",
-   "is_new": false,
-   "from_pool": true
-  },
-  {
-   "code": "sh600880",
-   "name": "博瑞传播",
-   "signal": "★ 双信号｜四维7分·双弦共振(67)",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "纠缠",
-    "month_gate": "WARN",
-    "week_trend": "多头",
-    "week_gate": "PASS",
-    "verdict": "🟡试仓",
-    "desc": "月线纠缠(WARN) / 周线多头(PASS) —— 上级周期未共振，仅可试仓(仓位×0.5)"
-   },
-   "budget": {
-    "price": 5.08,
-    "stop": 4.58,
-    "target": 7.83,
-    "rr": 5.5,
-    "pos_pct": 20.3,
-    "max_loss": 19969,
-    "status": "✅预算达标",
-    "reason": "止损4.58(-9.8%) 目标7.83 盈亏比5.50 满仓建议20.3% 满仓最大亏损≈19969元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 5.0,
-     "trigger": "信号确认位附近(≈5.08)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标7.83止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 3.0,
-     "trigger": "回踩MA10(4.76)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标7.83或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
-     "pct": 2.0,
-     "trigger": "放量突破前高(7.83)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(4.37)或MACD死叉离场"
-    }
-   ],
-   "verdict": "🟡试仓",
-   "max_loss_final": 9843,
-   "summary": "✅预算达标 | 分批合计10.0%（单票上限30%×门禁0.5）实际最大亏损≈9843元",
-   "is_new": false,
-   "from_pool": true
-  },
-  {
-   "code": "sh601218",
-   "name": "吉鑫科技",
-   "signal": "★ 双信号｜四维7分·双弦共振(72)",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "纠缠",
-    "month_gate": "WARN",
-    "week_trend": "多头",
-    "week_gate": "PASS",
-    "verdict": "🟡试仓",
-    "desc": "月线纠缠(WARN) / 周线多头(PASS) —— 上级周期未共振，仅可试仓(仓位×0.5)"
-   },
-   "budget": {
-    "price": 5.55,
-    "stop": 5.0,
-    "target": 8.18,
-    "rr": 4.75,
-    "pos_pct": 20.1,
-    "max_loss": 20039,
-    "status": "✅预算达标",
-    "reason": "止损5.00(-10.0%) 目标8.18 盈亏比4.75 满仓建议20.1% 满仓最大亏损≈20039元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 5.0,
-     "trigger": "信号确认位附近(≈5.55)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标8.18止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 3.0,
-     "trigger": "回踩MA10(4.94)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标8.18或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
-     "pct": 2.0,
-     "trigger": "放量突破前高(8.18)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(4.72)或MACD死叉离场"
-    }
-   ],
-   "verdict": "🟡试仓",
-   "max_loss_final": 9910,
-   "summary": "✅预算达标 | 分批合计10.0%（单票上限30%×门禁0.5）实际最大亏损≈9910元",
-   "is_new": false,
-   "from_pool": true
-  },
-  {
-   "code": "sz000980",
-   "name": "众泰汽车",
-   "signal": "★ 双信号｜四维8分·双弦共振(72)",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "纠缠",
-    "month_gate": "WARN",
-    "week_trend": "多头",
-    "week_gate": "PASS",
-    "verdict": "🟡试仓",
-    "desc": "月线纠缠(WARN) / 周线多头(PASS) —— 上级周期未共振，仅可试仓(仓位×0.5)"
-   },
-   "budget": {
-    "price": 2.29,
-    "stop": 1.97,
-    "target": 4.36,
-    "rr": 6.57,
-    "pos_pct": 14.5,
-    "max_loss": 19956,
-    "status": "✅预算达标",
-    "reason": "止损1.97(-13.8%) 目标4.36 盈亏比6.57 满仓建议14.5% 满仓最大亏损≈19956元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 3.5,
-     "trigger": "信号确认位附近(≈2.29)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标4.36止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 2.0,
-     "trigger": "回踩MA10(2.10)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标4.36或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
-     "pct": 1.5,
-     "trigger": "放量突破前高(4.36)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(1.89)或MACD死叉离场"
-    }
-   ],
-   "verdict": "🟡试仓",
-   "max_loss_final": 9782,
-   "summary": "✅预算达标 | 分批合计7.0%（单票上限30%×门禁0.5）实际最大亏损≈9782元",
-   "is_new": false,
-   "from_pool": true
-  },
-  {
-   "code": "sz002172",
-   "name": "澳洋健康",
-   "signal": "★ 双信号｜四维9分·双弦共振(75)",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "纠缠",
-    "month_gate": "WARN",
-    "week_trend": "多头",
-    "week_gate": "PASS",
-    "verdict": "🟡试仓",
-    "desc": "月线纠缠(WARN) / 周线多头(PASS) —— 上级周期未共振，仅可试仓(仓位×0.5)"
-   },
-   "budget": {
-    "price": 5.28,
-    "stop": 4.42,
-    "target": 5.7,
-    "rr": 0.49,
-    "pos_pct": 12.3,
-    "max_loss": 19929,
-    "status": "⚠️盈亏比不足",
-    "reason": "止损4.42(-16.2%) 目标5.70 盈亏比0.49 满仓建议12.3% 满仓最大亏损≈19929元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 3.0,
-     "trigger": "信号确认位附近(≈5.28)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标5.70止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 2.0,
-     "trigger": "回踩MA10(4.93)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标5.70或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
-     "pct": 1.0,
-     "trigger": "放量突破前高(5.70)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(4.72)或MACD死叉离场"
-    }
-   ],
-   "verdict": "🟡试仓",
-   "max_loss_final": 9773,
-   "summary": "⚠️盈亏比不足 | 分批合计6.0%（单票上限30%×门禁0.5）实际最大亏损≈9773元",
-   "is_new": false,
-   "from_pool": true
-  },
-  {
-   "code": "sz002303",
-   "name": "美盈森",
-   "signal": "★ 双信号｜四维8分·双弦共振(72)",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "多头",
-    "month_gate": "PASS",
-    "week_trend": "多头",
-    "week_gate": "PASS",
-    "verdict": "✅放行",
-    "desc": "月线多头(PASS) + 周线多头(PASS) —— 大小周期共振，正常仓位"
-   },
-   "budget": {
-    "price": 5.7,
-    "stop": 5.06,
-    "target": 6.16,
-    "rr": 0.71,
-    "pos_pct": 17.8,
-    "max_loss": 19971,
-    "status": "⚠️盈亏比不足",
-    "reason": "止损5.06(-11.2%) 目标6.16 盈亏比0.71 满仓建议17.8% 满仓最大亏损≈19971元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 9.0,
-     "trigger": "信号确认位附近(≈5.70)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标6.16止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 5.5,
-     "trigger": "回踩MA10(5.43)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标6.16或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
-     "pct": 3.5,
-     "trigger": "放量突破前高(6.16)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(5.31)或MACD死叉离场"
-    }
-   ],
-   "verdict": "✅放行",
-   "max_loss_final": 20211,
-   "summary": "⚠️盈亏比不足 | 分批合计18.0%（单票上限30%×门禁1.0）实际最大亏损≈20211元",
+   "max_loss_final": 10549,
+   "summary": "✅预算达标 | 分批合计8.0%（单票上限30%×门禁0.5）实际最大亏损≈10549元",
    "is_new": true,
    "from_pool": true
   },
   {
    "code": "sz002836",
    "name": "新宏泽",
-   "signal": "★ 双信号｜四维6分·鱼身高阳强势+MACD空中加油+箱体突破(76)",
+   "signal": "★ 双信号｜鱼身高阳强势+MACD空中加油+箱体突破(76)·双弦共振(49)",
    "date": "2026-09-18",
    "upper": {
     "month_trend": "纠缠",
@@ -624,110 +208,6 @@
    "verdict": "🟡试仓",
    "max_loss_final": 9966,
    "summary": "✅预算达标 | 分批合计12.0%（单票上限30%×门禁0.5）实际最大亏损≈9966元",
-   "is_new": true,
-   "from_pool": true
-  },
-  {
-   "code": "sz003001",
-   "name": "中岩大地",
-   "signal": "★ 双信号｜四维9分·双弦共振(49)",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "纠缠",
-    "month_gate": "WARN",
-    "week_trend": "纠缠",
-    "week_gate": "WARN",
-    "verdict": "🟡试仓",
-    "desc": "月线纠缠(WARN) / 周线纠缠(WARN) —— 上级周期未共振，仅可试仓(仓位×0.5)"
-   },
-   "budget": {
-    "price": 20.0,
-    "stop": 17.88,
-    "target": 37.1,
-    "rr": 8.08,
-    "pos_pct": 18.9,
-    "max_loss": 20002,
-    "status": "✅预算达标",
-    "reason": "止损17.88(-10.6%) 目标37.10 盈亏比8.08 满仓建议18.9% 满仓最大亏损≈20002元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 4.5,
-     "trigger": "信号确认位附近(≈20.00)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标37.10止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 3.0,
-     "trigger": "回踩MA10(17.15)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标37.10或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
-     "pct": 2.0,
-     "trigger": "放量突破前高(37.10)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(16.60)或MACD死叉离场"
-    }
-   ],
-   "verdict": "🟡试仓",
-   "max_loss_final": 10070,
-   "summary": "✅预算达标 | 分批合计9.5%（单票上限30%×门禁0.5）实际最大亏损≈10070元",
-   "is_new": true,
-   "from_pool": true
-  },
-  {
-   "code": "sh600088",
-   "name": "中视传媒",
-   "signal": "★ 双信号｜四维7分",
-   "date": "2026-09-18",
-   "upper": {
-    "month_trend": "纠缠",
-    "month_gate": "WARN",
-    "week_trend": "多头",
-    "week_gate": "PASS",
-    "verdict": "🟡试仓",
-    "desc": "月线纠缠(WARN) / 周线多头(PASS) —— 上级周期未共振，仅可试仓(仓位×0.5)"
-   },
-   "budget": {
-    "price": 15.76,
-    "stop": 13.94,
-    "target": 19.99,
-    "rr": 2.32,
-    "pos_pct": 17.3,
-    "max_loss": 19991,
-    "status": "✅预算达标",
-    "reason": "止损13.94(-11.6%) 目标19.99 盈亏比2.32 满仓建议17.3% 满仓最大亏损≈19991元"
-   },
-   "batches": [
-    {
-     "batch": "B1底仓",
-     "pct": 4.5,
-     "trigger": "信号确认位附近(≈15.76)",
-     "note": "底分型/站上5日线确认",
-     "exit": "到目标19.99止盈"
-    },
-    {
-     "batch": "B2加仓",
-     "pct": 2.5,
-     "trigger": "回踩MA10(13.98)不破",
-     "note": "或回踩缺口/前平台企稳",
-     "exit": "到目标19.99或前高止盈"
-    },
-    {
-     "batch": "B3右侧",
-     "pct": 1.5,
-     "trigger": "放量突破前高(19.99)",
-     "note": "或上级周期转多共振",
-     "exit": "跌破MA20(12.93)或MACD死叉离场"
-    }
-   ],
-   "verdict": "🟡试仓",
-   "max_loss_final": 9816,
-   "summary": "✅预算达标 | 分批合计8.5%（单票上限30%×门禁0.5）实际最大亏损≈9816元",
    "is_new": true,
    "from_pool": true
   }
