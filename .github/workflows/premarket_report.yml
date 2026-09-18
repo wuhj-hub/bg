@@ -52,13 +52,21 @@ jobs:
           python3 quant_scripts/report_selfcheck.py --premarket "premarket_judgment_$(date +%Y-%m-%d).json" --today "$(date +%Y-%m-%d)" --alert || echo "自检发现问题(已推送报警), 不阻断流程"
 
       - name: 提交盘前预判到仓库（供复盘报告真实验证）
-        # 防阻断：提交失败不阻断后续推送
+        # 防阻断：提交失败不阻断后续推送（⚠️2026-09-18：由静默改为受控告警——judgment 断链曾致 8/12-9/3 复盘验证失真）
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
+          set +e
           python3 git_api_commit.py --msg "chore: update premarket judgment ($(date +%Y-%m-%d))" \
             premarket_judgment_latest.json "premarket_judgment_$(date +%Y-%m-%d).json" "盘前市场报告_$(date +%Y-%m-%d).md"
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::盘前预判提交失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️盘前预判提交失败&content=premarket judgment 提交失败(rc=$RC),次日复盘报告将无法验证盘前预判&template=txt" > /dev/null || true
+          fi
 
       - name: 推送盘前报告到微信
         if: always()
