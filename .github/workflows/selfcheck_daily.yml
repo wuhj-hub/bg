@@ -1,0 +1,115 @@
+name: 体系自检（数据源真实性 + 静默失败）
+
+# 补齐自检两大缺口（2026-09-18）：
+#   ① 数据源真实性 —— 原 data_guard --probe 只验「能不能拉到」（连通性），
+#      从不验「拉到的是不是对的」（数值）。本 workflow 用三源对拍补上。
+#   ② 静默失败 —— 体系原来没有任何东西审计 workflow 自身
+#      「报 success 但实际没干活」（假绿）。本 workflow 静态扫描补上。
+
+on:
+  schedule:
+    # 北京 07:00（UTC 23:00）—— 盘前自检，验证前一交易日数据可靠性
+    - cron: "0 23 * * *"
+  repository_dispatch:
+    types: [selfcheck-daily-run]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # ⚠️ 必须：提交自检产物。缺此声明 PUT 会 403 且 step 仍报 success（静默丢失）
+
+concurrency:
+  group: selfcheck-daily
+  cancel-in-progress: false
+
+jobs:
+  selfcheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 预热 westock 数据包（避免首个 kl 调用冷启动失败）
+        timeout-minutes: 3
+        run: |
+          npx -y westock-data-skillhub@1.0.3 kline sh000001 --period day --limit 5 > /dev/null 2>&1 || echo "预热未成功(非致命)"
+
+      - name: ① 数据源交叉验证（westock × 东财 × 腾讯）
+        id: cross
+        continue-on-error: true   # 受控捕获：下方显式记录 RC 并告警，非静默吞掉
+        run: |
+          set +e
+          python3 quant_scripts/cross_source_check.py --out outputs \
+            --json outputs/cross_source_latest.json > /tmp/cross.log 2>&1
+          RC=$?
+          set -e
+          tail -40 /tmp/cross.log
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+
+      - name: ② 静默失败元审计（扫 workflow 自身的假绿风险）
+        id: meta
+        continue-on-error: true   # 同上：受控捕获
+        run: |
+          set +e
+          python3 quant_scripts/silent_failure_audit.py --repo . --out outputs --strict \
+            > /tmp/meta.log 2>&1
+          RC=$?
+          set -e
+          head -40 /tmp/meta.log
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+
+      - name: 提交自检产物到仓库
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "outputs/数据源交叉验证_$(date +%Y-%m-%d).md" outputs/cross_source_latest.md 2>/dev/null || :
+          cp "outputs/静默失败审计_$(date +%Y-%m-%d).md" outputs/silent_failure_latest.md 2>/dev/null || :
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          for f in outputs/cross_source_latest.md outputs/cross_source_latest.json \
+                   outputs/silent_failure_latest.md outputs/silent_failure_audit.json; do
+            if [ -f "$f" ]; then git add "$f"; fi
+          done
+          if git diff --cached --quiet; then
+            echo "无变更"
+          else
+            git commit -m "chore: 体系自检（数据源交叉验证+静默失败审计）$(date +%Y-%m-%d)"
+            git push
+          fi
+
+      - name: 异常告警到微信
+        if: always()
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          CR="${{ steps.cross.outputs.rc }}"
+          ME="${{ steps.meta.outputs.rc }}"
+          if [ "$CR" != "0" ] || [ "$ME" != "0" ]; then
+            MSG="数据源交叉验证 rc=${CR:-?} ｜ 静默失败审计 rc=${ME:-?}"
+            curl -s "https://pushplus.plus/send" \
+              -d "token=${PUSH_TOKEN}&title=⚠️体系自检异常&content=${MSG}&template=txt" > /dev/null || echo "推送失败"
+            echo "::warning::体系自检异常 —— $MSG"
+          else
+            echo "✅ 两项自检全部通过"
+          fi
+
+      - name: 上传自检报告到盘后量化文件夹
+        if: always()
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          for f in "outputs/数据源交叉验证_$(date +%Y-%m-%d).md" \
+                   "outputs/静默失败审计_$(date +%Y-%m-%d).md"; do
+            if [ -f "$f" ]; then
+              python3 upload_ima.py --file "$f" --name "$(basename "$f")" || echo "上传失败(非致命): $f"
+            fi
+          done
