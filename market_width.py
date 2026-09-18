@@ -7,7 +7,8 @@ import csv, json, os, re, subprocess, sys, time
 from datetime import datetime
 
 POOL = "all_mainboard.csv"
-BATCH = 50        # ⚠️ 2026-09-17：100→50，runner 上大批次返回不全
+BATCH = 40        # ⚠️ 2026-09-18：50→40（对齐 beast_pool 在 runner 上 96% 成功率的 chunk）；
+                  #    即便仍丢数，下方"缺失补齐"会兜底
 OUT_DIR = "outputs"
 
 
@@ -51,6 +52,37 @@ def width_score(up_pct, strong_cnt, limitup_cnt, total):
     return round(min(100, score), 1)
 
 
+def _harvest(c, kl, chg, touched, zhaban, lianban, lianban3, lianban_cnt):
+    """把一只股票的K线并入统计（供主循环与补齐复用）"""
+    if len(kl) < 2:
+        return
+    _, c_last, h_last = kl[0]
+    _, c_prev, _ = kl[1]
+    if not (c_prev and c_prev > 0):
+        return
+    pct = (c_last - c_prev) / c_prev * 100
+    chg.append((c["code"], c["name"], round(pct, 2)))
+    limit_p = c_prev * 1.10
+    if h_last and h_last >= limit_p * 0.99:
+        touched.append(c["code"])
+        if pct < 9.8:
+            zhaban.append(c["code"])
+    days_lb = 0
+    for j in range(len(kl) - 1):
+        _, c0, _ = kl[j]
+        _, c1, _ = kl[j + 1]
+        if c1 > 0 and (c0 - c1) / c1 * 100 >= 9.8:
+            days_lb += 1
+        else:
+            break
+    if days_lb >= 1:
+        lianban_cnt[c["code"]] = days_lb
+        if days_lb >= 2:
+            lianban.append(c["code"])
+        if days_lb >= 3:
+            lianban3.append(c["code"])
+
+
 def main():
     pool = POOL
     batch = BATCH
@@ -62,11 +94,13 @@ def main():
             batch = int(argv[i + 1])
 
     rows = list(csv.DictReader(open(pool, encoding="utf-8-sig")))
-    rows = [r for r in rows if "退" not in r.get("name", "")]
+    # 过滤退市/僵尸股（2026-09-18 补 PT：PT金田A/PT中浩A 等无行情老股）
+    rows = [r for r in rows if "退" not in r.get("name", "") and not r.get("name", "").strip().startswith("PT")]
     total = len(rows)
     print(f"[INFO] 股票池 {total}只（已过滤退市）", flush=True)
 
     chg = []  # (code, name, pct)
+    lacks = []  # (chunk, missing_codes) 供缺失补齐
     touched, zhaban, lianban, lianban3 = [], [], [], []  # 涨停池代理：触板/炸板/连板(≥2)/高连板(≥3)
     lianban_cnt = {}  # code -> 连续涨停天数
     for i in range(0, total, batch):
@@ -105,7 +139,44 @@ def main():
                         if days_lb >= 3:
                             lianban3.append(c["code"])
         got = sum(1 for c in codes if len(data.get(c, [])) >= 2)
-        print(f"[{i + len(chunk)}/{total}] 已处理 本批返回 {len(data)} 只 / 有效 {got} 只", flush=True)
+        # ⚠️ 存 dict 不存 str：曾用 zip(chunk, missing) 导致"第N只缺"配成"第1只"
+        missing = [c for c in chunk
+                   if len(data.get(("sh" if c["code"].startswith("60") else "sz") + c["code"], [])) < 2]
+        print(f"[{i + len(chunk)}/{total}] 已处理 本批返回 {len(data)} 只 / 有效 {got} 只"
+              + (f" / ⚠️缺 {len(missing)} 只" if missing else ""), flush=True)
+        lacks.append((chunk, missing))
+
+    # ── 缺失补齐（2026-09-18）：runner 上 westock 批量偶发大面积丢股票。
+    # 收集所有缺数据的代码，用小批（10只）二次拉取，仍失败的再逐只补。
+    all_missing = [c for _, miss in lacks for c in miss]
+    if all_missing:
+        print(f"[补齐] 共 {len(all_missing)} 只缺数据，启动小批补偿…", flush=True)
+        fixed = 0
+        def _code(c):
+            return ("sh" if c["code"].startswith("60") else "sz") + c["code"]
+        for k in range(0, len(all_missing), 10):
+            sub = all_missing[k:k + 10]
+            txt2 = run(["kline", ",".join(_code(c) for c in sub), "--period", "day", "--limit", "10"])
+            d2 = parse_batch(txt2)
+            for c in sub:
+                kl = d2.get(_code(c), [])
+                if len(kl) >= 2:
+                    fixed += 1
+                    _harvest(c, kl, chg, touched, zhaban, lianban, lianban3, lianban_cnt)
+            print(f"  补齐进度 {min(k + 10, len(all_missing))}/{len(all_missing)}（已补回 {fixed}）", flush=True)
+        # 仍缺失的逐只兜底
+        done = {x[0] for x in chg}
+        still = [c for c in all_missing if c["code"] not in done]
+        if still:
+            print(f"[补齐] 剩余 {len(still)} 只逐只重试…", flush=True)
+            for c in still:
+                txt3 = run(["kline", _code(c), "--period", "day", "--limit", "10"], timeout=60)
+                d3 = parse_batch(txt3)
+                kl = d3.get(_code(c), [])
+                if len(kl) >= 2:
+                    fixed += 1
+                    _harvest(c, kl, chg, touched, zhaban, lianban, lianban3, lianban_cnt)
+        print(f"[补齐] 完成：补回 {fixed}/{len(all_missing)} 只，最终有效 {len(chg)} 只", flush=True)
 
     n = len(chg)
     up = [x for x in chg if x[2] > 0]
