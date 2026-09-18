@@ -101,7 +101,10 @@ def audit_workflow(path):
                    or any(h in body for h in ("hot_emotion", "market_width", "data_guard",
                                               "self_check", "market_regime", "sector_component",
                                               "gen_premarket", "gen_review"))
-        core = any(h in body for h in CORE_HINTS) and critical
+        # 受控捕获识别（2026-09-18）：步骤内已含「失败→推送告警」链路（pushplus / --alert）
+        # → 吞错误是设计意图（防阻断+主动告警），不算高危静默失败
+        alerted = bool(re.search(r"pushplus\.plus/send|--alert", body))
+        core = any(h in body for h in CORE_HINTS) and critical and not alerted
         issues.append({
             "level": "🔴高危·静默失败" if core else "🟡中危·吞错误",
             "step": f"{st['name']} (L{st['line']})",
