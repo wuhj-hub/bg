@@ -1,7 +1,7 @@
 {
  "date": "20260918",
  "verdict": "震荡市",
- "score": 0.453,
+ "score": 0.479,
  "long": {
   "score": 0.533,
   "state": "纠缠"
@@ -16,12 +16,12 @@
  },
  "width": {
   "above250": 0.249,
-  "above60": 0.539,
-  "above20": 0.32,
-  "up_ratio": 0.696
+  "above60": 0.54,
+  "above20": 0.322,
+  "up_ratio": 0.698
  },
  "emotion": {
-  "limit_up": 42,
+  "limit_up": 75,
   "limit_down": 0
  },
  "indices": [
@@ -134,5 +134,5 @@
    "短分": 0.6
   }
  ],
- "n_stocks": 2972
+ "n_stocks": 2998
 }
