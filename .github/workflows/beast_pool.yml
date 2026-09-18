@@ -45,13 +45,16 @@ jobs:
       - name: 预热 westock 数据包
         run: npx -y westock-data-skillhub@1.0.3 kline sh000001 --period day --limit 5 || true
 
-      # 候选池：优先用仓库里的 all_mainboard.csv（quant_scan 产出），缺失则回退
+      # 候选池：仓库根的 all_mainboard.csv（quant_scan 产出）
+      # ⚠️ 勿用 cp 到 /sandbox/workspace —— runner 上它是工作目录软链，会变成"复制到自身"报错
       - name: 准备候选池
         run: |
-          for f in all_mainboard.csv outputs/all_mainboard.csv; do
-            if [ -s "$f" ]; then cp "$f" /sandbox/workspace/all_mainboard.csv; echo "✅ 用 $f"; break; fi
-          done
-          ls -la /sandbox/workspace/all_mainboard.csv 2>/dev/null || echo "⚠️ 无候选池"
+          if [ -s all_mainboard.csv ]; then
+            echo "✅ 候选池就绪: $(wc -l < all_mainboard.csv) 行"
+          else
+            echo "⚠️ 无候选池，脚本将自行处理"
+          fi
+          ls -la all_mainboard.csv 2>/dev/null || true
 
       # 猛兽突破池扫描（RSV>74 且 RSV1>85 且 RSVHY>74 且 前置PV<6 且 PV3>12）
       # 输出：命中清单 + 每只的分批减仓价位（+10% / +20% / 峰值回撤5%）
