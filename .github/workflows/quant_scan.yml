@@ -71,9 +71,22 @@ jobs:
       - name: 预热westock数据包
         # ⚠️ 2026-09-15：原只预热 hot board（板块接口），未预热 kline →
         #    鱼身阶段1「上证指数K线」作为首个 kline 调用在 runner 上冷启动失败（temp=0/数据缺失）
+        # ⚠️ 2026-09-18：|| true 改受控告警——预热失败是「runner 大面积丢数据」的前兆信号
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
-          npx -y westock-data-skillhub@1.0.3 hot board --limit 3 || true
-          npx -y westock-data-skillhub@1.0.3 kline sh000001 --period day --limit 5 || true
+          set +e
+          npx -y westock-data-skillhub@1.0.3 hot board --limit 3 > /dev/null 2>&1
+          R1=$?
+          npx -y westock-data-skillhub@1.0.3 kline sh000001 --period day --limit 5 > /dev/null 2>&1
+          R2=$?
+          set -e
+          if [ "$R1" != "0" ] || [ "$R2" != "0" ]; then
+            echo "::warning::westock 预热部分失败(board=$R1, kline=$R2)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️westock预热失败&content=数据包预热失败(board=$R1,kline=$R2),本轮扫描可能大面积丢数据,请留意当日产物审计告警&template=txt" > /dev/null || true
+          else
+            echo "✅ 预热完成"
+          fi
 
       # ⚠️ 2026-09-15 顺序优化：板块映射原排在 1-2h 的主扫描之后，一遇拖延就被挤压；
       #    它本身独立（仅依赖东财接口），提前到预热后执行，既避免超时又让 hot_emotion 更早有数据。
@@ -87,9 +100,17 @@ jobs:
         # ⚠️ 2026-09-15：串行版 486 板块 >20min 被 timeout 砍（仅跑到 302 只）→
         #    脚本已改 8 并发（预计 1-2min 完成），同时把上限放宽到 40min 兜底
         timeout-minutes: 40
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
-          python3 quant_scripts/runner_fetch_em_sectors.py --out outputs/sector_component_em.json \
-            || echo "⚠️ 板块成分映射失败（非致命：hot_emotion 将退化为无题材）"
+          set +e
+          python3 quant_scripts/runner_fetch_em_sectors.py --out outputs/sector_component_em.json
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::板块成分映射失败(rc=$RC)（hot_emotion 将退化为无题材）"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️板块成分映射失败&content=runner_fetch_em_sectors 失败(rc=$RC),hot_emotion 将退化为无题材,主线判定失效&template=txt" > /dev/null || true
+          fi
           cp outputs/sector_component_em.json sector_component_em.json 2>/dev/null || true
           python3 -c "import json;d=json.load(open('outputs/sector_component_em.json'));print('板块映射:',len(d.get('sectors',{})),'板块 |',len(d.get('code_sector',{})),'只有题材')" 2>/dev/null || echo "板块映射: 无输出"
 
@@ -112,16 +133,25 @@ jobs:
 
       # ─── 第二步.1.3b：热点情绪扫描（hot_emotion 连板梯队+情绪温度+退潮预警，westock自算42s，供次日盘前②.5/②.6引用；2026-09-03接入消除手动漏跑断链）───
       - name: 热点情绪扫描（hot_emotion 连板梯队+情绪温度）
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           # 先拉取仓库根现有 history 作为累积起点（防 runner 空 history 断链/覆盖丢失，2026-09-03 修复）
           curl -sL --retry 2 "https://raw.githubusercontent.com/wuhj-hub/bg/main/hot_emotion_history.json" -o outputs/hot_emotion_history.json || echo "{}" > outputs/hot_emotion_history.json
           python3 quant_scripts/fetch_hot_kline.py --limit 25 --out outputs/hot_kline.txt --batch 100 --workers 4 --csv all_mainboard.csv
           # ⚠️ 2026-09-15：显式传 --name-file（此前未传且脚本默认路径层数错误 → 连板梯队只剩代码）
+          set +e
           python3 quant_scripts/hot_emotion.py --date "$(date +%Y-%m-%d)" --westock \
             --kline-file outputs/hot_kline.txt --end-date "$(date +%Y-%m-%d)" \
             --name-file all_mainboard.csv \
             --sector-file outputs/sector_component_em.json \
             --outdir outputs --history-file outputs/hot_emotion_history.json
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::热点情绪扫描失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️热点情绪扫描失败&content=hot_emotion 失败(rc=$RC),情绪温度/连板梯队停更&template=txt" > /dev/null || true
+          fi
           cp outputs/hot_emotion_latest.json hot_emotion_latest.json 2>/dev/null || true
           echo "情绪: $(python3 -c "import json;d=json.load(open('outputs/hot_emotion_latest.json'));print(str(d['score']['score'])+'/'+d['score']['level']+' 涨停'+str(d['total'])+' 连板'+str(d['lianban_cnt'])+' 最高'+str(d['max_lb'])+'板')" 2>/dev/null || echo '计算失败')"
 
@@ -240,24 +270,30 @@ jobs:
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
+          FAILS=0
           # 鱼身JSON+报告（原内部上传因无凭证静默失败，改为workflow统一上传）
           FISH_JSON=$(ls outputs/fish_body_enhanced_*.json 2>/dev/null | head -1)
           FISH_MD=$(ls outputs/鱼身报告_*.md 2>/dev/null | head -1)
           if [ -n "$FISH_JSON" ]; then
-            python3 upload_ima.py --file "$FISH_JSON" --name "$(basename $FISH_JSON)" || echo "鱼身JSON上传失败"
+            python3 upload_ima.py --file "$FISH_JSON" --name "$(basename $FISH_JSON)" || FAILS=$((FAILS+1))
           fi
           if [ -n "$FISH_MD" ]; then
-            python3 upload_ima.py --file "$FISH_MD" --name "$(basename $FISH_MD)" || echo "鱼身报告上传失败"
+            python3 upload_ima.py --file "$FISH_MD" --name "$(basename $FISH_MD)" || FAILS=$((FAILS+1))
           fi
           # 量化汇总JSON（盘前premarket_quant引用）
           QJSON=$(ls outputs/quant_results_$(date +%Y-%m-%d).json 2>/dev/null | head -1)
           if [ -n "$QJSON" ]; then
-            python3 upload_ima.py --file "$QJSON" --name "$(basename $QJSON)" || echo "量化汇总上传失败"
+            python3 upload_ima.py --file "$QJSON" --name "$(basename $QJSON)" || FAILS=$((FAILS+1))
           fi
           # 猛兽原始输出
           if [ -f "outputs/beast_results.txt" ]; then
-            python3 upload_ima.py --file "outputs/beast_results.txt" --name "beast_results_$(date +%Y-%m-%d).txt" || echo "猛兽输出上传失败"
+            python3 upload_ima.py --file "outputs/beast_results.txt" --name "beast_results_$(date +%Y-%m-%d).txt" || FAILS=$((FAILS+1))
+          fi
+          if [ "$FAILS" -gt 0 ]; then
+            echo "::warning::三系统原始数据上传失败 ${FAILS} 个"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️三系统数据上传失败&content=quant_scan 知识库上传失败 ${FAILS} 个文件（鱼身/猛兽/量化汇总）,盘前引用数据源可能缺失&template=txt" > /dev/null || true
           fi
 
       # ─── 第四步（原）：上传全盘量化报告到全盘量化文件夹（尽早传，用户先看到扫描结果）───
@@ -312,6 +348,7 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           cp outputs/quant_results_$(date +%Y-%m-%d).json quant_results_latest.json 2>/dev/null || cp outputs/quant_results_latest.json quant_results_latest.json 2>/dev/null || true
           # 鱼身JSON一并提交（盘前premarket_fishbody从GitHub拉取，防止知识库上传失败导致缺失）
@@ -335,6 +372,7 @@ jobs:
           cp outputs/一统天下建仓区股池_$(date +%Y-%m-%d).md 一统天下建仓区股池_latest.md 2>/dev/null || true
           if [ -f quant_results_latest.json ] || [ -f fish_body_latest.json ]; then
             # 改用 Contents API 提交（git pull/push 浅克隆+并发冲突曾导致连续失败，API 绕开）
+            set +e
             python3 git_api_commit.py --msg "chore: scan results ($(date +%Y-%m-%d))" \
               quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
               outputs/data_guard_audit_$(date +%Y-%m-%d).md \
@@ -351,6 +389,12 @@ jobs:
               pools/pool_$(date +%Y-%m).json \
               一统天下建仓区股池_latest.json 一统天下建仓区股池_latest.md yitong_pool.txt \
               sector_component_em.json
+            RC=$?
+            set -e
+            if [ "$RC" != "0" ]; then
+              echo "::warning::扫描产物提交失败(rc=$RC)"
+              curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️扫描产物提交失败&content=quant_scan git_api_commit 失败(rc=$RC),盘前报告将读到陈旧数据&template=txt" > /dev/null || true
+            fi
           fi
 
       # ─── 关键产物完整性检查（2026-08-28：任一关键步骤失败→微信告警明细）───
