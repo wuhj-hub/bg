@@ -21,12 +21,13 @@ BJ = timezone(timedelta(hours=8))
 
 SELF_SKILLS = [
     "复盘报告", "猛兽体系", "盘前市场报告", "双弦投资系统",
-    "双弦投资系统-月度股池", "鱼身", "wangbei-report", "wuwei-report",
+    # 2026-09-18 移除「双弦投资系统-月度股池」：该技能已合并入双弦投资系统并删除备份
+    "鱼身", "wangbei-report", "wuwei-report",
     "xihu-report", "bo-duan-sao-miao", "duo-wei-du", "fish-body-trading",
     "强势体系", "个人23策略股票分析技能",
 ]
 SKILLS_WITH_SCRIPTS = [  # 必须有 scripts/*.py 的技能（依据GitHub实际备份结构）
-    "猛兽体系", "盘前市场报告", "双弦投资系统", "双弦投资系统-月度股池",
+    "猛兽体系", "盘前市场报告", "双弦投资系统",
     "鱼身", "bo-duan-sao-miao", "duo-wei-du", "fish-body-trading",
 ]
 REQUIRED_QUANT = [  # quant_scripts/ 关键脚本（缺任一即告警）
