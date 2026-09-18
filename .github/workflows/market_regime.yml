@@ -48,10 +48,18 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
+          set +e
           python3 git_api_commit.py --msg "chore: market regime ($(date +%Y-%m-%d))" \
             market_regime_latest.json market_regime_latest.md \
             "outputs/市场状态判定_$(date +%Y%m%d).md"
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::market_regime 提交失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️市场状态提交失败&content=market_regime 提交失败(rc=$RC),market_regime_latest 未更新,盘前②.7环境判定将滞后&template=txt" > /dev/null || true
+          fi
 
       - name: 推送微信
         if: always()
