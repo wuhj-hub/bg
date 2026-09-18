@@ -302,9 +302,18 @@ jobs:
       - name: 乖离低买扫描（一统天下·跌破MA5>7%）
         continue-on-error: true
         timeout-minutes: 20
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
+          set +e
           python3 quant_scripts/yitong_guaili_screener.py --out outputs
+          RC=$?
+          set -e
           echo "乖离低买: $(python3 -c "import json;d=json.load(open('outputs/乖离低买_latest.json'));print(str(d['total'])+'只')" 2>/dev/null || echo '无输出')"
+          if [ "$RC" != "0" ]; then
+            echo "::warning::乖离低买扫描失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️乖离低买扫描失败&content=yitong_guaili_screener 失败(rc=$RC),乖离低买池未更新&template=txt" > /dev/null || true
+          fi
 
       # ─── 第三步.6：提交报告阶段产物（供次日盘前报告引用）───
       # ─── 市场状态判定（三级别力量）内联刷新（2026-09-14 加固）───
@@ -316,11 +325,27 @@ jobs:
         if: steps.dataguard.outputs.data_ok == 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
-          python3 quant_scripts/market_regime.py || echo "market_regime 生成失败(非致命)"
-          python3 git_api_commit.py --msg "chore: market regime ($(date +%Y-%m-%d))" \
-            market_regime_latest.json market_regime_latest.md \
-            "outputs/市场状态判定_$(date +%Y%m%d).md" || echo "market_regime 提交失败(非致命)"
+          set +e
+          python3 quant_scripts/market_regime.py
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::market_regime 生成失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️市场状态判定失败&content=market_regime 内联刷新失败(rc=$RC),market_regime_latest 停更&template=txt" > /dev/null || true
+          else
+            set +e
+            python3 git_api_commit.py --msg "chore: market regime ($(date +%Y-%m-%d))" \
+              market_regime_latest.json market_regime_latest.md \
+              "outputs/市场状态判定_$(date +%Y%m%d).md"
+            RC2=$?
+            set -e
+            if [ "$RC2" != "0" ]; then
+              echo "::warning::market_regime 提交失败(rc=$RC2)"
+              curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️市场状态提交失败&content=market_regime 提交失败(rc=$RC2),盘前②.7环境判定将滞后&template=txt" > /dev/null || true
+            fi
+          fi
 
       # ─── 股池守护：数据源故障时恢复历史股池，拒绝被空扫描覆盖（2026-09-14）───
       - name: 股池守护（数据源故障则不覆盖历史股池）
@@ -353,6 +378,7 @@ jobs:
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           cp outputs/market_style_latest.json market_style_latest.json 2>/dev/null || true
           cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
@@ -365,6 +391,7 @@ jobs:
           cp outputs/execution_cards_latest.json execution_cards_latest.json 2>/dev/null || true
           cp outputs/一统天下建仓区股池_$(date +%Y-%m-%d).json 一统天下建仓区股池_latest.json 2>/dev/null || true
           cp outputs/乖离低买_latest.json 乖离低买_latest.json 2>/dev/null || true
+          set +e
           python3 git_api_commit.py --msg "chore: report results ($(date +%Y-%m-%d))" \
             market_style_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json \
             ai_chokepoint_watch_latest.json \
@@ -375,7 +402,13 @@ jobs:
             outputs/四态胜率_$(date +%Y-%m-%d).md \
             outputs/仲裁信号日志.csv \
             outputs/data_guard_audit_$(date +%Y-%m-%d).md \
-            pools/pool_$(date +%Y-%m).json || true
+            pools/pool_$(date +%Y-%m).json
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::报告产物提交失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️报告产物提交失败&content=quant_report 报告产物 git_api_commit 失败(rc=$RC),盘前报告引用的数据可能陈旧&template=txt" > /dev/null || true
+          fi
 
       # ─── 第五.5步：自动生成复盘报告并上传（含③.5股池三阶漏斗状态引用 + 反转数值信号池）───
       - name: 自动生成复盘报告并上传
@@ -489,10 +522,20 @@ jobs:
       - name: 体系自检 — 健康评分 / 市场状态 / 异常检测
         if: always()  # 即使上传失败也执行自检
         continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           echo "🔍 体系自检开始..."
+          set +e
           python3 self_check.py --csv panhou_lianghua.csv --mainboard all_mainboard.csv --fix
-          echo "✅ 自检完成，结果写入 health_status.json"
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::体系自检执行失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️体系自检执行失败&content=self_check.py 失败(rc=$RC),健康评分未产出,盘后健康闭环中断&template=txt" > /dev/null || true
+          else
+            echo "✅ 自检完成，结果写入 health_status.json"
+          fi
 
       - name: 推送自检报告到微信
         if: always()
