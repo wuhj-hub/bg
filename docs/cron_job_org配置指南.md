@@ -78,6 +78,31 @@ Settings → 找到 "Timezone"
 | 6 | 产物入库审计 | **`artifact-audit-run`** | **06:05** | `5 6 * * *` | 盘前跑 |
 | 7 | 体系自检 | **`guard-selfcheck-run`** | **09:35** | `35 9 * * *` | 原 cron 09:30 |
 | 8 | 证据月度复核 | **`evidence-review-run`** | **每月1号 09:05** | `5 9 1 * *` | 低频，可选 |
+| 9 | **体系自检**（数据源真实性+静默失败） | **`selfcheck-daily-run`** | **07:00** | `0 7 * * *` | 🆕2026-09-18 新增，盘前先验数据可信 |
+
+### 🔍 如何自查 cron-job.org 上到底配了什么（推荐每月一次）
+
+cron-job.org 的 job 列表**看不出 event_type**（它只显示 URL，而所有 job 的 URL 都一样），
+所以判断「某个 workflow 被配了几次」要看 **GitHub Actions 的触发记录**：
+
+1. 打开 `https://github.com/wuhj-hub/bg/actions` → 左侧点某个 workflow
+2. 看每次运行的 **Event** 列：
+   - `repository_dispatch` = 由 cron-job.org 触发（外部）
+   - `schedule` = GitHub 原生 cron
+   - `workflow_dispatch` = 手动点的
+3. 统计 `repository_dispatch` 的**触发时刻**：
+   - 同一 workflow 一天出现**两个固定时刻**（如 09:35 + 09:45）→ **配重了，删掉一个**
+   - 出现非计划的时刻 → 可能是手动/其他来源，忽略
+
+> 也可以在 cron-job.org 每个 job 的 **History** 标签页看实际触发记录，
+> 标题重名时按 **Created** 时间先后区分。
+
+**已知需处理**：`market-regime-run` 实测在 09:35 与 09:45 各触发一次（配了 2 个）。
+且**时间点本身不对** —— 该 workflow 依赖收盘数据（市场宽度/涨停数），
+盘中跑出来的是不完整快照（9/18 实例：早上 09:35 判「弱势偏熊」，盘后 17:35 判「震荡市」）。
+**建议：删掉早上的两个，改配 1 个盘后 17:35。**
+
+---
 
 ### ⚠️ 优先级：前两个（1、2）最重要
 
