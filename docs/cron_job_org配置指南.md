@@ -13,6 +13,7 @@ GitHub Actions 免费版的 `schedule` cron 存在**降频、随机延迟数小�
 |---|---|
 | 丢单 | `market_regime` 9/17 未触发 |
 | 降频 | `intraday_monitor` 理论应 28 次/交易日，实测仅 4.2 次 |
+| **延迟数小时** | `guard_selfcheck` 应 09:30 → 实际 14:18（+4.8h）；`artifact_audit` 应 06:00 → 实际 07:45 |
 | 已放弃原生 cron | `quant_scan`、`premarket_report` 的 schedule **已被注释**，完全依赖外部触发 |
 
 **cron-job.org** 是免费的外部定时服务，到点后向 GitHub 发 `repository_dispatch` 事件，从而精确触发 workflow。
@@ -68,17 +69,24 @@ Settings → 找到 "Timezone"
 
 ## 四、各 Job 配置表（北京时间 + 权威事件名）
 
-| # | Job 名称（建议） | **event_type** | 建议时间（北京）| cron 表达式 | 说明 |
+> **本表于 2026-09-19 与 cron-job.org 实际配置逐项核对，为权威清单。**
+> 原生 cron 状态：**除 evidence_review / artifact_audit 外，其余全部已停用**（避免与外部触发双跑）。
+
+| # | Job 名称 | **event_type** | 运行时间（北京）| 周期 | 原生 cron |
 |---|---|---|---|---|---|
-| 1 | 盘前市场报告 | **`premarket-run`** | **06:35** | `35 6 * * 1-5` | ⚠️**原生 cron 已注释，必须配** |
-| 2 | 全盘量化扫描 | **`quant-scan-run`** | **15:05** | `5 15 * * 1-5` | ⚠️**原生 cron 已注释，必须配** |
-| 3 | 市场状态判定 | **`market-regime-run`** | **17:35** | `35 17 * * 1-5` | 与 workflow cron 17:30 错开 |
-| 4 | 涨停型王者跟踪 | **`wangzhe-track-run`** | **15:35** | `35 15 * * 1-5` | 原 cron 就是 15:35 |
-| 5 | 盘中监控 | **`intraday-monitor-run`** | **09:00-15:45 每15分** | `*/15 9-15 * * 1-5` | 见下方"高频 job 说明" |
-| 6 | 产物入库审计 | **`artifact-audit-run`** | **06:05** | `5 6 * * *` | 盘前跑 |
-| 7 | 体系自检 | **`guard-selfcheck-run`** | **09:35** | `35 9 * * *` | 原 cron 09:30 |
-| 8 | 证据月度复核 | **`evidence-review-run`** | **每月1号 09:05** | `5 9 1 * *` | 低频，可选 |
-| 9 | **体系自检**（数据源真实性+静默失败） | **`selfcheck-daily-run`** | **07:00** | `0 7 * * *` | 🆕2026-09-18 新增，盘前先验数据可信 |
+| 1 | 产物入库审计 | **`artifact-audit-run`** | 06:05 | 周一至周五 | ⚠️ 暂留（见注）|
+| 2 | 体系自检（数据源真实性+静默失败） | **`selfcheck-daily-run`** | 07:00 | 周一至周五 | 已停用 |
+| 3 | 盘前市场报告 | **`premarket-run`** | 08:00 | 周一至周五 | 已注释 |
+| 4 | guard备份自检 | **`guard-selfcheck-run`** | 09:35 | 周一至周五 | 已停用 |
+| 5 | 盘中监控 | **`intraday-monitor-run`** | 09:00–15:45 每15分 | 周一至周五 | 已停用 |
+| 6 | 全盘量化扫描 | **`quant-scan-run`** | 15:05 | 周一至周五 | 已注释 |
+| 7 | 涨停型王者跟踪 | **`wangzhe-track-run`** | 15:35 | 周一至周五 | 已停用 |
+| 8 | 猛兽突破池扫描 | **`beast-pool-run`** | 16:00 | 周一至周五 | 已停用 |
+| 9 | 市场状态判定 | **`market-regime-run`** | 17:35 | 周一至周五 | 已停用 |
+| 10 | 证据月度复核 | **`evidence-review-run`** | 每月1号 09:05 | 每月 | 保留（低频无妨）|
+
+> **注｜artifact_audit 为何暂留原生 cron**：它 06:05 触发，而原生 cron 06:00（延迟到 07:45）——
+> 两条通道并存期间保持原生兜底，等 cron-job.org 稳定运行 1-2 周后再注释。
 
 ### 🔍 如何自查 cron-job.org 上到底配了什么（推荐每月一次）
 
@@ -201,17 +209,92 @@ GitHub Actions 运行记录里有个 **event 字段**：
 | 5 | **PAT 过期** | 401 | 换新 token |
 | 6 | **URL 写成 `.../actions/workflows/xxx/dispatches`** | 404 | 正确是 `.../repos/{owner}/{repo}/dispatches` |
 | 7 | 高频 job 触发太多 | cron-job.org 限额提示 | 降频到 30 分钟 |
+| 8 | **换新 token 后未同步到所有 job** | 部分 job 401（其余正常）| 逐个 TEST RUN 排查，见 §9.3 |
+| 9 | **204 但 workflow 没跑** | 界面绿勾、GitHub 无记录 | event_type 拼写错，见 §9.2 |
+| 10 | **周期配成"每天"** | 周末空跑（全盘扫描 2.5h/次）| 改成周一至周五 |
 
 ---
 
 ## 八、当前状态备忘
 
-截至 2026-09-18：
+截至 2026-09-19：
 
-- ✅ 8 个 workflow 均已具备 `repository_dispatch` 通道（9/17 补齐 guard_selfcheck + evidence_review）
-- ✅ 通道已验证可用（手动 POST 可触发成功）
-- ⏳ **待完成**：cron-job.org 侧配置（用户操作中）
+- ✅ **cron-job.org 已建 10 个 job**，覆盖全部需要定时的 workflow
+- ✅ **5 个已验证有效**（GitHub 有 `repository_dispatch` 记录）：盘中监控、盘前市场报告、全盘量化扫描、市场状态判定、产物入库审计
+- ✅ **原生 cron 已停用 6 个**：guard_selfcheck / intraday_monitor / wangzhe_track / beast_pool / market_regime / selfcheck_daily
+- ⏳ **暂留原生 cron 1 个**：artifact_audit（双通道观察期）
+- ✅ **Token 已设为永久有效**（响应头无 `token-expiration` 字段）
+- ✅ **Job 周期已统一为周一至周五**（A股交易日相关）
+- ⏳ **待自然验证**：体系自检 / guard自检 / 王者跟踪 / 猛兽池（周一触发时核对）
 
 ---
 
-*本指南基于仓库内 9 个 workflow 的实际配置提取，事件名与 cron 值为权威值。*
+## 九、定期维护清单（每月核对一次）
+
+> 下面这几项**在 cron-job.org 界面上完全看不出来**（job 永远显示绿勾），
+> 只能主动去查。建议每月 1 号花 5 分钟过一遍。
+
+### 9.1 🔴 Token 有效期（最隐蔽 —— 曾差点导致全线瘫痪）
+
+**症状**：token 到期后**所有 job 集体 401**，但界面仍显示绿勾，极难定位。
+
+**检查方法**：任一 job → **TEST RUN** → 弹窗点 **DETAILS** → **RESPONSE** 标签，看响应头：
+
+```
+github-authentication-token-expiration: 2026-09-20 14:25:57 UTC
+```
+
+| 情况 | 含义 | 动作 |
+|---|---|---|
+| **有**该字段 | token 有到期日 | 记下日期，**到期前更新** |
+| **无**该字段 | ✅ 永久有效 | 无需处理 |
+
+> **真实案例（2026-09-19）**：配置时 token 误选 1 天有效期，响应头显示次日即过期。
+> 若未察觉，**周一全部 job 会 401**。现已改为**永久有效**。
+> 教训：配置时若手滑选了短有效期，界面毫无提示，只有翻响应头才能发现。
+
+### 9.2 触发记录双向核对（防止 event_type 写错）
+
+**症状**：cron-job.org 显示 `204 Successful` + 绿勾，但 GitHub **什么都没发生**。
+
+**原因**：GitHub dispatches API 对**任何** event_type 都回 204，即使没有 workflow 监听。
+拼错一个字符（如漏掉 `-run` 后缀）就是这种"假成功"。
+
+**核对方法**（两边记录对起来看）：
+
+1. **cron-job.org**：每个 job 的 **History** → 记下 `Executed` 时刻
+2. **GitHub**：`https://github.com/wuhj-hub/bg/actions/workflows/{name}.yml` → 看 **Event** 列
+3. **两边对不上 = body 写错了**
+
+### 9.3 Token 轮换 SOP（换 token 的连带影响）
+
+**⚠️ 重新生成 token 会立即作废旧的**，而 token 存在多处，必须同步：
+
+| 存放位置 | 数量 | 更新方式 |
+|---|---|---|
+| **cron-job.org 的每个 job** | 10 个 | 逐个 EDIT → HEADERS → 改 `Authorization` |
+| **沙箱/本地脚本环境变量** | 1 处 | 重设 `GITHUB_TOKEN` |
+| GitHub Actions 自身 | — | 一般不受影响（用 `github.token`）|
+
+**轮换后必做**：对每个 job 点一次 **TEST RUN**，确认返回 **204**（不是 401）。
+
+> 案例（2026-09-19）：换 token 后沙箱立即 401，因为环境变量还是旧值 —— 这类"单点未同步"很常见。
+
+### 9.4 重复 job 检查
+
+同一 workflow 配了 2 个 job → 一天触发多次。
+（曾发生：`market-regime-run` 在 09:35 与 09:45 各触发一次）
+
+**检查方法**：见第四章「🔍 如何自查 cron-job.org 上到底配了什么」。
+
+### 9.5 时间与周期检查
+
+| 项 | 正确值 | 错误后果 |
+|---|---|---|
+| **Timezone** | `Asia/Shanghai` | 不改 → 凌晨触发 |
+| **周期（A股相关）** | 周一至周五 | 配成"每天" → 周末空跑（全盘扫描 2.5h/次，严重浪费额度）|
+
+---
+
+*本指南基于仓库内 14 个 workflow 的实际配置提取，事件名与 cron 值为权威值。*
+*最后核对：2026-09-19*
