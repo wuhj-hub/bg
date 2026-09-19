@@ -7,9 +7,10 @@ name: 产物入库审计
 # 并把「被消费方读取却没提交」的列为高危告警。
 
 on:
-  schedule:
-    # 每日 06:00 北京（UTC 22:00），在盘后链路跑完之后、盘前之前
-    - cron: '0 22 * * *'
+  # ⚠️ 2026-09-19：原生 cron 已停用 —— 避免与 cron-job.org 双重触发（原生实测延迟 2-8h 不可靠，外部触发为准；如需回退删掉下方 # 即可）
+#  schedule:
+#    # 每日 06:00 北京（UTC 22:00），在盘后链路跑完之后、盘前之前
+#    - cron: '0 22 * * *'
   repository_dispatch:
     types: [artifact-audit-run]
   workflow_dispatch:
