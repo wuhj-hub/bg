@@ -182,7 +182,7 @@ def get_board_moves():
             moves.append({"name": name, "zdf": zdf_f})
     return moves
 
-def fetch_wangzhe_signals():
+def fetch_wangzhe_signals(date=None):
     """王者封板扫描（v2.0）：东财涨停池单请求 → 筛「首板+换手>5%+价<10元+未炸板」
 
     回测依据（bt_filters.py，2015-2026，13706 样本）：
@@ -191,7 +191,7 @@ def fetch_wangzhe_signals():
     东财涨停池字段：lbc连板数 / hs换手率 / zbc炸板次数 / fbt首次封板 / hybk行业
     """
     import urllib.request
-    date = datetime.now(BJT).strftime("%Y%m%d")
+    date = date or datetime.now(BJT).strftime("%Y%m%d")   # 可传参便于回测/复现
     url = ("https://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989"
            f"&dpt=wz.ztzt&Pageindex=0&pagesize=300&sort=fbt%3Aasc&date={date}")
     try:
@@ -217,10 +217,17 @@ def fetch_wangzhe_signals():
             continue                                  # 仅沪深主板
         if "ST" in name.upper():
             continue
-        if lbc != 1 or hs <= 5 or price > MAX_PRICE or zbc > 0:
-            continue                                  # 王者封板四条件（含价格上限）
+        if lbc != 1 or hs <= 5 or zbc > 0:
+            continue                                  # 首板+换手>5%+未炸板
+        # ⚠️ 2026-09-19 价格门槛复议：由「硬性排除」改为「分档标注」
+        #    回测（29732 样本，2016-2026）：≤10元 10日超额 +0.64% vs >10元 +0.16%（全样本略优），
+        #    但**分年度 8 年中 4 年反向**（2020/2022/2025/2026 年 >10元更优）→ 门槛不稳健；
+        #    且 10-15 元档 5526 样本平均超额仅 +0.01%、中位 -1.39%，仅 3.7% 样本超额>30%
+        #    → 硬排除会系统性漏掉该档里的少数极端机会（如闽东电力 10.43 起涨 +77%）。
+        #    故：tier=core（≤10元，主推）/ tier=ref（>10元，仅列示参考，不硬砍）。
         out.append({"code": code, "name": name, "price": price,
-                    "turnover": round(hs, 2), "fbt": fbt, "hybk": it.get("hybk", "")})
+                    "turnover": round(hs, 2), "fbt": fbt, "hybk": it.get("hybk", ""),
+                    "tier": "core" if price <= MAX_PRICE else "ref"})
     out.sort(key=lambda x: x["fbt"])
     return out
 
@@ -317,13 +324,13 @@ def main():
             seen.add(code)
             unique_pool.append((code, name))
 
-    log(f"监控池: {len(unique_pool)} 只 | 价格上限: {MAX_PRICE:.2f} 元")
+    log(f"监控池: {len(unique_pool)} 只 | 王者信号价格分档线: {MAX_PRICE:.2f} 元（不再硬筛监控池）")
 
     # ── 【v2.0 主推】王者封板扫描（首板+换手>5%+价<10元+未炸板）──
     pushed = load_pushed()
     wz_all = fetch_wangzhe_signals()
     wz_new = [w for w in wz_all if f"{w['code']}_{w['fbt']}" not in pushed]
-    log(f"王者封板: 全市场涨停池命中 {len(wz_all)} 只，新增 {len(wz_new)} 只")
+    log(f"王者封板: 全市场涨停池命中 {len(wz_all)} 只（主推 {sum(1 for w in wz_all if w.get('tier')!='ref')} / 门槛外 {sum(1 for w in wz_all if w.get('tier')=='ref')}），新增 {len(wz_new)} 只")
 
     # ── 板块异动检测 ──
     board_moves = get_board_moves()
@@ -337,16 +344,14 @@ def main():
         daily = fetch_daily(code)
         if not daily:
             continue
-        # ⚠️ 2026-09-16 价格上限预筛：昨收已超上限的标的直接跳过（省一次分时调用）
-        if daily.get("prev_close", 0) > MAX_PRICE:
-            continue
+        # ⚠️ 2026-09-19：移除监控池的价格上限预筛。
+        #    原因：监控池含 CORE/持仓/仲裁TOP5，按价格跳过会让「>10元 持仓股」的
+        #    破位预警(跌破MA20)、大涨大跌异动全部失效 —— 风控功能不应受选股价格门槛影响。
+        #    价格门槛仅保留在「王者封板信号」的 tier 标注上（见 fetch_wangzhe_signals）。
         minute = fetch_minute(code)
         if not minute:
             continue
         price = minute["price"]
-        # ⚠️ 2026-09-16：现价复核（防止盘中跳涨突破上限后仍被推送）
-        if price > MAX_PRICE:
-            continue
         zdf = (price - daily["prev_close"]) / daily["prev_close"] * 100 if daily["prev_close"] else 0
 
         # 【v2.0】突破MA20 已移除：回测 5日超额 -0.42%、胜率49%（负贡献），改由王者封板信号替代
@@ -368,14 +373,24 @@ def main():
 
     # 构建推送内容（限制9000字符）
     content_lines = [f"# ⚡ 盘中监控 {now.strftime('%H:%M')}",
-                     f"> 预警范围：价格 ≤ {MAX_PRICE:.0f} 元"]
-    if wz_new:
-        content_lines.append("\n## 👑 王者封板信号（首板+换手>5%+价<10元）")
+                     f"> 王者信号主推区：价格 ≤ {MAX_PRICE:.0f} 元（>该值另列参考）；监控池不受价格限制"]
+    wz_core = [w for w in wz_new if w.get("tier") != "ref"]
+    wz_ref = [w for w in wz_new if w.get("tier") == "ref"]
+    if wz_core:
+        content_lines.append(f"\n## 👑 王者封板信号（首板+换手>5%+价≤{MAX_PRICE:.0f}元）")
         content_lines.append("> 持有周期 **5日**（回测5日超额+0.89%/胜率56.1%，10日衰减）")
-        for w in wz_new[:20]:
+        for w in wz_core[:20]:
             t = f"{w['fbt']//10000:02d}:{w['fbt']//100%100:02d}" if w["fbt"] else "--:--"
             content_lines.append(
                 f"👑 **{w['name']}**({w['code']}) {w['price']:.2f}元 换手{w['turnover']:.1f}% "
+                f"封板{t} · {w['hybk']}")
+    if wz_ref:
+        content_lines.append(f"\n## 📎 门槛外参考（价>{MAX_PRICE:.0f}元，同形态，仅列示不主推）")
+        content_lines.append("> 统计上该档位不优于门槛内（8年中4年反向），列出仅为避免信息盲区")
+        for w in wz_ref[:10]:
+            t = f"{w['fbt']//10000:02d}:{w['fbt']//100%100:02d}" if w["fbt"] else "--:--"
+            content_lines.append(
+                f"· {w['name']}({w['code']}) {w['price']:.2f}元 换手{w['turnover']:.1f}% "
                 f"封板{t} · {w['hybk']}")
     if board_moves:
         content_lines.append("\n## 📊 板块异动")
