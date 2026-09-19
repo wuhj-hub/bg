@@ -7,9 +7,10 @@ name: 体系自检（数据源真实性 + 静默失败）
 #      「报 success 但实际没干活」（假绿）。本 workflow 静态扫描补上。
 
 on:
-  schedule:
-    # 北京 07:00（UTC 23:00）—— 盘前自检，验证前一交易日数据可靠性
-    - cron: "0 23 * * *"
+  # ⚠️ 2026-09-19：原生 cron 已停用 —— 避免与 cron-job.org 双重触发（原生实测延迟 2-8h 不可靠，外部触发为准；如需回退删掉下方 # 即可）
+#  schedule:
+#    # 北京 07:00（UTC 23:00）—— 盘前自检，验证前一交易日数据可靠性
+#    - cron: "0 23 * * *"
   repository_dispatch:
     types: [selfcheck-daily-run]
   workflow_dispatch: {}
