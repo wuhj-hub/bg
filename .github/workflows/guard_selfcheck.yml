@@ -1,9 +1,10 @@
 name: guard备份自检
 
 on:
-  schedule:
-    # 北京时间 09:30（UTC 01:30），每日检查备份完整性（避开15:30全盘扫描）
-    - cron: "30 1 * * *"
+  # ⚠️ 2026-09-19：原生 cron 已停用 —— 避免与 cron-job.org 双重触发（原生实测延迟 2-8h 不可靠，外部触发为准；如需回退删掉下方 # 即可）
+#  schedule:
+#    # 北京时间 09:30（UTC 01:30），每日检查备份完整性（避开15:30全盘扫描）
+#    - cron: "30 1 * * *"
   repository_dispatch:
     types: [guard-selfcheck-run]
   workflow_dispatch: {}
