@@ -1,9 +1,10 @@
 name: 涨停型王者跟踪
 
 on:
-  schedule:
-    # 交易日盘后 15:35（北京）= UTC 07:35。⚠️ GitHub 免费版 cron 会降频/延迟 → 以 dispatch 为主通道
-    - cron: '35 7 * * 1-5'
+  # ⚠️ 2026-09-19：原生 cron 已停用 —— 避免与 cron-job.org 双重触发（原生实测延迟 2-8h 不可靠，外部触发为准；如需回退删掉下方 # 即可）
+#  schedule:
+#    # 交易日盘后 15:35（北京）= UTC 07:35。⚠️ GitHub 免费版 cron 会降频/延迟 → 以 dispatch 为主通道
+#    - cron: '35 7 * * 1-5'
   repository_dispatch:
     types: [wangzhe-track-run]
   workflow_dispatch:
