@@ -1,21 +1,21 @@
-# 🔍 体系自检元审计 · 2026-09-19
+# 🔍 体系自检元审计 · 2026-09-20
 
-> 扫描 14 个 workflow ｜ 风险项 **81** ｜ 🔴高危 **0**
+> 扫描 14 个 workflow ｜ 风险项 **88** ｜ 🔴高危 **0**
 
-## 🟡中危·吞错误（79）
+## 🟡中危·吞错误（80）
 
 - artifact_audit.yml :: 运行产物入库审计 (L33) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
 - artifact_audit.yml :: 提交审计报告 (L53) — 命中 2>/dev/null（屏蔽 stderr）, || true
-- beast_pool.yml :: 预热 westock 数据包 (L45) — 命中 || true
-- beast_pool.yml :: 准备候选池 (L50) — 命中 2>/dev/null（屏蔽 stderr）, || true
-- beast_pool.yml :: 提交产物 (L66) — 命中 set +e, || true
+- beast_pool.yml :: 预热 westock 数据包 (L46) — 命中 || true
+- beast_pool.yml :: 准备候选池 (L51) — 命中 2>/dev/null（屏蔽 stderr）, || true
+- beast_pool.yml :: 提交产物 (L67) — 命中 set +e, || true
 - evidence_review.yml :: 生成 evidence 复核工作单 (L26) — 命中 || echo（吞错误）, || true
 - evidence_review.yml :: 提交工作单到仓库（outputs/） (L38) — 命中 continue-on-error: true
 - evidence_review.yml :: PushPlus 推送复核提醒（含待复核/过期统计） (L70) — 命中 continue-on-error: true, || echo（吞错误）
-- guard_selfcheck.yml :: IMA 凭证预检（失效/疑似过期立即微信告警） (L31) — 命中 continue-on-error: true, || true
-- guard_selfcheck.yml :: 上传自检报告到盘后量化文件夹（供查阅） (L43) — 命中 continue-on-error: true, || echo（吞错误）
-- intraday_monitor.yml :: 开盘八法强形态扫描+突破监控 (L93) — 命中 continue-on-error: true
-- market_regime.yml :: 提交判定结果到仓库 (L47) — 命中 continue-on-error: true, set +e, || true
+- guard_selfcheck.yml :: IMA 凭证预检（失效/疑似过期立即微信告警） (L32) — 命中 continue-on-error: true, || true
+- guard_selfcheck.yml :: 上传自检报告到盘后量化文件夹（供查阅） (L44) — 命中 continue-on-error: true, || echo（吞错误）
+- intraday_monitor.yml :: 开盘八法强形态扫描+突破监控 (L94) — 命中 continue-on-error: true
+- market_regime.yml :: 提交判定结果到仓库 (L48) — 命中 continue-on-error: true, set +e, || true
 - premarket_report.yml :: 生成盘前市场报告 (L45) — 命中 || echo（吞错误）
 - premarket_report.yml :: 提交盘前预判到仓库（供复盘报告真实验证） (L54) — 命中 continue-on-error: true, set +e, || true
 - probe_em.yml :: 东财板块接口参数探测（找可用 fs/ 端点） (L21) — 命中 continue-on-error: true
@@ -63,47 +63,54 @@
 - quant_scan.yml :: 断档分歧板块择时信号 (L175) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true
 - quant_scan.yml :: 123/2B/ABC反转信号扫描 (L183) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
 - quant_scan.yml :: RSV相对强度扫描 (L191) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
-- quant_scan.yml :: 月线MACD监控 (L199) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true
-- quant_scan.yml :: 市场见顶五维监测（top_signal） (L206) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
-- quant_scan.yml :: 量学扫描（黑马王子体系，与曾星智月线闸门同级） (L215) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
-- quant_scan.yml :: 量学×月线联合输出（月线多头∩量学PASS） (L223) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
-- quant_scan.yml :: 量学PASS分时量波验证（人线偏离检测） (L231) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
-- quant_scan.yml :: 分时强度分析（信号股分时MACD） (L239) — 命中 continue-on-error: true
-- quant_scan.yml :: 板块资金共振（本地复算·无外部依赖） (L244) — 命中 continue-on-error: true
-- quant_scan.yml :: 一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） (L261) — 命中 continue-on-error: true
-- quant_scan.yml :: 上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源） (L266) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true
-- quant_scan.yml :: 上传全盘量化报告到全盘量化文件夹 (L300) — 命中 || true
-- quant_scan.yml :: 扫描产物可信度审计 (L332) — 命中 continue-on-error: true, set +e, || true
-- quant_scan.yml :: 提交扫描产物到仓库（供盘前引用/报告workflow读取） (L347) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
-- quant_scan.yml :: 关键扫描产物检查（缺失即告警） (L401) — 命中 continue-on-error: true, || true
-- selfcheck_daily.yml :: 预热 westock 数据包（避免首个 kl 调用冷启动失败） (L37) — 命中 || echo（吞错误）
-- selfcheck_daily.yml :: ① 数据源交叉验证（westock × 东财 × 腾讯） (L42) — 命中 continue-on-error: true, set +e
-- selfcheck_daily.yml :: ② 静默失败元审计（扫 workflow 自身的假绿风险） (L54) — 命中 continue-on-error: true, set +e
-- selfcheck_daily.yml :: 提交自检产物到仓库 (L66) — 命中 2>/dev/null（屏蔽 stderr）
-- selfcheck_daily.yml :: 异常告警到微信 (L85) — 命中 || echo（吞错误）
-- selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L101) — 命中 continue-on-error: true, || echo（吞错误）
-- wangzhe_track.yml :: 才哥公众号文章跟踪 (L55) — 命中 continue-on-error: true
+- quant_scan.yml :: 西湖-RSV 多周期相对强度扫描（全市场） (L199) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
+- quant_scan.yml :: 月线MACD监控 (L210) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true
+- quant_scan.yml :: 市场见顶五维监测（top_signal） (L217) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
+- quant_scan.yml :: 量学扫描（黑马王子体系，与曾星智月线闸门同级） (L226) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
+- quant_scan.yml :: 量学×月线联合输出（月线多头∩量学PASS） (L234) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
+- quant_scan.yml :: 量学PASS分时量波验证（人线偏离检测） (L242) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
+- quant_scan.yml :: 分时强度分析（信号股分时MACD） (L250) — 命中 continue-on-error: true
+- quant_scan.yml :: 板块资金共振（本地复算·无外部依赖） (L255) — 命中 continue-on-error: true
+- quant_scan.yml :: 一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） (L272) — 命中 continue-on-error: true
+- quant_scan.yml :: 上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源） (L277) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true
+- quant_scan.yml :: 上传全盘量化报告到全盘量化文件夹 (L311) — 命中 || true
+- quant_scan.yml :: 扫描产物可信度审计 (L343) — 命中 continue-on-error: true, set +e, || true
+- quant_scan.yml :: 提交扫描产物到仓库（供盘前引用/报告workflow读取） (L358) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
+- quant_scan.yml :: 关键扫描产物检查（缺失即告警） (L413) — 命中 continue-on-error: true, || true
+- selfcheck_daily.yml :: 预热 westock 数据包（避免首个 kl 调用冷启动失败） (L38) — 命中 || echo（吞错误）
+- selfcheck_daily.yml :: ① 数据源交叉验证（westock × 东财 × 腾讯） (L43) — 命中 continue-on-error: true, set +e
+- selfcheck_daily.yml :: ② 静默失败元审计（扫 workflow 自身的假绿风险） (L55) — 命中 continue-on-error: true, set +e
+- selfcheck_daily.yml :: 提交自检产物到仓库 (L67) — 命中 2>/dev/null（屏蔽 stderr）
+- selfcheck_daily.yml :: 异常告警到微信 (L86) — 命中 || echo（吞错误）
+- selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L102) — 命中 continue-on-error: true, || echo（吞错误）
+- wangzhe_track.yml :: 才哥公众号文章跟踪 (L56) — 命中 continue-on-error: true
 
-## 🟡中危·依赖外部 cron（2）
+## 🟡中危·依赖外部 cron（8）
 
+- beast_pool.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
+- guard_selfcheck.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
+- intraday_monitor.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
+- market_regime.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - premarket_report.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - quant_scan.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
+- selfcheck_daily.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
+- wangzhe_track.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 
 ## 各 workflow 静默失败热点
 
 | workflow | 风险数 | 高危 |
 |---|---|---|
 | artifact_audit.yml | 2 | — |
-| beast_pool.yml | 3 | — |
+| beast_pool.yml | 4 | — |
 | evidence_review.yml | 3 | — |
-| guard_selfcheck.yml | 2 | — |
-| intraday_monitor.yml | 1 | — |
-| market_regime.yml | 1 | — |
+| guard_selfcheck.yml | 3 | — |
+| intraday_monitor.yml | 2 | — |
+| market_regime.yml | 2 | — |
 | premarket_report.yml | 3 | — |
 | probe_em.yml | 5 | — |
 | probe_kpl.yml | 0 | — |
 | probe_search.yml | 0 | — |
 | quant_report.yml | 29 | — |
-| quant_scan.yml | 25 | — |
-| selfcheck_daily.yml | 6 | — |
-| wangzhe_track.yml | 1 | — |
+| quant_scan.yml | 26 | — |
+| selfcheck_daily.yml | 7 | — |
+| wangzhe_track.yml | 2 | — |
