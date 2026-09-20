@@ -1,6 +1,6 @@
 ---
 name: xihu-report
-description: 西湖区的孩纸 · 三重滤网扫描报告生成器。基于"大周期找趋势，小周期找买点"策略，扫描A股执行三重滤网系统（周线MACD>0轴→日线均线支撑买点→综合评分），生成结构化报告。当用户说"西湖区的孩子""三重滤网""大周期找趋势""小周期找买点""西湖区的孩纸""扫描三重滤网"时触发。不适用于长线价值投资、基金分析、非A股市场。
+description: 西湖区的孩纸 · 三重滤网扫描报告生成器。基于"大周期找趋势，小周期找买点"策略，扫描A股执行三重滤网系统（周线MACD>0轴→日线均线支撑买点→综合评分），生成结构化报告。同时内置「西湖-RSV 多周期相对强度模型」（猛兽框架×西湖方法，RSV50/144/250 + 共振）。当用户说"西湖区的孩子""三重滤网""大周期找趋势""小周期找买点""西湖区的孩纸""扫描三重滤网""西湖RSV""西湖-RSV""多周期相对强度"时触发。不适用于长线价值投资、基金分析、非A股市场。
 ---
 
 # 西湖区的孩纸 · 三重滤网扫描报告
@@ -127,3 +127,62 @@ python3 /sandbox/workspace/skills/ima-knowledge/scripts/upload_file.py \
 3. **结果文件** — `~/.xihu_cache/scan_result.json`，脚本自动覆盖
 4. **报告存放** — 工作区 `/sandbox/workspace/outputs/` 目录下
 5. **数据来源** — 腾讯自选股行情数据接口 (westock-data)
+
+---
+
+## 🏔️ 西湖-RSV 多周期相对强度模型（猛兽框架 × 西湖方法）
+
+> 2026-09-20 新增。以**猛兽体系框架为核心**（数据层/RSV体质/评分层/输出层），以**西湖框架为方法论**（多周期相对强度 + 新高能力 + 第二阶段 + 周线闸门）。
+
+### 模型定义
+
+```
+RSV1(N) = (C - LLV(L,N)) / (HHV(H,N) - LLV(L,N)) × 100      # 价格在N日区间的位置
+RSV2(N) = (RS - min(RS,N)) / (max(RS,N) - min(RS,N)) × 100  # 相对基准强度位置, RS=C/中证全指
+RSV(N)  = (RSV1 + RSV2) / 2                                   # 单周期相对强度 0-100
+CRS     = 0.25·RSV50 + 0.35·RSV144 + 0.40·RSV250             # 综合相对强度（趋势派偏长周期）
+结构分  = 100×(0.40·强势股 + 0.35·第二阶段 + 0.25·站上50日线)
+Score   = 0.80·CRS + 0.20·结构分                             # 0-100
+```
+
+- **基准**：中证全指 `sh000985`（对齐猛兽体系主基准）
+- **周期**：50 / 144 / 250（对齐西湖 RPS 三周期）
+- **共振层级**：三周期均≥85 = 🔥三周期共振 / ≥2周期 = ⚡双周期共振 / 一周期 = ·单周期强
+- **RSV2 双口径**：`rel`（相对基准时序位置，默认）/ `cross`（全市场横截面RPS排名）
+
+### 命令用法
+
+```bash
+# 全市场扫描（默认，读 all_mainboard.csv，仅沪深主板，剔除ST）
+python3 quant_scripts/xihu_rsv.py --top 30 \
+  --json outputs/xihu_rsv_latest.json \
+  --report "outputs/西湖RSV全市场_$(date +%Y-%m-%d).md"
+
+# 横截面RPS模式（RSV2 换为全市场N日涨幅排名百分位）
+python3 quant_scripts/xihu_rsv.py --top 30 --rsv2-mode cross
+
+# 指定标的
+python3 quant_scripts/xihu_rsv.py --stocks sh600519,sz000993
+
+# 独立计算横截面RPS
+python3 quant_scripts/rps.py --top 30 --json outputs/rps_latest.json
+```
+
+### 输出
+
+- JSON：`{date, bench, periods, total, top:[{code,name,close,rsv50,rsv144,rsv250,crs,structure,score,rating,resonance,weekly_gate}]}`
+- 报告：`outputs/西湖RSV全市场_{date}.md`（TOP榜单表 + 分布统计）
+
+### 体系融合
+
+- **猛兽 `beast_screener.py`**：Setup ⑦项已接入（`RSVA(3)+SSV(3)+RSL(2)+西湖RSV(2)`，总上限10）；领先股表新增「西湖R」列；函数 `calc_xihu_rsv()`
+- **盘前报告**：③.5b「西湖-RSV 多周期相对强度」节（`gen_premarket_report.py`）
+- **每日自动**：`quant_scan.yml` 盘后扫描步骤「西湖-RSV 多周期相对强度扫描（全市场）」
+
+### 验证锚点（2026-09-18 数据）
+
+| 标的 | RSV50 | RSV144 | RSV250 | CRS | 共振 |
+|---|---|---|---|---|---|
+| 闽东电力 | 99.2 | 99.2 | 99.2 | 99.2 | 🔥三周期共振 |
+| 招商银行 | 73.6 | 83.3 | 81.6 | 80.2 | ○三周期偏强 |
+| 贵州茅台 | 36.8 | 41.1 | 35.1 | 37.6 | — |
