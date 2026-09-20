@@ -593,6 +593,14 @@ def gen_report(today_str):
     except Exception as e:
         lines.append(f"- 一统天下RSV50：读取失败({e})")
 
+    # ③.5b 西湖-RSV 多周期相对强度（猛兽框架×西湖方法，全市场）
+    try:
+        _xr = render_xihu_rsv()
+        if _xr:
+            lines.append(_xr)
+    except Exception as e:
+        lines.append(f"- 西湖-RSV：读取失败({e})")
+
     # ③.6 一统天下·乖离低买（20年验证唯一6/6环境全显著正）
     try:
         _gl = render_guaili()
@@ -858,6 +866,40 @@ def render_yitong_rsv50():
             f"{r['name']}({r['code'][2:]})" for r in top))
     L.append(f"- 统计：建仓区{len(rs)}只 | RSV50强度{len(stg)}只 | 双共振{len(dual)}只")
     L.append("\n> 数据源：一统天下建仓区股池（yitong_screener·盘后产出）")
+    return "\n".join(L)
+
+
+def read_xihu_rsv():
+    """读西湖-RSV多周期相对强度（xihu_rsv_latest.json，全市场扫描），失败返回None"""
+    for p in ("xihu_rsv_latest.json", "outputs/xihu_rsv_latest.json",
+              "../outputs/xihu_rsv_latest.json",
+              "/sandbox/workspace/outputs/xihu_rsv_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def render_xihu_rsv():
+    """③.5b 西湖-RSV 多周期相对强度（猛兽框架×西湖方法，全市场50/144/250，缺数据返回None）"""
+    d = read_xihu_rsv()
+    if not d or not d.get("top"):
+        return None
+    top = d["top"]
+    res = [r for r in top if "三周期共振" in (r.get("resonance") or "")]
+    strong = [r for r in top if (r.get("score") or 0) >= 85]
+    L = ["\n### ③.5b 🏔️ 西湖-RSV 多周期相对强度（猛兽框架×西湖方法·全市场50/144/250）"]
+    L.append("")
+    if res:
+        L.append("- 🔥 **三周期共振**（RSV50/144/250 均≥85）：" + " / ".join(
+            f"{r['name']}({r['code'][2:]})" for r in res[:12]))
+    show = strong[:15] if strong else top[:10]
+    if show:
+        L.append("- 📊 **较强标的**：" + " / ".join(
+            f"{r['name']}(Score{r['score']}·{r.get('resonance', '')})" for r in show))
+    L.append(f"- 统计：评分{d.get('total', 0)}只 | TOP榜{len(top)}只 | 三周期共振{len(res)}只")
+    L.append(f"\n> 数据源：xihu_rsv_latest.json（{d.get('date', '?')} 盘后 xihu_rsv 全市场扫描）")
     return "\n".join(L)
 
 
