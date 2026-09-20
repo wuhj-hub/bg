@@ -81,6 +81,25 @@ def is_not_st(name: str) -> bool:
     if not name: return False
     return not ('ST' in name or '*ST' in name)
 
+def load_rsg_map() -> dict:
+    """读取 RSV 扫描的 RSG 强势标注（2026-08-27：周线RS偏离52周均线>50‰=强势侧）
+    返回 {code: {rsg_dev, rsg_strong}}；失败返回空dict。仅供标注，不强制过滤。"""
+    rsg = {}
+    for p in ("outputs/rsv_strength_latest.json", "rsv_strength_latest.json",
+              "quant_scripts/outputs/rsv_strength_latest.json"):
+        if os.path.exists(p):
+            try:
+                d = json.load(open(p, encoding="utf-8"))
+                for r in (d.get("launch", []) + d.get("hold", []) + d.get("exit", [])):
+                    if r.get("code"):
+                        rsg[r["code"]] = {"rsg_dev": r.get("rsg_dev"),
+                                          "rsg_strong": bool(r.get("rsg_strong"))}
+                break
+            except Exception:
+                continue
+    return rsg
+
+
 def parse_kline_df(code: str, limit: int = 60) -> pd.DataFrame:
     """获取K线并解析为DataFrame (时间正序)"""
     raw = cli(f"kline {code} --period day --limit {limit}")
@@ -640,7 +659,9 @@ def _score_single_index(code: str, name: str) -> dict:
     """对单个指数进行安全评分 (0-100)"""
     df = parse_kline_df(code, 30)
     if df.empty or len(df) < 10:
-        return {"score": 50, "level": "数据不足", "close": 0, "df": df, "name": name}
+        # ⚠️ 2026-09-15 加固：原为 50（中性）→ 数据源故障时会"假装中性"掩盖风险（9/14 数据源事件暴露）。
+        #    改为 0 + 明确标注：大盘安全分因而不通过（保守方向），且不返回 None 以免下游崩溃。
+        return {"score": 0, "level": "⚠️数据缺失", "close": 0, "df": df, "name": name}
 
     closes = df["close"].values
     latest = closes[-1]
@@ -836,7 +857,7 @@ def get_sector_ranking(top_n: int = 5) -> list[dict]:
 # ============================================================
 #      Step 2: 候选股获取
 # ============================================================
-def get_candidate_stocks(max_count: int = 25) -> list[dict]:
+def get_candidate_stocks(max_count: int = 50) -> list[dict]:
     raw = cli("hot stock --limit 50")
     rows = parse_table(raw)
     candidates = []
@@ -1027,6 +1048,54 @@ def calc_rsva(df: pd.DataFrame, index_df: pd.DataFrame, n: int = 20) -> float:
     rsv2 = max(0, min(100, rsv2))
 
     return (rsv1 + rsv2) / 2
+
+
+# ============================================================
+#      ★★★ 西湖-RSV 多周期相对强度（猛兽体质 × 西湖框架）★★★
+#      来源: 西湖区的孩纸《RPS高于一切/条件选股公式汇总》
+#            × 猛兽派《不做扩展数据，如何实现相对强度指标》
+#      RSV(N) = ( 价格在N日区间位置 + 相对基准强度位置 ) / 2
+#      基准 = 中证全指(与 RSVA 同源)；周期 = 50/144/250（对齐西湖RPS三周期）
+# ============================================================
+def calc_xihu_rsv(df: pd.DataFrame, index_df: pd.DataFrame, n_list=(50, 144, 250)) -> dict:
+    """西湖-RSV 多周期相对强度 (0-100)；CRS=0.25*RSV50+0.35*RSV144+0.40*RSV250"""
+    out = {"rsv50": 0.0, "rsv144": 0.0, "rsv250": 0.0, "crs": 0.0, "resonance": "—"}
+    if df.empty or index_df.empty or len(df) < 20:
+        return out
+    m = pd.merge(df[['date', 'close', 'high', 'low']],
+                 index_df[['date', 'close']], on='date', how='inner',
+                 suffixes=('_s', '_i'))
+    if len(m) < 20:
+        return out
+    closes = m['close_s'].values
+    highs = m['high'].values
+    lows = m['low'].values
+    rs = closes / m['close_i'].values
+
+    def _rsv(n):
+        seg = closes[-n:] if len(closes) >= n else closes
+        lo = lows[-n:] if len(lows) >= n else lows
+        hi = highs[-n:] if len(highs) >= n else highs
+        r1 = (seg[-1] - min(lo)) / (max(hi) - min(lo)) * 100 if max(hi) != min(lo) else 50.0
+        rsg = rs[-n:] if len(rs) >= n else rs
+        r2 = (rsg[-1] - min(rsg)) / (max(rsg) - min(rsg)) * 100 if max(rsg) != min(rsg) else 50.0
+        return (max(0, min(100, r1)) + max(0, min(100, r2))) / 2
+
+    vals = {n: _rsv(n) for n in n_list}
+    for n in n_list:
+        out[f"rsv{n}"] = round(vals[n], 1)
+    w = {50: 0.25, 144: 0.35, 250: 0.40}
+    out["crs"] = round(sum(w[n] * vals[n] for n in n_list), 1)
+    hi_cnt = sum(1 for n in n_list if vals[n] >= 85)
+    if hi_cnt == 3:
+        out["resonance"] = "🔥三周期共振"
+    elif hi_cnt == 2:
+        out["resonance"] = "⚡双周期共振"
+    elif hi_cnt == 1:
+        out["resonance"] = "·单周期强"
+    elif all(vals[n] >= 70 for n in n_list):
+        out["resonance"] = "○三周期偏强"
+    return out
 
 
 # ============================================================
@@ -1223,6 +1292,7 @@ def setup_score_stock(code: str, name: str, index_df: pd.DataFrame) -> dict:
         "anti_fall_score": 0, "fundamental_score": 0,
         "ambush_score": 0, "rsd_score": 0,
         "gpoint_score": 0, "trade_mode": "",
+        "xihu_crs": 0.0, "xihu_resonance": "—",
         "details": {}
     }
 
@@ -1474,14 +1544,26 @@ def setup_score_stock(code: str, name: str, index_df: pd.DataFrame) -> dict:
         elif ssv["ssv2"] > 0:
             rsva_score_total += 1
 
-        # RSL (144日RSLine)
+        # RSL (144日RSLine) — 权重2（与西湖RSV144语义重叠，让位给多周期）
         rsl = calc_rsl(df, index_df, 144)
         result["details"]["rsl2"] = rsl["rsl2"]
         if rsl["rsl2"] > 100:
-            rsva_score_total += 4
+            rsva_score_total += 2
         elif rsl["rsl2"] > 50:
-            rsva_score_total += 3
+            rsva_score_total += 2
         elif rsl["rsl2"] > 0:
+            rsva_score_total += 1
+
+        # ★ 西湖-RSV 多周期相对强度（与 RSVA/SSV/RSL 并列，权重2）
+        xihu = calc_xihu_rsv(df, index_df, (50, 144, 250))
+        result["details"]["xihu_rsv50"] = xihu["rsv50"]
+        result["details"]["xihu_rsv144"] = xihu["rsv144"]
+        result["details"]["xihu_rsv250"] = xihu["rsv250"]
+        result["xihu_crs"] = xihu["crs"]
+        result["xihu_resonance"] = xihu["resonance"]
+        if xihu["crs"] >= 85:
+            rsva_score_total += 2
+        elif xihu["crs"] >= 70:
             rsva_score_total += 1
     else:
         rsva_score_total = 0
@@ -1627,7 +1709,7 @@ def main():
     # ---- Step 2: 候选股获取 ----
     print("\n🎯 Step 2: 候选股筛选（热搜股·主板过滤）")
     print("-" * 40)
-    candidates = get_candidate_stocks(25)
+    candidates = get_candidate_stocks(50)
     print(f"  获取到 {len(candidates)} 只候选股")
     if not candidates:
         print("\n❌ 无候选股，终止扫描")
@@ -1786,13 +1868,14 @@ def main():
     print("🟢 二、领先股 — 强势突破信号 (Setup≥40 + 突破强 + RSVA高)")
     print("=" * 72)
     if leaders:
-        print(f"  {'代码':<11} {'名称':<7} {'总分':>4} {'突破':>4} {'RSVA':>5} {'孤狼':>6} {'近高点':>6}  模式  {'月线'}  {'评级'}")
-        print("  " + "-" * 78)
+        _rsg_map = load_rsg_map()
+        print(f"  {'代码':<11} {'名称':<7} {'总分':>4} {'突破':>4} {'RSVA':>5} {'西湖R':>6} {'孤狼':>6} {'近高点':>6}  模式  {'月线'}  {'RSG'}  {'评级'}")
+        print("  " + "-" * 92)
         for s in leaders:
             d = s["details"]
             lead_tag = f"+{d.get('lead_over_index',0):.0f}%" if d.get('lead_over_index',0) else ""
             level = "⭐⭐" if s["setup_total"] >= 55 else "⭐"
-            gap_mark = " [断层]" if s["gap_score_display"] >= 8 else ""
+            gap_mark = " [断层]" if s.get("gap_score_display", 0) >= 8 else ""
             gpoint_mark = " [G点]" if d.get("has_gpoint", False) else ""
             mode_tag = s.get("trade_mode", "")
             m_tag = ""
@@ -1806,18 +1889,24 @@ def main():
                 m_tag = "🔴空头"
             else:
                 m_tag = "—"
+            _rg = _rsg_map.get(s['code'], {})
+            _rd = _rg.get('rsg_dev')
+            rsg_txt = "🟢强势" if _rg.get('rsg_strong') else ("🟡偏离" if _rd is not None and _rd > 0 else "⚪弱势")
             print(f"  {s['code']:<11} {s['name']:<7} "
                   f"{s['setup_total']:>3}/{100:<2} "
                   f"{s['breakout_score']:>2}/{15:<2} "
                   f"{d.get('rsva_20',0):>4.0f}  "
+                  f"{s.get('xihu_crs',0):>5.0f} "
                   f"{lead_tag:>6} "
                   f"{d.get('dist_from_high_pct',0):>4.1f}% "
                   f"{mode_tag:>4} "
                   f"{m_tag:>6} "
+                  f"{rsg_txt:>5} "
                   f"{level}{gap_mark}{gpoint_mark}")
     else:
         print(f"  ⚠️ 当前无符合条件的领先股")
-        print(f"  说明: 大盘危险区(安全评分23.6)，强势突破信号难以形成")
+        # ⚠️ 2026-09-16 修复：原硬编码「安全评分23.6」与实况（当日 11.6）不符
+        print(f"  说明: 大盘{safety.get('level','—')}(安全评分{safety.get('score',0):.1f})，强势突破信号难以形成")
 
     # ====== 三、回调股（基底回撤末期 + 低吸信号） ======
     # 条件: VCP收缩 + 缩量 + 伏击线低吸 or RS_D背离 → 回调低吸
@@ -1871,7 +1960,14 @@ def main():
                   f"{' '.join(notes)}")
     else:
         print(f"  ⚠️ 当前无符合条件的回调股")
-        print(f"  说明: 大盘处于上涨波段，多数股票振幅在扩大而非收缩")
+        # ⚠️ 2026-09-16 修复：原硬编码「大盘处于上涨波段」与实况（当日为熊市/上涨占比17%）相反。
+        #    改为按大盘安全评分分支：弱势→下跌放量致振幅扩大；强势→上涨波段致振幅扩大。
+        _sc = safety.get("score", 0.0)
+        _lv = safety.get("level", "—")
+        if _sc < 50:
+            print(f"  说明: 大盘{_lv}({_sc:.1f}分)，个股放量下挫致振幅扩大而非收缩，未见典型基底回撤末期形态")
+        else:
+            print(f"  说明: 大盘{_lv}({_sc:.1f}分)处于强势波段，多数股票振幅在扩大而非收缩")
 
     # ====== 四、综合评分表 ======
     print(f"\n{'=' * 90}")
@@ -1922,7 +2018,7 @@ def main():
         print(f"\n  🟢 【领先股关注】突破信号清晰, 可跟踪枢轴点确认")
         for s in leaders:
             d = s["details"]
-            gap_info = f" [断层{s['gap_score_display']}分]" if s["gap_score_display"] >= 8 else ""
+            gap_info = f" [断层{s.get('gap_score_display', 0)}分]" if s.get("gap_score_display", 0) >= 8 else ""
             gpoint_info = f" [⚡G点]" if d.get("has_gpoint", False) else ""
             mode_info = f" ({s['trade_mode']})" if s.get("trade_mode") else ""
             print(f"     {s['name']}({s['code']}) Setup={s['setup_total']}分 "
@@ -1976,8 +2072,9 @@ def main():
                   f"跳空:{'是' if d.get('gap_detected') else '否'}")
 
     if not leaders and not pullbacks:
-        print(f"\n  ⚠️  当前市场环境危险(安全评分23.6), 无明确信号")
-        print(f"     建议等待大盘企稳后再关注")
+        print(f"\n  ⚠️  当前市场环境{safety.get('level','—')}(安全评分{safety.get('score',0):.1f}), 无明确信号")
+        if safety.get("score", 0) < 50:
+            print(f"     建议等待大盘企稳后再关注")
 
     # ---- 综合总结 ----
     print(f"\n{'=' * 90}")
@@ -2004,6 +2101,74 @@ def main():
     print(f"     🔔 伏击线 = 低波动率低吸点 → 爬升途中回调末端")
     print(f"     📉 RS_D背离 = 斜率差底背离 → 动量角度低吸信号")
     print("=" * 90)
+
+    # ---- Step 6: 双模式市场聚合（堆量/欧马 → 与市场风格轴交叉验证） ----
+    try:
+        from collections import Counter
+        def _mc(items):
+            return dict(Counter(s.get("trade_mode", "未知") for s in items))
+        agg = {
+            "date": datetime.now().strftime("%Y-%m-%d"),
+            "total_scored": len(setup_results),
+            "all": _mc(setup_results),
+            "leaders": _mc(leaders),
+            "pullbacks": _mc(pullbacks),
+            "gpoints": _mc(gpoint_sigs),
+        }
+        dom_pool = {**agg["leaders"], **agg["pullbacks"]}
+        valid_dom = {k: v for k, v in dom_pool.items() if k in ("堆量模式", "欧马模式")}
+        agg["dominant"] = max(valid_dom, key=valid_dom.get) if valid_dom else "无显著主导"
+        os.makedirs("outputs", exist_ok=True)
+        with open("outputs/mode_aggregate_latest.json", "w", encoding="utf-8") as f:
+            json.dump(agg, f, ensure_ascii=False, indent=1)
+        print("\n" + "=" * 72)
+        print("📦 Step 6: 双模式市场聚合（堆量 vs 欧马 · 与市场风格轴交叉验证）")
+        print("=" * 72)
+        print(f"  评分股总数: {agg['total_scored']}只")
+        print(f"  全部信号: {json.dumps(agg['all'], ensure_ascii=False)}")
+        print(f"  领先股:   {json.dumps(agg['leaders'], ensure_ascii=False)}")
+        print(f"  回调股:   {json.dumps(agg['pullbacks'], ensure_ascii=False)}")
+        print(f"  G点信号:  {json.dumps(agg['gpoints'], ensure_ascii=False)}")
+        print(f"  主导模式: {agg['dominant']}  → outputs/mode_aggregate_latest.json")
+    except Exception as e:
+        print(f"  [WARN] 双模式聚合失败(不影响主流程): {e}")
+
+    # ---- Step 7: 领先池动态统计（猛兽派日报启发：池宽/留存率/净流） ----
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        cur_codes = [s["code"] for s in leaders] + [s["code"] for s in pullbacks]
+        prev = {}
+        if os.path.exists("outputs/beast_pool_stats.json"):
+            try:
+                prev = json.load(open("outputs/beast_pool_stats.json", encoding="utf-8"))
+            except Exception:
+                prev = {}
+        prev_codes = (prev.get("leaders") or []) + (prev.get("pullbacks") or [])
+        prev_width = prev.get("width", len(prev_codes)) or len(prev_codes)
+        cur_set, prev_set = set(cur_codes), set(prev_codes)
+        retention = round(len(cur_set & prev_set) / len(prev_set), 2) if prev_set else 1.0
+        inflow = len(cur_set - prev_set)
+        outflow = len(prev_set - cur_set)
+        net = inflow - outflow
+        width = len(cur_set)
+        trend = "扩张" if width > prev_width else ("收缩" if width < prev_width else "持平")
+        stats = {"date": today, "width": width, "prev_date": prev.get("date"),
+                 "prev_width": prev_width,
+                 "leaders": [s["code"] for s in leaders],
+                 "pullbacks": [s["code"] for s in pullbacks],
+                 "retention": retention, "inflow": inflow, "outflow": outflow,
+                 "net": net, "trend": trend}
+        os.makedirs("outputs", exist_ok=True)
+        with open("outputs/beast_pool_stats.json", "w", encoding="utf-8") as f:
+            json.dump(stats, f, ensure_ascii=False, indent=1)
+        print("=" * 72)
+        print("📊 Step 7: 领先池动态统计（猛兽派日报启发：池宽/留存率/净流）")
+        print("=" * 72)
+        print(f"  池宽: {width} 只（{trend}，昨 {prev_width}）")
+        print(f"  留存率: {retention:.0%} | 新增 {inflow} / 淘汰 {outflow} / 净流 {net:+d}")
+        print(f"  → outputs/beast_pool_stats.json")
+    except Exception as e:
+        print(f"  [WARN] 领先池统计失败(不影响主流程): {e}")
 
 
 if __name__ == "__main__":
