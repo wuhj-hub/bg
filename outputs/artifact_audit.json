@@ -60,6 +60,11 @@
    "quad_resonance.py",
    "quant_scripts/caige_track.py"
   ],
+  "mode_aggregate_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/beast_screener.py",
+   "skills_backup/猛兽体系/scripts/beast_screener.py"
+  ],
   "股池标的跟踪报告_{var}.md": [
    "quant_scripts/pool_tracking_report.py",
    "skills_backup/猛兽体系/scripts/pool_tracking_report.py"
@@ -181,10 +186,6 @@
   ],
   "wangzhe_golden_bt.json": [
    "quant_scripts/bt_wangzhe_golden.py"
-  ],
-  "mode_aggregate_latest.json": [
-   ".github/workflows/quant_scan.yml",
-   "quant_scripts/beast_screener.py"
   ],
   "年线广度_{var}.md": [
    "quant_scripts/yearline_breadth.py"
@@ -418,6 +419,9 @@
   "四维共振_chinext_kcb_latest.json": [
    ".github/workflows/quant_report.yml"
   ],
+  "xihu_rsv_latest.json": [
+   ".github/workflows/quant_scan.yml"
+  ],
   "quant_results_latest.json": [
    ".github/workflows/quant_scan.yml"
   ],
@@ -531,6 +535,9 @@
   "market_width_latest.json": [
    "quant_scan.yml"
   ],
+  "西湖rsv全市场_{var}.md": [
+   "quant_scan.yml"
+  ],
   "资金快照_{var}.csv": [
    "quant_scan.yml"
   ],
@@ -550,6 +557,9 @@
    "quant_scan.yml"
   ],
   "rsv_strength_latest.json": [
+   "quant_scan.yml"
+  ],
+  "xihu_rsv_latest.json": [
    "quant_scan.yml"
   ],
   "monthly_macd_latest.json": [
@@ -650,6 +660,9 @@
    "gen_premarket_report.py"
   ],
   "hot_emotion_latest.json": [
+   "gen_premarket_report.py"
+  ],
+  "xihu_rsv_latest.json": [
    "gen_premarket_report.py"
   ],
   "premarket_judgment_latest.json": [
@@ -807,6 +820,7 @@
   "top_signal_latest.json",
   "wangzhe_signals.csv",
   "wangzhe_stats.json",
+  "xihu_rsv_latest.json",
   "yao_pool.txt",
   "yearline_breadth_latest.json",
   "yitong_pool.txt",
@@ -843,6 +857,7 @@
   "四态胜率_{var}.md",
   "涨停型王者_成功率报告",
   "盘前市场报告_{var}.md",
+  "西湖rsv全市场_{var}.md",
   "资金快照_{var}.csv"
  ]
 }

@@ -1,7 +1,7 @@
 # 🔍 产物入库审计 · 2026-09-20
 
-> 扫描 119 个产出路径 / 58 个提交路径 / 24 个消费读取路径
-> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **66** ｜ ✅ 已提交 **53** ｜ ❔ 提交但未见生成 14
+> 扫描 120 个产出路径 / 60 个提交路径 / 25 个消费读取路径
+> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **66** ｜ ✅ 已提交 **54** ｜ ❔ 提交但未见生成 15
 
 ## 🟡 写而未提交（其余，多为研究/一次性产物）
 
@@ -76,7 +76,7 @@
 
 ## ✅ 已提交
 
-`123_2b_latest.json`, `ai_chokepoint_watch_{var}.json`, `all_mainboard.csv`, `board_top_latest.json`, `caige_track.json`, `data_guard_audit_{var}.md`, `data_guard_{var}.md`, `fish_body_latest.json`, `hot_emotion_history.json`, `hot_emotion_latest.json`, `hot_emotion_{var}.md`, `liangxue_latest.json`, `liangxue_minute_check_latest.json`, `liangxue_month_join_latest.json`, `longtou_pool.txt`, `market_regime_latest.json`, `market_regime_latest.md`, `market_width_latest.json`, `mode_aggregate_latest.json`, `monthly_macd_latest.json`, `panhou_lianghua.csv`, `pool_{var}.json`, `premarket_judgment_latest.json`, `premarket_judgment_{var}.json`, `qiankun_a_latest.json`, `quant_results_latest.json`, `quant_results_{var}.json`, `rsv_strength_latest.json`, `sector_component_em.json`, `top_signal_latest.json`, `wangzhe_signals.csv`, `wangzhe_stats.json`, `yao_pool.txt`, `yearline_breadth_latest.json`, `yitong_pool.txt`, `{var}.json`, `{var}_latest.json`, `{var}_{var}.csv`, `{var}_{var}.json`, `{var}_{var}.md`, `乖离低买_latest.json`, `仲裁信号日志.csv`, `信号仲裁_latest.json`, `双弦观察池_latest.json`, `四维共振_chinext_kcb_latest.json`, `四维共振_latest.json`, `市场状态判定_{var}.md`, `情绪预判_latest.json`, `执行纪律_latest.json`, `断档分歧_latest.json`, `板块共振_latest.json`, `组合风控_latest.json`, `鱼身报告_latest.md`
+`123_2b_latest.json`, `ai_chokepoint_watch_{var}.json`, `all_mainboard.csv`, `board_top_latest.json`, `caige_track.json`, `data_guard_audit_{var}.md`, `data_guard_{var}.md`, `fish_body_latest.json`, `hot_emotion_history.json`, `hot_emotion_latest.json`, `hot_emotion_{var}.md`, `liangxue_latest.json`, `liangxue_minute_check_latest.json`, `liangxue_month_join_latest.json`, `longtou_pool.txt`, `market_regime_latest.json`, `market_regime_latest.md`, `market_width_latest.json`, `mode_aggregate_latest.json`, `monthly_macd_latest.json`, `panhou_lianghua.csv`, `pool_{var}.json`, `premarket_judgment_latest.json`, `premarket_judgment_{var}.json`, `qiankun_a_latest.json`, `quant_results_latest.json`, `quant_results_{var}.json`, `rsv_strength_latest.json`, `sector_component_em.json`, `top_signal_latest.json`, `wangzhe_signals.csv`, `wangzhe_stats.json`, `xihu_rsv_latest.json`, `yao_pool.txt`, `yearline_breadth_latest.json`, `yitong_pool.txt`, `{var}.json`, `{var}_latest.json`, `{var}_{var}.csv`, `{var}_{var}.json`, `{var}_{var}.md`, `乖离低买_latest.json`, `仲裁信号日志.csv`, `信号仲裁_latest.json`, `双弦观察池_latest.json`, `四维共振_chinext_kcb_latest.json`, `四维共振_latest.json`, `市场状态判定_{var}.md`, `情绪预判_latest.json`, `执行纪律_latest.json`, `断档分歧_latest.json`, `板块共振_latest.json`, `组合风控_latest.json`, `鱼身报告_latest.md`
 
 ## ❔ 提交但未见脚本生成（手工或外部产物）
 
@@ -95,4 +95,5 @@
 | `四态胜率_{var}.md` | quant_report.yml |
 | `涨停型王者_成功率报告` | wangzhe_track.yml(via wangzhe_commit.py) |
 | `盘前市场报告_{var}.md` | premarket_report.yml |
+| `西湖rsv全市场_{var}.md` | quant_scan.yml |
 | `资金快照_{var}.csv` | quant_scan.yml |
