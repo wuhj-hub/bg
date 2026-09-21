@@ -1,4 +1,4 @@
-# 🔍 体系自检元审计 · 2026-09-20
+# 🔍 体系自检元审计 · 2026-09-21
 
 > 扫描 14 个 workflow ｜ 风险项 **88** ｜ 🔴高危 **0**
 
@@ -17,7 +17,7 @@
 - intraday_monitor.yml :: 开盘八法强形态扫描+突破监控 (L94) — 命中 continue-on-error: true
 - market_regime.yml :: 提交判定结果到仓库 (L48) — 命中 continue-on-error: true, set +e, || true
 - premarket_report.yml :: 生成盘前市场报告 (L45) — 命中 || echo（吞错误）
-- premarket_report.yml :: 提交盘前预判到仓库（供复盘报告真实验证） (L54) — 命中 continue-on-error: true, set +e, || true
+- premarket_report.yml :: 提交盘前预判到仓库（供复盘报告真实验证） (L57) — 命中 continue-on-error: true, set +e, || true
 - probe_em.yml :: 东财板块接口参数探测（找可用 fs/ 端点） (L21) — 命中 continue-on-error: true
 - probe_em.yml :: 同花顺页面数据内容验证（防hexin-v反爬空表） (L25) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）
 - probe_em.yml :: 同花顺板块页结构验证（行业列表+成分页） (L39) — 命中 2>/dev/null（屏蔽 stderr）
@@ -47,11 +47,11 @@
 - quant_report.yml :: 盘后数据健康审计（产物可信度） (L363) — 命中 continue-on-error: true, set +e, || true
 - quant_report.yml :: 提交报告产物到仓库（供盘前报告引用） (L377) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
 - quant_report.yml :: 自动生成复盘报告并上传 (L414) — 命中 continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 股池信号实盘胜率跟踪 (L440) — 命中 continue-on-error: true, || echo（吞错误）, || true
-- quant_report.yml :: 纸面组合跟踪（选股方法对比） (L465) — 命中 continue-on-error: true
-- quant_report.yml :: 反转数值周线信号上传推送 (L484) — 命中 continue-on-error: true, || true
-- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L522) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 推送自检报告到微信 (L540) — 命中 continue-on-error: true
+- quant_report.yml :: 股池信号实盘胜率跟踪 (L442) — 命中 continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: 纸面组合跟踪（选股方法对比） (L467) — 命中 continue-on-error: true
+- quant_report.yml :: 反转数值周线信号上传推送 (L486) — 命中 continue-on-error: true, || true
+- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L524) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 推送自检报告到微信 (L542) — 命中 continue-on-error: true
 - quant_scan.yml :: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断） (L53) — 命中 continue-on-error: true, || echo（吞错误）
 - quant_scan.yml :: IMA 凭证早期预检（失效立即微信告警，不阻断扫描） (L61) — 命中 continue-on-error: true, || true
 - quant_scan.yml :: 预热westock数据包 (L71) — 命中 set +e, || true
