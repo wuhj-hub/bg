@@ -49,10 +49,10 @@ jobs:
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
         run: |
+          # 🤖 GLM 外围传导研判（先跑，供报告插入；智谱免费模型，失败不阻断）
+          python3 quant_scripts/glm_brief.py --out "outputs/glm_brief_$(date +%Y-%m-%d).md" || echo "GLM 研判跳过"
           python3 quant_scripts/gen_premarket_report.py
           python3 quant_scripts/report_selfcheck.py --premarket "premarket_judgment_$(date +%Y-%m-%d).json" --today "$(date +%Y-%m-%d)" --alert || echo "自检发现问题(已推送报警), 不阻断流程"
-          # 🤖 GLM 外围传导研判（智谱免费模型 glm-4-flash，失败不阻断）
-          python3 quant_scripts/glm_brief.py --out "outputs/glm_brief_$(date +%Y-%m-%d).md" || echo "GLM 研判跳过"
 
       - name: 提交盘前预判到仓库（供复盘报告真实验证）
         # 防阻断：提交失败不阻断后续推送（⚠️2026-09-18：由静默改为受控告警——judgment 断链曾致 8/12-9/3 复盘验证失真）
@@ -63,7 +63,7 @@ jobs:
         run: |
           set +e
           python3 git_api_commit.py --msg "chore: update premarket judgment ($(date +%Y-%m-%d))" \
-            premarket_judgment_latest.json "premarket_judgment_$(date +%Y-%m-%d).json" "盘前市场报告_$(date +%Y-%m-%d).md"
+            premarket_judgment_latest.json "premarket_judgment_$(date +%Y-%m-%d).json" "盘前市场报告_$(date +%Y-%m-%d).md" "outputs/glm_brief_$(date +%Y-%m-%d).md"
           RC=$?
           set -e
           if [ "$RC" != "0" ]; then
