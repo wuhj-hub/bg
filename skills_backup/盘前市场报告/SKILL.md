@@ -380,17 +380,23 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_chain.py \
 
 数据不足时自动提示跳过，不影响报告完整性。
 
-#### 2.16 曾星智短线·先锋备选池（新增 · 2026-09-22 吸收）
+#### 2.17 🤖 GLM 外围传导研判（LLM 解读 · 2026-09-22 接入）
 
-输出当日各板块「**最早封板的首板 = 先锋**」备选池（吸收曾星智《利用反弹行情做好短线》三期验证：**板块内先锋次日晋级率 20.2% > 全部首板 17.1% > 热门跟风首板 <8%**，即"做板块先锋，不做热门跟风"）。
+用**智谱 GLM-4-Flash（永久免费）**自动生成「外围→A股传导研判 + 今日关注」，补上原本缺失的 LLM 主观解读：
 
 ```bash
-python3 /sandbox/workspace/skills/盘前市场报告/scripts/xzz_shortlist.py --live --json outputs/xzz_pioneer_latest.json
+# ① 把当日事实数据（外围美股/商品/港股/A股指数/热门板块/月线力量）写成 facts 文件
+# ② 生成研判片段（嵌入报告第①外围节末 或 第②大盘定势）
+python3 /sandbox/workspace/skills/盘前市场报告/scripts/glm_brief.py \
+    --facts-file outputs/glm_facts_{date}.txt --out outputs/glm_brief_{date}.md
+
+# 通用调用（新闻解读/摘要/任意提问）：
+python3 /sandbox/workspace/skills/盘前市场报告/scripts/llm_glm.py --prompt "..." [--model glm-4.7-flash]
 ```
 
-输出（板块 / 先锋(代码 名称) / 封板时间 / 涨幅 / 换手 / 板块涨停数）：
-- ⚠️ 依赖东财涨停池（`push2ex`），**可用窗口为近 2-3 周**；建议盘后（15:35 后）运行
-- 同期可跑二期统计：`xzz_shortlist.py --kline-file <日线> ` 输出首板/2板/3板晋级率基准
+- 模型：`glm-4-flash`（永久免费、不限 Token、30 并发）；依赖环境变量 **`ZHIPU_API_KEY`**（GitHub 运行时放 Secrets）
+- 输出片段格式：`### 🤖 GLM 外围传导研判（GLM-4-Flash 自动生成）` + 传导研判 + 今日关注
+- ⚠️ 免费档约 3 次/秒限流，仅用于每日报告级调用，勿用于批量任务；失败不阻断主报告（可选节）
 
 ### Step 3：智能提醒分析
 
