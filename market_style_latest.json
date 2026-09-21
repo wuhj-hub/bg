@@ -1,88 +1,90 @@
 {
- "date": "2026-09-18",
- "data_date": "2026-09-18",
+ "date": "2026-09-21",
+ "data_date": "2026-09-21",
  "style": "情绪市",
  "icon": "🔥",
- "score": 42,
+ "score": 53,
  "score_detail": {
-  "size_style": 20,
-  "limitup_structure": 29,
-  "volume_structure": -8,
+  "size_style": 12,
+  "limitup_structure": 33,
+  "volume_structure": 7,
   "sector_fund": 1
  },
  "size_style": {
-  "hs300_5d": -0.06,
-  "hs300_10d": -0.89,
-  "zz1000_5d": 3.51,
-  "zz1000_10d": 2.39,
-  "rel_5d": 3.57,
-  "rel_10d": 3.28,
-  "rel_20d": 3.54,
-  "zz500_5d": 2.89
+  "hs300_5d": 1.33,
+  "hs300_10d": -0.77,
+  "zz1000_5d": 3.99,
+  "zz1000_10d": 1.66,
+  "rel_5d": 2.66,
+  "rel_10d": 2.44,
+  "rel_20d": 4.19,
+  "zz500_5d": 3.69
  },
  "limitup_structure": {
-  "limitup": 75,
-  "strong": 148,
-  "width_score": 99.9,
+  "limitup": 84,
+  "strong": 235,
+  "width_score": 100,
   "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 4.8,
-  "zhaban_rate": 37.5,
-  "lianban": 12
+  "strong_ratio": 8.5,
+  "zhaban_rate": 37.3,
+  "lianban": 17
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.121,
-  "small_big_ratio_5d": 1.263,
-  "vol_shift": "资金回流大盘"
+  "small_big_ratio_now": 1.199,
+  "small_big_ratio_5d": 1.24,
+  "small_vol_pulse": 110.51
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "半导体",
-    "zdf": "3.95",
-    "main_net5d": -44.4,
-    "retail_net": -187.5,
-    "tag": "游资型"
-   },
-   {
-    "name": "新股与次新股",
-    "zdf": "5.91",
-    "main_net5d": 5.1,
-    "retail_net": -31.1,
+    "name": "房地产服务",
+    "zdf": "6.04",
+    "main_net5d": 2.1,
+    "retail_net": -2.7,
     "tag": "机构型"
    },
    {
     "name": "房地产开发",
-    "zdf": "3.44",
-    "main_net5d": -3.5,
-    "retail_net": -15.8,
+    "zdf": "3.81",
+    "main_net5d": 16.6,
+    "retail_net": -6.0,
+    "tag": "机构型"
+   },
+   {
+    "name": "半导体",
+    "zdf": "0.34",
+    "main_net5d": 243.8,
+    "retail_net": 43.1,
+    "tag": "混合"
+   },
+   {
+    "name": "化学制药",
+    "zdf": "4.36",
+    "main_net5d": -15.7,
+    "retail_net": -26.0,
     "tag": "游资型"
    },
    {
     "name": "元件",
-    "zdf": "0.91",
-    "main_net5d": 5.9,
-    "retail_net": 32.8,
-    "tag": "混合"
-   },
-   {
-    "name": "通信设备",
-    "zdf": "2.92",
-    "main_net5d": 53.9,
-    "retail_net": -47.0,
-    "tag": "机构型"
+    "zdf": "2.05",
+    "main_net5d": -67.8,
+    "retail_net": -17.8,
+    "tag": "游资型"
    }
   ]
  },
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 10,
-   "欧马模式": 5
+   "欧马模式": 3,
+   "堆量模式": 11,
+   "": 1
   },
   "leaders": {
-   "堆量模式": 4
+   "欧马模式": 2,
+   "堆量模式": 8
   },
   "pullbacks": {},
   "gpoints": {
