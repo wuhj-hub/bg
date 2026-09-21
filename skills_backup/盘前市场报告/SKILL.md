@@ -164,14 +164,25 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/sector_flow.py --to
 npx -y westock-data-skillhub@1.0.3 kline sh601398,sh600030,sh601318,sh600519,sh600887,sh600276,sh603259,sh600196,sz002594,sz002475,sz000725,sz002371,sz000333,sh601899,sh600900,sz000063,sh601728,sh600487,sh601857,sh601088,sh600585,sh600760,sh600879,sz002714,sh600309,sz002027,sh601888,sh600019,sh603019,sz002129,sh601012,sz000002,sz002352,sh600031 --period day --limit 3
 ```
 
-#### 2.5 八指数月线（市场阶段定性用）
+#### 2.5 九指数月线（市场阶段定性用）
 
 ```bash
-# 8大指数月线K线（最近10个月，用于双弦+曾星智体系定性）
-npx -y westock-data-skillhub@1.0.3 kline sh000001,sz399106,sh000016,sh000300,sz399101,sh000688,sz399006,sh000905 --period month --limit 10
+# 9大指数月线K线（最近10个月，用于双弦+曾星智体系定性）—— 2026-09-21 由8大扩为9大(+北证50)
+npx -y westock-data-skillhub@1.0.3 kline sh000001,sz399106,sh000016,sh000300,sz399101,sh000688,sz399006,sh000905,bj899050 --period month --limit 10
 ```
 
-> 对应通达信代码：上证指数(999999)、深证综指(399106)、上证50(SH000016)、沪深300(000300)、中小综指(399101)、科创50(SH000688)、创业板指(399006)、中证500(000905)
+> 对应代码：上证指数(999999)、深证综指(399106)、上证50(SH000016)、沪深300(000300)、中小综指(399101)、科创50(SH000688)、创业板指(399006)、中证500(000905)、**北证50(bj899050)**
+> 📌 吸收曾星智《利用反弹行情做好短线》(2026-09-21)：其"9大指数长期力量"含北证50，故补齐。
+
+#### 2.5bis 九指数「长期力量/短期力量」（曾星智力量双维度 · 2026-09-21 吸收）
+
+```bash
+python3 /sandbox/workspace/skills/盘前市场报告/scripts/xzz_force.py --json outputs/xzz_force_latest.json
+```
+
+输出：9大指数「长期力量(月线MA6方向)」「短期力量(日线收盘>MA5>MA10)」+ 向上计数 →
+- **长期力量向上 0/9 → 大方向熊市**；**短期力量向上数 ≥2 → 短线做多成立**（曾星智"长期熊+短期多"框架）
+- 供 Step3.5 与报告②.3 引用；与 A3 仓位联动（短期力量≥4 放开短线仓，≤1 短线观望）
 
 #### 2.5.1 年线广度（市场牛熊结构 · 中期）
 
@@ -329,20 +340,7 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/hot_emotion.py --da
 - 最高板环比下降 → ⚠️ 高度退潮
 - 昨日 TOP 主线题材涨停家数减半 → ⚠️ 主线退潮
 
-**自动化降级**：GitHub Actions/无 tdx 环境用 westock 批量K线自算（无题材/封单明细）：`python3 hot_emotion.py --date {date} --westock --kline-file {westock_kline_output.txt}`。kline 文件获取：`fetch_hot_kline.py --limit 25 --out /tmp/kline_full.txt`（全主板~3125只×25日，42s 完成，代码在沙箱 workspace 根）。
-**回溯补历史**：`--end-date {YYYY-MM-DD}` 只统计该日(含)之前的K线，连板终点=end_date——漏跑日期无需重拉数据，同一 kline 文件跑多次即可（9/1、9/2 已用此法补齐）。
-⚠️ **westock 模式已修复（2026-09-03）**：npx 批量输出为 markdown 管道表（`| sz000001 | date |...`），parse_westock_kline 原先按空格 split 导致全部过滤、--westock 从未真正工作；已兼容 '|' 分隔（真实校验：新赛5板/国芳4板与实况一致）。
-
-> 📛 **名称+板块增强（2026-09-03 A+B方案）**：westock 模式新增 `--name-file all_mainboard.csv`（涨停股名称，100%覆盖主板）与 `--sector-file outputs/sector_component.json`（板块归属，新浪行业49+概念163=212板块/3303只，平均3板块/股）。连板梯队输出格式：`新赛股份(5天5板)[农林牧渔/风电]`。板块成分映射刷新：`python3 quant_scripts/sector_components.py --out outputs/sector_component.json`（本地免费~2分钟，成分变化低频，月度/异动时刷新；产物已入库 quant_scripts/sector_component.json 供 longtou.py 龙头板块归属 code 直查）。已知局限：新浪分类不含部分次新股（连板命中~71%，名称仍100%可见），必要时 tdx 逐只补查。
-
-> 🔄 **每日自动链路（2026-09-03 固化，quant_scan.yml 第二步.1.3b）**：hot_emotion 已接入 GitHub quant_scan.yml——每日 15:30 盘后自动跑 `fetch_hot_kline.py(42s) → hot_emotion.py --westock`，产物提交到仓库根（hot_emotion_latest.json/history/当日md）。**ima 生成盘前报告前必须先同步**：
-> ```bash
-> python3 skills/盘前市场报告/scripts/sync_hot_emotion.py --check-date {昨日交易日}
-> # exit 0 = GitHub 有昨日数据，直接用；exit 1 = 缺 → 本地降级补跑：
-> # python3 skills/盘前市场报告/scripts/fetch_hot_kline.py --limit 25 --out /tmp/kh.txt
-> # python3 skills/盘前市场报告/scripts/hot_emotion.py --date {昨日} --westock --kline-file /tmp/kh.txt --end-date {昨日}
-> ```
-> 同步脚本候选路径：仓库根（workflow 最新）→ skills_backup 备份（兜底）。
+**自动化降级**：GitHub Actions/无 tdx 环境用 westock 批量K线自算（无题材/封单明细）：`python3 hot_emotion.py --date {date} --westock --kline-file {westock_kline_output.txt}`。
 
 若 tdx 数据不可用（接口异常/非交易日），自动提示占位，不影响报告完整性。
 
@@ -393,19 +391,15 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/market_chain.py \
 
 数据不足时自动提示跳过，不影响报告完整性。
 
-> ⛔ **硬规则（2026-09-03 固化，防 9/3 手写误判事件复发）**：
-> 1. **报告②.4 行情类型 / ②.5-②.6 快照段禁止手写判断**——必须实跑本脚本嵌入输出；`regime_type()` 是行情类型判定的**唯一入口**，LLM 不得凭温度"感觉"自行定性（9/3 曾手写"震荡反弹"而实跑均值58≥55 应为"牛市中继·边界"，方向性误导）。
-> 2. 判定公式强制核对：**均值 = (双弦+猛兽+鱼身)/3**（鱼身偏热会显著拉高均值，勿忽略）；牛市中继必须**均值≥55 且宽度≥60 双条件**，宽度缺失一律降级"边界"（regime_type 已内置该逻辑，勿绕过）。
-> 3. 报告文本中行情类型/推荐模型/仓位区间必须与 market_chain.py 输出**逐字一致**，不得改写措辞（改写即引入偏差）。
-> 4. hot_emotion_latest.json 若日期 < 报告日期前 2 日，热点快照段标注"⚠️数据停更于 {date}"并用手工口径补注来源，不得静默引用旧数据。
-
 ### Step 3：智能提醒分析
 
 对采集到的数据逐一检查 alert-rules.md 中的触发条件，提取所有触发项。
 
 ### Step 3.5：市场阶段定性（双弦+曾星智体系）
 
-对 8 大指数月度 K 线数据进行以下分析：
+对 9 大指数（含北证50）月度 K 线数据进行以下分析：
+
+> 📌 另见 #### 2.5bis `xzz_force.py`：输出「长期力量/短期力量」统一口径——**长期力量向上 0/9 = 熊市**；**短期力量向上 ≥2 = 短线做多成立**（曾星智"长期熊+短期多"框架，2026-09-21 吸收）。
 
 **双弦体系**（快弦 MA20 ≈ 1月MA，慢弦 MA60 ≈ 3月MA）：
 - 计算每个指数的 MA60（近3月均值）
@@ -512,26 +506,6 @@ python3 /sandbox/workspace/skills/盘前市场报告/scripts/sandbox_push_report
 
 > ⚠️ 若 PUSH_TOKEN 环境变量未设置，跳过推送（不影响报告生成）
 > 推送内容自动截取报告前部关键摘要（标题/信号卡/操作建议）
-
-### Step 5.6：预判落盘与 GitHub 推送（⛔ 强制·闭环必需·2026-09-04 固化）
-
-盘前报告生成后**必须**执行预判落盘，否则次日复盘无法验证（9/3 复盘因 judgment 缺失准确率误显 0%；8/12-9/3 长期断链根因=本地手工报告流程无此步骤）：
-
-```bash
-# 从今日报告自动提取预判要素 → 生成 premarket_judgment_{date}.json + 推 GitHub（当日+latest双文件）
-python3 /sandbox/workspace/skills/盘前市场报告/scripts/gen_judgment.py \
-  --date {今日交易日} --from-md /sandbox/workspace/盘前市场报告_{今日}.md
-# 自动提取不准时可手动参数覆盖：
-python3 .../gen_judgment.py --date {今日} --direction "震荡反弹" --key-levels "支撑3930、压力3968" \
-  --position "30-50%" --main-lines "AI算力/液冷,贵金属,航运港口" --three-systems "fish:73;beast:45.7;shuangxian:45" --risk "..."
-```
-
-⛔ **完成标准（缺一不可）**：
-1. 本地 `outputs/premarket_judgment_{date}.json` 生成，`date` 字段 == 今日
-2. GitHub 仓库根 `premarket_judgment_{date}.json` + `premarket_judgment_latest.json` 均推送成功（脚本自动双推，出现 ❌ 视为失败）
-3. key_levels 合规格式："支撑X、压力Y"（复盘侧自检 regex 要求）
-
-> 📌 断链史（防再犯）：8/11 曾修复"复盘侧当日严格校验"并补推 8/10/8/11，但**盘前侧固化随 skills 回滚丢失**（SKILL.md 被平台重置）→ 8/12 起 judgment 断推、9/3 复盘验证失真。修复策略：①本步骤强制固化（SKILL 双备份 GitHub skills_backup）；②gen_judgment.py 已存 GitHub quant_scripts/（不受沙箱回滚影响）；③复盘侧加"缺失微信告警"（当天发现当天补）。
 
 ---
 
