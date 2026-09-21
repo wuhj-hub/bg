@@ -1185,6 +1185,15 @@ def main():
     if "--date" in sys.argv:
         today = sys.argv[sys.argv.index("--date") + 1]
     md = gen_report(today)
+    # 🤖 GLM 复盘研判（若 outputs/glm_brief_review_{today}.md 存在则插入开头）
+    try:
+        _gf = f"outputs/glm_brief_review_{today}.md"
+        if os.path.exists(_gf):
+            _g = open(_gf, encoding="utf-8").read().strip()
+            if "## 一、大盘全景" in md and "GLM" not in md[:600]:
+                md = md.replace("## 一、大盘全景", _g + "\n\n## 一、大盘全景", 1)
+    except Exception as _e:
+        print("[WARN] GLM 插入失败:", _e)
     fname = f"复盘报告_{today}.md"
     os.makedirs("outputs", exist_ok=True)
     with open(f"outputs/{fname}", "w", encoding="utf-8") as f:
