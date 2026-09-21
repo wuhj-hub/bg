@@ -996,6 +996,16 @@ def main():
             today = m.group(1)
     md, judgment = gen_report(today)
     fname = f"盘前市场报告_{today}.md"
+    # 🤖 GLM 外围传导研判（若 outputs/glm_brief_{today}.md 存在则插入①外围末尾）
+    try:
+        _gf = f"outputs/glm_brief_{today}.md"
+        if os.path.exists(_gf):
+            _g = open(_gf, encoding="utf-8").read().strip()
+            if "## ② 大盘定势" in md and "GLM 外围传导研判" not in md:
+                md = md.replace("## ② 大盘定势", _g + "\n\n## ② 大盘定势", 1)
+                print("[OK] GLM 研判已插入报告")
+    except Exception as _e:
+        print("[WARN] GLM 插入失败:", _e)
     with open(fname, "w", encoding="utf-8") as f:
         f.write(md)
     print(f"[OK] {fname} generated ({len(md)} chars)")
