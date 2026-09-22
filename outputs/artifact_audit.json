@@ -1,5 +1,5 @@
 {
- "date": "2026-09-21",
+ "date": "2026-09-22",
  "writes": {
   "panhou_lianghua.md": [
    "full_market_dualdim.py"
@@ -433,6 +433,18 @@
   ]
  },
  "committed": {
+  "premarket_judgment_latest.json": [
+   "premarket_report.yml"
+  ],
+  "premarket_judgment_{var}.json": [
+   "premarket_report.yml"
+  ],
+  "盘前市场报告_{var}.md": [
+   "premarket_report.yml"
+  ],
+  "glm_brief_{var}.md": [
+   "premarket_report.yml"
+  ],
   "sector_component_em.json": [
    "probe_em.yml",
    "quant_scan.yml"
@@ -709,10 +721,7 @@
    "portfolio_risk.py"
   ]
  },
- "high_risk": [
-  "premarket_judgment_latest.json",
-  "premarket_judgment_{var}.json"
- ],
+ "high_risk": [],
  "missing": [
   "ai_chain_pool.json",
   "ai_chokepoint_watch_{var}.md",
@@ -735,8 +744,6 @@
   "panhou_lianghua.md",
   "pool.csv",
   "pool_51.txt",
-  "premarket_judgment_latest.json",
-  "premarket_judgment_{var}.json",
   "rsv_strength_{var}.md",
   "samples.json",
   "silent_failure_audit.json",
@@ -806,6 +813,8 @@
   "monthly_macd_latest.json",
   "panhou_lianghua.csv",
   "pool_{var}.json",
+  "premarket_judgment_latest.json",
+  "premarket_judgment_{var}.json",
   "qiankun_a_latest.json",
   "quant_results_latest.json",
   "quant_results_{var}.json",
@@ -843,6 +852,7 @@
   "caige_pool.txt",
   "dragon_pool.txt",
   "execution_cards_latest.json",
+  "glm_brief_{var}.md",
   "hot_emotion_latest.md",
   "ima_cred_last_ok.json",
   "market_style_latest.json",
@@ -850,6 +860,7 @@
   "一统天下建仓区股池_latest.md",
   "四态胜率_{var}.md",
   "涨停型王者_成功率报告",
+  "盘前市场报告_{var}.md",
   "西湖rsv全市场_{var}.md",
   "资金快照_{var}.csv"
  ]
