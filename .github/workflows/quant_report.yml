@@ -402,6 +402,8 @@ jobs:
             outputs/四态胜率_$(date +%Y-%m-%d).md \
             outputs/仲裁信号日志.csv \
             outputs/data_guard_audit_$(date +%Y-%m-%d).md \
+            outputs/复盘报告_$(date +%Y-%m-%d).md \
+            outputs/glm_brief_review_$(date +%Y-%m-%d).md \
             pools/pool_$(date +%Y-%m).json
           RC=$?
           set -e
