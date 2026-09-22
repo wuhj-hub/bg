@@ -1,7 +1,7 @@
 {
  "date": "20260922",
  "verdict": "震荡市",
- "score": 0.519,
+ "score": 0.506,
  "long": {
   "score": 0.556,
   "state": "纠缠"
@@ -21,7 +21,7 @@
   "up_ratio": 0.381
  },
  "emotion": {
-  "limit_up": 59,
+  "limit_up": 50,
   "limit_down": 4
  },
  "indices": [
