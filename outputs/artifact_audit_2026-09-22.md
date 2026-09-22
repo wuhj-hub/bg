@@ -1,7 +1,7 @@
 # 🔍 产物入库审计 · 2026-09-22
 
-> 扫描 120 个产出路径 / 61 个提交路径 / 25 个消费读取路径
-> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **66** ｜ ✅ 已提交 **54** ｜ ❔ 提交但未见生成 16
+> 扫描 120 个产出路径 / 63 个提交路径 / 25 个消费读取路径
+> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **66** ｜ ✅ 已提交 **54** ｜ ❔ 提交但未见生成 18
 
 ## 🟡 写而未提交（其余，多为研究/一次性产物）
 
@@ -87,6 +87,7 @@
 | `caige_pool.txt` | quant_report.yml |
 | `dragon_pool.txt` | quant_report.yml |
 | `execution_cards_latest.json` | quant_report.yml |
+| `glm_brief_review_{var}.md` | quant_report.yml |
 | `glm_brief_{var}.md` | premarket_report.yml |
 | `hot_emotion_latest.md` | quant_scan.yml |
 | `ima_cred_last_ok.json` | quant_scan.yml |
@@ -94,6 +95,7 @@
 | `一统天下建仓区股池_latest.json` | quant_report.yml, quant_scan.yml |
 | `一统天下建仓区股池_latest.md` | quant_scan.yml |
 | `四态胜率_{var}.md` | quant_report.yml |
+| `复盘报告_{var}.md` | quant_report.yml |
 | `涨停型王者_成功率报告` | wangzhe_track.yml(via wangzhe_commit.py) |
 | `盘前市场报告_{var}.md` | premarket_report.yml |
 | `西湖rsv全市场_{var}.md` | quant_scan.yml |

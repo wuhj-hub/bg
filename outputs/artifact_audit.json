@@ -522,6 +522,12 @@
    "quant_report.yml",
    "quant_scan.yml"
   ],
+  "复盘报告_{var}.md": [
+   "quant_report.yml"
+  ],
+  "glm_brief_review_{var}.md": [
+   "quant_report.yml"
+  ],
   "pool_{var}.json": [
    "quant_report.yml",
    "quant_scan.yml"
@@ -852,6 +858,7 @@
   "caige_pool.txt",
   "dragon_pool.txt",
   "execution_cards_latest.json",
+  "glm_brief_review_{var}.md",
   "glm_brief_{var}.md",
   "hot_emotion_latest.md",
   "ima_cred_last_ok.json",
@@ -859,6 +866,7 @@
   "一统天下建仓区股池_latest.json",
   "一统天下建仓区股池_latest.md",
   "四态胜率_{var}.md",
+  "复盘报告_{var}.md",
   "涨停型王者_成功率报告",
   "盘前市场报告_{var}.md",
   "西湖rsv全市场_{var}.md",
