@@ -1192,6 +1192,7 @@ def main():
             _g = open(_gf, encoding="utf-8").read().strip()
             if "## 一、大盘全景" in md and "GLM" not in md[:600]:
                 md = md.replace("## 一、大盘全景", _g + "\n\n## 一、大盘全景", 1)
+                print("[OK] GLM 复盘研判已插入报告")
     except Exception as _e:
         print("[WARN] GLM 插入失败:", _e)
     fname = f"复盘报告_{today}.md"
