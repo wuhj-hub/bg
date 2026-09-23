@@ -133,5 +133,81 @@ def main():
     print(f"   → {SNAP}（{len(existing)} 天） | {ENTRY}（{len(ent)} 条）")
 
 
+def backtest():
+    """按 entry_date 算「入池后 5/10/20 日收益」→ 各池胜率/均值（数据够才出结果）"""
+    import subprocess
+    from concurrent.futures import ThreadPoolExecutor
+    if not os.path.exists(ENTRY):
+        print("❌ 无 pool_entries.csv")
+        return
+    rows = list(csv.DictReader(open(ENTRY, encoding="utf-8")))
+    codes = sorted({r["code"] for r in rows})
+    print(f"标的 {len(codes)} 只（entry_date 起算）", flush=True)
+    WEST = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+    kline = {}
+
+    def fb(b):
+        try:
+            out = subprocess.run(WEST + ["kline", ",".join(b), "--period", "day", "--limit", "120"],
+                                 capture_output=True, text=True, timeout=300).stdout or ""
+        except Exception:
+            return {}
+        d = {}
+        for ln in out.splitlines():
+            if not ln.strip().startswith("|"):
+                continue
+            p = [x.strip() for x in ln.strip().strip("|").split("|")]
+            if re.match(r"^(sh|sz)\d{6}$", p[0]) and len(p) >= 7:
+                try:
+                    d.setdefault(p[0], []).append((p[1], float(p[3])))
+                except ValueError:
+                    pass
+        for c in d:
+            d[c].sort()
+        return d
+
+    batches = [codes[i:i + 40] for i in range(0, len(codes), 40)]
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        for res in ex.map(fb, batches):
+            kline.update(res)
+
+    def ret(code, entry_date, h):
+        b = kline.get(code)
+        if not b:
+            return None
+        idx = next((i for i, x in enumerate(b) if x[0] >= entry_date), None)
+        if idx is None or idx + h >= len(b):
+            return None
+        c0, c1 = b[idx][1], b[idx + h][1]
+        return (c1 / c0 - 1) * 100 if c0 > 0 else None
+
+    agg = {}
+    for r in rows:
+        for h in (5, 10, 20):
+            v = ret(r["code"], r["entry_date"], h)
+            if v is not None:
+                agg.setdefault((r["pool"], h), []).append(v)
+    print(f"\n{'池':<10}{'样本':>6}{'5日':>10}{'10日':>10}{'20日':>10}")
+    pools = sorted({p for p, _ in agg})
+    for p in pools:
+        line, n = f"{p:<10}", 0
+        for h in (5, 10, 20):
+            v = agg.get((p, h), [])
+            if v:
+                n = max(n, len(v))
+                line += f"{(str(round(sum(v)/len(v),2))+'%'):>10}"
+            else:
+                line += f"{'—':>10}"
+        print(f"{line}{'' if n else '（数据不足）'}")
+    print("\n> ⚠️ 仅在 entry_date 之后有足够交易日时才有值；初期数据不足属正常。")
+
+
 if __name__ == "__main__":
-    main()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--date", default=datetime.now(BJT).strftime("%Y-%m-%d"))
+    ap.add_argument("--report", action="store_true", help="按入池日回测 5/10/20 日收益")
+    a = ap.parse_args()
+    if a.report:
+        backtest()
+    else:
+        main()
