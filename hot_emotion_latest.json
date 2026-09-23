@@ -1,20 +1,20 @@
 {
- "date": "2026-09-22",
- "total": 26,
- "lianban_cnt": 9,
+ "date": "2026-09-23",
+ "total": 44,
+ "lianban_cnt": 12,
  "max_lb": 4,
- "shouban": 17,
+ "shouban": 32,
  "by_lb": {
-  "4": 1,
-  "3": 1,
-  "2": 7,
-  "1": 17
+  "4": 2,
+  "3": 7,
+  "2": 3,
+  "1": 32
  },
  "score": {
-  "score": 58,
+  "score": 61,
   "level": "活跃",
   "parts": {
-   "涨停家数": 5,
+   "涨停家数": 8,
    "连板高度": 18,
    "连板占比": 35
   }
@@ -23,8 +23,8 @@
  "alerts": [],
  "lianban_rows": [
   {
-   "code": "sz000504",
-   "name": "南华生物",
+   "code": "sz000910",
+   "name": "大亚圣象",
    "price": "",
    "chg": "",
    "lianban": 4,
@@ -35,15 +35,27 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "其他医疗服务",
-    "医疗服务",
-    "医药生物",
-    "昨日打二板以上表现"
+    "瓷砖地板",
+    "轻工制造"
    ]
   },
   {
-   "code": "sh603068",
-   "name": "博通集成",
+   "code": "sh601811",
+   "name": "新华文轩",
+   "price": "",
+   "chg": "",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sz000560",
+   "name": "我爱我家",
    "price": "",
    "chg": "",
    "lianban": 3,
@@ -54,29 +66,44 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "模拟芯片设计",
-    "半导体",
-    "电子",
-    "昨日连板"
+    "房产租赁经纪",
+    "房地产服务",
+    "房地产"
    ]
   },
   {
-   "code": "sz000560",
-   "name": "我爱我家",
+   "code": "sz001234",
+   "name": "泰慕士",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "房产租赁经纪",
-    "房地产服务",
-    "房地产",
-    "昨日首板"
+    "运动服装",
+    "服装家纺"
+   ]
+  },
+  {
+   "code": "sz002614",
+   "name": "奥佳华",
+   "price": "",
+   "chg": "",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他家电Ⅱ",
+    "其他家电Ⅲ",
+    "家用电器"
    ]
   },
   {
@@ -84,8 +111,8 @@
    "name": "华丽家族",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -93,28 +120,8 @@
    "fengdan": "",
    "sectors": [
     "房地产",
-    "住宅开发",
     "房地产开发",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sh600664",
-   "name": "哈药股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "化学制剂",
-    "化学制药",
-    "医药生物",
-    "昨日首板"
+    "住宅开发"
    ]
   },
   {
@@ -122,8 +129,8 @@
    "name": "华远控股",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -132,8 +139,7 @@
    "sectors": [
     "房地产服务",
     "物业管理",
-    "房地产",
-    "昨日首板"
+    "房地产"
    ]
   },
   {
@@ -141,44 +147,37 @@
    "name": "新华传媒",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
-   "sectors": [
-    "出版",
-    "大众出版",
-    "传媒",
-    "昨日首板"
-   ]
-  },
-  {
-   "code": "sh603020",
-   "name": "爱普股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "食品及饲料添加剂",
-    "化学制品",
-    "基础化工",
-    "昨日首板"
-   ]
+   "sectors": []
   },
   {
    "code": "sh603636",
    "name": "南威软件",
    "price": "",
    "chg": "",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "网络安全",
+    "电子车牌"
+   ]
+  },
+  {
+   "code": "sz002238",
+   "name": "天威视讯",
+   "price": "",
+   "chg": "",
    "lianban": 2,
    "ji_ji_ban": "2天2板",
    "reason": "",
@@ -187,10 +186,43 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "IT服务Ⅱ",
-    "IT服务Ⅲ",
-    "计算机",
-    "昨日首板"
+    "网络安全"
+   ]
+  },
+  {
+   "code": "sh600418",
+   "name": "江淮汽车",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "商用载货车",
+    "商用车",
+    "汽车"
+   ]
+  },
+  {
+   "code": "sh605058",
+   "name": "澳弘电子",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "印制电路板",
+    "元件",
+    "电子"
    ]
   }
  ],
