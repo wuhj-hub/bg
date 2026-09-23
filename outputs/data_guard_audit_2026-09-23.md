@@ -6,15 +6,15 @@
 |---|---|---|
 | 市场宽度 | ✅ | outputs/market_width_latest.json |
 | 市场状态判定 | ✅ | market_regime_latest.json |
-| 热点情绪 | ✅ | outputs/hot_emotion_latest.json |
+| 热点情绪 | ✅ | hot_emotion_latest.json |
 | 板块成分映射 | ✅ | outputs/sector_component_em.json |
 | 一统天下建仓区 | ✅ | 一统天下建仓区股池_latest.json |
 | 三系统原始输出 | ⚠️ fishbody.stderr 含错误 | quant_results_latest.json |
 | 龙头池 | ✅ | quant_scripts/longtou_pool.txt(22只) |
 | 龙头战法池 | ✅ | quant_scripts/dragon_pool.txt(8只) |
-| 才哥战法池 | ✅ | quant_scripts/caige_pool.txt(97只) |
-| 一统天下池 | ✅ | quant_scripts/yitong_pool.txt(507只) |
-| 妖股池 | ✅ | quant_scripts/yao_pool.txt(92只) |
+| 才哥战法池 | ✅ | quant_scripts/caige_pool.txt(73只) |
+| 一统天下池 | ✅ | quant_scripts/yitong_pool.txt(487只) |
+| 妖股池 | ✅ | quant_scripts/yao_pool.txt(75只) |
 
 ## ⚠️ 需处理
 
