@@ -469,6 +469,7 @@ jobs:
       - name: 纸面组合跟踪（选股方法对比）
         if: always()  # 防阻断：前置步骤失败仍执行
         continue-on-error: true
+        timeout-minutes: 30   # ⚠️ 2026-09-24：原无超时→曾跑3h拖垮整链（已改批量取数，约12min）
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
