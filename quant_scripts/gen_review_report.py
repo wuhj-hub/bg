@@ -563,6 +563,18 @@ def read_fish_signals():
         return None
 
 
+def hl_price(v, digits=2):
+    """低价高亮：现价 <10 元 → 红色加粗（Markdown 内联 HTML）"""
+    try:
+        p = float(v)
+    except (TypeError, ValueError):
+        return str(v)
+    s = f"{p:.{digits}f}"
+    if p < 10:
+        return f'<span style="color:#e60012"><b>{s}</b></span>'
+    return s
+
+
 def pool_overview_section(today):
     """③.6 各体系股池速览：双弦/猛兽/鱼身/乾坤/武威"""
     L = []
@@ -574,7 +586,7 @@ def pool_overview_section(today):
     # 双弦月度池
     sx = read_shuangxian_pool(today)
     if sx:
-        detail = "、".join(f"{n}{p}({s})" for n, p, s in sx)
+        detail = "、".join(f"{n}{hl_price(p)}({s})" for n, p, s in sx)
         A(f"| 🔗 双弦 | 月度共振池(≤10元) | {len(sx)} | {detail} |")
     else:
         A("| 🔗 双弦 | 月度共振池 | ⏳ 数据缺失 | quant_results 未产出 |")
@@ -1020,7 +1032,7 @@ def gen_report(today_str):
         for i, s in enumerate(ALL_STOCKS, 1):
             emoji = sig_emoji.get(s["sig"], " ")
             sig_short = s["sig"][:15] + ".." if len(s["sig"]) > 15 else s["sig"]
-            lines.append(f"| {i} | {s['code']} | {s['name']} | {s['price']:.2f} | {emoji} {sig_short} | {s['precip']}% | {s['m5']:.2f} |")
+            lines.append(f"| {i} | {s['code']} | {s['name']} | {hl_price(s['price'])} | {emoji} {sig_short} | {s['precip']}% | {s['m5']:.2f} |")
     
     if cheap:
         lines.append("\n### 💰 低价精选（≤10元）\n")
@@ -1029,7 +1041,7 @@ def gen_report(today_str):
         for i, s in enumerate(cheap[:15], 1):
             emoji = sig_emoji.get(s["sig"], " ")
             focus = "⭐" if s["price"] < 5 else "👀"
-            lines.append(f"| {i} | {s['code']} | {s['name']} | {s['price']:.2f} | {emoji} {s['sig'][:12]} | {s['precip']}% | {s['m5']:.2f} | {focus} |")
+            lines.append(f"| {i} | {s['code']} | {s['name']} | {hl_price(s['price'])} | {emoji} {s['sig'][:12]} | {s['precip']}% | {s['m5']:.2f} | {focus} |")
     
     # ════════════════════════════════════════
     # ── 乾坤A级金股（第四信号源：资金强攻+业绩共振，full_market_dualdim黑石启发）──
@@ -1040,7 +1052,7 @@ def gen_report(today_str):
         lines.append("| # | 代码 | 名称 | 价格 | 资金阶段 | 资金模式 | 沉淀率 | 评分 | 理由 |")
         lines.append("|---|------|------|:---:|:-----|:-----|:----:|:----:|:-----|")
         for i, s in enumerate(qa.get("stocks", [])[:15], 1):
-            lines.append(f"| {i} | {s.get('code','')} | {s.get('name','')} | {s.get('price',0):.2f} | {s.get('phase','')} | {s.get('mode','')} | {s.get('precip','')}% | {s.get('score',0)} | {s.get('greason','')} |")
+            lines.append(f"| {i} | {s.get('code','')} | {s.get('name','')} | {hl_price(s.get('price',0))} | {s.get('phase','')} | {s.get('mode','')} | {s.get('precip','')}% | {s.get('score',0)} | {s.get('greason','')} |")
         lines.append("")
 
     # 五、尾盘异动扫描（新增！）
