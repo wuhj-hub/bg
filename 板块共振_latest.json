@@ -1,12 +1,23 @@
 {
  "date": "2026-09-23",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 50,
+ "pool_size": 46,
  "resonance_boards": [
   {
    "name": "商用车",
    "code": "pt01801096",
    "zdf": 1.48,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "水泥",
+   "code": "pt01801711",
+   "zdf": 1.36,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -63,22 +74,17 @@
     "进场",
     "吸筹"
    ]
-  },
-  {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "zdf": 0.64,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
   }
  ],
  "grab_top": [
   {
    "name": "商用车",
    "code": "pt01801096",
+   "value": 7
+  },
+  {
+   "name": "水泥",
+   "code": "pt01801711",
    "value": 7
   }
  ],
@@ -124,9 +130,9 @@
    "value": 5.1
   },
   {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "value": 0.9
+   "name": "水泥",
+   "code": "pt01801711",
+   "value": 0.3
   }
  ],
  "absorption_top": [
@@ -166,9 +172,9 @@
    "value": 0.58
   },
   {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "value": 0.39
+   "name": "水泥",
+   "code": "pt01801711",
+   "value": 0.26
   },
   {
    "name": "电子化学品Ⅱ",
