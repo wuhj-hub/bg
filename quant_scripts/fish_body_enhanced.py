@@ -434,11 +434,22 @@ def is_valid_stock(code):
         return False
     return True
 
+_FAIL_CNT = {'stock': 0, 'batch': 0}
+
+
 def process_batch(batch):
-    """处理3只批次：批量technical + 逐只多维评分/共振/模式识别。返回 (signals, multis, filtered)"""
+    """处理3只批次：批量technical + 逐只多维评分/共振/模式识别。返回 (signals, multis, filtered)
+
+    ⚠️ 2026-09-23 加固：单只异常只跳过该只，不再让整批（进而整条链路）崩溃。
+    """
     local_sigs, local_multis, local_filtered = [], [], []
     cs = ','.join(batch)
-    tech_rows = parse_table(run(f"{WESTOCK_CMD} technical {cs} --group all 2>/dev/null"))
+    try:
+        tech_rows = parse_table(run(f"{WESTOCK_CMD} technical {cs} --group all 2>/dev/null"))
+    except Exception as e:
+        _FAIL_CNT['batch'] += 1
+        print(f"  [WARN] 批量取数失败 {batch}: {e}")
+        return local_sigs, local_multis, local_filtered
     for row in tech_rows:
         code = row.get('code', row.get('symbol', ''))
         name = row.get('name', '')
@@ -446,18 +457,33 @@ def process_batch(batch):
             continue
         if 'ST' in name.upper() or '*ST' in name.upper():
             continue
-        multi = score_stock_multi(code)
-        local_multis.append({'code': code, 'name': name, 'score': multi['score']})
-        res = verify_resonance(code)
-        sigs, filt = detect_fish_patterns(row, multi['score'], res, multi.get('kline'))
-        local_filtered.extend(filt)
-        for s in sigs:
-            if s.get('mode') == 1 and s.get('final_score', 0) >= 55:
-                if detect_golden_breakout(code):
-                    s['tag'] = '黄金起爆'
-            s['resonance_detail'] = res
-            local_sigs.append(s)
+        try:
+            multi = score_stock_multi(code)
+            local_multis.append({'code': code, 'name': name, 'score': multi['score']})
+            res = verify_resonance(code)
+            sigs, filt = detect_fish_patterns(row, multi['score'], res, multi.get('kline'))
+            local_filtered.extend(filt)
+            for s in sigs:
+                if s.get('mode') == 1 and s.get('final_score', 0) >= 55:
+                    if detect_golden_breakout(code):
+                        s['tag'] = '黄金起爆'
+                s['resonance_detail'] = res
+                local_sigs.append(s)
+        except Exception as e:
+            _FAIL_CNT['stock'] += 1
+            print(f"  [WARN] {code} 评分异常，跳过: {e}")
+            continue
     return local_sigs, local_multis, local_filtered
+
+
+def safe_process_batch(batch):
+    """最外层兜底：任何未捕获异常都不影响其它批次（修复 9-23 整链崩溃）"""
+    try:
+        return process_batch(batch)
+    except Exception as e:
+        _FAIL_CNT['batch'] += 1
+        print(f"  [WARN] 批次崩溃 {batch}: {e}")
+        return [], [], []
 
 
 def main():
@@ -521,12 +547,14 @@ def main():
     batches=[pool[i:i+3] for i in range(0,len(pool),3)]
     print(f"  → 并发扫描 {len(batches)} 批 × 4 workers（优化超时问题）")
     with ThreadPoolExecutor(max_workers=4) as ex:
-        for sigs_b, multis_b, filt_b in ex.map(process_batch, batches):
+        for sigs_b, multis_b, filt_b in ex.map(safe_process_batch, batches):
             all_sigs.extend(sigs_b)
             multis.extend(multis_b)
             all_filtered.extend(filt_b)
             if len(all_sigs) % 50 == 0 and all_sigs:
                 print(f"  ...已识别 {len(all_sigs)} 信号")
+    if _FAIL_CNT['stock'] or _FAIL_CNT['batch']:
+        print(f"  ⚠️ 本次跳过异常：个股 {_FAIL_CNT['stock']} 只 / 批次 {_FAIL_CNT['batch']} 批（详见上方 WARN）")
     if all_filtered:
         print(f"  🚫 箱体突破有效性过滤 {len(all_filtered)} 只（量能/回踩/位置三条件）：")
         for f in all_filtered[:20]:
