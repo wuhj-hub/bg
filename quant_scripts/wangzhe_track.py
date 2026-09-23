@@ -40,7 +40,7 @@ SIG = os.path.join(OUT, "wangzhe_signals.csv")
 BENCH = os.path.join(OUT, "wangzhe_benchmark.json")
 HOLD = [5, 10, 20]
 FIELDS = ["signal_date", "code", "name", "price", "vol_ratio", "turnover", "vr_checked", "confirmed", "lbc",
-          "fbt", "hybk", "source", "variant", "limit_date", "r5", "r10", "r20",
+          "fbt", "hybk", "source", "variant", "limit_date", "scan_date", "r5", "r10", "r20",
           "b5", "b10", "b20", "ex5", "ex10", "ex20"]
 
 
@@ -268,7 +268,13 @@ def fetch_vol_ratios(codes, chunk=40):
                 # ⚠️ volume 在 index 6（index 5 是 low，2026-09-16 修）
                 code, vol_s = parts[0], parts[6]
             elif re.match(r"^\d{4}-\d{2}-\d{2}$", parts[0]):
-                continue          # 无代码列，本批不可用
+                # 单股输出无代码列（p[0]=date）→ 用本批唯一代码
+                # ⚠️ 2026-09-23 修：候选仅 1~2 只时批量调用退化为单股格式，原逻辑直接 continue
+                #    → 量比恒为「未校验」（如 9/23 鸿路钢构/兴瑞科技）
+                if len(batch) == 1:
+                    code, vol_s = batch[0], parts[5]
+                else:
+                    continue
             else:
                 continue
             try:
@@ -307,13 +313,22 @@ def fetch_bars_batch(codes, limit=65, chunk=20):
             if not line.strip().startswith("|"):
                 continue
             p = [x.strip() for x in line.strip().strip("|").split("|")]
-            if len(p) < 9 or not re.match(r"^(sh|sz)\d{6}$", p[0]):
-                continue
-            try:
-                out.setdefault(p[0], []).append(
-                    (p[1], float(p[2]), float(p[3]), float(p[4]), float(p[5]), float(p[6])))
-            except (ValueError, TypeError):
-                continue
+            if re.match(r"^(sh|sz)\d{6}$", p[0]):
+                if len(p) < 9:
+                    continue
+                try:
+                    out.setdefault(p[0], []).append(
+                        (p[1], float(p[2]), float(p[3]), float(p[4]), float(p[5]), float(p[6])))
+                except (ValueError, TypeError):
+                    continue
+            elif len(batch) == 1 and re.match(r"^\d{4}-\d{2}-\d{2}$", p[0]):
+                # 单股输出无代码列（date|open|last|high|low|volume|amount|exchange）
+                # ⚠️ 2026-09-23 修：兼容候选仅 1 只时的单股格式
+                try:
+                    out.setdefault(batch[0], []).append(
+                        (p[0], float(p[1]), float(p[2]), float(p[3]), float(p[4]), float(p[5])))
+                except (ValueError, TypeError):
+                    continue
         for c in out:
             out[c].sort(key=lambda x: x[0])
     return out
@@ -349,17 +364,44 @@ def confirm_pending(rows, lookback_days=6):
         log("确认检查：无待确认候选（T-3~T-%d 无 live 信号）" % lookback_days)
         return 0
     log(f"确认检查：{len(pend)} 条候选（T-3~T-{lookback_days}）…")
-    bars_map = fetch_bars_batch(sorted({r["code"] for r, _ in pend}))
+    bars_map = fetch_bars_batch(sorted({r["code"] for r, _ in pend}), limit=130)
     done = 0
+    fixed = 0
     for r, sd in pend:
         b = bars_map.get(r["code"])
         if not b:
             continue
         dates = [x[0] for x in b]
+
+        def _is_lu(i):
+            return i > 0 and b[i - 1][2] > 0 and (b[i][2] / b[i - 1][2] - 1) >= 0.098
+
+        # ⚠️ 2026-09-23 新增「自愈校验」：signal_date 当天必须真的是涨停日；
+        #    否则（典型：盘前运行抓到上一交易日涨停池 → signal_date=运行日）改用真实涨停日，
+        #    避免 T+3 校验建立在错误基准上（漳州发展 sz000753 曾被误判为真·王者）。
+        if sd in dates:
+            t0 = dates.index(sd)
+            if not _is_lu(t0):
+                real_i = next((i for i in range(len(b) - 1, 0, -1) if _is_lu(i)), None)
+                if real_i is None:
+                    r["confirmed"] = "N"
+                    done += 1
+                    continue
+                if b[real_i][0] != sd:
+                    log(f"[自愈] {r['code']} {r.get('name','')} 信号日{sd}非涨停日 → 修正为{b[real_i][0]}（并重算确认）")
+                    r["signal_date"] = b[real_i][0]
+                    r["limit_date"] = b[real_i][0]
+                    fixed += 1
+        sd = r["signal_date"]
         if sd not in dates:
             continue
         t = dates.index(sd)
-        if t + 3 >= len(b) or t < 60:
+        if t < 59:
+            continue
+        if t + 3 >= len(b):
+            # T+3 数据未到 → 保持「空」（未满3日）；若之前误判为 Y 则清掉，防残留
+            if r.get("confirmed") == "Y" and fixed:
+                r["confirmed"] = ""
             continue
         c_t = b[t][2]; v_t = b[t][5]
         c13 = [b[t + 1][2], b[t + 2][2], b[t + 3][2]]
@@ -375,7 +417,8 @@ def confirm_pending(rows, lookback_days=6):
         ok = a2 and a3 and (a4a and a4b) and a5
         r["confirmed"] = "Y" if ok else "N"
         done += 1
-    log(f"确认检查完成：{done} 条已判定（Y={sum(1 for r,_ in pend if r.get('confirmed')=='Y')}）")
+    _y = sum(1 for r, _ in pend if r.get("confirmed") == "Y")
+    log(f"确认检查完成：{done} 条已判定（Y={_y}）" + (f" | 自愈修正 {fixed} 条" if fixed else ""))
     return done
 
 
@@ -416,19 +459,45 @@ def scan(live=True):
     # （如 600103 青山纸业：换手 11.88% 但量比仅 1.02）。
     # 现改为：换手>5%（初筛）AND 量比 1.5~4（确认）；拉取失败的保留并标注未校验。
     vr_map = fetch_vol_ratios([c[0] for c in cand])
+    # ⚠️ 2026-09-23 修复：用「真实涨停日」回填 signal_date/limit_date
+    #    （原实现 signal_date=运行日，盘前/跨日运行会与涨停池数据错位）
+    real_ld = fetch_real_limit_dates([c[0] for c in cand])
     for code_s, code, name, price, hs, lbc, fbt, hybk in cand:
         vr = vr_map.get(code_s)
         if vr is not None and not (1.5 <= vr <= 4):
             continue                                  # 量比不符 → 剔除
+        ld = real_ld.get(code_s) or ds                # 真实涨停日；取不到才退回运行日
         r = {k: "" for k in FIELDS}
-        r.update({"signal_date": ds, "code": code_s, "name": name,
+        r.update({"signal_date": ld, "code": code_s, "name": name,
                   "price": round(price, 2), "vol_ratio": (round(vr, 2) if vr is not None else ""),
                   "turnover": round(hs, 2), "vr_checked": ("Y" if vr is not None else "N"),
                   "lbc": lbc, "fbt": fbt, "hybk": hybk, "source": "live",
-                  "variant": "day1", "limit_date": ds})
+                  "variant": "day1", "limit_date": ld, "scan_date": ds})
+        if ld != ds:
+            log(f"[修正] {code_s} {name} 扫描日{ds} ≠ 真实涨停日{ld}，已按真实涨停日归档")
         rows.append(r)
     rows.sort(key=lambda x: x["fbt"])
     return rows
+
+
+def fetch_real_limit_dates(codes, lookback=12):
+    """回填「真实涨停日」：拉近 lookback 日线，找最近一次涨停（收盘涨幅≥9.8%）。
+
+    修复 2026-09-23 发现的「日期错位」：原实现 signal_date = 运行日；
+    若在盘前/跨日运行，东财涨停池返回的是上一交易日数据 → 日期与数据错位，
+    使 T+3 校验建立在错误基准上（例：漳州发展 sz000753 被误判为「真·王者倍量柱」）。
+    """
+    out = {}
+    bars = fetch_bars_batch(codes, limit=lookback + 2, chunk=20)
+    for code, b in bars.items():
+        if not b:
+            continue
+        for i in range(len(b) - 1, 0, -1):
+            pc, c = b[i - 1][2], b[i][2]
+            if pc > 0 and (c / pc - 1) >= 0.098:
+                out[code] = b[i][0]
+                break
+    return out
 
 
 def merge(new_rows, old_rows):
