@@ -106,6 +106,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="outputs/sector_component_em.json")
     ap.add_argument("--concepts-only", action="store_true", help="只拉概念板块(更快)")
+    ap.add_argument("--budget-sec", type=int, default=2000,
+                    help="时间预算秒数；到点优雅保存退出(默认2000≈33分，避 workflow 40min 强杀)")
+    ap.add_argument("--workers", type=int, default=WORKERS, help="并发数(默认3)")
+    ap.add_argument("--force", action="store_true", help="忽略旧缓存，全量重拉")
     args = ap.parse_args()
 
     groups = []
@@ -121,7 +125,20 @@ def main():
     #    （当日仅跑到 302 只就被杀）。改为 8 并发，各 worker 返回结果后主线程合并。
     tasks = [(bname, bcode) for gname, boards in groups for bcode, bname in boards if bcode.startswith("BK")]
     total_boards = len(tasks)
-    print(f"共 {total_boards} 个板块待拉取（{WORKERS} 并发）", flush=True)
+
+    # ── 断点续传：复用旧缓存，只拉缺失板块（板块成分变化很慢）──────────────
+    sectors, code_sector, code_name = {}, {}, {}
+    if not args.force and os.path.exists(args.out):
+        try:
+            old = json.load(open(args.out, encoding="utf-8"))
+            sectors = old.get("sectors", {}) or {}
+            code_name = old.get("code_name", {}) or {}
+            code_sector = old.get("code_sector", {}) or {}
+            print(f"续传：复用旧缓存 {len(sectors)} 板块 / {len(code_name)} 只", flush=True)
+        except Exception as e:
+            print(f"[WARN] 旧缓存不可用({e})，改为全量拉取", flush=True)
+    todo = [(bn, bc) for bn, bc in tasks if bn not in sectors]
+    print(f"共 {total_boards} 板块（待拉 {len(todo)}，{args.workers} 并发，预算 {args.budget_sec}s）", flush=True)
 
     def _one(item):
         bname, bcode = item
@@ -129,40 +146,55 @@ def main():
             stocks = fetch_board_stocks(bcode)
         except Exception:
             stocks = []
-        time.sleep(0.15)          # 请求间隔，降低被限流概率
+        time.sleep(0.06)          # 请求间隔，降低被限流概率
         codes = [sc for sc, sn in stocks if sc and sn]
         names = {sc: sn for sc, sn in stocks if sc and sn}
         return bname, codes, names
 
-    sectors = {}
-    code_sector = {}
-    code_name = {}
+    def _merge(bname, codes, names):
+        sectors[bname] = codes
+        for sc in codes:
+            lst = code_sector.setdefault(sc, [])
+            if bname not in lst:
+                lst.append(bname)
+        for sc, sn in names.items():
+            code_name.setdefault(sc, sn)
+
+    def _save():
+        data = {"date": time.strftime("%Y-%m-%d"), "sectors": sectors, "code_sector": code_sector,
+                "code_name": code_name, "source": "eastmoney",
+                "covered_boards": len(sectors), "total_boards": total_boards,
+                "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+        os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
+        with open(args.out, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=1)
+
+    t0 = time.time()
     done = 0
-    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
-        futs = {ex.submit(_one, t): t for t in tasks}
+    ex = ThreadPoolExecutor(max_workers=args.workers)
+    futs = {ex.submit(_one, t): t for t in todo}
+    stopped = False
+    try:
         for fu in as_completed(futs):
             try:
                 bname, codes, names = fu.result()
             except Exception:
                 continue
-            sectors[bname] = codes
-            for sc in codes:
-                code_sector.setdefault(sc, []).append(bname)
-            for sc, sn in names.items():
-                if sc not in code_name:
-                    code_name[sc] = sn
+            _merge(bname, codes, names)
             done += 1
-            if done % 50 == 0 or done == total_boards:
-                print(f"  进度 {done}/{total_boards} 板块 | 已覆盖 {len(code_name)} 只", flush=True)
-
-    date = time.strftime("%Y-%m-%d")
-    data = {"date": date, "sectors": sectors, "code_sector": code_sector, "code_name": code_name,
-            "source": "eastmoney"}
-    os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
-    with open(args.out, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=1)
+            if done % 50 == 0:
+                print(f"  进度 +{done} | 累计 {len(sectors)}/{total_boards} 板块 | {len(code_name)} 只", flush=True)
+                _save()                       # 周期性落盘 → 即便被强杀也不丢已拉部分
+            if time.time() - t0 > args.budget_sec:
+                stopped = True
+                print(f"⏱ 达到时间预算 {args.budget_sec}s → 提前保存（剩余 {len(todo) - done} 板块下次续拉）", flush=True)
+                break
+    finally:
+        ex.shutdown(wait=False, cancel_futures=True)
+    _save()
     avg = sum(len(v) for v in code_sector.values()) / max(len(code_sector), 1)
-    print(f"✅ {args.out}: {len(sectors)} 板块 | {len(code_name)} 只 | 平均 {avg:.1f} 题材/股")
+    print(f"✅ {args.out}: {len(sectors)}/{total_boards} 板块 | {len(code_name)} 只 | 平均 {avg:.1f} 题材/股"
+          + ("（未拉完，下次自动续传）" if stopped or len(sectors) < total_boards else ""))
     # 次新覆盖抽检（新浪漏的连板股）
     for c in ("003005", "601086", "605577", "603207"):
         print(f"  抽检 {c} {code_name.get(c,'?' )}: {code_sector.get(c, [])[:6]}")
