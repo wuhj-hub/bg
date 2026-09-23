@@ -7,7 +7,7 @@ gen_premarket_report.py —— 盘前市场报告生成器
 输出：盘前市场报告_YYYY-MM-DD.md → 上传至盘前报告文件夹
 """
 
-import subprocess, json, time, os, sys, re
+import subprocess, json, time, os, sys, re, urllib.request
 from datetime import datetime, timedelta
 
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
@@ -282,16 +282,25 @@ NEWS_SECTOR_MAP = [
 ]
 
 
-def news_sector_hint(news):
-    """新闻关键词 → 板块联动提示（规则化要闻解读）"""
-    text_all = " ".join(n["text"] for n in news)
-    hit = []
-    for kws, sec in NEWS_SECTOR_MAP:
-        if any(k.lower() in text_all.lower() for k in kws) and sec not in hit:
-            hit.append(sec)
-    if not hit:
-        return ""
-    return "📰 要闻联动：" + "、".join(hit) + "（隔夜消息面提示）"
+def get_commodity():
+    """商品（纽约原油/布伦特原油/纽约黄金）：腾讯期货接口。
+    注意：该接口字段用逗号分隔、最后一项为名称（09-23 修复原硬编码占位符）"""
+    out = []
+    try:
+        req = urllib.request.Request("https://qt.gtimg.cn/q=hf_CL,hf_OIL,hf_GC",
+                                     headers={"User-Agent": "Mozilla/5.0"})
+        raw = urllib.request.urlopen(req, timeout=15).read().decode("gbk", "ignore")
+        for ln in raw.split(";"):
+            if "=" not in ln:
+                continue
+            p = ln.split('"')[1].split(",")
+            if len(p) < 3:
+                continue
+            arrow = "🔴" if p[1].startswith("-") else "🟢"
+            out.append(f"- {p[-1]}：{p[0]}（{arrow}{p[1]}%）")
+    except Exception:
+        out = ["- ⏳ 商品数据获取失败"]
+    return out
 
 
 def get_index_monthly():
@@ -400,17 +409,14 @@ def gen_report(today_str):
     if news:
         for n in news:
             lines.append(f"- [{n['time']}] {n['text']}")
-        hint = news_sector_hint(news)
-        if hint:
-            lines.append(f"\n{hint}\n")
-        else:
-            lines.append("")
+        lines.append("")
     else:
         lines.append("- ⏳ 快讯获取失败\n")
 
     lines.append("\n### 商品\n")
-    oil = run_curl("https://api.exchangerate-api.com/v4/latest/USD")[:100] or "⏳ 数据获取中"
-    lines.append(f"- 原油/黄金数据：正在采集\n")
+    for _c in get_commodity():
+        lines.append(_c)
+    lines.append("")
     
     # ② 大盘
     lines.append("## ② 大盘定势\n")
