@@ -1,13 +1,13 @@
 {
  "date": "2026-09-23",
  "data_date": "2026-09-23",
- "style": "情绪市",
- "icon": "🔥",
- "score": 30,
+ "style": "均衡市",
+ "icon": "⚖️",
+ "score": 23,
  "score_detail": {
   "size_style": 0,
   "limitup_structure": 16,
-  "volume_structure": 7,
+  "volume_structure": 0,
   "sector_fund": 7
  },
  "size_style": {
@@ -21,20 +21,19 @@
   "zz500_5d": 1.41
  },
  "limitup_structure": {
-  "limitup": 44,
-  "strong": 81,
-  "width_score": 55.9,
+  "limitup": 46,
+  "strong": 83,
+  "width_score": 56.0,
   "level": "偏强（涨多跌少）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
   "strong_ratio": 2.7,
-  "zhaban_rate": 45.7,
+  "zhaban_rate": 44.6,
   "lianban": 12
  },
  "volume_structure": {
   "small_big_ratio_now": 1.323,
-  "small_big_ratio_5d": 1.206,
-  "small_vol_pulse": 97.11
+  "small_big_ratio_5d": 1.206
  },
  "sector_fund": {
   "sectors": [
@@ -78,8 +77,8 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 13,
-   "欧马模式": 2
+   "堆量模式": 14,
+   "欧马模式": 1
   },
   "leaders": {
    "堆量模式": 11,
@@ -87,10 +86,10 @@
   },
   "pullbacks": {},
   "gpoints": {
-   "堆量模式": 2
+   "堆量模式": 3
   },
-  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
+  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
- "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
+ "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
 }
