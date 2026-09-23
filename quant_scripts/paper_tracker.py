@@ -1,25 +1,47 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-paper_tracker.py —— 纸面组合跟踪（不依赖实盘，比较选股方法效果）
+paper_tracker.py —— 纸面组合跟踪 v2（OOS 前瞻验证 · 不依赖实盘）
 ================================================================
-将选股信号建成"虚拟持仓"组合（paper portfolio），记录信号日价格，
-之后每日更新现价计算盈亏，按选股方法分组统计，比较不同方法效果。
-
-方法分组（同一标的可属于多个组）：
-  A 月线反转only   B +武威G1   C +v2.1(支撑≥5%+盈利)
-  D +盈亏比≥2      E 三阶共振(完整)   对照组: 月线空头
+v2 改造（2026-09-23，方案A）：
+  ① 覆盖「体系所有股池」：--add 扫描各池文件，新标的自动入池（记录来源池）
+  ② 到期退出：持有 ≥ MAX_DAYS 交易日后结仓（保留 closed 记录用于统计）
+  ③ 落库闭环：产物需由 workflow 提交到仓库（原实现从不落库 → 每天白跑）
+  ④ 定位修正：唯一价值 = **样本外(out-of-sample)前瞻验证**「回测结论在未来是否仍成立」
 
 用法:
-  python3 paper_tracker.py --init pool_signals.json   # 初始化组合（首次）
-  python3 paper_tracker.py --update                    # 每日更新盈亏
-  python3 paper_tracker.py --report                    # 输出对比报告
+  python3 paper_tracker.py --init outputs/pool_signals_log.csv   # 首次初始化
+  python3 paper_tracker.py --add                                 # 每日：各池新标的入池
+  python3 paper_tracker.py --update                              # 每日：更新盈亏 + 到期结仓
+  python3 paper_tracker.py --report                              # 输出对比报告
 """
-import subprocess, sys, os, re, json, argparse
+import subprocess, sys, os, re, csv, json, argparse
 from datetime import datetime
 
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 PORTFOLIO = "outputs/paper_portfolio.json"
+MAX_DAYS = 20          # 持有到期（自然日）
+HOLD_CHECK = 20        # 与 MAX_DAYS 一致，便于阅读
+
+# 体系各股池（来源名, 路径）——存在即采集
+POOL_SOURCES = [
+    ("鱼身", "quant_scripts/stock_pool.txt"),
+    ("一统天下", "quant_scripts/yitong_pool.txt"),
+    ("才哥", "quant_scripts/caige_pool.txt"),
+    ("龙头", "quant_scripts/longtou_pool.txt"),
+    ("龙头战法", "quant_scripts/dragon_pool.txt"),
+    ("妖股", "quant_scripts/yao_pool.txt"),
+    ("猛兽本月", "quant_scripts/beast_pool.txt"),
+    ("乾坤A", "outputs/qiankun_a_latest.json"),
+    ("双弦", "outputs/双弦观察池_latest.json"),
+    ("猛兽突破", "outputs/beast_pool_latest.json"),
+    ("宁静卡位", "quant_scripts/ai_chain_pool.json"),
+    ("低空经济", "quant_scripts/low_altitude_pool.json"),
+    ("固态电池", "quant_scripts/solid_battery_pool.json"),
+    ("商业航天", "quant_scripts/space_pool.json"),
+    ("西湖RSV", "outputs/xihu_rsv_latest.json"),
+]
+
 
 def run(args, timeout=45):
     try:
@@ -27,6 +49,7 @@ def run(args, timeout=45):
         return r.stdout
     except Exception:
         return ""
+
 
 def parse_kline(txt):
     rows, header = [], None
@@ -50,19 +73,17 @@ def parse_kline(txt):
     rows.sort(key=lambda r: r[0])
     return rows
 
+
 def get_price(code):
-    """最新收盘价 + 信号日次日收盘"""
+    """日线 [(date, close)...] 升序；失败重试 3 次"""
     for _ in range(3):
-        txt = run(["kline", code, "--period", "day", "--limit", "60"])
-        rows = parse_kline(txt)
+        rows = parse_kline(run(["kline", code, "--period", "day", "--limit", "60"]))
         if rows:
             return rows
     return []
 
 
 def load_rsg_state():
-    """读取 RSV 扫描的 RSG 状态（2026-08-28：RSG实盘验证闭环）→ {code: {rsg_dev, rsg_strong}}
-    供纸面组合按"强势池/非强势池"分组对比，验证 RSG 过滤是否真的提升信号质量"""
     rsg = {}
     for p in ("outputs/rsv_strength_latest.json", "rsv_strength_latest.json"):
         if os.path.exists(p):
@@ -77,142 +98,226 @@ def load_rsg_state():
                 continue
     return rsg
 
+
+def _norm(code):
+    """6位数字 → sh/sz 前缀"""
+    c = (code or "").strip()
+    if re.match(r"^(sh|sz)\d{6}$", c):
+        return c
+    m = re.search(r"(\d{6})", c)
+    if not m:
+        return ""
+    d = m.group(1)
+    if d[0] in ("6", "9"):
+        return "sh" + d
+    return "sz" + d
+
+
+def collect_pool_codes():
+    """扫描所有股池文件 → [(pool_name, code)]（txt 取代码；json 递归取 code 字段）"""
+    out = []
+    for pool, path in POOL_SOURCES:
+        if not os.path.exists(path):
+            continue
+        try:
+            if path.endswith(".json"):
+                raw = json.load(open(path, encoding="utf-8"))
+                found = []
+
+                def walk(x):
+                    if isinstance(x, dict):
+                        for k, v in x.items():
+                            if k in ("code", "symbol", "ts_code") and isinstance(v, str):
+                                found.append(v)
+                            else:
+                                walk(v)
+                    elif isinstance(x, list):
+                        for i in x:
+                            walk(i)
+                walk(raw)
+                codes = {_norm(c) for c in found}
+            else:
+                txt = open(path, encoding="utf-8", errors="ignore").read()
+                codes = {_norm(c) for c in re.findall(r"\b(?:sh|sz)?\d{6}\b", txt)}
+            for c in sorted(x for x in codes if x):
+                out.append((pool, c))
+        except Exception as e:
+            print(f"  [WARN] 读取股池 {path} 失败: {e}")
+    # 去重（同一只保留首个来源）
+    seen, res = set(), []
+    for pool, c in out:
+        if c in seen:
+            continue
+        seen.add(c)
+        res.append((pool, c))
+    return res
+
+
+def _load():
+    if os.path.exists(PORTFOLIO):
+        try:
+            return json.load(open(PORTFOLIO, encoding="utf-8"))
+        except Exception:
+            pass
+    return {"init_date": datetime.now().strftime("%Y-%m-%d"), "positions": [], "closed": []}
+
+
+def _save(pf):
+    os.makedirs(os.path.dirname(PORTFOLIO) or ".", exist_ok=True)
+    json.dump(pf, open(PORTFOLIO, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+
+
 def init_portfolio(signals_file):
-    """从信号日志初始化纸面组合：取每个(date,code)最新一行"""
     signals = {}
     with open(signals_file, encoding="utf-8") as f:
-        for row in __import__("csv").DictReader(f):
-            key = (row["date"], row["code"])
-            signals[key] = row
-    # 初始化：记录信号日价格（取信号日之后第一个交易日的收盘作为入场价）
-    portfolio = {"init_date": datetime.now().strftime("%Y-%m-%d"), "positions": []}
+        for row in csv.DictReader(f):
+            signals[(row.get("date", ""), row.get("code", ""))] = row
+    pf = {"init_date": datetime.now().strftime("%Y-%m-%d"), "positions": [], "closed": []}
     for (sig_date, code), s in sorted(signals.items()):
         rows = get_price(code)
         if not rows:
             continue
-        # 入场价 = 信号日（或其后第一个交易日）收盘
-        entry = None
-        for d, c in rows:
-            if d >= sig_date:
-                entry = c
-                break
+        entry = next((c for d, c in rows if d >= sig_date), None)
         if entry is None:
             continue
-        _rsg_sig = load_rsg_state().get(code, {})
-        position = {
-            "code": code, "name": s.get("name", ""), "sig_date": sig_date,
-            "entry": entry, "gate": s.get("gate", ""), "g1": s.get("g1", ""),
-            "support": s.get("support", ""), "finance": s.get("finance", ""),
-            "rsg_sig": _rsg_sig.get("rsg_dev"), "rsg_sig_strong": _rsg_sig.get("rsg_strong", False),
-        }
-        # 方法分组
         methods = ["A月线反转only"]
         if s.get("g1") in ("双阴", "一阴"):
             methods.append("B+武威G1")
-            try:
-                if float(s.get("support", 0) or 0) >= 0.05:
-                    methods.append("C+v2.1支撑")
-            except ValueError:
-                pass
         if s.get("finance") == "盈利":
             methods.append("C+v2.1盈利")
-        position["methods"] = methods
-        portfolio["positions"].append(position)
-    with open(PORTFOLIO, "w", encoding="utf-8") as f:
-        json.dump(portfolio, f, ensure_ascii=False, indent=2)
-    print(f"✅ 纸面组合初始化: {len(portfolio['positions'])} 个信号（{PORTFOLIO}）")
+        pf["positions"].append({
+            "code": code, "name": s.get("name", ""), "sig_date": sig_date, "entry": entry,
+            "pool": "池信号", "methods": methods, "status": "open",
+        })
+    _save(pf)
+    print(f"✅ 初始化: {len(pf['positions'])} 个信号")
+
+
+def add_positions():
+    """扫描各池 → 新标的入池（已持有/已结仓的跳过）"""
+    pf = _load()
+    have = {p["code"] for p in pf.get("positions", [])} | {p["code"] for p in pf.get("closed", [])}
+    pools = collect_pool_codes()
+    added, bypool = 0, {}
+    for pool, code in pools:
+        if code in have:
+            continue
+        rows = get_price(code)
+        if not rows:
+            continue
+        pf.setdefault("positions", []).append({
+            "code": code, "name": "", "sig_date": rows[-1][0], "entry": rows[-1][1],
+            "pool": pool, "methods": [], "status": "open",
+        })
+        have.add(code)
+        added += 1
+        bypool[pool] = bypool.get(pool, 0) + 1
+        print(f"  + [{pool}] {code} @{rows[-1][1]}")
+    _save(pf)
+    print(f"✅ 新增入池 {added} 只（池来源: {bypool or '无'}）")
+
 
 def update_portfolio():
-    """更新所有持仓现价，计算盈亏"""
-    if not os.path.exists(PORTFOLIO):
-        print("❌ 组合未初始化，先 --init")
+    pf = _load()
+    if not pf.get("positions") and not pf.get("closed"):
+        print("❌ 组合未初始化，先 --init/--add")
         return
-    pf = json.load(open(PORTFOLIO, encoding="utf-8"))
     _rsg_now = load_rsg_state()
-    for p in pf["positions"]:
+    closed_n = 0
+    for p in list(pf.get("positions", [])):
         rows = get_price(p["code"])
-        if rows:
-            p["cur_price"] = rows[-1][1]
-            p["cur_date"] = rows[-1][0]
-            p["ret"] = (p["cur_price"] / p["entry"] - 1) * 100
+        if not rows:
+            continue
+        p["cur_price"] = rows[-1][1]
+        p["cur_date"] = rows[-1][0]
+        p["ret"] = (p["cur_price"] / p["entry"] - 1) * 100
+        try:
             p["days"] = (datetime.strptime(rows[-1][0], "%Y-%m-%d") - datetime.strptime(p["sig_date"], "%Y-%m-%d")).days
-            _rg_now = _rsg_now.get(p["code"], {})
-            p["rsg_now"] = _rg_now.get("rsg_dev")
-            p["rsg_now_strong"] = _rg_now.get("rsg_strong", False)
+        except Exception:
+            p["days"] = 0
+        _rg = _rsg_now.get(p["code"], {})
+        p["rsg_now"] = _rg.get("rsg_dev")
+        p["rsg_now_strong"] = _rg.get("rsg_strong", False)
+        # 到期结仓
+        if p.get("days", 0) >= MAX_DAYS:
+            p["status"] = "closed"
+            p["close_ret"] = p["ret"]
+            pf.setdefault("closed", []).append(p)
+            pf["positions"].remove(p)
+            closed_n += 1
     pf["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M")
-    json.dump(pf, open(PORTFOLIO, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-    print(f"✅ 组合已更新（{len(pf['positions'])} 个信号）")
+    _save(pf)
+    print(f"✅ 已更新：持仓 {len(pf.get('positions', []))} 只 | 本期到期结仓 {closed_n} 只 | 历史结仓 {len(pf.get('closed', []))} 只")
+
+
+def _stat(rets):
+    if not rets:
+        return "—", "—", "—"
+    wins = [r for r in rets if r > 0]
+    return (f"{len(wins)/len(rets)*100:.0f}%", f"{sum(rets)/len(rets):+.2f}%", f"{sum(rets):+.1f}%")
+
 
 def report():
-    pf = json.load(open(PORTFOLIO, encoding="utf-8"))
-    positions = [p for p in pf["positions"] if "ret" in p]
-    if not positions:
-        print("⏳ 先 --update 更新盈亏")
-        return
+    pf = _load()
+    positions = [p for p in pf.get("positions", []) if "ret" in p]
+    closed = [p for p in pf.get("closed", []) if "close_ret" in p]
     L = []
     A = L.append
-    A(f"# 📊 纸面组合跟踪报告（不依赖实盘）\n")
-    A(f"> 初始化: {pf.get('init_date')} | 更新: {pf.get('last_update')} | 信号数: {len(positions)}")
-    A(f"> 口径：信号日收盘入场 → 现价盈亏，按选股方法分组对比\n")
-    A("## 一、选股方法效果对比（纸面组合）\n")
-    A("| 方法 | 持仓数 | 胜率 | 平均收益 | 中位 | 累计 |")
-    A("|:----|:---:|:----:|:-------:|:----:|:----:|")
-    groups = {}
-    for p in positions:
-        for m in p.get("methods", []):
-            groups.setdefault(m, []).append(p["ret"])
-    order = ["A月线反转only", "B+武威G1", "C+v2.1支撑", "C+v2.1盈利", "E三阶共振"]
-    for m in order:
-        rets = groups.get(m, [])
-        if len(rets) < 3:
-            continue
-        wins = [r for r in rets if r > 0]
-        A(f"| {m} | {len(rets)} | {len(wins)/len(rets)*100:.0f}% | {sum(rets)/len(rets):+.2f}% | {sorted(rets)[len(rets)//2]:+.2f}% | {sum(rets):+.1f}% |")
-    # RSG 分组对比（2026-08-28：RSG实盘验证闭环，验证强势侧过滤是否有效）
-    A("\n## 二、RSG 强势池分组对比（RSG实盘验证）\n")
-    A("> 口径：按**当前RSG状态**分组（周线RS偏离52周均线>50‰=强势池）。若RSG过滤有效，强势池组收益应显著优于非强势池组。\n")
-    A("| 分组 | 持仓数 | 胜率 | 平均收益 | 累计 |")
+    A("# 📊 纸面组合跟踪报告 v2（OOS 前瞻验证）\n")
+    A(f"> 初始化 {pf.get('init_date')} | 更新 {pf.get('last_update')} | 在场 {len(positions)} 只 | 已结仓 {len(closed)} 只")
+    A("> **口径**：入池日收盘 = 入场价；现价盈亏；持有 ≥20 天结仓。**定位 = 样本外前瞻**（回测结论在未来是否仍成立）\n")
+
+    # 一、按股池分组（当前在场）
+    A("## 一、各股池表现（在场持仓）\n")
+    A("| 股池 | 持仓数 | 胜率 | 平均收益 | 累计 |")
     A("|:----|:---:|:----:|:-------:|:----:|")
-    _grp_s = [p["ret"] for p in positions if p.get("rsg_now_strong")]
-    _grp_w = [p["ret"] for p in positions if not p.get("rsg_now_strong")]
-    for _name, _rets in (("🟢 强势池(RSG>50‰)", _grp_s), ("⚪ 非强势池", _grp_w)):
-        if len(_rets) >= 3:
-            _w = [r for r in _rets if r > 0]
-            A(f"| {_name} | {len(_rets)} | {len(_w)/len(_rets)*100:.0f}% | {sum(_rets)/len(_rets):+.2f}% | {sum(_rets):+.1f}% |")
-        else:
-            A(f"| {_name} | {len(_rets)}（样本不足） | — | — | — |")
-    _sig_s = [p["ret"] for p in positions if p.get("rsg_sig_strong")]
-    _sig_w = [p["ret"] for p in positions if not p.get("rsg_sig_strong") and p.get("rsg_sig") is not None]
-    if len(_sig_s) >= 3 or len(_sig_w) >= 3:
-        A("\n> 信号日RSG分组（信号发生时即标注，更严格）：")
-        for _name, _rets in (("🟢 信号日强势", _sig_s), ("⚪ 信号日非强势", _sig_w)):
-            if len(_rets) >= 3:
-                _w = [r for r in _rets if r > 0]
-                A(f"| {_name} | {len(_rets)} | {len(_w)/len(_rets)*100:.0f}% | {sum(_rets)/len(_rets):+.2f}% | {sum(_rets):+.1f}% |")
-    A("\n## 三、当前持仓清单\n")
-    A("| 代码 | 名称 | 信号日 | 入场价 | 现价 | 盈亏 | 天数 | RSG | 方法 |")
-    A("|:----|:----|:----|:----:|:----:|:----:|:----:|:----:|:----|")
+    byp = {}
+    for p in positions:
+        byp.setdefault(p.get("pool", "?"), []).append(p["ret"])
+    for k in sorted(byp, key=lambda x: -sum(byp[x]) / len(byp[x])):
+        w, m, c = _stat(byp[k])
+        A(f"| {k} | {len(byp[k])} | {w} | {m} | {c} |")
+
+    # 二、已结仓统计（更有意义：完整周期）
+    if closed:
+        A("\n## 二、已结仓统计（完整持有周期，样本外验证）\n")
+        A("| 股池 | 结仓数 | 胜率 | 平均收益 | 累计 |")
+        A("|:----|:---:|:----:|:-------:|:----:|")
+        bp2 = {}
+        for p in closed:
+            bp2.setdefault(p.get("pool", "?"), []).append(p["close_ret"])
+        for k in sorted(bp2, key=lambda x: -sum(bp2[x]) / len(bp2[x])):
+            w, m, c = _stat(bp2[k])
+            A(f"| {k} | {len(bp2[k])} | {w} | {m} | {c} |")
+        w, m, c = _stat([p["close_ret"] for p in closed])
+        A(f"\n> **合计**：{len(closed)} 笔 | 胜率 {w} | 平均 {m} | 累计 {c}")
+
+    # 三、在场明细
+    A("\n## 三、在场持仓明细\n")
+    A("| 代码 | 股池 | 入场日 | 入场价 | 现价 | 盈亏 | 天数 |")
+    A("|:----|:----|:----|:----:|:----:|:----:|:----:|")
     for p in sorted(positions, key=lambda x: -x.get("ret", 0)):
-        _rsg_txt = "🟢" if p.get("rsg_now_strong") else ("🟡" if (p.get("rsg_now") or 0) > 0 else "⚪")
-        A(f"| {p['code']} | {p['name']} | {p['sig_date']} | {p['entry']:.2f} | {p.get('cur_price', 0):.2f} | {p.get('ret', 0):+.1f}% | {p.get('days', 0)} | {_rsg_txt} | {'+'.join(p.get('methods', [])[:3])} |")
+        A(f"| {p['code']} | {p.get('pool','?')} | {p['sig_date']} | {p['entry']:.2f} | {p.get('cur_price',0):.2f} | {p.get('ret',0):+.1f}% | {p.get('days',0)} |")
     A("\n---")
-    A("⚠️ 本报告为纸面模拟跟踪，非实盘记录，不构成投资建议。")
+    A("⚠️ 纸面模拟，非实盘记录，不构成投资建议。")
     md = "\n".join(L)
     os.makedirs("outputs", exist_ok=True)
     out = f"outputs/纸面组合跟踪报告_{datetime.now().strftime('%Y-%m-%d')}.md"
-    with open(out, "w", encoding="utf-8") as f:
-        f.write(md)
+    open(out, "w", encoding="utf-8").write(md)
     print(f"[OK] {out}")
-    print(md[:1200])
+
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--init", default="", help="从信号日志CSV初始化")
+    ap.add_argument("--add", action="store_true", help="扫描所有股池，新标的入池")
     ap.add_argument("--update", action="store_true")
     ap.add_argument("--report", action="store_true")
     a = ap.parse_args()
     if a.init:
         init_portfolio(a.init)
+    elif a.add:
+        add_positions()
     elif a.update:
         update_portfolio()
     elif a.report:
