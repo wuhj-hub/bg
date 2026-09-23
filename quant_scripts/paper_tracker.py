@@ -442,9 +442,10 @@ def report():
         cur = [p["ret"] for p in row]
         A(f"| {pool} | {len(row)} | " + " | ".join(cells) + f" | {sum(cur)/len(cur):+.2f}% |")
 
-    A("\n## 二、三线退出对照（C 轨：与\"固定持有期\"比，谁更值）\n")
-    A("| 池 | 样本 | 黄金线退出 | 持股线退出 | 锚定线退出 | 固定20日 |")
-    A("|:----|:---:|:----:|:----:|:----:|:----:|")
+    A("\n## 二、三线 × 固定持有期 收益对比（**仅对比用，不作退出规则**）\n")
+    A("> 口径：① 固定持有 5/10/20/60 交易日的收益；② 三条线各自\"持有到破线\"的收益（**仅作对比基准，实盘不执行**）\n")
+    A("| 池 | 样本 | 黄金线 | 持股线 | 锚定线 | 固定5日 | 固定10日 | 固定20日 | 固定60日 |")
+    A("|:----|:---:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|")
     tot = {"gold": [], "hold": [], "anchor": []}
     for pool in allp:
         row = [p for p in pos if p.get("pool") == pool]
@@ -453,12 +454,14 @@ def report():
             vs = [p[f"exit_{tag}_ret"] for p in row if p.get(f"exit_{tag}_ret") is not None]
             tot[tag] += vs
             cells.append(f"{sum(vs)/len(vs):+.2f}%" if vs else "—")
-        r20 = [p["ret_20"] for p in row if p.get("ret_20") is not None]
-        A(f"| {pool} | {len(row)} | " + " | ".join(cells) + f" | {(f'{sum(r20)/len(r20):+.2f}%' if r20 else '—')} |")
+        fixed = []
+        for h in HOLDS:
+            vs = [p[f"ret_{h}"] for p in row if p.get(f"ret_{h}") is not None]
+            fixed.append(f"{sum(vs)/len(vs):+.2f}%" if vs else "—")
+        A(f"| {pool} | {len(row)} | " + " | ".join(cells) + " | " + " | ".join(fixed) + " |")
     A("\n**全体合计**：" + " ｜ ".join(
         f"{n} {sum(tot[t])/len(tot[t]):+.2f}%（{sum(1 for x in tot[t] if x>0)/len(tot[t])*100:.0f}%胜）"
         for n, t in (("黄金线", "gold"), ("持股线", "hold"), ("锚定线", "anchor")) if tot[t]))
-
     A("\n## 三、三线状态分布（当前）\n")
     A("| 状态 | 只数 |")
     A("|:----|:---:|")
