@@ -482,6 +482,8 @@ jobs:
             echo "首次：从池信号日志初始化"
             python3 quant_scripts/paper_tracker.py --init outputs/pool_signals_log.csv
           fi
+          # 各股池「每日入池快照」（为未来 OOS 回测积累 entry_date）
+          python3 quant_scripts/pool_snapshot.py
           # 扫描体系所有股池 → 新标的入池（2026-09-23 方案A：覆盖全部股池）
           python3 quant_scripts/paper_tracker.py --add
           python3 quant_scripts/paper_tracker.py --update
@@ -489,6 +491,9 @@ jobs:
           # ⚠️ 2026-09-23 修复：产物落库（原实现从不提交 → 49 天白跑、零累积）
           python3 git_api_commit.py --msg "chore: paper portfolio ($(date +%Y-%m-%d))" \
             outputs/paper_portfolio.json \
+            outputs/pool_snapshots.jsonl \
+            outputs/pool_entries.csv \
+            outputs/pool_quality.json \
             "outputs/纸面组合跟踪报告_$(date +%Y-%m-%d).md"
           RC=$?
           set -e
