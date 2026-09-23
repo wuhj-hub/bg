@@ -1,70 +1,75 @@
 {
- "date": "2026-09-22",
+ "date": "2026-09-23",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 51,
+ "pool_size": 50,
  "resonance_boards": [
+  {
+   "name": "商用车",
+   "code": "pt01801096",
+   "zdf": 1.48,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
   {
    "name": "房地产服务",
    "code": "pt01801183",
-   "zdf": 3.4,
-   "strength": 8,
+   "zdf": 3.31,
+   "strength": 6,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "zdf": 3.58,
-   "strength": 7,
+   "name": "电子化学品Ⅱ",
+   "code": "pt01801086",
+   "zdf": 1.52,
+   "strength": 5,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "zdf": 1.71,
-   "strength": 7,
+   "name": "光学光电子",
+   "code": "pt01801084",
+   "zdf": 0.27,
+   "strength": 5,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "IT服务Ⅱ",
-   "code": "pt01801103",
-   "zdf": 1.36,
-   "strength": 7,
+   "name": "通用设备",
+   "code": "pt01801072",
+   "zdf": 0.66,
+   "strength": 5,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "计算机设备",
-   "code": "pt01801101",
-   "zdf": 1.3,
-   "strength": 7,
+   "name": "房地产",
+   "code": "pt01801180",
+   "zdf": 0.02,
+   "strength": 5,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "煤炭",
-   "code": "pt01801950",
-   "zdf": 1.18,
-   "strength": 7,
+   "name": "非白酒",
+   "code": "pt01801126",
+   "zdf": 0.64,
+   "strength": 5,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -72,127 +77,122 @@
  ],
  "grab_top": [
   {
-   "name": "房地产服务",
-   "code": "pt01801183",
-   "value": 8
-  },
-  {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "value": 7
-  },
-  {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 7
-  },
-  {
-   "name": "IT服务Ⅱ",
-   "code": "pt01801103",
-   "value": 7
-  },
-  {
-   "name": "计算机设备",
-   "code": "pt01801101",
-   "value": 7
-  },
-  {
-   "name": "煤炭",
-   "code": "pt01801950",
+   "name": "商用车",
+   "code": "pt01801096",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "新股与次新股",
-   "code": "pt02003501",
-   "value": 33.9
+   "name": "光学光电子",
+   "code": "pt01801084",
+   "value": 47.7
   },
   {
-   "name": "计算机设备",
-   "code": "pt01801101",
-   "value": 21.6
+   "name": "通用设备",
+   "code": "pt01801072",
+   "value": 28.7
   },
   {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "value": 18.0
+   "name": "房地产",
+   "code": "pt01801180",
+   "value": 19.9
   },
   {
-   "name": "IT服务Ⅱ",
-   "code": "pt01801103",
-   "value": 12.5
+   "name": "汽车",
+   "code": "pt01801880",
+   "value": 19.3
+  },
+  {
+   "name": "房地产开发",
+   "code": "pt01801181",
+   "value": 18.7
   },
   {
    "name": "房地产服务",
    "code": "pt01801183",
-   "value": 4.5
+   "value": 7.7
   },
   {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 4.2
+   "name": "商用车",
+   "code": "pt01801096",
+   "value": 5.4
   },
   {
-   "name": "煤炭",
-   "code": "pt01801950",
-   "value": 1.3
+   "name": "电子化学品Ⅱ",
+   "code": "pt01801086",
+   "value": 5.1
+  },
+  {
+   "name": "非白酒",
+   "code": "pt01801126",
+   "value": 0.9
   }
  ],
  "absorption_top": [
   {
    "name": "房地产服务",
    "code": "pt01801183",
-   "value": 3.14
+   "value": 4.43
   },
   {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "value": 2.75
+   "name": "商用车",
+   "code": "pt01801096",
+   "value": 2.12
   },
   {
-   "name": "计算机设备",
-   "code": "pt01801101",
+   "name": "房地产开发",
+   "code": "pt01801181",
    "value": 1.73
   },
   {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 1.03
+   "name": "光学光电子",
+   "code": "pt01801084",
+   "value": 1.59
   },
   {
-   "name": "新股与次新股",
-   "code": "pt02003501",
-   "value": 0.89
+   "name": "房地产",
+   "code": "pt01801180",
+   "value": 1.59
   },
   {
-   "name": "IT服务Ⅱ",
-   "code": "pt01801103",
-   "value": 0.63
+   "name": "通用设备",
+   "code": "pt01801072",
+   "value": 0.79
   },
   {
-   "name": "煤炭",
-   "code": "pt01801950",
-   "value": 0.2
+   "name": "汽车",
+   "code": "pt01801880",
+   "value": 0.58
+  },
+  {
+   "name": "非白酒",
+   "code": "pt01801126",
+   "value": 0.39
+  },
+  {
+   "name": "电子化学品Ⅱ",
+   "code": "pt01801086",
+   "value": 0.24
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "房地产服务",
-   "stock": "我爱我家",
-   "code": "sz000560",
-   "zdf": "10.03",
-   "main1": 3.33,
-   "main5": 3.1
+   "board": "商用车",
+   "stock": "江淮汽车",
+   "code": "sh600418",
+   "zdf": "9.99",
+   "main1": 7.99,
+   "main5": 5.73
   },
   {
-   "board": "广告营销",
-   "stock": "智度股份",
-   "code": "sz000676",
-   "zdf": "10.04",
-   "main1": 2.87,
-   "main5": -0.21
+   "board": "房地产服务",
+   "stock": "华远控股",
+   "code": "sh600743",
+   "zdf": "10.16",
+   "main1": 0.22,
+   "main5": 0.54
   }
  ]
 }
