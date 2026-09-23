@@ -532,6 +532,18 @@
    "quant_report.yml",
    "quant_scan.yml"
   ],
+  "paper_portfolio.json": [
+   "quant_report.yml"
+  ],
+  "pool_entries.csv": [
+   "quant_report.yml"
+  ],
+  "pool_quality.json": [
+   "quant_report.yml"
+  ],
+  "纸面组合跟踪报告_{var}.md": [
+   "quant_report.yml"
+  ],
   "quant_results_latest.json": [
    "quant_scan.yml"
   ],
@@ -863,12 +875,16 @@
   "hot_emotion_latest.md",
   "ima_cred_last_ok.json",
   "market_style_latest.json",
+  "paper_portfolio.json",
+  "pool_entries.csv",
+  "pool_quality.json",
   "一统天下建仓区股池_latest.json",
   "一统天下建仓区股池_latest.md",
   "四态胜率_{var}.md",
   "复盘报告_{var}.md",
   "涨停型王者_成功率报告",
   "盘前市场报告_{var}.md",
+  "纸面组合跟踪报告_{var}.md",
   "西湖rsv全市场_{var}.md",
   "资金快照_{var}.csv"
  ]
