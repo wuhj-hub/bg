@@ -11,7 +11,7 @@ v3 相对 v2 的改造（A+B+C 三轨）：
 三线定义（与体系既有口径一致）：
   黄金线（腰缠万贯）：XA72=MA(TR,13); XA73=REF(C,1)-REF(XA72,1); 黄金线=HHV(XA73,12)
   持股线（猛兽派）  ：EMA(C,20) - 2*ATR(14)
-  锚定线（新增）    ：从「入场日」起累计的 VWAP = Σ((H+L+C)/3*V)/Σ(V)
+  锚定线（标准AVWAP）：锚点=最近一次「250日新低」日；AVWAP=Σ((H+L+C)/3*V)/Σ(V)
 
 用法:
   python3 paper_tracker.py --init outputs/pool_signals_log.csv
@@ -159,93 +159,38 @@ def line_hold(bars, n_ema=20, n_atr=14):
     return [None if (ema[i] is None or atr[i] is None) else ema[i] - 2 * atr[i] for i in range(n)]
 
 
-def zig_pivots(bars, pct=15.0):
-    """ZIG(2,pct) 低点（月线主图「锚定线」口径，含**确认日**以消除未来函数）
-    → [(low_idx, confirm_idx)]：低点位置 + 该低点被确认（后续高点涨幅≥pct）的位置
+def anchor_index(bars, lookback=250):
+    """标准 Anchored VWAP 的锚点：最近一次「创 lookback 日新低」的交易日
+    ⚠️ 无未来函数：只用「过去 lookback 日」判断，锚点在当天收盘即可确定。
     """
     n = len(bars)
-    lows = [b[4] for b in bars]
-    piv, i = [], 0
-    while i < n:
-        j = i
-        while j + 1 < n and lows[j + 1] <= lows[j]:
-            j += 1
-        low_i, low_p = j, lows[j]
-        conf, k = None, j + 1
-        while k < n:
-            if bars[k][3] >= low_p * (1 + pct / 100):
-                conf = k
-                break
-            k += 1
-        if conf is None:
-            break
-        piv.append((low_i, conf))
-        i = conf
-    return piv
+    anchor = 0
+    for i in range(n):
+        seg = bars[max(0, i - lookback + 1):i + 1]
+        lo = min(b[4] for b in seg)
+        if bars[i][4] <= lo + 1e-9:              # 当日即为区间最低 → 新低点
+            anchor = i
+    return anchor
 
 
-def monthly_from_daily(bars):
-    """日线 → 月线 [(ym, open, close, high, low, vol)]（用于月线口径的 ZIG 锚点）"""
-    from collections import OrderedDict
-    mm = OrderedDict()
-    for d, o, c, h, l, v in bars:
-        ym = d[:7]
-        if ym not in mm:
-            mm[ym] = [ym, o, c, h, l, v]
-        else:
-            r = mm[ym]
-            r[2] = c                                  # 最新收盘
-            r[3] = max(r[3], h)
-            r[4] = min(r[4], l)
-            r[5] += v
-    return [tuple(x) for x in mm.values()]
-
-
-def line_anchor(bars, pct=15.0):
-    """锚定线（**月线主图口径**）= 从「最近已确认的 ZIG 低点」起算的累计 VWAP
-
-    来源：通达信月线主图（ZIG(2,N) 锚定 VWAP）
-        N:=15; 典型价格:=(H+L+C)/3;
-        A:=ZIG(2,N); B1:=IF(A=LLV(L,N),DATE,DRAWNULL); B2:=BARSLAST(DATE-B1=0);
-        VWAP2:=SUM(典型价格*V,B4)/SUM(V,B4); 锚定线:=VWAP2
-
-    ⚠️ ZIG 是未来函数（低点需后续反弹 ≥N% 才确认）→ 锚点仅在**确认日之后**才可见，
-       否则回测会偷看未来（本函数已在月线上做确认延迟）。
+def line_anchor(bars, lookback=250):
+    """锚定线（标准 Anchored VWAP 口径）
+        锚点 anchor = 最近一次「lookback 日新低」日
+        AVWAP(t) = Σ_{i=anchor..t} ((H+L+C)/3 × V) / Σ_{i=anchor..t} V
+    无未来函数：锚点当天即可确定；本函数对全部 t>=anchor 输出。
     """
     n = len(bars)
     out = [None] * n
-    mb = monthly_from_daily(bars)
-    if len(mb) < 3:
+    if n == 0:
         return out
-    piv = zig_pivots(mb, pct)                        # 月线 ZIG 低点（含确认月）
-    if not piv:
-        return out
-    # 把「锚点月 / 确认月」映射回日线索引
-    def ym_to_first_idx(ym):
-        for i, b in enumerate(bars):
-            if b[0][:7] >= ym:
-                return i
-        return None
-    # 取最近一个「确认日已到」的锚点
-    chosen = None
-    for low_m, conf_m in piv:
-        if ym_to_first_idx(mb[conf_m][0]) is None:
-            continue
-        chosen = (mb[low_m][0], mb[conf_m][0])
-    if not chosen:
-        return out
-    lo_idx = ym_to_first_idx(chosen[0])
-    vis_idx = ym_to_first_idx(chosen[1])
-    if lo_idx is None or vis_idx is None:
-        return out
+    a = anchor_index(bars, lookback)
     pv = vv = 0.0
-    for t in range(lo_idx, n):
+    for t in range(a, n):
         tp = (bars[t][3] + bars[t][4] + bars[t][2]) / 3
         v = bars[t][5] or 0
         pv += tp * v
         vv += v
-        if t >= vis_idx and vv > 0:                  # 确认日之前不出线
-            out[t] = pv / vv
+        out[t] = pv / vv if vv > 0 else None
     return out
 
 
