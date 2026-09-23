@@ -1,29 +1,41 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-paper_tracker.py —— 纸面组合跟踪 v2（OOS 前瞻验证 · 不依赖实盘）
-================================================================
-v2 改造（2026-09-23，方案A）：
-  ① 覆盖「体系所有股池」：--add 扫描各池文件，新标的自动入池（记录来源池）
-  ② 到期退出：持有 ≥ MAX_DAYS 交易日后结仓（保留 closed 记录用于统计）
-  ③ 落库闭环：产物需由 workflow 提交到仓库（原实现从不落库 → 每天白跑）
-  ④ 定位修正：唯一价值 = **样本外(out-of-sample)前瞻验证**「回测结论在未来是否仍成立」
+"""paper_tracker.py v3 —— 纸面组合 / 股池 OOS 前瞻跟踪（2026-09-24）
+
+v3 相对 v2 的改造（A+B+C 三轨）：
+  A 多期快照：不结仓、不删除，记录 ret_5/10/20/60（按交易日）→ 任何时候都能回答"持多久最好"
+  B 分池观察窗：按池类型标注观察期（短线5-10 / 趋势20 / 月线60），仅供参考不强制
+  C 三线退出对照：黄金线 / 持股线 / 锚定线，各自给"按该线退出的收益" → 与固定持有期对比
+  + 结仓改为「标记」（status=closed 仍保留在统计里，永不丢信息）
+
+三线定义（与体系既有口径一致）：
+  黄金线（腰缠万贯）：XA72=MA(TR,13); XA73=REF(C,1)-REF(XA72,1); 黄金线=HHV(XA73,12)
+  持股线（猛兽派）  ：EMA(C,20) - 2*ATR(14)
+  锚定线（新增）    ：从「入场日」起累计的 VWAP = Σ((H+L+C)/3*V)/Σ(V)
 
 用法:
-  python3 paper_tracker.py --init outputs/pool_signals_log.csv   # 首次初始化
-  python3 paper_tracker.py --add                                 # 每日：各池新标的入池
-  python3 paper_tracker.py --update                              # 每日：更新盈亏 + 到期结仓
-  python3 paper_tracker.py --report                              # 输出对比报告
+  python3 paper_tracker.py --init outputs/pool_signals_log.csv
+  python3 paper_tracker.py --add                 # 各股池新标的入池
+  python3 paper_tracker.py --update              # 更新收益快照 + 三线状态
+  python3 paper_tracker.py --report              # 按期收益曲线 + 三线退出对照
 """
 import subprocess, sys, os, re, csv, json, argparse
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 PORTFOLIO = "outputs/paper_portfolio.json"
-MAX_DAYS = 20          # 持有到期（自然日）
-HOLD_CHECK = 20        # 与 MAX_DAYS 一致，便于阅读
+BJT = timezone(timedelta(hours=8))
+HOLDS = [5, 10, 20, 60]
 
-# 体系各股池（来源名, 路径）——存在即采集
+# 分池观察窗（交易日）：短线池短、趋势池中、月线池长
+POOL_WINDOW = {
+    "王者": 5, "才哥": 5, "妖股": 10, "龙头": 5, "龙头战法": 5,
+    "双弦": 20, "鱼身": 20, "猛兽突破": 20, "猛兽本月": 20, "西湖RSV": 20,
+    "一统天下": 20, "乾坤A": 20, "宁静卡位": 20,
+    "武威": 60, "卡位": 60,
+}
+DEFAULT_WINDOW = 20
+
 POOL_SOURCES = [
     ("鱼身", "quant_scripts/stock_pool.txt"),
     ("一统天下", "quant_scripts/yitong_pool.txt"),
@@ -31,7 +43,6 @@ POOL_SOURCES = [
     ("龙头", "quant_scripts/longtou_pool.txt"),
     ("龙头战法", "quant_scripts/dragon_pool.txt"),
     ("妖股", "quant_scripts/yao_pool.txt"),
-    ("猛兽本月", "quant_scripts/beast_pool.txt"),
     ("乾坤A", "outputs/qiankun_a_latest.json"),
     ("双弦", "outputs/双弦观察池_latest.json"),
     ("猛兽突破", "outputs/beast_pool_latest.json"),
@@ -45,76 +56,186 @@ POOL_SOURCES = [
 
 def run(args, timeout=45):
     try:
-        r = subprocess.run(WESTOCK + args, capture_output=True, text=True, timeout=timeout)
-        return r.stdout
+        return subprocess.run(WESTOCK + args, capture_output=True, text=True, timeout=timeout).stdout
     except Exception:
         return ""
 
 
-def parse_kline(txt):
+def parse_bars(txt, single_code=None):
+    """→ [(date, open, close, high, low, volume)] 升序"""
     rows, header = [], None
     for ln in txt.splitlines():
         s = ln.strip()
         if not s.startswith("|"):
             continue
-        parts = [p.strip() for p in s.strip("|").split("|")]
-        if "date" in parts:
-            header = parts
+        p = [x.strip() for x in s.strip("|").split("|")]
+        if "date" in p:
+            header = p
             continue
-        if not header or "---" in parts[0]:
+        if not header or "---" in p[0]:
             continue
         try:
             di = header.index("date")
+            oi = header.index("open")
             ci = header.index("last")
-            if re.match(r"^\d{4}-\d{2}-\d{2}$", parts[di]):
-                rows.append((parts[di], float(parts[ci])))
+            hi = header.index("high")
+            li = header.index("low")
+            vi = header.index("volume")
+            if not re.match(r"^\d{4}-\d{2}-\d{2}$", p[di]):
+                continue
+            rows.append((p[di], float(p[oi]), float(p[ci]), float(p[hi]), float(p[li]), float(p[vi])))
         except (ValueError, IndexError):
             pass
     rows.sort(key=lambda r: r[0])
     return rows
 
 
-def get_price(code):
-    """日线 [(date, close)...] 升序；失败重试 3 次"""
+def get_bars(code, limit=250):
     for _ in range(3):
-        rows = parse_kline(run(["kline", code, "--period", "day", "--limit", "60"]))
-        if rows:
-            return rows
+        b = parse_bars(run(["kline", code, "--period", "day", "--limit", str(limit)]))
+        if b:
+            return b
     return []
 
 
-def load_rsg_state():
-    rsg = {}
-    for p in ("outputs/rsv_strength_latest.json", "rsv_strength_latest.json"):
-        if os.path.exists(p):
-            try:
-                d = json.load(open(p, encoding="utf-8"))
-                for r in (d.get("launch", []) + d.get("hold", []) + d.get("exit", [])):
-                    if r.get("code"):
-                        rsg[r["code"]] = {"rsg_dev": r.get("rsg_dev"),
-                                          "rsg_strong": bool(r.get("rsg_strong"))}
-                break
-            except Exception:
-                continue
-    return rsg
-
-
-def _norm(code):
-    """6位数字 → sh/sz 前缀"""
-    c = (code or "").strip()
+def norm(c):
+    c = (c or "").strip()
     if re.match(r"^(sh|sz)\d{6}$", c):
         return c
     m = re.search(r"(\d{6})", c)
     if not m:
         return ""
     d = m.group(1)
-    if d[0] in ("6", "9"):
-        return "sh" + d
-    return "sz" + d
+    return ("sh" if d[0] in ("6", "9") else "sz") + d
+
+
+# ── 三线计算 ───────────────────────────────────────────────────
+def tr_series(bars):
+    n = len(bars)
+    tr = [0.0] * n
+    for i in range(1, n):
+        h, l, pc = bars[i][3], bars[i][4], bars[i - 1][2]
+        tr[i] = max(h - l, abs(h - pc), abs(l - pc))
+    return tr
+
+
+def line_gold(bars):
+    """黄金线：XA72=MA(TR,13); XA73=REF(C,1)-REF(XA72,1); 黄金线=HHV(XA73,12)"""
+    n = len(bars)
+    tr = tr_series(bars)
+    xa72 = [None] * n
+    for i in range(12, n):
+        xa72[i] = sum(tr[i - 12:i + 1]) / 13
+    xa73 = [None] * n
+    for i in range(1, n):
+        if xa72[i - 1] is not None:
+            xa73[i] = bars[i - 1][2] - xa72[i - 1]
+    gold = [None] * n
+    for i in range(12, n):
+        seg = [x for x in xa73[max(0, i - 11):i + 1] if x is not None]
+        if len(seg) >= 12:
+            gold[i] = max(seg)
+    return gold
+
+
+def line_hold(bars, n_ema=20, n_atr=14):
+    """持股线 = EMA(C,20) - 2*ATR(14)"""
+    n = len(bars)
+    close = [b[2] for b in bars]
+    ema = [None] * n
+    k = 2.0 / (n_ema + 1)
+    for i in range(n):
+        if i == 0:
+            ema[i] = close[0]
+        else:
+            ema[i] = close[i] * k + ema[i - 1] * (1 - k)
+    tr = tr_series(bars)
+    atr = [None] * n
+    for i in range(n_atr, n):                     # Wilder 平滑
+        if atr[i - 1] is None:
+            atr[i] = sum(tr[i - n_atr + 1:i + 1]) / n_atr
+        else:
+            atr[i] = (atr[i - 1] * (n_atr - 1) + tr[i]) / n_atr
+    return [None if (ema[i] is None or atr[i] is None) else ema[i] - 2 * atr[i] for i in range(n)]
+
+
+def line_anchor(bars, entry_idx):
+    """锚定线 = 从入场日起累计 VWAP"""
+    n = len(bars)
+    out = [None] * n
+    pv = vv = 0.0
+    for i in range(entry_idx, n):
+        tp = (bars[i][3] + bars[i][4] + bars[i][2]) / 3
+        v = bars[i][5] or 0
+        pv += tp * v
+        vv += v
+        out[i] = pv / vv if vv > 0 else None
+    return out
+
+
+def eval_position(p, bars):
+    """计算：多期收益 + 三线状态 + 按各线退出的收益"""
+    dates = [b[0] for b in bars]
+    if p["entry_date"] not in dates:
+        return False
+    ei = dates.index(p["entry_date"])
+    entry = p["entry"]
+    n = len(bars)
+    cur = bars[-1][2]
+    p["cur_date"] = bars[-1][0]
+    p["cur_price"] = cur
+    p["ret"] = (cur / entry - 1) * 100
+    try:
+        p["days_td"] = n - 1 - ei                  # 已持有交易日
+    except Exception:
+        p["days_td"] = 0
+    # A 多期收益
+    for h in HOLDS:
+        j = ei + h
+        p[f"ret_{h}"] = round((bars[j][2] / entry - 1) * 100, 2) if j < n else None
+    # C 三线
+    g = line_gold(bars)
+    hd = line_hold(bars)
+    an = line_anchor(bars, ei)
+    p["gold_now"] = round(g[-1], 2) if g and g[-1] is not None else None
+    p["hold_now"] = round(hd[-1], 2) if hd and hd[-1] is not None else None
+    p["anchor_now"] = round(an[-1], 3) if an and an[-1] is not None else None
+    p["below_gold"] = bool(g[-1] is not None and cur < g[-1])
+    p["below_hold"] = bool(hd[-1] is not None and cur < hd[-1])
+    p["below_anchor"] = bool(an[-1] is not None and cur < an[-1])
+
+    def exit_ret(line):
+        for i in range(ei + 1, n):
+            if line[i] is not None and bars[i][2] < line[i]:
+                return round((bars[i][2] / entry - 1) * 100, 2), dates[i]
+        return round((cur / entry - 1) * 100, 2), "持有中"
+
+    for tag, ln in (("gold", g), ("hold", hd), ("anchor", an)):
+        r, d = exit_ret(ln)
+        p[f"exit_{tag}_ret"] = r
+        p[f"exit_{tag}_date"] = d
+    # 标记（不删除）：跌破入场锚定线视为"结构走坏"
+    if p.get("below_anchor") and p.get("status") == "open":
+        p["status"] = "closed"
+        p["closed_by"] = "anchor"
+    return True
+
+
+def _load():
+    if os.path.exists(PORTFOLIO):
+        try:
+            return json.load(open(PORTFOLIO, encoding="utf-8"))
+        except Exception:
+            pass
+    return {"init_date": datetime.now(BJT).strftime("%Y-%m-%d"), "positions": [], "closed": []}
+
+
+def _save(pf):
+    os.makedirs(os.path.dirname(PORTFOLIO) or ".", exist_ok=True)
+    json.dump(pf, open(PORTFOLIO, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
 
 def collect_pool_codes():
-    """扫描所有股池文件 → [(pool_name, code)]（txt 取代码；json 递归取 code 字段）"""
     out = []
     for pool, path in POOL_SOURCES:
         if not os.path.exists(path):
@@ -135,15 +256,13 @@ def collect_pool_codes():
                         for i in x:
                             walk(i)
                 walk(raw)
-                codes = {_norm(c) for c in found}
+                codes = {norm(c) for c in found}
             else:
-                txt = open(path, encoding="utf-8", errors="ignore").read()
-                codes = {_norm(c) for c in re.findall(r"\b(?:sh|sz)?\d{6}\b", txt)}
+                codes = {norm(c) for c in re.findall(r"\b(?:sh|sz)?\d{6}\b", open(path, encoding="utf-8", errors="ignore").read())}
             for c in sorted(x for x in codes if x):
                 out.append((pool, c))
         except Exception as e:
-            print(f"  [WARN] 读取股池 {path} 失败: {e}")
-    # 去重（同一只保留首个来源）
+            print(f"  [WARN] {path}: {e}")
     seen, res = set(), []
     for pool, c in out:
         if c in seen:
@@ -153,164 +272,136 @@ def collect_pool_codes():
     return res
 
 
-def _load():
-    if os.path.exists(PORTFOLIO):
-        try:
-            return json.load(open(PORTFOLIO, encoding="utf-8"))
-        except Exception:
-            pass
-    return {"init_date": datetime.now().strftime("%Y-%m-%d"), "positions": [], "closed": []}
-
-
-def _save(pf):
-    os.makedirs(os.path.dirname(PORTFOLIO) or ".", exist_ok=True)
-    json.dump(pf, open(PORTFOLIO, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-
-
 def init_portfolio(signals_file):
     signals = {}
     with open(signals_file, encoding="utf-8") as f:
         for row in csv.DictReader(f):
             signals[(row.get("date", ""), row.get("code", ""))] = row
-    pf = {"init_date": datetime.now().strftime("%Y-%m-%d"), "positions": [], "closed": []}
+    pf = {"init_date": datetime.now(BJT).strftime("%Y-%m-%d"), "positions": [], "closed": []}
     for (sig_date, code), s in sorted(signals.items()):
-        rows = get_price(code)
-        if not rows:
+        bars = get_bars(code)
+        if not bars:
             continue
-        entry = next((c for d, c in rows if d >= sig_date), None)
-        if entry is None:
+        b = next((x for x in bars if x[0] >= sig_date), None)
+        if not b:
             continue
-        methods = ["A月线反转only"]
-        if s.get("g1") in ("双阴", "一阴"):
-            methods.append("B+武威G1")
-        if s.get("finance") == "盈利":
-            methods.append("C+v2.1盈利")
         pf["positions"].append({
-            "code": code, "name": s.get("name", ""), "sig_date": sig_date, "entry": entry,
-            "pool": "池信号", "methods": methods, "status": "open",
+            "code": code, "name": s.get("name", ""), "entry_date": b[0], "entry": b[2],
+            "pool": "池信号", "status": "open",
         })
     _save(pf)
-    print(f"✅ 初始化: {len(pf['positions'])} 个信号")
+    print(f"✅ 初始化 {len(pf['positions'])} 个信号")
 
 
 def add_positions():
-    """扫描各池 → 新标的入池（已持有/已结仓的跳过）"""
     pf = _load()
-    have = {p["code"] for p in pf.get("positions", [])} | {p["code"] for p in pf.get("closed", [])}
-    pools = collect_pool_codes()
+    have = {p["code"] for p in pf.get("positions", [])}
     added, bypool = 0, {}
-    for pool, code in pools:
+    for pool, code in collect_pool_codes():
         if code in have:
             continue
-        rows = get_price(code)
-        if not rows:
+        bars = get_bars(code, limit=40)
+        if not bars:
             continue
         pf.setdefault("positions", []).append({
-            "code": code, "name": "", "sig_date": rows[-1][0], "entry": rows[-1][1],
-            "pool": pool, "methods": [], "status": "open",
+            "code": code, "name": "", "entry_date": bars[-1][0], "entry": bars[-1][2],
+            "pool": pool, "status": "open",
         })
         have.add(code)
         added += 1
         bypool[pool] = bypool.get(pool, 0) + 1
-        print(f"  + [{pool}] {code} @{rows[-1][1]}")
     _save(pf)
-    print(f"✅ 新增入池 {added} 只（池来源: {bypool or '无'}）")
+    print(f"✅ 新增入池 {added} 只（{bypool or '无'}）")
 
 
 def update_portfolio():
     pf = _load()
-    if not pf.get("positions") and not pf.get("closed"):
-        print("❌ 组合未初始化，先 --init/--add")
+    pos = pf.get("positions", [])
+    if not pos:
+        print("❌ 组合为空")
         return
-    _rsg_now = load_rsg_state()
-    closed_n = 0
-    for p in list(pf.get("positions", [])):
-        rows = get_price(p["code"])
-        if not rows:
+    ok, fail = 0, 0
+    for p in pos:
+        bars = get_bars(p["code"], limit=250)
+        if not bars:
+            p["last_err"] = "K线获取失败"
+            fail += 1
             continue
-        p["cur_price"] = rows[-1][1]
-        p["cur_date"] = rows[-1][0]
-        p["ret"] = (p["cur_price"] / p["entry"] - 1) * 100
-        try:
-            p["days"] = (datetime.strptime(rows[-1][0], "%Y-%m-%d") - datetime.strptime(p["sig_date"], "%Y-%m-%d")).days
-        except Exception:
-            p["days"] = 0
-        _rg = _rsg_now.get(p["code"], {})
-        p["rsg_now"] = _rg.get("rsg_dev")
-        p["rsg_now_strong"] = _rg.get("rsg_strong", False)
-        # 到期结仓
-        if p.get("days", 0) >= MAX_DAYS:
-            p["status"] = "closed"
-            p["close_ret"] = p["ret"]
-            pf.setdefault("closed", []).append(p)
-            pf["positions"].remove(p)
-            closed_n += 1
-    pf["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        if eval_position(p, bars):
+            p.pop("last_err", None)
+            ok += 1
+    pf["last_update"] = datetime.now(BJT).strftime("%Y-%m-%d %H:%M")
+    if pos:
+        pf["last_bars_date"] = pos[0].get("cur_date", "")
     _save(pf)
-    print(f"✅ 已更新：持仓 {len(pf.get('positions', []))} 只 | 本期到期结仓 {closed_n} 只 | 历史结仓 {len(pf.get('closed', []))} 只")
+    print(f"✅ 更新 {ok} 只（失败 {fail}）| 共 {len(pos)} 只")
 
 
-def _stat(rets):
-    if not rets:
-        return "—", "—", "—"
-    wins = [r for r in rets if r > 0]
-    return (f"{len(wins)/len(rets)*100:.0f}%", f"{sum(rets)/len(rets):+.2f}%", f"{sum(rets):+.1f}%")
+def _stat(v):
+    if not v:
+        return ["—", "—", "—"]
+    w = sum(1 for x in v if x > 0) / len(v) * 100
+    return [f"{len(v)}", f"{w:.0f}%", f"{sum(v)/len(v):+.2f}%"]
 
 
 def report():
     pf = _load()
-    positions = [p for p in pf.get("positions", []) if "ret" in p]
-    closed = [p for p in pf.get("closed", []) if "close_ret" in p]
+    pos = [p for p in pf.get("positions", []) if "ret" in p]
     L = []
     A = L.append
-    A("# 📊 纸面组合跟踪报告 v2（OOS 前瞻验证）\n")
-    A(f"> 初始化 {pf.get('init_date')} | 更新 {pf.get('last_update')} | 在场 {len(positions)} 只 | 已结仓 {len(closed)} 只")
-    A("> **口径**：入池日收盘 = 入场价；现价盈亏；持有 ≥20 天结仓。**定位 = 样本外前瞻**（回测结论在未来是否仍成立）\n")
+    A("# 📊 纸面组合跟踪报告 v3（OOS 前瞻 · 多期收益 + 三线退出对照）\n")
+    A(f"> 更新 {pf.get('last_update')} | 标的 {len(pos)} 只 | 行情截止 {pf.get('last_bars_date','—')}")
+    A("> 口径：入池日收盘=入场价；**不设固定结仓**，记录 5/10/20/60 交易日收益 + 三条线的退出对照\n")
 
-    # 一、按股池分组（当前在场）
-    A("## 一、各股池表现（在场持仓）\n")
-    A("| 股池 | 持仓数 | 胜率 | 平均收益 | 累计 |")
-    A("|:----|:---:|:----:|:-------:|:----:|")
-    byp = {}
-    for p in positions:
-        byp.setdefault(p.get("pool", "?"), []).append(p["ret"])
-    for k in sorted(byp, key=lambda x: -sum(byp[x]) / len(byp[x])):
-        w, m, c = _stat(byp[k])
-        A(f"| {k} | {len(byp[k])} | {w} | {m} | {c} |")
+    allp = sorted({p.get("pool", "?") for p in pos})
+    A("## 一、各池 · 多期收益（A 轨：任何时候都能回答\"持多久最好\"）\n")
+    A("| 池 | 样本 | 5日 | 10日 | 20日 | 60日 | 今收 |")
+    A("|:----|:---:|:----:|:----:|:----:|:----:|:----:|")
+    for pool in allp:
+        row = [p for p in pos if p.get("pool") == pool]
+        cells = []
+        for h in HOLDS:
+            vs = [p[f"ret_{h}"] for p in row if p.get(f"ret_{h}") is not None]
+            cells.append(f"{sum(vs)/len(vs):+.2f}%" if vs else "—")
+        cur = [p["ret"] for p in row]
+        A(f"| {pool} | {len(row)} | " + " | ".join(cells) + f" | {sum(cur)/len(cur):+.2f}% |")
 
-    # 二、已结仓统计（更有意义：完整周期）
-    if closed:
-        A("\n## 二、已结仓统计（完整持有周期，样本外验证）\n")
-        A("| 股池 | 结仓数 | 胜率 | 平均收益 | 累计 |")
-        A("|:----|:---:|:----:|:-------:|:----:|")
-        bp2 = {}
-        for p in closed:
-            bp2.setdefault(p.get("pool", "?"), []).append(p["close_ret"])
-        for k in sorted(bp2, key=lambda x: -sum(bp2[x]) / len(bp2[x])):
-            w, m, c = _stat(bp2[k])
-            A(f"| {k} | {len(bp2[k])} | {w} | {m} | {c} |")
-        w, m, c = _stat([p["close_ret"] for p in closed])
-        A(f"\n> **合计**：{len(closed)} 笔 | 胜率 {w} | 平均 {m} | 累计 {c}")
+    A("\n## 二、三线退出对照（C 轨：与\"固定持有期\"比，谁更值）\n")
+    A("| 池 | 样本 | 黄金线退出 | 持股线退出 | 锚定线退出 | 固定20日 |")
+    A("|:----|:---:|:----:|:----:|:----:|:----:|")
+    tot = {"gold": [], "hold": [], "anchor": []}
+    for pool in allp:
+        row = [p for p in pos if p.get("pool") == pool]
+        cells = []
+        for tag in ("gold", "hold", "anchor"):
+            vs = [p[f"exit_{tag}_ret"] for p in row if p.get(f"exit_{tag}_ret") is not None]
+            tot[tag] += vs
+            cells.append(f"{sum(vs)/len(vs):+.2f}%" if vs else "—")
+        r20 = [p["ret_20"] for p in row if p.get("ret_20") is not None]
+        A(f"| {pool} | {len(row)} | " + " | ".join(cells) + f" | {(f'{sum(r20)/len(r20):+.2f}%' if r20 else '—')} |")
+    A("\n**全体合计**：" + " ｜ ".join(
+        f"{n} {sum(tot[t])/len(tot[t]):+.2f}%（{sum(1 for x in tot[t] if x>0)/len(tot[t])*100:.0f}%胜）"
+        for n, t in (("黄金线", "gold"), ("持股线", "hold"), ("锚定线", "anchor")) if tot[t]))
 
-    # 三、在场明细
-    A("\n## 三、在场持仓明细\n")
-    A("| 代码 | 股池 | 入场日 | 入场价 | 现价 | 盈亏 | 天数 |")
-    A("|:----|:----|:----|:----:|:----:|:----:|:----:|")
-    for p in sorted(positions, key=lambda x: -x.get("ret", 0)):
-        A(f"| {p['code']} | {p.get('pool','?')} | {p['sig_date']} | {p['entry']:.2f} | {p.get('cur_price',0):.2f} | {p.get('ret',0):+.1f}% | {p.get('days',0)} |")
+    A("\n## 三、三线状态分布（当前）\n")
+    A("| 状态 | 只数 |")
+    A("|:----|:---:|")
+    A(f"| 跌破黄金线（快线/预警） | {sum(1 for p in pos if p.get('below_gold'))} |")
+    A(f"| 跌破持股线（慢线/兜底） | {sum(1 for p in pos if p.get('below_hold'))} |")
+    A(f"| 跌破锚定线（结构走坏） | {sum(1 for p in pos if p.get('below_anchor'))} |")
     A("\n---")
     A("⚠️ 纸面模拟，非实盘记录，不构成投资建议。")
     md = "\n".join(L)
     os.makedirs("outputs", exist_ok=True)
-    out = f"outputs/纸面组合跟踪报告_{datetime.now().strftime('%Y-%m-%d')}.md"
+    out = f"outputs/纸面组合跟踪报告_{datetime.now(BJT).strftime('%Y-%m-%d')}.md"
     open(out, "w", encoding="utf-8").write(md)
     print(f"[OK] {out}")
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--init", default="", help="从信号日志CSV初始化")
-    ap.add_argument("--add", action="store_true", help="扫描所有股池，新标的入池")
+    ap.add_argument("--init", default="")
+    ap.add_argument("--add", action="store_true")
     ap.add_argument("--update", action="store_true")
     ap.add_argument("--report", action="store_true")
     a = ap.parse_args()
