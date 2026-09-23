@@ -90,12 +90,45 @@ def parse_bars(txt, single_code=None):
     return rows
 
 
-def get_bars(code, limit=500):
+def get_bars(code, limit=260):
+    """单只取数（保留给 init 等小场景）"""
     for _ in range(3):
         b = parse_bars(run(["kline", code, "--period", "day", "--limit", str(limit)]))
         if b:
             return b
     return []
+
+
+def get_bars_batch(codes, limit=500, chunk=40):
+    """⭐ 批量取数（一次40只）—— 修复 2026-09-23 超时：原逐只调用 1000+ 次 npx 拖垮 3h"""
+    out = {}
+    if not codes:
+        return out
+    for k in range(0, len(codes), chunk):
+        batch = codes[k:k + chunk]
+        try:
+            txt = subprocess.run(WESTOCK + ["kline", ",".join(batch), "--period", "day", "--limit", str(limit)],
+                                 capture_output=True, text=True, timeout=300).stdout or ""
+        except Exception:
+            continue
+        for ln in txt.splitlines():
+            s2 = ln.strip()
+            if not s2.startswith("|"):
+                continue
+            p2 = [x.strip() for x in s2.strip("|").split("|")]
+            if re.match(r"^(sh|sz)\d{6}$", p2[0]) and len(p2) >= 7:
+                try:
+                    out.setdefault(p2[0], []).append((p2[1], float(p2[2]), float(p2[3]), float(p2[4]), float(p2[5]), float(p2[6])))
+                except (ValueError, IndexError):
+                    pass
+            elif len(batch) == 1 and re.match(r"^\d{4}-\d{2}-\d{2}$", p2[0]):
+                try:
+                    out.setdefault(batch[0], []).append((p2[0], float(p2[1]), float(p2[2]), float(p2[3]), float(p2[4]), float(p2[5])))
+                except (ValueError, IndexError):
+                    pass
+        for c in out:
+            out[c].sort(key=lambda x: x[0])
+    return out
 
 
 def norm(c):
@@ -318,17 +351,16 @@ def add_positions():
     pf = _load()
     have = {p["code"] for p in pf.get("positions", [])}
     added, bypool = 0, {}
-    for pool, code in collect_pool_codes():
-        if code in have:
-            continue
-        bars = get_bars(code, limit=40)
+    todo = [(pool, code) for pool, code in collect_pool_codes() if code not in have]
+    bmap = get_bars_batch([c for _, c in todo], limit=40)
+    for pool, code in todo:
+        bars = bmap.get(code)
         if not bars:
             continue
         pf.setdefault("positions", []).append({
             "code": code, "name": "", "entry_date": bars[-1][0], "entry": bars[-1][2],
             "pool": pool, "status": "open",
         })
-        have.add(code)
         added += 1
         bypool[pool] = bypool.get(pool, 0) + 1
     _save(pf)
@@ -342,8 +374,9 @@ def update_portfolio():
         print("❌ 组合为空")
         return
     ok, fail = 0, 0
+    bmap = get_bars_batch([p["code"] for p in pos], limit=260)   # 260日足够：250日锚定+60日多期
     for p in pos:
-        bars = get_bars(p["code"], limit=500)
+        bars = bmap.get(p["code"])
         if not bars:
             p["last_err"] = "K线获取失败"
             fail += 1
