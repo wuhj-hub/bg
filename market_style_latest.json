@@ -1,76 +1,76 @@
 {
- "date": "2026-09-22",
- "data_date": "2026-09-22",
+ "date": "2026-09-23",
+ "data_date": "2026-09-23",
  "style": "情绪市",
  "icon": "🔥",
- "score": 45,
+ "score": 30,
  "score_detail": {
-  "size_style": 12,
+  "size_style": 0,
   "limitup_structure": 16,
   "volume_structure": 7,
-  "sector_fund": 10
+  "sector_fund": 7
  },
  "size_style": {
-  "hs300_5d": 2.12,
-  "hs300_10d": -0.31,
-  "zz1000_5d": 4.32,
-  "zz1000_10d": 1.3,
-  "rel_5d": 2.2,
-  "rel_10d": 1.61,
-  "rel_20d": 3.24,
-  "zz500_5d": 3.54
+  "hs300_5d": 0.83,
+  "hs300_10d": -1.21,
+  "zz1000_5d": 2.08,
+  "zz1000_10d": 1.27,
+  "rel_5d": 1.26,
+  "rel_10d": 2.47,
+  "rel_20d": 4.26,
+  "zz500_5d": 1.41
  },
  "limitup_structure": {
-  "limitup": 50,
-  "strong": 91,
-  "width_score": 67.2,
+  "limitup": 44,
+  "strong": 81,
+  "width_score": 55.9,
   "level": "偏强（涨多跌少）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 3.3,
-  "zhaban_rate": 46.2,
-  "lianban": 20
+  "strong_ratio": 2.7,
+  "zhaban_rate": 45.7,
+  "lianban": 12
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.27,
-  "small_big_ratio_5d": 1.217,
-  "small_vol_pulse": 108.89
+  "small_big_ratio_now": 1.323,
+  "small_big_ratio_5d": 1.206,
+  "small_vol_pulse": 97.11
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "昨日涨停",
-    "zdf": "2.38",
-    "main_net5d": -132.6,
-    "retail_net": 23.4,
-    "tag": "游资型"
-   },
-   {
-    "name": "半导体",
-    "zdf": "0.54",
-    "main_net5d": 274.7,
-    "retail_net": 6.3,
-    "tag": "混合"
-   },
-   {
-    "name": "昨日连板",
-    "zdf": "2.35",
-    "main_net5d": -21.8,
-    "retail_net": 12.9,
-    "tag": "游资型"
-   },
-   {
-    "name": "出版",
-    "zdf": "3.39",
-    "main_net5d": -4.6,
-    "retail_net": -3.8,
+    "name": "PCB概念",
+    "zdf": "1.42",
+    "main_net5d": -73.0,
+    "retail_net": -1.2,
     "tag": "游资型"
    },
    {
     "name": "元件",
-    "zdf": "-0.13",
-    "main_net5d": -81.3,
-    "retail_net": 7.3,
+    "zdf": "0.48",
+    "main_net5d": -71.0,
+    "retail_net": 1.2,
+    "tag": "游资型"
+   },
+   {
+    "name": "房地产服务",
+    "zdf": "3.31",
+    "main_net5d": 7.7,
+    "retail_net": -1.4,
+    "tag": "机构型"
+   },
+   {
+    "name": "半导体",
+    "zdf": "0.19",
+    "main_net5d": 224.8,
+    "retail_net": 39.5,
+    "tag": "混合"
+   },
+   {
+    "name": "昨日连板",
+    "zdf": "1.42",
+    "main_net5d": -28.9,
+    "retail_net": 20.3,
     "tag": "游资型"
    }
   ]
@@ -78,17 +78,17 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 14,
-   "欧马模式": 1
+   "堆量模式": 13,
+   "欧马模式": 2
   },
   "leaders": {
-   "堆量模式": 10,
+   "堆量模式": 11,
    "欧马模式": 1
   },
-  "pullbacks": {
-   "堆量模式": 1
+  "pullbacks": {},
+  "gpoints": {
+   "堆量模式": 2
   },
-  "gpoints": {},
   "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
   "total_scored": 15
  },
