@@ -474,14 +474,30 @@ jobs:
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
+          set +e
           if [ ! -f "outputs/paper_portfolio.json" ]; then
+            echo "首次：从池信号日志初始化"
             python3 quant_scripts/paper_tracker.py --init outputs/pool_signals_log.csv
           fi
+          # 扫描体系所有股池 → 新标的入池（2026-09-23 方案A：覆盖全部股池）
+          python3 quant_scripts/paper_tracker.py --add
           python3 quant_scripts/paper_tracker.py --update
           python3 quant_scripts/paper_tracker.py --report
+          # ⚠️ 2026-09-23 修复：产物落库（原实现从不提交 → 49 天白跑、零累积）
+          python3 git_api_commit.py --msg "chore: paper portfolio ($(date +%Y-%m-%d))" \
+            outputs/paper_portfolio.json \
+            "outputs/纸面组合跟踪报告_$(date +%Y-%m-%d).md"
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::纸面组合产物提交失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️纸面组合提交失败&content=paper_tracker git_api_commit 失败(rc=$RC)→产物无累积&template=txt" > /dev/null || true
+          fi
           if [ -f "outputs/纸面组合跟踪报告_$(date +%Y-%m-%d).md" ]; then
-            python3 upload_ima.py --file "outputs/纸面组合跟踪报告_$(date +%Y-%m-%d).md" --name "纸面组合跟踪报告_$(date +%Y-%m-%d).md"
+            python3 upload_ima.py --file "outputs/纸面组合跟踪报告_$(date +%Y-%m-%d).md" --name "纸面组合跟踪报告_$(date +%Y-%m-%d).md" || true
           fi
 
       # ─── 第五.8步：反转数值周线信号上传+推送（信号md已由复盘步骤生成）───
