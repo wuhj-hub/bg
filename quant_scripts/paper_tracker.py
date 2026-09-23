@@ -90,7 +90,7 @@ def parse_bars(txt, single_code=None):
     return rows
 
 
-def get_bars(code, limit=250):
+def get_bars(code, limit=500):
     for _ in range(3):
         b = parse_bars(run(["kline", code, "--period", "day", "--limit", str(limit)]))
         if b:
@@ -159,17 +159,93 @@ def line_hold(bars, n_ema=20, n_atr=14):
     return [None if (ema[i] is None or atr[i] is None) else ema[i] - 2 * atr[i] for i in range(n)]
 
 
-def line_anchor(bars, entry_idx):
-    """锚定线 = 从入场日起累计 VWAP"""
+def zig_pivots(bars, pct=15.0):
+    """ZIG(2,pct) 低点（月线主图「锚定线」口径，含**确认日**以消除未来函数）
+    → [(low_idx, confirm_idx)]：低点位置 + 该低点被确认（后续高点涨幅≥pct）的位置
+    """
+    n = len(bars)
+    lows = [b[4] for b in bars]
+    piv, i = [], 0
+    while i < n:
+        j = i
+        while j + 1 < n and lows[j + 1] <= lows[j]:
+            j += 1
+        low_i, low_p = j, lows[j]
+        conf, k = None, j + 1
+        while k < n:
+            if bars[k][3] >= low_p * (1 + pct / 100):
+                conf = k
+                break
+            k += 1
+        if conf is None:
+            break
+        piv.append((low_i, conf))
+        i = conf
+    return piv
+
+
+def monthly_from_daily(bars):
+    """日线 → 月线 [(ym, open, close, high, low, vol)]（用于月线口径的 ZIG 锚点）"""
+    from collections import OrderedDict
+    mm = OrderedDict()
+    for d, o, c, h, l, v in bars:
+        ym = d[:7]
+        if ym not in mm:
+            mm[ym] = [ym, o, c, h, l, v]
+        else:
+            r = mm[ym]
+            r[2] = c                                  # 最新收盘
+            r[3] = max(r[3], h)
+            r[4] = min(r[4], l)
+            r[5] += v
+    return [tuple(x) for x in mm.values()]
+
+
+def line_anchor(bars, pct=15.0):
+    """锚定线（**月线主图口径**）= 从「最近已确认的 ZIG 低点」起算的累计 VWAP
+
+    来源：通达信月线主图（ZIG(2,N) 锚定 VWAP）
+        N:=15; 典型价格:=(H+L+C)/3;
+        A:=ZIG(2,N); B1:=IF(A=LLV(L,N),DATE,DRAWNULL); B2:=BARSLAST(DATE-B1=0);
+        VWAP2:=SUM(典型价格*V,B4)/SUM(V,B4); 锚定线:=VWAP2
+
+    ⚠️ ZIG 是未来函数（低点需后续反弹 ≥N% 才确认）→ 锚点仅在**确认日之后**才可见，
+       否则回测会偷看未来（本函数已在月线上做确认延迟）。
+    """
     n = len(bars)
     out = [None] * n
+    mb = monthly_from_daily(bars)
+    if len(mb) < 3:
+        return out
+    piv = zig_pivots(mb, pct)                        # 月线 ZIG 低点（含确认月）
+    if not piv:
+        return out
+    # 把「锚点月 / 确认月」映射回日线索引
+    def ym_to_first_idx(ym):
+        for i, b in enumerate(bars):
+            if b[0][:7] >= ym:
+                return i
+        return None
+    # 取最近一个「确认日已到」的锚点
+    chosen = None
+    for low_m, conf_m in piv:
+        if ym_to_first_idx(mb[conf_m][0]) is None:
+            continue
+        chosen = (mb[low_m][0], mb[conf_m][0])
+    if not chosen:
+        return out
+    lo_idx = ym_to_first_idx(chosen[0])
+    vis_idx = ym_to_first_idx(chosen[1])
+    if lo_idx is None or vis_idx is None:
+        return out
     pv = vv = 0.0
-    for i in range(entry_idx, n):
-        tp = (bars[i][3] + bars[i][4] + bars[i][2]) / 3
-        v = bars[i][5] or 0
+    for t in range(lo_idx, n):
+        tp = (bars[t][3] + bars[t][4] + bars[t][2]) / 3
+        v = bars[t][5] or 0
         pv += tp * v
         vv += v
-        out[i] = pv / vv if vv > 0 else None
+        if t >= vis_idx and vv > 0:                  # 确认日之前不出线
+            out[t] = pv / vv
     return out
 
 
@@ -196,7 +272,7 @@ def eval_position(p, bars):
     # C 三线
     g = line_gold(bars)
     hd = line_hold(bars)
-    an = line_anchor(bars, ei)
+    an = line_anchor(bars)
     p["gold_now"] = round(g[-1], 2) if g and g[-1] is not None else None
     p["hold_now"] = round(hd[-1], 2) if hd and hd[-1] is not None else None
     p["anchor_now"] = round(an[-1], 3) if an and an[-1] is not None else None
@@ -322,7 +398,7 @@ def update_portfolio():
         return
     ok, fail = 0, 0
     for p in pos:
-        bars = get_bars(p["code"], limit=250)
+        bars = get_bars(p["code"], limit=500)
         if not bars:
             p["last_err"] = "K线获取失败"
             fail += 1
