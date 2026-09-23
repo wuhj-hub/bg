@@ -1193,6 +1193,18 @@ def render_guaili():
     return "\n".join(L)
 
 
+def hl_price(v, digits=2):
+    """低价高亮：现价 <10 元 → 红色加粗（Markdown 内联 HTML）"""
+    try:
+        p = float(v)
+    except (TypeError, ValueError):
+        return str(v)
+    s = f"{p:.{digits}f}"
+    if p < 10:
+        return f'<span style="color:#e60012"><b>{s}</b></span>'
+    return s
+
+
 def render_execution_cards():
     """④.1 个股执行卡紧凑渲染 v1.1
     改动：① 🆕 新上卡标记 ② summary 内联进卡片行（修复"孤立半截行"） ③ 持仓/新增候选/延续候选 分组
@@ -1222,6 +1234,8 @@ def render_execution_cards():
             tr = x.get("trigger", "")
             if tr.startswith("信号确认位附近(≈"):
                 tr = "≈" + tr.split("(≈")[1].rstrip(")")
+            if tr.startswith("≈"):          # 现价（B1 参考价）<10 元 → 红色加粗
+                tr = "≈" + hl_price(tr[1:])
             parts.append(f"{x['batch']} {x.get('pct')}%@{tr}")
         out = [f"- {tag}{v} **{nm}**：月{up.get('month_trend')}({up.get('month_gate')})/"
                f"周{up.get('week_trend')}({up.get('week_gate')}) | 止损{b.get('stop')} "
