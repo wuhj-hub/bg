@@ -64,6 +64,21 @@ jobs:
           head -40 /tmp/meta.log
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
 
+      - name: ③ 流水线自愈巡检（run状态/步骤耗时/产物新鲜度/脚本异常）
+        id: pipe
+        continue-on-error: true   # 同上：受控捕获
+        env:
+          GITHUB_TOKEN: ${{ github.token }}   # 查 run/job/step 需 API
+        run: |
+          set +e
+          python3 quant_scripts/pipeline_audit.py --days 2 --step-min 25 \
+            --json outputs/pipeline_audit.json > /tmp/pipe.log 2>&1
+          RC=$?
+          set -e
+          tail -30 /tmp/pipe.log
+          cp outputs/pipeline_audit.json outputs/pipeline_audit_latest.json 2>/dev/null || :
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+
       - name: 提交自检产物到仓库
         env:
           GH_TOKEN: ${{ github.token }}
@@ -73,13 +88,14 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           for f in outputs/cross_source_latest.md outputs/cross_source_latest.json \
-                   outputs/silent_failure_latest.md outputs/silent_failure_audit.json; do
+                   outputs/silent_failure_latest.md outputs/silent_failure_audit.json \
+                   outputs/pipeline_audit.json outputs/pipeline_audit_latest.json; do
             if [ -f "$f" ]; then git add "$f"; fi
           done
           if git diff --cached --quiet; then
             echo "无变更"
           else
-            git commit -m "chore: 体系自检（数据源交叉验证+静默失败审计）$(date +%Y-%m-%d)"
+            git commit -m "chore: 体系自检（数据源+静默失败+流水线巡检）$(date +%Y-%m-%d)"
             git push
           fi
 
@@ -90,13 +106,15 @@ jobs:
         run: |
           CR="${{ steps.cross.outputs.rc }}"
           ME="${{ steps.meta.outputs.rc }}"
-          if [ "$CR" != "0" ] || [ "$ME" != "0" ]; then
-            MSG="数据源交叉验证 rc=${CR:-?} ｜ 静默失败审计 rc=${ME:-?}"
+          PI="${{ steps.pipe.outputs.rc }}"
+          if [ "$CR" != "0" ] || [ "$ME" != "0" ] || [ "$PI" != "0" ]; then
+            EXTRA=$(python3 -c "import json;d=json.load(open('outputs/pipeline_audit.json'));print(' | '.join(d.get('issues',[]))[:400])" 2>/dev/null || :)
+            MSG="数据源 rc=${CR:-?} ｜ 静默失败 rc=${ME:-?} ｜ 流水线 rc=${PI:-?} ${EXTRA}"
             curl -s "https://pushplus.plus/send" \
               -d "token=${PUSH_TOKEN}&title=⚠️体系自检异常&content=${MSG}&template=txt" > /dev/null || echo "推送失败"
             echo "::warning::体系自检异常 —— $MSG"
           else
-            echo "✅ 两项自检全部通过"
+            echo "✅ 三项自检全部通过"
           fi
 
       - name: 上传自检报告到盘后量化文件夹
