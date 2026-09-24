@@ -1,8 +1,15 @@
 {
- "date": "2026-09-24 08:46",
+ "date": "2026-09-25 07:01",
  "runs": {
-  "total": 82,
+  "total": 83,
   "bad": [
+   {
+    "name": ".github/workflows/bt_cycle.yml",
+    "conclusion": "failure",
+    "created": "2026-09-24T06:18",
+    "id": 35963897468,
+    "event": "push"
+   },
    {
     "name": "盘后报告生成",
     "conclusion": "cancelled",
@@ -12,19 +19,23 @@
    }
   ]
  },
- "heavy_steps": [],
- "stale_products": [
+ "heavy_steps": [
   {
-   "path": "outputs/paper_portfolio.json",
-   "status": "停更46天",
-   "age": 46,
-   "max": 2
+   "workflow": "盘后报告生成",
+   "step": "一统天下建仓区股池扫描+跟踪（多周期共振）",
+   "minutes": 30.9
+  },
+  {
+   "workflow": "盘后报告生成",
+   "step": "四维共振评分（政策/资金/筹码/关联方四维证据链）",
+   "minutes": 37.9
   }
  ],
+ "stale_products": [],
  "script_errors": [],
  "issues": [
-  "❌ run 异常 1 个（盘后报告生成:cancelled）",
-  "⚠️ 产物停更：outputs/paper_portfolio.json(停更46天)"
+  "❌ run 异常 2 个（.github/workflows/bt_cycle.yml:failure、盘后报告生成:cancelled）",
+  "⚠️ 重步骤：盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 30.9min、盘后报告生成/四维共振评分（政策/资金/筹码/关联方四维证据链） 37.9min"
  ],
  "status": "FAIL"
 }

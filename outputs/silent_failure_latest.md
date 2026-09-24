@@ -1,17 +1,19 @@
 # 🔍 体系自检元审计 · 2026-09-24
 
-> 扫描 14 个 workflow ｜ 风险项 **89** ｜ 🔴高危 **0**
+> 扫描 15 个 workflow ｜ 风险项 **92** ｜ 🔴高危 **0**
 
-## 🟡中危·吞错误（81）
+## 🟡中危·吞错误（83）
 
 - artifact_audit.yml :: 运行产物入库审计 (L33) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
 - artifact_audit.yml :: 提交审计报告 (L53) — 命中 2>/dev/null（屏蔽 stderr）, || true
 - beast_pool.yml :: 预热 westock 数据包 (L46) — 命中 || true
 - beast_pool.yml :: 准备候选池 (L51) — 命中 2>/dev/null（屏蔽 stderr）, || true
 - beast_pool.yml :: 提交产物 (L67) — 命中 set +e, || true
+- bt_cycle.yml :: 回测周期回归（数据体检 + 基准 + 候选复核） (L33) — 命中 continue-on-error: true, set +e
 - evidence_review.yml :: 生成 evidence 复核工作单 (L26) — 命中 || echo（吞错误）, || true
 - evidence_review.yml :: 提交工作单到仓库（outputs/） (L38) — 命中 continue-on-error: true
-- evidence_review.yml :: PushPlus 推送复核提醒（含待复核/过期统计） (L70) — 命中 continue-on-error: true, || echo（吞错误）
+- evidence_review.yml :: 回测周期回归（月度，report-only 不改代码） (L70) — 命中 continue-on-error: true, set +e
+- evidence_review.yml :: PushPlus 推送复核提醒（含待复核/过期统计） (L87) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
 - guard_selfcheck.yml :: IMA 凭证预检（失效/疑似过期立即微信告警） (L32) — 命中 continue-on-error: true, || true
 - guard_selfcheck.yml :: 上传自检报告到盘后量化文件夹（供查阅） (L44) — 命中 continue-on-error: true, || echo（吞错误）
 - intraday_monitor.yml :: 开盘八法强形态扫描+突破监控 (L94) — 命中 continue-on-error: true
@@ -86,9 +88,10 @@
 - selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L120) — 命中 continue-on-error: true, || echo（吞错误）
 - wangzhe_track.yml :: 才哥公众号文章跟踪 (L56) — 命中 continue-on-error: true
 
-## 🟡中危·依赖外部 cron（8）
+## 🟡中危·依赖外部 cron（9）
 
 - beast_pool.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
+- bt_cycle.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - guard_selfcheck.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - intraday_monitor.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - market_regime.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
@@ -103,7 +106,8 @@
 |---|---|---|
 | artifact_audit.yml | 2 | — |
 | beast_pool.yml | 4 | — |
-| evidence_review.yml | 3 | — |
+| bt_cycle.yml | 2 | — |
+| evidence_review.yml | 4 | — |
 | guard_selfcheck.yml | 3 | — |
 | intraday_monitor.yml | 2 | — |
 | market_regime.yml | 2 | — |
