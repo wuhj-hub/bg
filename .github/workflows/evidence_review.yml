@@ -67,6 +67,23 @@ jobs:
           print(("✅ 工作单已入库" if code in (200, 201) else "❌ 提交失败 HTTP %s" % code), f)
           PYEOF
 
+      - name: 回测周期回归（月度，report-only 不改代码）
+        continue-on-error: true
+        timeout-minutes: 12
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set +e
+          if [ -f data/bt_sample.json ]; then
+            python3 quant_scripts/bt_cycle.py --data data/bt_sample.json --out outputs --push > /tmp/cyc.log 2>&1
+            RC=$?
+            tail -50 /tmp/cyc.log
+            echo "bt_cycle rc=$RC"
+          else
+            echo "WARN: 缺少 data/bt_sample.json，跳过回测周期"
+          fi
+          set -e
+
       - name: PushPlus 推送复核提醒（含待复核/过期统计）
         if: always()
         continue-on-error: true
@@ -77,7 +94,8 @@ jobs:
           Y="${REVIEW_YELLOW:-0}"
           R="${REVIEW_RED:-0}"
           TITLE="🔍 AI链 evidence 月度复核提醒"
-          CONTENT="本月AI链30只标的复核工作单已生成。待复核🟡 ${Y} 只｜过期🔴 ${R} 只。请在ima中检索公告/投关/研报更新 ai_chain_pool.json 的 evidence 字段。运行: python3 evidence_review.py 查看工作单"
+          BT=$(python3 -c "import json;d=json.load(open('outputs/bt_cycle_latest.json'));print('回测周期: ' + ('通过 ' + '、'.join(d['passed']) if d.get('passed') else '无候选通过（维持现状）'))" 2>/dev/null || echo "")
+          CONTENT="本月AI链30只标的复核工作单已生成。待复核🟡 ${Y} 只｜过期🔴 ${R} 只。${BT}。请在ima中检索公告/投关/研报更新 ai_chain_pool.json 的 evidence 字段"
           # PushPlus token从secret读（工作区沙箱secret可能缺失，静默）
           if [ -n "$PUSH_TOKEN" ] && [ "$PUSH_TOKEN" != "None" ]; then
             curl -s "https://www.pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=${TITLE}&content=${CONTENT}&template=txt" || echo "推送失败"
