@@ -22,8 +22,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 BJ = timezone(timedelta(hours=8))
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
-BATCH = 20
-WORKERS = 4
+BATCH = 40   # ⭐2026-09-25: 20→40（减少 npx 启动次数，批次数 150→75）
+WORKERS = 8   # ⭐2026-09-25: 4→8（IO密集，全市场3000+只，150批/4并发=38轮串行过久）
+# ⭐2026-09-25: 日线取数 120→80 根（varo7 自 i=33 起算+指数平滑，80根收敛充分；
+#             实测 200只 候选名单与 120 根完全一致，数据量 -33%）
 # 路径兼容：沙箱用 /sandbox/workspace，GitHub runner 用仓库根(cwd)
 BASE = "/sandbox/workspace" if os.path.isdir("/sandbox/workspace") else os.getcwd()
 
@@ -183,7 +185,7 @@ def main():
     with ThreadPoolExecutor(max_workers=WORKERS) as ex:
         futs = {}
         for i in range(0, len(syms), BATCH):
-            futs[ex.submit(fetch_kline, syms[i:i + BATCH], "day", 120)] = 1
+            futs[ex.submit(fetch_kline, syms[i:i + BATCH], "day", 80)] = 1
         for f in as_completed(futs):
             for k, v in f.result().items():
                 if len(v) > 40:
