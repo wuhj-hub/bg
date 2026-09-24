@@ -1,0 +1,88 @@
+name: 回测周期（月度定期回归）
+
+# 回测机制 v1.0 的运维部分：把「回测」从一次性动作变成周期性常态（2026-09-24）
+# 每月 1 日 09:10（北京）运行，随 evidence_review（09:05）之后
+# 内容：数据体检（方向校验）→ 基准回归 → 候选复核 → 出报告
+# 纪律：本 workflow **只出报告、不改代码**；候选需「连续 2 期通过」才建议落地
+
+on:
+  repository_dispatch:
+    types: [bt-cycle-run]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # 必须：提交回测报告；缺此声明 PUT 会 403 且 step 仍报 success
+
+concurrency:
+  group: bt-cycle
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 准备回测数据
+        run: |
+          mkdir -p data
+          if [ -f data/kline800.json ]; then
+            echo "已有历史数据 $(du -h data/kline800.json | cut -f1)"
+          else
+            echo "无历史数据，跳过（需先归档 kline800.json 到 data/）"
+          fi
+
+      - name: ① 回测周期回归（数据体检 + 基准 + 候选复核）
+        id: cyc
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set +e
+          if [ ! -f data/kline800.json ]; then
+            echo "⚠️ 缺少 data/kline800.json，本期跳过回归（仅出提示）" 
+            echo "rc=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 quant_scripts/bt_cycle.py --data data/kline800.json --out outputs --push > /tmp/cyc.log 2>&1
+          RC=$?
+          set -e
+          tail -60 /tmp/cyc.log
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+
+      - name: 提交回测报告
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          for f in outputs/回测周期_*.md outputs/bt_cycle_latest.json; do
+            [ -f "$f" ] && git add "$f" || :
+          done
+          if git diff --cached --quiet; then
+            echo "无变更"
+          else
+            git commit -m "chore: 回测周期月度回归 $(date +%Y-%m)"
+            git push
+          fi
+
+      - name: 异常告警
+        if: always()
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          RC="${{ steps.cyc.outputs.rc }}"
+          if [ "$RC" != "0" ]; then
+            curl -s "https://pushplus.plus/send" \
+              -d "token=${PUSH_TOKEN}&title=⚠️回测周期异常&content=回测周期回归 rc=${RC:-?}&template=txt" > /dev/null || :
+            echo "::warning::回测周期回归异常 rc=$RC"
+          else
+            echo "✅ 回测周期回归完成"
+          fi
