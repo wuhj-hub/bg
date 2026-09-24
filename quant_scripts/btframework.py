@@ -14,6 +14,10 @@
  5. 分档看单调性：不只看均值，要看档位是否单调（避免选择性报告）
  6. 样本量门槛：分档样本 < 300 不做结论（标注「样本不足」）
  7. 时间切分样本外：用前段调参、后段验证；两段结论不一致 = 不可信
+ 0. ⭐数据方向校验（2026-09-24 补）：K 线必须为【升序（旧→新）】。
+    westock 批量 kline 实际输出【降序（新→旧）】！若误当升序，rows[t+1..] 会读到
+    「更早的历史」、prev_high(rows,t,n) 会读到「未来数据」→ 回测反转（FutureFunction）。
+    DataFeed 已内置自动检测与反转，并在日志打印修正只数。
 
 用法：
     from btframework import DataFeed, atr_w, ma, simulate, stats, run_matrix
@@ -34,6 +38,21 @@ class DataFeed:
         self.path = path
         self.raw = json.load(open(path, encoding="utf-8"))
         self.min_bars = min_bars
+        self._normalize()
+
+    def _normalize(self):
+        """⭐铁律0（2026-09-24 新增）：数据方向校验。
+        westock 批量 kline 输出为【降序（新→旧）】，若直接当升序用，
+        则 rows[t+1..] 变成「更早的历史」、prev_high(rows,t,n) 变成「未来数据」
+        → 典型未来函数（曾致三轮回测结论全部作废）。
+        此处按日期自动判定并统一为【升序（旧→新）】。
+        """
+        fixed = 0
+        for c, rows in list(self.raw.items()):
+            if len(rows) >= 2 and str(rows[0][0]) > str(rows[-1][0]):
+                self.raw[c] = list(reversed(rows))
+                fixed += 1
+        self.normalized = fixed
 
     def codes(self):
         return [c for c, r in self.raw.items() if len(r) >= self.min_bars]
