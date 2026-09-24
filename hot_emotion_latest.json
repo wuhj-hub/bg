@@ -1,21 +1,22 @@
 {
- "date": "2026-09-23",
- "total": 43,
+ "date": "2026-09-24",
+ "total": 45,
  "lianban_cnt": 12,
- "max_lb": 4,
- "shouban": 31,
+ "max_lb": 5,
+ "shouban": 33,
  "by_lb": {
-  "4": 2,
-  "3": 7,
-  "2": 3,
-  "1": 31
+  "5": 1,
+  "4": 3,
+  "3": 1,
+  "2": 7,
+  "1": 33
  },
  "score": {
-  "score": 61,
-  "level": "活跃",
+  "score": 71,
+  "level": "亢奋",
   "parts": {
    "涨停家数": 8,
-   "连板高度": 18,
+   "连板高度": 28,
    "连板占比": 35
   }
  },
@@ -23,29 +24,12 @@
  "alerts": [],
  "lianban_rows": [
   {
-   "code": "sz000910",
-   "name": "大亚圣象",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "瓷砖地板",
-    "轻工制造"
-   ]
-  },
-  {
    "code": "sh601811",
    "name": "新华文轩",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -54,30 +38,12 @@
    "sectors": []
   },
   {
-   "code": "sz000560",
-   "name": "我爱我家",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "房产租赁经纪",
-    "房地产服务",
-    "房地产"
-   ]
-  },
-  {
    "code": "sz001234",
    "name": "泰慕士",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -93,8 +59,8 @@
    "name": "奥佳华",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -107,48 +73,12 @@
    ]
   },
   {
-   "code": "sh600503",
-   "name": "华丽家族",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "房地产",
-    "房地产开发",
-    "住宅开发"
-   ]
-  },
-  {
-   "code": "sh600743",
-   "name": "华远控股",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "房地产服务",
-    "物业管理",
-    "房地产"
-   ]
-  },
-  {
    "code": "sh600825",
    "name": "新华传媒",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -157,29 +87,12 @@
    "sectors": []
   },
   {
-   "code": "sh603636",
-   "name": "南威软件",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "网络安全",
-    "电子车牌"
-   ]
-  },
-  {
    "code": "sz002238",
    "name": "天威视讯",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -190,8 +103,8 @@
    ]
   },
   {
-   "code": "sh600418",
-   "name": "江淮汽车",
+   "code": "sz000850",
+   "name": "华茂股份",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -202,14 +115,12 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "商用载货车",
-    "商用车",
-    "汽车"
+    "棉纺"
    ]
   },
   {
-   "code": "sh605058",
-   "name": "澳弘电子",
+   "code": "sz002119",
+   "name": "康强电子",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -220,9 +131,101 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "印制电路板",
-    "元件",
-    "电子"
+    "半导体材料",
+    "半导体",
+    "电子",
+    "核能核电"
+   ]
+  },
+  {
+   "code": "sz002819",
+   "name": "东方中科",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "仪器仪表",
+    "通用设备",
+    "机械设备",
+    "网络安全"
+   ]
+  },
+  {
+   "code": "sh600802",
+   "name": "福建水泥",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "水泥制造",
+    "水泥",
+    "建筑材料"
+   ]
+  },
+  {
+   "code": "sh600843",
+   "name": "上工申贝",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "纺织服装设备",
+    "机械设备",
+    "专用设备"
+   ]
+  },
+  {
+   "code": "sh603396",
+   "name": "金辰股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "光伏加工设备",
+    "光伏设备",
+    "电力设备"
+   ]
+  },
+  {
+   "code": "sh603949",
+   "name": "雪龙集团",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "汽车零部件",
+    "汽车",
+    "底盘与发动机系统"
    ]
   }
  ],
