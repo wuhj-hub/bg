@@ -1,5 +1,5 @@
 {
- "date": "2026-09-23",
+ "date": "2026-09-24",
  "workflows": 14,
  "high_risk": 0,
  "issues": {
@@ -49,9 +49,9 @@
    "quant_report.yml :: 自动生成复盘报告并上传 (L416) — 命中 continue-on-error: true, || echo（吞错误）",
    "quant_report.yml :: 股池信号实盘胜率跟踪 (L444) — 命中 continue-on-error: true, || echo（吞错误）, || true",
    "quant_report.yml :: 纸面组合跟踪（选股方法对比） (L469) — 命中 continue-on-error: true, set +e, || true",
-   "quant_report.yml :: 反转数值周线信号上传推送 (L509) — 命中 continue-on-error: true, || true",
-   "quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L547) — 命中 continue-on-error: true, set +e, || true",
-   "quant_report.yml :: 推送自检报告到微信 (L565) — 命中 continue-on-error: true",
+   "quant_report.yml :: 反转数值周线信号上传推送 (L510) — 命中 continue-on-error: true, || true",
+   "quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L548) — 命中 continue-on-error: true, set +e, || true",
+   "quant_report.yml :: 推送自检报告到微信 (L566) — 命中 continue-on-error: true",
    "quant_scan.yml :: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断） (L53) — 命中 continue-on-error: true, || echo（吞错误）",
    "quant_scan.yml :: IMA 凭证早期预检（失效立即微信告警，不阻断扫描） (L61) — 命中 continue-on-error: true, || true",
    "quant_scan.yml :: 预热westock数据包 (L71) — 命中 set +e, || true",
@@ -80,9 +80,10 @@
    "selfcheck_daily.yml :: 预热 westock 数据包（避免首个 kl 调用冷启动失败） (L38) — 命中 || echo（吞错误）",
    "selfcheck_daily.yml :: ① 数据源交叉验证（westock × 东财 × 腾讯） (L43) — 命中 continue-on-error: true, set +e",
    "selfcheck_daily.yml :: ② 静默失败元审计（扫 workflow 自身的假绿风险） (L55) — 命中 continue-on-error: true, set +e",
-   "selfcheck_daily.yml :: 提交自检产物到仓库 (L67) — 命中 2>/dev/null（屏蔽 stderr）",
-   "selfcheck_daily.yml :: 异常告警到微信 (L86) — 命中 || echo（吞错误）",
-   "selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L102) — 命中 continue-on-error: true, || echo（吞错误）",
+   "selfcheck_daily.yml :: ③ 流水线自愈巡检（run状态/步骤耗时/产物新鲜度/脚本异常） (L67) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e",
+   "selfcheck_daily.yml :: 提交自检产物到仓库 (L82) — 命中 2>/dev/null（屏蔽 stderr）",
+   "selfcheck_daily.yml :: 异常告警到微信 (L102) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）",
+   "selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L120) — 命中 continue-on-error: true, || echo（吞错误）",
    "wangzhe_track.yml :: 才哥公众号文章跟踪 (L56) — 命中 continue-on-error: true"
   ],
   "🟡中危·依赖外部 cron": [
@@ -368,17 +369,17 @@
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "反转数值周线信号上传推送 (L509)",
+    "step": "反转数值周线信号上传推送 (L510)",
     "detail": "命中 continue-on-error: true, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "体系自检 — 健康评分 / 市场状态 / 异常检测 (L547)",
+    "step": "体系自检 — 健康评分 / 市场状态 / 异常检测 (L548)",
     "detail": "命中 continue-on-error: true, set +e, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "推送自检报告到微信 (L565)",
+    "step": "推送自检报告到微信 (L566)",
     "detail": "命中 continue-on-error: true"
    }
   ],
@@ -532,17 +533,22 @@
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "提交自检产物到仓库 (L67)",
+    "step": "③ 流水线自愈巡检（run状态/步骤耗时/产物新鲜度/脚本异常） (L67)",
+    "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e"
+   },
+   {
+    "level": "🟡中危·吞错误",
+    "step": "提交自检产物到仓库 (L82)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "异常告警到微信 (L86)",
-    "detail": "命中 || echo（吞错误）"
+    "step": "异常告警到微信 (L102)",
+    "detail": "命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "上传自检报告到盘后量化文件夹 (L102)",
+    "step": "上传自检报告到盘后量化文件夹 (L120)",
     "detail": "命中 continue-on-error: true, || echo（吞错误）"
    },
    {

@@ -1,0 +1,30 @@
+{
+ "date": "2026-09-24 08:46",
+ "runs": {
+  "total": 82,
+  "bad": [
+   {
+    "name": "盘后报告生成",
+    "conclusion": "cancelled",
+    "created": "2026-09-23T16:00",
+    "id": 35885744729,
+    "event": "workflow_run"
+   }
+  ]
+ },
+ "heavy_steps": [],
+ "stale_products": [
+  {
+   "path": "outputs/paper_portfolio.json",
+   "status": "停更46天",
+   "age": 46,
+   "max": 2
+  }
+ ],
+ "script_errors": [],
+ "issues": [
+  "❌ run 异常 1 个（盘后报告生成:cancelled）",
+  "⚠️ 产物停更：outputs/paper_portfolio.json(停更46天)"
+ ],
+ "status": "FAIL"
+}
