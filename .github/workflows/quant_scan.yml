@@ -273,6 +273,16 @@ jobs:
         continue-on-error: true
         run: python3 quant_scripts/yitong_screener.py
 
+      # ─── 四维共振评分（2026-09-25 从「盘后报告」上移至此）───
+      # 原因：该步耗时 37.9min，是报告 job(134min/上限180min) 的最大单步；
+      #       而报告 job 由本 workflow 完成后的 workflow_run 触发（天然有 3h 时差），
+      #       上移后报告 job 直接读仓库产物 → 省约 38min，且不破坏依赖链
+      # 下游消费方：报告 job 的「全系统信号仲裁」「宁静AI卡位」「创业板/科创四维」
+      - name: 四维共振评分（政策/资金/筹码/关联方四维证据链）
+        continue-on-error: true
+        timeout-minutes: 45   # 历史曾跑 55min+ 拖死 job，超时后由 continue-on-error 继续
+        run: python3 quad_resonance.py --pool panhou_lianghua.csv --top 15
+
       # ─── 第三步.4：上传三系统原始数据到知识库（供次日盘前报告引用，防止缺失）───
       - name: 上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源）
         continue-on-error: true
@@ -400,7 +410,8 @@ jobs:
               hot_emotion_latest.json hot_emotion_history.json hot_emotion_latest.md \
               pools/pool_$(date +%Y-%m).json \
               一统天下建仓区股池_latest.json 一统天下建仓区股池_latest.md yitong_pool.txt \
-              sector_component_em.json
+              sector_component_em.json \
+              outputs/四维共振_latest.json
             RC=$?
             set -e
             if [ "$RC" != "0" ]; then
