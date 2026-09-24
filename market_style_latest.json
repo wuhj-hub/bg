@@ -1,69 +1,77 @@
 {
  "date": "2026-09-24",
- "data_date": "2026-09-23",
- "style": "均衡市",
- "icon": "⚖️",
- "score": 20,
+ "data_date": "2026-09-24",
+ "style": "情绪市",
+ "icon": "🔥",
+ "score": 30,
  "score_detail": {
   "size_style": 0,
-  "limitup_structure": 16,
-  "volume_structure": 0,
-  "sector_fund": 4
+  "limitup_structure": 13,
+  "volume_structure": 7,
+  "sector_fund": 10
  },
  "size_style": {
-  "hs300_5d": 0.83,
-  "hs300_10d": -1.21,
-  "zz1000_5d": 2.08,
-  "zz1000_10d": 1.27,
-  "rel_5d": 1.26,
-  "rel_10d": 2.47,
-  "rel_20d": 4.26,
-  "zz500_5d": 1.41
+  "hs300_5d": -0.47,
+  "hs300_10d": -2.4,
+  "zz1000_5d": 0.28,
+  "zz1000_10d": -0.23,
+  "rel_5d": 0.75,
+  "rel_10d": 2.17,
+  "rel_20d": 2.02,
+  "zz500_5d": -0.4
  },
  "limitup_structure": {
-  "limitup": 46,
-  "strong": 83,
-  "width_score": 56.0,
-  "level": "偏强（涨多跌少）",
+  "limitup": 47,
+  "strong": 76,
+  "width_score": 53.6,
+  "level": "震荡（多空均衡）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 2.7,
-  "zhaban_rate": 44.6,
-  "lianban": 12
+  "strong_ratio": 2.6,
+  "zhaban_rate": 42.7,
+  "lianban": 13
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.323,
-  "small_big_ratio_5d": 1.206
+  "small_big_ratio_now": 1.223,
+  "small_big_ratio_5d": 1.216,
+  "small_vol_pulse": 86.69
  },
  "sector_fund": {
   "sectors": [
    {
+    "name": "福建",
+    "zdf": "0.71",
+    "main_net5d": -64.5,
+    "retail_net": 7.0,
+    "tag": "游资型"
+   },
+   {
     "name": "半导体",
-    "zdf": "0.19",
-    "main_net5d": 224.8,
-    "retail_net": 39.5,
+    "zdf": "-2.59",
+    "main_net5d": 49.3,
+    "retail_net": 94.8,
     "tag": "混合"
    },
    {
-    "name": "元件",
-    "zdf": "0.48",
-    "main_net5d": -71.0,
-    "retail_net": 1.2,
+    "name": "风电设备",
+    "zdf": "1.25",
+    "main_net5d": -11.6,
+    "retail_net": -8.5,
     "tag": "游资型"
    },
    {
-    "name": "PCB概念",
-    "zdf": "1.42",
-    "main_net5d": -73.0,
-    "retail_net": -1.2,
+    "name": "昨日涨停",
+    "zdf": "0.55",
+    "main_net5d": -152.5,
+    "retail_net": 6.3,
     "tag": "游资型"
    },
    {
-    "name": "房地产服务",
-    "zdf": "3.31",
-    "main_net5d": 7.7,
-    "retail_net": -1.4,
-    "tag": "机构型"
+    "name": "出版",
+    "zdf": "0.49",
+    "main_net5d": -1.0,
+    "retail_net": -3.3,
+    "tag": "游资型"
    }
   ]
  },
@@ -74,15 +82,16 @@
    "欧马模式": 1
   },
   "leaders": {
-   "堆量模式": 11,
-   "欧马模式": 1
+   "堆量模式": 11
   },
-  "pullbacks": {},
+  "pullbacks": {
+   "堆量模式": 1
+  },
   "gpoints": {
-   "堆量模式": 3
+   "堆量模式": 2
   },
-  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
+  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
   "total_scored": 15
  },
- "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
+ "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
 }
