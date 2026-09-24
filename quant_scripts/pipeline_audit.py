@@ -68,9 +68,11 @@ def check_runs(days=2):
 
 
 # ── B. 步骤耗时 ───────────────────────────────────────────────
-def check_steps(step_min=25, sample=4):
-    """取最近 N 个 run（含 cancelled/timed_out，才能抓到「跑 3h 被杀」的步骤）"""
-    d = api("actions/runs?per_page=40")
+def check_steps(step_min=25, sample=30):
+    """扫描「每个 workflow 最近一次 run」（含 cancelled/timed_out），找慢步骤。
+    ⚠️2026-09-25 修正：原 sample=4 只取最近 4 个不同 workflow，被高频的盘中监控挤掉，
+    导致漏检全盘量化扫描的 55min 单步。改为覆盖全部 workflow（至多 sample 个）。"""
+    d = api("actions/runs?per_page=100")
     heavy = []
     if not d:
         return heavy
