@@ -228,10 +228,25 @@ jobs:
       # ⚠️ 路径规范（2026-09-16）：quad_resonance.py / signal_arbiter.py 真源在**仓库根目录**，workflow 一律以 `python3 xxx.py` 调用。
       #    quant_scripts/ 下同名副本（如 signal_arbiter.py）已于 2026-09-16 删除。勿再建根目录副本。
       # ─── 第三步.5b：四维共振评分（政策/资金/筹码/关联方，依赖扫描workflow提交的panhou_lianghua.csv）───
-      - name: 四维共振评分（政策/资金/筹码/关联方四维证据链）
+      - name: 四维共振评分（复用上游 quant_scan 产物，缺失则本地补跑兜底）
         continue-on-error: true
-        timeout-minutes: 45  # 2026-09-03: quad_resonance曾跑55min+拖死job, 超时后continue-on-error继续后续步骤
-        run: python3 quad_resonance.py --pool panhou_lianghua.csv --top 15
+        timeout-minutes: 45
+        run: |
+          set +e
+          D=$(date +%Y-%m-%d)
+          if [ ! -f "outputs/四维共振_latest.json" ]; then
+            RV="missing"
+          else
+            RV=$(python3 -c "import json;d=json.load(open('outputs/四维共振_latest.json'));print('ok' if str(d.get('date',''))[:10]=='$D' else 'stale')" 2>/dev/null || echo bad)
+          fi
+          echo "上游四维产物状态: $RV"
+          if [ "$RV" = "ok" ]; then
+            echo "复用上游 quant_scan 四维产物（本步省约38min）"
+          else
+            echo "上游产物异常($RV) -> 本地补跑兜底"
+            python3 quad_resonance.py --pool panhou_lianghua.csv --top 15
+          fi
+          set -e
 
       # ─── 第三步.5c：全系统信号仲裁（统一出口：9信号源+操作清单+市场级信号，依赖四维+三系统输出）───
       - name: 全系统信号仲裁（统一出口·今日操作清单）
