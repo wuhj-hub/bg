@@ -70,7 +70,65 @@ def parse_asfund_simple(txt):
     return {}
 
 
+def batch_asfund(codes, chunk=40):
+    """⭐2026-09-25 性能优化：asfund 批量预取（单只 1 次 npx → 40 只 1 次）。
+    npx 子进程启动开销约 2-4s，全池 400 只逐只调用 ≈ 20min 纯开销。
+    返回 {full_code: {m1..m20, tag}}；解析失败返回 {}（由调用方逐只兜底）。
+    """
+    out = {}
+    for i in range(0, len(codes), chunk):
+        part = codes[i:i + chunk]
+        txt = run(["asfund", ",".join(part)], timeout=150)
+        if not txt:
+            continue
+        # 批量 asfund 输出长表：列名不含前缀，每只一行（symbol/code 均可作 key）
+        for block in txt.split("\n\n"):
+            lines = [ln.strip() for ln in block.splitlines() if ln.strip().startswith("|")]
+            if len(lines) < 3:
+                continue
+            header = [q.strip() for q in lines[0].strip("|").split("|")]
+            if "MainNetFlow" not in header:
+                continue
+            ki = header.index("symbol") if "symbol" in header else (header.index("code") if "code" in header else 0)
+            for ln in lines[2:]:
+                d = [q.strip() for q in ln.strip("|").split("|")]
+                if len(d) != len(header):
+                    continue
+                row = dict(zip(header, d))
+                key = d[ki]
+                if key and key.startswith(("sh", "sz")):
+                    out[key] = _layer_from_row(row)
+    return out
+
+
+def _layer_from_row(row):
+    """由 asfund 行 → 四层资金标签（与 fund_layer_check 同口径）"""
+    try:
+        m1 = float(row.get("MainNetFlow", 0) or 0)
+        m5 = float(row.get("MainNetFlow5D", 0) or 0)
+        m10 = float(row.get("MainNetFlow10D", 0) or 0)
+        m20 = float(row.get("MainNetFlow20D", 0) or 0)
+    except Exception:
+        return None
+    neg = [x < 0 for x in (m1, m5, m10, m20)]
+    if all(neg):
+        finished = (m1 >= 0 or abs(m1) < abs(m5) * 0.25) and (m5 < 0 and m10 < 0 and abs(m5) < abs(m10))
+        tag = "🌀出货完成·抛压枯竭" if finished else "⛔出货中·全周期流出"
+    elif m1 < 0 and m20 > 0:
+        tag = "🌀回调洗盘·20日控盘正"
+    elif m1 > 0 and m20 > 0:
+        tag = "📈资金共振·控盘正"
+    else:
+        tag = "⚖️中性"
+    return {"m1": round(m1 / 1e8, 2), "m5": round(m5 / 1e8, 2),
+            "m10": round(m10 / 1e8, 2), "m20": round(m20 / 1e8, 2), "tag": tag}
+
+
+FUND_PREFETCH = {}   # ⭐批量预取结果（main 中填充）
+
+
 def fund_layer_check(code):
+
     """四层资金验证（黑石启发·多周期资金验证）+ 出货完成度状态机（2026-08-12，源自OPPO笔记"是否出货vs完成出货"）：
     当日/5日/10日/20日主力净流 → 洗盘vs出货判定（区分"出货中"与"出货完成"两阶段）
       ⛔出货中   = 四层全负且当日流出未收窄（主力仍在卖，坚决规避）
@@ -79,6 +137,8 @@ def fund_layer_check(code):
       📈共振     = 当日正且20日正（资金共振，健康上行）
       ⚖️中性     = 其余（观察）
     """
+    if code in FUND_PREFETCH:          # ⭐优先用批量预取结果（零网络开销）
+        return FUND_PREFETCH[code]
     row = parse_asfund_simple(run(["asfund", code]))
     if not row:
         return None
@@ -280,8 +340,15 @@ def main():
                 "fund_tag": (fl or {}).get("tag", ""),
                 "fund_layers": (fl or {})}
 
+    # ⭐2026-09-25 性能优化：先批量预取全池 asfund（40只/次），消除逐只 npx 启动开销
+    codes_all = [("sh" if c.startswith("6") else "sz") + c for c, _, _, _ in stocks]
+    t0 = time.time()
+    FUND_PREFETCH.update(batch_asfund(codes_all))
+    print(f"[INFO] asfund 批量预取 {len(FUND_PREFETCH)}/{len(codes_all)} 只，"
+          f"耗时 {time.time()-t0:.1f}s（替代逐只调用，原需约 20min）", flush=True)
+
     results = []
-    with ThreadPoolExecutor(max_workers=8) as ex:
+    with ThreadPoolExecutor(max_workers=12) as ex:
         for r in ex.map(work, stocks):
             if r:
                 results.append(r)
