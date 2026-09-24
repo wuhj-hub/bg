@@ -1,13 +1,11 @@
 name: 回测周期（月度定期回归）
 
-# 回测机制 v1.0 的运维部分：把「回测」从一次性动作变成周期性常态（2026-09-24）
-# 每月 1 日 09:10（北京）运行，随 evidence_review（09:05）之后
-# 内容：数据体检（方向校验）→ 基准回归 → 候选复核 → 出报告
-# 纪律：本 workflow **只出报告、不改代码**；候选需「连续 2 期通过」才建议落地
+# 回测机制 v1.0 运维部分（2026-09-24）
+# 纪律：report-only，不改代码；候选需「连续2期通过 + 人工确认」才落地
+# 数据：data/bt_sample.json（400只固定样本，保证月度可复现）
 
 on:
   # 可靠触发：由 evidence_review 链路内联（每月1日 09:05，已在 cron-job.org 验证）
-  # 本 workflow 保留手动/外部触发入口
   repository_dispatch:
     types: [bt-cycle-run]
   workflow_dispatch: {}
@@ -22,7 +20,7 @@ concurrency:
 jobs:
   cycle:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 60
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -32,36 +30,30 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: 准备回测数据（固定样本，保证月度可复现）
-        run: |
-          ls -la data/bt_sample.json && python3 -c "
-import json; d=json.load(open('data/bt_sample.json'))
-print(f'样本 {len(d)} 只')"
-
-      - name: ① 回测周期回归（数据体检 + 基准 + 候选复核）
+      - name: 回测周期回归（数据体检 + 基准 + 候选复核）
         id: cyc
         continue-on-error: true
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           set +e
-          if [ ! -f data/bt_sample.json ]; then
-            echo "⚠️ 缺少 data/bt_sample.json，本期跳过" ; echo "rc=0" >> "$GITHUB_OUTPUT"; exit 0
+          if [ -f data/bt_sample.json ]; then
+            python3 quant_scripts/bt_cycle.py --data data/bt_sample.json --out outputs --push > /tmp/cyc.log 2>&1
+            RC=$?
+            tail -60 /tmp/cyc.log
+          else
+            echo "WARN: 缺少 data/bt_sample.json，本期跳过"
+            RC=0
           fi
-          python3 quant_scripts/bt_cycle.py --data data/bt_sample.json --out outputs --push > /tmp/cyc.log 2>&1
-          RC=$?
           set -e
-          tail -60 /tmp/cyc.log
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
 
       - name: 提交回测报告
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           for f in outputs/回测周期_*.md outputs/bt_cycle_latest.json; do
-            [ -f "$f" ] && git add "$f" || :
+            if [ -f "$f" ]; then git add "$f"; fi
           done
           if git diff --cached --quiet; then
             echo "无变更"
@@ -77,9 +69,8 @@ print(f'样本 {len(d)} 只')"
         run: |
           RC="${{ steps.cyc.outputs.rc }}"
           if [ "$RC" != "0" ]; then
-            curl -s "https://pushplus.plus/send" \
-              -d "token=${PUSH_TOKEN}&title=⚠️回测周期异常&content=回测周期回归 rc=${RC:-?}&template=txt" > /dev/null || :
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️回测周期异常&content=rc=${RC:-?}&template=txt" > /dev/null || :
             echo "::warning::回测周期回归异常 rc=$RC"
           else
-            echo "✅ 回测周期回归完成"
+            echo "OK 回测周期回归完成"
           fi
