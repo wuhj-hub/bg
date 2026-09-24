@@ -379,6 +379,12 @@
   "yao_pool.txt": [
    "quant_scripts/yao_gu_pool.py"
   ],
+  "回测周期_{var}.md": [
+   "quant_scripts/bt_cycle.py"
+  ],
+  "bt_cycle_latest.json": [
+   "quant_scripts/bt_cycle.py"
+  ],
   "caige_zxz_increment_bt.json": [
    "quant_scripts/bt_caige_increment.py"
   ],
@@ -430,6 +436,9 @@
   ],
   "鱼身报告_latest.md": [
    ".github/workflows/quant_scan.yml"
+  ],
+  "pipeline_audit_latest.json": [
+   ".github/workflows/selfcheck_daily.yml"
   ]
  },
  "committed": {
@@ -747,6 +756,7 @@
   "beast_pool_latest.json",
   "beast_results.txt",
   "beast_timing_exit.json",
+  "bt_cycle_latest.json",
   "caige_urls.txt",
   "caige_zxz_increment_bt.json",
   "cross_source_latest.json",
@@ -760,6 +770,7 @@
   "liangxue_winrate_latest.json",
   "market_width_{var}.md",
   "panhou_lianghua.md",
+  "pipeline_audit_latest.json",
   "pool.csv",
   "pool_51.txt",
   "rsv_strength_{var}.md",
@@ -789,6 +800,7 @@
   "回测卡_{var}_{var}.json",
   "回测卡_猛兽技术代理_持{var}周_{var}.md",
   "回测卡_鱼身{var}_持{var}日_{var}.md",
+  "回测周期_{var}.md",
   "年线广度_{var}.md",
   "开盘强形态_{var}.json",
   "才哥战法股池_{var}.json",

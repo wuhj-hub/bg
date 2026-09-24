@@ -1,7 +1,7 @@
 # 🔍 产物入库审计 · 2026-09-24
 
-> 扫描 120 个产出路径 / 67 个提交路径 / 25 个消费读取路径
-> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **66** ｜ ✅ 已提交 **54** ｜ ❔ 提交但未见生成 22
+> 扫描 123 个产出路径 / 67 个提交路径 / 25 个消费读取路径
+> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **69** ｜ ✅ 已提交 **54** ｜ ❔ 提交但未见生成 22
 
 ## 🟡 写而未提交（其余，多为研究/一次性产物）
 
@@ -13,6 +13,7 @@
 | `beast_pool_latest.json` | quant_scripts/beast_pool_screener.py |
 | `beast_results.txt` | quant_scripts/monthly_pool_sync.py |
 | `beast_timing_exit.json` | quant_scripts/bt_beast_timing.py |
+| `bt_cycle_latest.json` | quant_scripts/bt_cycle.py |
 | `caige_urls.txt` | quant_scripts/caige_track.py |
 | `caige_zxz_increment_bt.json` | quant_scripts/bt_caige_increment.py |
 | `cross_source_latest.json` | quant_scripts/cross_source_check.py |
@@ -26,6 +27,7 @@
 | `liangxue_winrate_latest.json` | quant_scripts/win_rate_liangxue.py |
 | `market_width_{var}.md` | market_width.py |
 | `panhou_lianghua.md` | full_market_dualdim.py |
+| `pipeline_audit_latest.json` | .github/workflows/selfcheck_daily.yml |
 | `pool.csv` | skills_backup/板块个股入牛时点/scripts/scan_inbull.py, skills_backup/板块个股入牛时点/scripts/ths_fetch.py, skills_backup/板块个股入牛时点/scripts/ths_fetch_week.py |
 | `pool_51.txt` | skills_backup/强势体系/backtest.py |
 | `rsv_strength_{var}.md` | quant_scripts/rsv_strength.py |
@@ -55,6 +57,7 @@
 | `回测卡_{var}_{var}.json` | quant_scripts/backtest_gate.py |
 | `回测卡_猛兽技术代理_持{var}周_{var}.md` | quant_scripts/beast_tech_backtest.py |
 | `回测卡_鱼身{var}_持{var}日_{var}.md` | quant_scripts/fish3_backtest.py |
+| `回测周期_{var}.md` | quant_scripts/bt_cycle.py |
 | `年线广度_{var}.md` | quant_scripts/yearline_breadth.py |
 | `开盘强形态_{var}.json` | quant_scripts/kaipan_8.py |
 | `才哥战法股池_{var}.json` | quant_scripts/caige_pool.py |
