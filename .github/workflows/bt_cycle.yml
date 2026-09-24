@@ -6,6 +6,8 @@ name: 回测周期（月度定期回归）
 # 纪律：本 workflow **只出报告、不改代码**；候选需「连续 2 期通过」才建议落地
 
 on:
+  # 可靠触发：由 evidence_review 链路内联（每月1日 09:05，已在 cron-job.org 验证）
+  # 本 workflow 保留手动/外部触发入口
   repository_dispatch:
     types: [bt-cycle-run]
   workflow_dispatch: {}
@@ -30,14 +32,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: 准备回测数据
+      - name: 准备回测数据（固定样本，保证月度可复现）
         run: |
-          mkdir -p data
-          if [ -f data/kline800.json ]; then
-            echo "已有历史数据 $(du -h data/kline800.json | cut -f1)"
-          else
-            echo "无历史数据，跳过（需先归档 kline800.json 到 data/）"
-          fi
+          ls -la data/bt_sample.json && python3 -c "
+import json; d=json.load(open('data/bt_sample.json'))
+print(f'样本 {len(d)} 只')"
 
       - name: ① 回测周期回归（数据体检 + 基准 + 候选复核）
         id: cyc
@@ -46,12 +45,10 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           set +e
-          if [ ! -f data/kline800.json ]; then
-            echo "⚠️ 缺少 data/kline800.json，本期跳过回归（仅出提示）" 
-            echo "rc=0" >> "$GITHUB_OUTPUT"
-            exit 0
+          if [ ! -f data/bt_sample.json ]; then
+            echo "⚠️ 缺少 data/bt_sample.json，本期跳过" ; echo "rc=0" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          python3 quant_scripts/bt_cycle.py --data data/kline800.json --out outputs --push > /tmp/cyc.log 2>&1
+          python3 quant_scripts/bt_cycle.py --data data/bt_sample.json --out outputs --push > /tmp/cyc.log 2>&1
           RC=$?
           set -e
           tail -60 /tmp/cyc.log
