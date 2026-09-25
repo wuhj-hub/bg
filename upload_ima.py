@@ -10,6 +10,9 @@ upload_ima.py —— 将 markdown 报告上传到 ima 知识库
 
 用法：python3 upload_ima.py --file panhou_lianghua.md --name "盘后量化_$(date +%Y-%m-%d).md"
 
+防重复（2026-09-25）：上传前先查目标文件夹是否已有同名文件，有则跳过（IMA_SKIP_DUP=0 可关闭）。
+  原因：KB 无删除 API 且同名不覆盖（自动加时间戳），同日多次运行会导致同名报告堆积。
+
 注意：此脚本由 GitHub Actions 调用，数据上传到「复盘报告」文件夹作为复盘报告的数据源。
 流程：create_media → cos_upload → add_knowledge（含 folder_id）
 """
@@ -135,6 +138,35 @@ def add_knowledge(kb_id, media_id, title, media_type, folder_id=None):
     return resp
 
 
+def list_existing_titles(kb_id, folder_id=None):
+    """列出目标知识库/文件夹中已有的文件名（分页，最多500条）。
+    ⭐2026-09-25 防重复：KB 无删除 API 且同名不覆盖（自动追加时间戳），
+    同日多次运行（定时+补跑）会导致同名报告在知识库中不断堆积。
+    查询失败时返回 None（调用方不跳过，宁可重复也不丢数据）。"""
+    titles = set()
+    cursor = ""
+    for _ in range(10):
+        body = {"cursor": cursor, "limit": 50, "knowledge_base_id": kb_id}
+        if folder_id:
+            body["folder_id"] = folder_id
+        try:
+            resp = send_ima("openapi/wiki/v1/get_knowledge_list", json.dumps(body))
+        except Exception as e:
+            print(f"[WARN] 查重失败({e})，跳过查重直接上传")
+            return None
+        d = resp.get("data") or resp
+        for it in (d.get("knowledge_list") or []):
+            t = it.get("title")
+            if t:
+                titles.add(t)
+        if d.get("is_end"):
+            break
+        cursor = d.get("next_cursor") or ""
+        if not cursor:
+            break
+    return titles
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", required=True)
@@ -150,6 +182,14 @@ def main():
     media_type = 7  # Markdown
     content_type = "text/markdown"
     file_ext = "md"
+
+    # Step 0: 查重（默认开启，设 IMA_SKIP_DUP=0 可关闭）
+    if os.environ.get("IMA_SKIP_DUP", "1") == "1":
+        existing = list_existing_titles(kb_id, folder_id or None)
+        if existing is not None and filename in existing:
+            print(f"[SKIP] 知识库中已存在同名文件，跳过上传: {filename}")
+            print("[SKIP] （KB 无删除 API，避免同名堆积；如需强制重传设 IMA_SKIP_DUP=0）")
+            return
 
     # Step 1: 创建媒体条目，获取 COS 上传凭证
     media_id, cred = create_media(kb_id, filename, size, media_type, content_type, file_ext)
