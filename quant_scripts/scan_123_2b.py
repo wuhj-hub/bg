@@ -245,7 +245,7 @@ def main():
                 pass
         return r
 
-    with ThreadPoolExecutor(max_workers=4) as ex:
+    with ThreadPoolExecutor(max_workers=8) as ex:   # ⭐2026-09-25: 4→8（该步实测32.9min）
         for r in ex.map(_one, pool):
             if r:
                 results.append(r)
