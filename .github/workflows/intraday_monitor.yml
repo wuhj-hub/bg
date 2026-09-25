@@ -14,7 +14,29 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ─── 交易日守卫（2026-09-25 统一新增）───
+  # 目的：cron-job.org 只能按"周一至周五"触发，无法感知 A股节假日
+  #（中秋 9/25-9/27、国庆 10/1-10/7 等休市日仍会触发 → 空跑白耗算力）。
+  # 判据：真实行情数据最新日期是否等于今天（自动适应任何节假日/临时休市，无需维护日历）。
+  # 数据源不可用时保守放行（宁多跑一次，不漏跑）。
+  trade_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ok: ${{ steps.g.outputs.is_trade_day }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 判断是否交易日
+        id: g
+        continue-on-error: true
+        run: python3 quant_scripts/trade_day_check.py --github-output
+
   intraday-monitor:
+    needs: trade_gate
+    if: needs.trade_gate.outputs.ok == '1'
     runs-on: ubuntu-latest
     # ⚠️ 2026-09-15：原 15min 不够——开盘八法"补算扫描"实测耗时 649s(11min)+ 盘中监控 3.5min
     #    会正好撞上超时被 cancelled（首次补算当日尤其明显）。补算每日只发生一次，之后走监控(快)。
