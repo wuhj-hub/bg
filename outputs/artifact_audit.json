@@ -1,5 +1,5 @@
 {
- "date": "2026-09-24",
+ "date": "2026-09-25",
  "writes": {
   "all_mainboard.csv": [
    ".github/workflows/quant_scan.yml",
@@ -477,7 +477,8 @@
    "quant_scan.yml"
   ],
   "四维共振_latest.json": [
-   "quant_report.yml"
+   "quant_report.yml",
+   "quant_scan.yml"
   ],
   "信号仲裁_latest.json": [
    "quant_report.yml"
