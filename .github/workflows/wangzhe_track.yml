@@ -14,7 +14,27 @@ permissions:
   contents: write
 
 jobs:
+  # ─── 交易日守卫（2026-09-25 统一新增）───
+  # cron-job.org 只能按"周一至周五"触发，无法感知 A股节假日（中秋/国庆等休市日仍触发→空跑）。
+  # 判据：真实行情数据最新日期 == 今天（自动适应任何节假日与临时休市，无需维护日历）；
+  #       数据源不可用时保守放行（宁多跑一次，不漏跑）。
+  trade_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ok: ${{ steps.g.outputs.is_trade_day }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 判断是否交易日
+        id: g
+        continue-on-error: true
+        run: python3 quant_scripts/trade_day_check.py --github-output
   wangzhe-track:
+    needs: trade_gate
+    if: needs.trade_gate.outputs.ok == '1'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
