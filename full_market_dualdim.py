@@ -275,12 +275,112 @@ def fund_score(r):
     return round(phase_w * 4 + match_w * 4 + sig_w * 4 + precip_w, 1)
 
 
+def parse_batch_kline(txt):
+    """批量 kline（长表，含 symbol 列）→ {symbol: [ {date, amount, last}, ... ]}（升序）"""
+    out = {}
+    header = None
+    for ln in txt.splitlines():
+        s2 = ln.strip()
+        if not s2.startswith("|"):
+            continue
+        parts = [q.strip() for q in s2.strip("|").split("|")]
+        if "date" in parts:
+            header = parts
+            continue
+        if not header or "---" in parts[0]:
+            continue
+        try:
+            if "symbol" in header:
+                sym = parts[0]
+                di = header.index("date")
+                if not re.match(r"^(sh|sz)\d{6}$", sym):
+                    continue
+                if not re.match(r"\d{4}-\d{2}-\d{2}", parts[di]):
+                    continue
+                out.setdefault(sym, []).append({
+                    "date": parts[di],
+                    "amount": float(parts[header.index("amount")]),
+                    "last": float(parts[header.index("last")])})
+            else:
+                di = header.index("date")
+                if not re.match(r"\d{4}-\d{2}-\d{2}", parts[di]):
+                    continue
+                out.setdefault("_single", []).append({
+                    "date": parts[di],
+                    "amount": float(parts[header.index("amount")]),
+                    "last": float(parts[header.index("last")])})
+        except Exception:
+            pass
+    for k in out:
+        out[k] = sorted(out[k], key=lambda r: r["date"])
+    return out
+
+
+def batch_fetch_kline(wcodes, limit=130, chunk=40):
+    """⭐2026-09-25 批量预取 kline（40只/次），替代逐只调用。
+    npx 子进程启动开销 2-4s，全市场 3000 只逐只调用约 6000 次 → 现约 150 次。"""
+    out = {}
+    for i in range(0, len(wcodes), chunk):
+        part = wcodes[i:i + chunk]
+        txt = run(["kline", ",".join(part), "--period", "day", "--limit", str(limit),
+                   "--fq", "qfq"], timeout=300)
+        if not txt or txt.startswith("ERR:"):
+            continue
+        out.update(parse_batch_kline(txt))
+    return out
+
+
+def parse_batch_asfund(txt):
+    """批量 asfund（长表，含 symbol 列）→ {symbol: {列名: 值}}"""
+    out = {}
+    header = None
+    for ln in txt.splitlines():
+        s2 = ln.strip()
+        if not s2.startswith("|"):
+            continue
+        parts = [q.strip() for q in s2.strip("|").split("|")]
+        if "code" in parts:
+            header = parts
+            continue
+        if not header or "---" in parts[0]:
+            continue
+        try:
+            key = parts[header.index("symbol")] if "symbol" in header else parts[0]
+            if re.match(r"^(sh|sz)\d{6}$", key):
+                out[key] = {header[i]: parts[i] for i in range(min(len(header), len(parts)))}
+        except Exception:
+            pass
+    return out
+
+
+def batch_fetch_asfund(wcodes, chunk=40):
+    """⭐2026-09-25 批量预取 asfund（40只/次）"""
+    out = {}
+    for i in range(0, len(wcodes), chunk):
+        part = wcodes[i:i + chunk]
+        txt = run(["asfund", ",".join(part)], timeout=300)
+        if not txt or txt.startswith("ERR:"):
+            continue
+        out.update(parse_batch_asfund(txt))
+    return out
+
+
+KLINE_PREFETCH = {}
+ASFUND_PREFETCH = {}
+
+
 def process(stock):
     code, name = stock
     wcode = to_westock_code(code)
     try:
-        kr = parse_kline(run(["kline", wcode, "--period", "day", "--limit", "130"]))
-        ar = parse_asfund(run(["asfund", wcode]))
+        if wcode in KLINE_PREFETCH:          # ⭐优先用批量预取（零启动开销）
+            kr = KLINE_PREFETCH[wcode]
+        else:
+            kr = parse_kline(run(["kline", wcode, "--period", "day", "--limit", "130"]))
+        if wcode in ASFUND_PREFETCH:
+            ar = ASFUND_PREFETCH[wcode]
+        else:
+            ar = parse_asfund(run(["asfund", wcode]))
         if not kr or not ar:
             return None
         amounts = [r["amount"] for r in kr]
@@ -466,6 +566,14 @@ def main():
     rows = list(csv.DictReader(open(inp, encoding="utf-8-sig")))
     stocks = [(r["code"], r["name"]) for r in rows if "退" not in r.get("name", "")]
     print(f"[INFO] total stocks={len(stocks)} workers={workers}")
+    # ⭐2026-09-25 性能优化：批量预取 kline + asfund（40只/次），消除逐只 npx 启动开销
+    wcodes = [to_westock_code(c) for c, _ in stocks]
+    t0 = time.time()
+    KLINE_PREFETCH.update(batch_fetch_kline(wcodes, limit=130))
+    t1 = time.time()
+    ASFUND_PREFETCH.update(batch_fetch_asfund(wcodes))
+    print(f"[INFO] 批量预取 完成: kline {len(KLINE_PREFETCH)}/{len(wcodes)} 只 "
+          f"({t1-t0:.0f}s) | asfund {len(ASFUND_PREFETCH)}/{len(wcodes)} 只 ({time.time()-t1:.0f}s)", flush=True)
     results = []
     done = 0
     with ThreadPoolExecutor(max_workers=workers) as ex:
