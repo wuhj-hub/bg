@@ -1,9 +1,11 @@
 name: evidence月度复核提醒
 
 on:
-  schedule:
-    # 每月1号北京时间 09:00（UTC 01:00），生成AI链evidence复核工作单并推送提醒
-    - cron: "0 1 1 * *"
+  # ⚠️2026-09-25：原生 cron 已停用（避免与 cron-job.org 的 evidence-review-run 双触发；
+  #   外部触发已验证可靠）。如需回退，取消下方注释即可。
+  # schedule:
+  #   # 每月1号北京时间 09:00（UTC 01:00），生成AI链evidence复核工作单并推送提醒
+  #   - cron: "0 1 1 * *"
   repository_dispatch:
     types: [evidence-review-run]
   workflow_dispatch: {}
