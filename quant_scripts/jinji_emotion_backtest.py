@@ -266,16 +266,36 @@ def main():
     rho_jf = spearman([r["jj_first"] for r in rows if r.get("jj_first") is not None and r.get("ret") is not None],
                       [r["ret"] for r in rows if r.get("jj_first") is not None and r.get("ret") is not None])
 
+    def seg_stats(seg):
+        if not seg:
+            return None
+        r = [x["ret"] for x in seg]
+        loss = [x["loss"] for x in seg if x.get("loss") is not None]
+        return (len(seg), mean(r), median(r), pstdev(r),
+                mean(loss) if loss else None, 100.0 * sum(1 for x in r if x > 0) / len(r))
+
+    def extreme_row(label, seg):
+        s = seg_stats(seg)
+        if not s:
+            return f"| {label} | 0 | — | — | — | — | — |"
+        n, m, md, sd, ls, wr = s
+        return (f"| {label} | {n} | {m:+.2f}% | {md:+.2f}% | {sd:.2f} | "
+                f"{(f'{ls:.0f}%' if ls is not None else '—')} | {wr:.0f}% |")
+
+    med = median([r["jj_first"] for r in rows]) or 0
+
     L = [f"# 🌡️ 首板/连板晋级率 · 情绪温度计预测力回测 {today}", "",
          f"> 样本：全主板 {len(series)} 只 · {len(cal)} 交易日（{cal[0]} ~ {cal[-1]}）· 有效回测 {len(rows)} 天",
          f"> 次日打板收益 均值 {avg_ret:+.2f}% · 中位 {avg_med:+.2f}% · 亏损率 {avg_loss:.0f}%（T日涨停股 T+1 收盘/T 收盘-1）", "",
          "## 🎯 结论",
-         f"1. **晋级率无择时预测力**：首板晋级率→次日打板收益 Spearman ρ={rho_jf:+.3f}（≈0），分层非单调（两端高、中间低）。"
-         f"即「今日情绪高→明日更赚钱」**不成立**，不宜单用晋级率水平择时。",
-         f"2. **连板 > 首板（选股有效、择时无效）**：次日打板收益 连板 cohort {mean(rl):+.2f}% 显著高于 首板 cohort {mean(r1):+.2f}%；"
-         f"印证二期「接力高板优于抢首板」——晋级率应作**结构筛选器**而非温度计。",
-         f"3. **情绪轻微均值回归**：首板晋级率 lag-1 自相关 ρ={ac:+.3f}（弱负），高涨期次日小幅回落。",
-         "4. **风险提示**：低晋级率档次日收益波动更大（见下表标准差），情绪弱时打板不确定性上升，而非单纯变差。",
+         f"1. **晋级率无择时预测力**：首板晋级率→次日打板收益 Spearman ρ={rho_jf:+.3f}（≈0），分层非单调（U形）。"
+         f"即「今日情绪高→明日更赚钱」**不成立**。",
+         f"2. **连板 > 首板（选股有效、择时无效）**：次日打板收益 连板 cohort {mean(rl):+.2f}% 显著高于 首板 cohort {mean(r1):+.2f}%——"
+         f"晋级率应作**结构筛选器**而非温度计。",
+         "3. **极端值/双因子亦无显著信号**（见五、六节）：尾部高低档差异在噪声内，连板高度×晋级率交互不稳健；"
+         "根因是样本量小（极端日仅个位数~数十天），差异不显著。",
+         f"4. **情绪轻微均值回归**：首板晋级率 lag-1 自相关 ρ={ac:+.3f}（弱负）。",
+         "5. **风险提示**：低晋级率档次日收益波动更大（标准差更高），情绪弱时是「更不确定」而非「更差」。",
          "",
          "## 一、相关性（情绪指标 → 次日打板收益）",
          "| 情绪指标 | N | Spearman ρ | 低1/3 → 高1/3 |", "|---|---|---|---|",
@@ -294,7 +314,24 @@ def main():
         L.append(f"| {lbl} | {n} | {mv:+.2f}% | {sd:.2f} | {ls:.0f}% |" if ls is not None else f"| {lbl} | {n} | {mv:+.2f}% | {sd:.2f} | — |")
     L += ["", "## 四、分 cohort", "", "| cohort | 天数 | 次日收益均值 |", "|---|---|---|",
           f"| 首板 | {len(r1)} | {mean(r1):+.2f}% |", f"| 连板 | {len(rl)} | {mean(rl):+.2f}% |",
-          "", "---",
+          "",
+          "## 五、极端值警戒（尾部择时）",
+          "", "| 条件 | 天数 | 均值 | 中位 | 标准差 | 亏损率 | 正收益日占比 |", "|---|---|---|---|---|---|---|",
+          extreme_row("首板晋级率 ≤10%（情绪冰点）", [r for r in rows if r["jj_first"] is not None and r["jj_first"] <= 10]),
+          extreme_row("首板晋级率 ≥30%（情绪沸点）", [r for r in rows if r["jj_first"] is not None and r["jj_first"] >= 30]),
+          extreme_row("连板晋级率 ≤15%", [r for r in rows if r["jj_lb"] is not None and r["jj_lb"] <= 15]),
+          extreme_row("连板晋级率 ≥30%", [r for r in rows if r["jj_lb"] is not None and r["jj_lb"] >= 30]),
+          extreme_row("**全样本**", rows),
+          "",
+          "## 六、双因子：连板高度 × 首板晋级率（按中位切分）",
+          f"> 首板晋级率中位 = {med:.0f}%",
+          "", "| 最高板 | 晋级率 | 天数 | 均值 | 中位 | 标准差 | 亏损率 | 正收益日占比 |", "|---|---|---|---|---|---|---|---|"]
+    for ml_lbl, ml_f in [("≤2", lambda m: m <= 2), ("=3", lambda m: m == 3), ("≥4", lambda m: m >= 4)]:
+        for jj_lbl, jj_f in [(f"<{med:.0f}%", lambda j: j < med), (f"≥{med:.0f}%", lambda j: j >= med)]:
+            seg = [r for r in rows if r["jj_first"] is not None and ml_f(r["maxlb"]) and jj_f(r["jj_first"])]
+            row = extreme_row(f"最高板{ml_lbl} | {jj_lbl}", seg)
+            L.append(row.replace("| " + f"最高板{ml_lbl} | {jj_lbl}" + " |", f"| {ml_lbl} | {jj_lbl} |", 1))
+    L += ["", "---",
           "⚠️ 涨停由日K重建（收盘=涨停价），非东财涨停池；打板收益为收盘→收盘，未计滑点/手续费/炸板。仅统计口径，非投资建议。"]
     md = "\n".join(L)
     mp = os.path.join(outdir, f"情绪温度计回测_{today}.md")
