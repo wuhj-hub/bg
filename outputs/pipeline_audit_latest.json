@@ -1,41 +1,57 @@
 {
- "date": "2026-09-25 07:01",
+ "date": "2026-09-28 07:01",
  "runs": {
-  "total": 83,
-  "bad": [
-   {
-    "name": ".github/workflows/bt_cycle.yml",
-    "conclusion": "failure",
-    "created": "2026-09-24T06:18",
-    "id": 35963897468,
-    "event": "push"
-   },
-   {
-    "name": "盘后报告生成",
-    "conclusion": "cancelled",
-    "created": "2026-09-23T16:00",
-    "id": 35885744729,
-    "event": "workflow_run"
-   }
-  ]
+  "total": 58,
+  "bad": []
  },
- "heavy_steps": [
+ "heavy_steps": [],
+ "stale_products": [
   {
-   "workflow": "盘后报告生成",
-   "step": "一统天下建仓区股池扫描+跟踪（多周期共振）",
-   "minutes": 30.9
+   "path": "quant_results_latest.json",
+   "status": "停更3天",
+   "age": 3,
+   "max": 1
   },
   {
-   "workflow": "盘后报告生成",
-   "step": "四维共振评分（政策/资金/筹码/关联方四维证据链）",
-   "minutes": 37.9
+   "path": "outputs/paper_portfolio.json",
+   "status": "停更3天",
+   "age": 3,
+   "max": 2
+  },
+  {
+   "path": "outputs/pool_entries.csv",
+   "status": "停更3天",
+   "age": 3,
+   "max": 2
+  },
+  {
+   "path": "market_width_latest.json",
+   "status": "停更3天",
+   "age": 3,
+   "max": 1
+  },
+  {
+   "path": "hot_emotion_latest.json",
+   "status": "停更3天",
+   "age": 3,
+   "max": 1
+  },
+  {
+   "path": "execution_cards_latest.json",
+   "status": "停更3天",
+   "age": 3,
+   "max": 1
+  },
+  {
+   "path": "market_regime_latest.json",
+   "status": "停更3天",
+   "age": 3,
+   "max": 2
   }
  ],
- "stale_products": [],
  "script_errors": [],
  "issues": [
-  "❌ run 异常 2 个（.github/workflows/bt_cycle.yml:failure、盘后报告生成:cancelled）",
-  "⚠️ 重步骤：盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 30.9min、盘后报告生成/四维共振评分（政策/资金/筹码/关联方四维证据链） 37.9min"
+  "⚠️ 产物停更：quant_results_latest.json(停更3天)、outputs/paper_portfolio.json(停更3天)、outputs/pool_entries.csv(停更3天)、market_width_latest.json(停更3天)、hot_emotion_latest.json(停更3天)"
  ],
- "status": "FAIL"
+ "status": "WARN"
 }
