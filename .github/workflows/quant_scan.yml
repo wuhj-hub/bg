@@ -207,6 +207,7 @@ jobs:
         run: |
           python3 quant_scripts/limitup_concept_rank.py --top 20
           cp outputs/涨停概念排行_latest.json 涨停概念排行_latest.json 2>/dev/null || true
+          cp outputs/情绪指标跟踪.json 情绪指标跟踪.json 2>/dev/null || true
           echo "涨停概念排行: $(python3 -c "import json;d=json.load(open('outputs/涨停概念排行_latest.json'));r=d.get('concept_rank',[]);print('涨停%d只 TOP概念=%s'%(d.get('limitup_total',0), r[0]['concept'] if r else '无'))" 2>/dev/null || echo '无数据')"
           echo "热板面板: $(python3 -c "import json;d=json.load(open('outputs/涨停概念排行_latest.json'));g=d.get('grade_summary',{});m=d.get('market',{});L=d.get('leaders',[]);print('主线%d/支线%d/一日游%d | 首板晋级率%s%% | 龙头=%s'%(g.get('main',0),g.get('sub',0),g.get('oneday',0),m.get('first_jinji_rate','-'),(L[0]['concept']+'·'+L[0]['leader']+str(L[0]['score'])) if L else '无'))" 2>/dev/null || echo '无数据')"
 
@@ -441,7 +442,7 @@ jobs:
               hot_emotion_latest.json hot_emotion_history.json hot_emotion_latest.md \
               pools/pool_$(date +%Y-%m).json \
               一统天下建仓区股池_latest.json 一统天下建仓区股池_latest.md yitong_pool.txt \
-              sector_component_em.json 涨停概念排行_latest.json \
+              sector_component_em.json 涨停概念排行_latest.json 情绪指标跟踪.json \
               outputs/四维共振_latest.json
             RC=$?
             set -e

@@ -550,6 +550,22 @@ def main():
                "stocks": ups},
               open(os.path.join(outdir, "涨停概念排行_latest.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
+
+    # 跨月跟踪：把当日情绪指标并入 情绪指标跟踪.json（按日期累积去重）
+    tk = os.path.join(outdir, "情绪指标跟踪.json")
+    try:
+        hist = json.load(open(tk, encoding="utf-8")) if os.path.exists(tk) else {}
+        hist[today] = {"zt": len(ups), "lb": n_lb, "first": n_first,
+                       "maxlb": max((u["lianban"] for u in ups), default=0),
+                       "jj_first": round(mkt_first_jj, 1) if mkt_first_jj is not None else None,
+                       "jj_lb": round(mkt_lb_jj, 1) if mkt_lb_jj is not None else None,
+                       "mood": mood}
+        json.dump(dict(sorted(hist.items())), open(tk, "w", encoding="utf-8"),
+                  ensure_ascii=False, indent=1)
+        print(f"[OK] 情绪指标跟踪 {len(hist)} 天 → {tk}")
+    except Exception as e:
+        print(f"[WARN] 情绪指标跟踪写入失败: {e}")
+
     print(md)
     print(f"\n[OK] {mp}")
     return 0
