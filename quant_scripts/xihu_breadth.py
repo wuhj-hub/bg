@@ -348,8 +348,23 @@ def make_chart(history, out_png, title="西湖广度温度计"):
     ax1.bar(range(len(net)), net, color=colors, width=0.75)
     ax1.axhline(0, color="#555", lw=0.8)
     ax1.set_ylabel("下雨图净值（新高-新低）")
-    ax1.set_title(f"{title} · 下雨图净值曲线（红=晴/绿=雨）")
+    ax1.set_title(f"{title} · 下雨图净值曲线（红=晴/绿=雨；↑净值转正 ↓净值转负）")
     ax1.grid(alpha=0.25)
+    # ── 拐点标注：新高/新低交叉（净值由负转正 ↑ / 由正转负 ↓）──
+    up_idx = [i for i in range(1, len(net)) if net[i] > 0 and net[i - 1] <= 0]
+    dn_idx = [i for i in range(1, len(net)) if net[i] <= 0 and net[i - 1] > 0]
+    for i in up_idx:
+        ax1.axvline(i, color="#d62728", ls=":", lw=0.8, alpha=0.45)
+        ax1.annotate("↑" + dates[i], xy=(i, max(net[i], 0)), xytext=(0, 12),
+                     textcoords="offset points", ha="center", fontsize=7,
+                     color="#b71c1c", fontweight="bold")
+    for i in dn_idx:
+        ax1.axvline(i, color="#2ca02c", ls=":", lw=0.8, alpha=0.45)
+        ax1.annotate("↓" + dates[i], xy=(i, min(net[i], 0)), xytext=(0, -14),
+                     textcoords="offset points", ha="center", fontsize=7,
+                     color="#1b5e20", fontweight="bold")
+    print(f"[拐点] 净值转正(↑{len(up_idx)}次): " + "、".join(ks[i] for i in up_idx))
+    print(f"[拐点] 净值转负(↓{len(dn_idx)}次): " + "、".join(ks[i] for i in dn_idx))
     ax2.plot(range(len(qsg)), qsg, color="#d62728", marker="o", ms=2, lw=1.2, label="强势股占比 QSG%")
     ax2.plot(range(len(ejd)), ejd, color="#1f77b4", marker="o", ms=2, lw=1.2, label="第二阶段占比 EJD%")
     ax2.axhline(6, color="#999", ls="--", lw=0.8)
