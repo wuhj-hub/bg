@@ -1,32 +1,31 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""limitup_concept_rank.py —— 涨停概念排行 · 板块分级 · 晋级率（v2, 2026-09-27）
+"""limitup_concept_rank.py —— 热板作战面板 v3（2026-09-27）
 
 灵感来源：
-  ① 曾星智《中秋快乐及短线核心方法》(2026-09-25)
-       汇总当日全部涨停 → 按概念归类 → 涨停家数最多者即当日热点概念。
-  ② 《热板选龙头、先锋、中军战法》(指标乐园, 2026-09-27) —— 板块三级分类：
-       主线板块：涨停≥8家 + 梯队完整 + 晋级率≥35%   → 重点布局
-       支线板块：涨停3-7家 + 晋级率20%-35%           → 小仓试错
-       一日游题材：涨停≤2家 或 晋级率<20%            → 直接放弃
-  ③ 曾星智「短线备选池·晋级率」二期（xzz_shortlist）：晋级率=次日继续涨停比例，
-       可作情绪温度计（首板晋级率>22% 题材活跃 / <13% 情绪退潮）。
+  ① 曾星智《中秋快乐及短线核心方法》(2026-09-25)：汇总涨停 → 按概念归类 → 涨停家数最多者=热点。
+  ② 《热板选龙头、先锋、中军战法》(指标乐园, 2026-09-27)：
+       模块一 板块热度筛选（分级）→ 模块二 龙头先锋识别（五步法）→ 模块三 中军配置。
+       主线：涨停≥8家 + 梯队完整 + 晋级率≥35% / 支线：3-7家 + 20-35% / 一日游：≤2家 或 <20%
+       龙头五步法：启动最早 / 涨幅最大 / 封单最强(封单/流通≥5%) / 带动性强 / 辨识度最高
+       中军：板块内市值前3、沿5/10日线慢涨、少连板、调整抗跌（趋势压舱石）
+  ③ 曾星智「短线备选池·晋级率」二期：晋级率=次日继续涨停比例，作情绪温度计。
 
-v2 在 v1（涨停家数 / 连板家数排行）基础上新增：
-  ★ 概念晋级率 = 该概念内「今日连板家数(≥2板)」/「该概念昨日涨停家数」
-  ★ 板块三级自动分档（主线 / 支线 / 一日游），阈值可调 (--main-zt/--main-jj/--sub-jj)
-  ★ 梯队指标：最高连板数 maxlb / 首板数 first
-  ★ 全市场情绪刻度：首板晋级率 + 连板晋级率（情绪温度计）
+版本演进：
+  v1 (2026-09-25) 涨停家数 / 连板家数排行
+  v2 (2026-09-27) ★概念晋级率 ★板块三级分档 ★梯队指标 ★市场情绪刻度 ★数据日期自适应
+  v3 (2026-09-27) ★龙头榜·五步法（接东财涨停池，量化封单/首封时间/带动性/弹性/辨识）
+                  ★中军榜（板块内成交额前列 + 非涨停 + 沿MA5/MA10 + 近10日回撤）
 
-⚠️ 口径说明（沿用 v1）：概念分类来自东财板块成分，一票可属多个概念（会放大家数），
-   晋级率分子=今日连板家数（连板必为"昨涨停且今涨停"）；分母=该概念昨日涨停家数。
-   样本过小(昨日涨停<3)时晋级率噪声大，已在输出中标注 "!"。
+数据源：all_mainboard.csv + westock 日线 + outputs/sector_component_em.json + 东财涨停池(push2ex)。
+口径提示：概念来自东财板块成分（一票多概念会放大家数）；市值接口在沙箱不可用，
+  故"中军"以**成交额**近似市值/流动性（与仓库 longtou.py 现行中军口径一致）。
 
 用法：
-  python3 quant_scripts/limitup_concept_rank.py [--days 6] [--top 20] [--date YYYY-MM-DD]
+  python3 quant_scripts/limitup_concept_rank.py [--days 20] [--top 20] [--date YYYY-MM-DD]
          [--main-zt 8] [--main-jj 35] [--sub-jj 20] [--max-stocks N] [--outdir DIR]
 """
-import os, re, sys, csv, json, time, argparse, subprocess
+import os, re, sys, csv, json, time, argparse, subprocess, urllib.request
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
@@ -37,10 +36,13 @@ WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 LIMIT_UP = 9.8          # 主板涨停阈值（含四舍五入误差）
 CHUNK = 40
 WORKERS = 4
-
 # 情绪刻度阈值（参考 xzz_shortlist 二期：首板晋级率 13%~18% 为常态带）
-JJ_HOT = 22.0           # 首板晋级率 ≥22% → 题材接力活跃
-JJ_COLD = 13.0          # 首板晋级率 <13%  → 情绪退潮
+JJ_HOT = 22.0
+JJ_COLD = 13.0
+# 东财涨停池（含 fbt首封时间 / fund封单 / ltsz流通市值 / zbc炸板 / zttj涨停统计）
+ZT_URL = ("https://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989"
+          "&dpt=wz.ztzt&Pageindex=0&pagesize=500&sort=fbt%3Aasc&date={d}")
+UA = {"User-Agent": "Mozilla/5.0"}
 
 
 def cli(args, timeout=180):
@@ -57,7 +59,7 @@ def cli(args, timeout=180):
 
 
 def parse_batch(txt):
-    """批量 kline 长表 → {symbol: [(date, close), ...]}（升序）"""
+    """批量 kline 长表 → {symbol: [(date,open,close,high,low,vol,amount), ...]}（升序）"""
     out = defaultdict(list)
     header = None
     for ln in txt.splitlines():
@@ -74,7 +76,9 @@ def parse_batch(txt):
             sym = p[0]
             if not re.match(r"^(sh|sz)\d{6}$", sym):
                 continue
-            out[sym].append((p[header.index("date")], float(p[header.index("last")])))
+            g = lambda c: float(p[header.index(c)])
+            out[sym].append((p[header.index("date")], g("open"), g("last"),
+                             g("high"), g("low"), g("volume"), g("amount")))
         except Exception:
             pass
     for k in out:
@@ -83,7 +87,6 @@ def parse_batch(txt):
 
 
 def fetch_all(codes, days):
-    """批量取K线"""
     res = {}
     batches = [codes[i:i + CHUNK] for i in range(0, len(codes), CHUNK)]
     def one(b):
@@ -101,19 +104,39 @@ def load_sector():
         if os.path.exists(p):
             try:
                 d = json.load(open(p, encoding="utf-8"))
-                return d.get("code_sector", {}), d.get("code_name", {}), d.get("date", "")
+                return (d.get("code_sector", {}), d.get("code_name", {}),
+                        d.get("sectors", {}), d.get("date", ""))
             except Exception:
                 continue
-    return {}, {}, ""
+    return {}, {}, {}, ""
+
+
+def fetch_ztpool(d8):
+    """东财涨停池 → {6位代码: {...}}；失败返回 {}（优雅降级）"""
+    try:
+        raw = urllib.request.urlopen(
+            urllib.request.Request(ZT_URL.format(d=d8), headers=UA), timeout=25).read().decode()
+        pool = (json.loads(raw).get("data") or {}).get("pool") or []
+    except Exception as e:
+        print(f"[WARN] 涨停池获取失败（{e}），龙头榜将降级", flush=True)
+        return {}
+    d = {}
+    for p in pool:
+        c = p.get("c") or ""
+        if not re.match(r"^\d{6}$", c):
+            continue
+        d[c] = {"fbt": p.get("fbt") or 0, "fund": p.get("fund") or 0,
+                "ltsz": p.get("ltsz") or 0, "zbc": p.get("zbc") or 0,
+                "amount": p.get("amount") or 0, "hybk": p.get("hybk") or ""}
+    return d
 
 
 def classify(zt, prev_zt, jj, a):
-    """板块三级分档。jj=晋级率(%)或None；prev_zt=昨日涨停家数"""
     if zt <= 2:
         return "一日游"
     if jj is not None and jj < a.sub_jj:
         return "一日游"
-    if prev_zt == 0:                                  # 今日新启动，无昨日样本
+    if prev_zt == 0:
         return "主线" if zt >= a.main_zt else "支线"
     if zt >= a.main_zt and jj is not None and jj >= a.main_jj:
         return "主线"
@@ -126,20 +149,89 @@ GRADE_ORDER = {"主线": 0, "支线": 1, "一日游": 2}
 def fmt_jj(jj, prev_zt):
     if jj is None:
         return "—  "
-    mark = "!" if prev_zt < 3 else ""
-    return f"{jj:.0f}%{mark}"
+    return f"{jj:.0f}%{'!' if prev_zt < 3 else ''}"
+
+
+def fmt_t(fbt):
+    if not fbt:
+        return "—"
+    return f"{fbt // 10000:02d}:{fbt // 100 % 100:02d}:{fbt % 100:02d}"
+
+
+def rank_frac(values, asc):
+    """数值列表 → 每项 0..1 排名分（1=最优）；缺值=0。asc=True 表示越小越好"""
+    n = len(values)
+    out = {i: 0.0 for i in range(n)}
+    valid = [(i, v) for i, v in enumerate(values) if v is not None]
+    if not valid:
+        return out
+    sv = sorted(valid, key=lambda x: x[1], reverse=not asc)
+    m = len(sv)
+    for j, (i, v) in enumerate(sv):
+        out[i] = (1 - j / (m - 1)) if m > 1 else 1.0
+    return out
+
+
+def leader_pick(members):
+    """龙头五步法：对同一概念内今日涨停股打分（0-100），返回 (龙头dict, 明细list)"""
+    k = len(members)
+    fbt = rank_frac([m.get("fbt") or None for m in members], asc=True)       # 启动最早
+    ret = rank_frac([m.get("ret5") for m in members], asc=False)            # 涨幅最大
+    fd = rank_frac([m.get("fdratio") for m in members], asc=False)          # 封单最强
+    maxlb = max([m.get("lianban") or 0 for m in members] + [1])
+    for i, m in enumerate(members):
+        s = 20 * fbt[i] + 20 * ret[i] + 25 * fd[i]
+        f = m.get("fbt")
+        later = sum(1 for y in members if f and y.get("fbt") and y["fbt"] > f)
+        m["s_qidong"] = round(20 * fbt[i])
+        m["s_danda"] = round(20 * (later / (k - 1))) if k > 1 else 20
+        m["s_fengdan"] = round(25 * fd[i])
+        m["s_bianshi"] = round(15 * ((m.get("lianban") or 0) / maxlb) - (5 if m.get("zbc") else 0))
+        m["s_elastic"] = round(20 * ret[i])
+        s += m["s_danda"] + max(0, m["s_bianshi"])
+        m["leader_score"] = int(max(0, round(s)))
+    leaders = sorted(members, key=lambda x: -x["leader_score"])
+    return leaders[0], leaders
+
+
+def find_zhongjun(codes, km, ups_codes, code_name):
+    """中军：概念内非涨停、沿 MA5>MA10、成交额前列。返回 前2 列表"""
+    cands = []
+    for c6 in codes:
+        if c6 in ups_codes:
+            continue
+        w = ("sh" if c6[0] == "6" else "sz") + c6
+        b = km.get(w)
+        if not b or len(b) < 11:
+            continue
+        cl = [x[2] for x in b]
+        ma5 = sum(cl[-5:]) / 5
+        ma10 = sum(cl[-10:]) / 10
+        if not (cl[-1] > ma5 > ma10):        # 均线多头、沿5/10日线
+            continue
+        run = cl[-10]
+        mdd = 0.0
+        for c in cl[-10:]:
+            run = max(run, c)
+            mdd = min(mdd, c / run - 1)
+        cands.append({"code": w, "name": code_name.get(c6, ""), "amt": b[-1][6] or 0,
+                      "ma5": ma5, "ma10": ma10, "price": cl[-1],
+                      "ret5": (cl[-1] / cl[-6] - 1) if len(cl) >= 6 else 0.0,
+                      "mdd": mdd})
+    cands.sort(key=lambda x: -x["amt"])
+    return cands[:2]
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--days", type=int, default=6)
+    ap.add_argument("--days", type=int, default=20)
     ap.add_argument("--top", type=int, default=20)
     ap.add_argument("--date", default=None)
     ap.add_argument("--outdir", default=None)
-    ap.add_argument("--main-zt", type=int, default=8, dest="main_zt")   # 主线涨停家数下限
-    ap.add_argument("--main-jj", type=float, default=35.0, dest="main_jj")  # 主线晋级率下限
-    ap.add_argument("--sub-jj", type=float, default=20.0, dest="sub_jj")    # 支线晋级率下限
-    ap.add_argument("--max-stocks", type=int, default=0, dest="max_stocks", help="调试：仅取前N只")
+    ap.add_argument("--main-zt", type=int, default=8, dest="main_zt")
+    ap.add_argument("--main-jj", type=float, default=35.0, dest="main_jj")
+    ap.add_argument("--sub-jj", type=float, default=20.0, dest="sub_jj")
+    ap.add_argument("--max-stocks", type=int, default=0, dest="max_stocks")
     a = ap.parse_args()
     outdir = a.outdir or os.path.join(BASE, "outputs")
     os.makedirs(outdir, exist_ok=True)
@@ -170,7 +262,7 @@ def main():
     km = fetch_all([x[0] for x in pool], a.days)
     print(f"[INFO] 取到 {len(km)} 只", flush=True)
 
-    # 数据日期自适应：未显式指定日期且当日无行情（周末/节假日/数据滞后）→ 回退截面最大日期
+    # 数据日期自适应
     if not a.date:
         dates = [bars[-1][0] for bars in km.values() if bars]
         if dates:
@@ -179,21 +271,25 @@ def main():
                 print(f"[WARN] {today} 无行情（周末/节假日/数据滞后），自动回退到 {latest}", flush=True)
                 today = latest
 
-    code_sector, code_name, sec_date = load_sector()
+    code_sector, code_name, sectors, sec_date = load_sector()
     print(f"[INFO] 题材映射 {len(code_sector)} 只（更新于 {sec_date}）", flush=True)
 
-    # 逐股：计算窗口内每日涨停标记 lim[] 与连板数 lb[]（升序），取今日/昨日截面
-    ups = []          # 今日涨停
-    prev_zt_codes = set()   # 昨日涨停（用于分母）
-    prev_first_codes = set()  # 昨日首板（用于市场首板晋级率）
+    # 涨停池（东财）
+    ztpool = fetch_ztpool(today.replace("-", ""))
+    print(f"[INFO] 涨停池 {len(ztpool)} 只（{today}）", flush=True)
+
+    # 逐股：涨停标记 + 连板 + 昨日截面
+    ups = []
+    prev_zt_codes = set()
+    prev_first_codes = set()
     prev_first_jinji = 0
     for wcode, c6, nm in pool:
         bars = km.get(wcode)
         if not bars or len(bars) < 4:
             continue
-        if bars[-1][0] != today:      # 最新K线须为当日（非当日=停牌/未更新）
+        if bars[-1][0] != today:
             continue
-        closes = [b[1] for b in bars]
+        closes = [b[2] for b in bars]
         n = len(bars)
         lim = [False] * n
         for i in range(1, n):
@@ -202,19 +298,23 @@ def main():
         lb = [0] * n
         for i in range(1, n):
             lb[i] = (lb[i - 1] + 1) if (lim[i] and lim[i - 1]) else (1 if lim[i] else 0)
-        # 昨日截面
         if lim[-2]:
             prev_zt_codes.add(c6)
             if lb[-2] == 1:
                 prev_first_codes.add(c6)
                 if lim[-1]:
                     prev_first_jinji += 1
-        # 今日截面
         if not lim[-1]:
             continue
         chg = (closes[-1] / closes[-2] - 1) * 100 if closes[-2] else 0
+        ret5 = (closes[-1] / closes[-6] - 1) * 100 if len(closes) >= 6 else None
+        z = ztpool.get(c6, {})
+        ltsz = z.get("ltsz") or 0
+        fund = z.get("fund") or 0
         ups.append({"code": wcode, "c6": c6, "name": nm, "chg": round(chg, 2),
-                    "lianban": lb[-1], "price": closes[-1]})
+                    "lianban": lb[-1], "price": closes[-1], "ret5": ret5,
+                    "fbt": z.get("fbt"), "fund": fund, "ltsz": ltsz, "zbc": z.get("zbc"),
+                    "fdratio": (fund / ltsz) if ltsz else None})
 
     n_lb = sum(1 for u in ups if u["lianban"] >= 2)
     n_first = sum(1 for u in ups if u["lianban"] == 1)
@@ -222,40 +322,29 @@ def main():
 
     # 市场情绪刻度
     prev_zt_n = len(prev_zt_codes)
-    mkt_lb_jj = (100.0 * n_lb / prev_zt_n) if prev_zt_n else None       # 连板晋级率
+    mkt_lb_jj = (100.0 * n_lb / prev_zt_n) if prev_zt_n else None
     mkt_first_jj = (100.0 * prev_first_jinji / len(prev_first_codes)) if prev_first_codes else None
-    if mkt_first_jj is None:
-        mood = "—"
-    elif mkt_first_jj >= JJ_HOT:
-        mood = "🔥 活跃（题材接力强）"
-    elif mkt_first_jj < JJ_COLD:
-        mood = "🧊 退潮（谨慎打板）"
-    else:
-        mood = "⚖️ 中性"
+    mood = ("—" if mkt_first_jj is None else
+            "🔥 活跃（题材接力强）" if mkt_first_jj >= JJ_HOT else
+            "🧊 退潮（谨慎打板）" if mkt_first_jj < JJ_COLD else "⚖️ 中性")
 
-    # 概念聚合（今日涨停 + 昨日涨停 + 晋级）
-    agg = defaultdict(lambda: {"n": 0, "lb": 0, "first": 0, "maxlb": 0,
-                               "prev": 0, "stocks": []})
+    # 概念聚合
+    agg = defaultdict(lambda: {"n": 0, "lb": 0, "first": 0, "maxlb": 0, "prev": 0, "stocks": []})
     for u in ups:
-        secs = code_sector.get(u["c6"]) or code_sector.get(u["code"]) or []
-        for s in secs:
+        for s in (code_sector.get(u["c6"]) or code_sector.get(u["code"]) or []):
             g = agg[s]
             g["n"] += 1
-            if u["lianban"] >= 2:
-                g["lb"] += 1
-            else:
-                g["first"] += 1
+            g["lb"] += 1 if u["lianban"] >= 2 else 0
+            g["first"] += 1 if u["lianban"] == 1 else 0
             g["maxlb"] = max(g["maxlb"], u["lianban"])
             g["stocks"].append(u)
-    # 昨日涨停回填（分母）—— 概念可含未在今日涨停池的昨日涨停股
     for c6 in prev_zt_codes:
-        secs = code_sector.get(c6) or []
-        for s in secs:
+        for s in (code_sector.get(c6) or []):
             agg[s]["prev"] += 1
 
     rank = []
     for s, v in agg.items():
-        if v["n"] < 2:                      # 单只涨停=噪声（沿用 v1）
+        if v["n"] < 2:
             continue
         jj = (100.0 * v["lb"] / v["prev"]) if v["prev"] else None
         v["jj"] = jj
@@ -264,42 +353,87 @@ def main():
     rank.sort(key=lambda kv: (GRADE_ORDER.get(kv[1]["grade"], 9),
                               -kv[1]["n"], -(kv[1]["jj"] or -1), -kv[1]["lb"]))
     rank = rank[:a.top]
-
     n_main = sum(1 for _, v in rank if v["grade"] == "主线")
     n_sub = sum(1 for _, v in rank if v["grade"] == "支线")
     n_day = sum(1 for _, v in rank if v["grade"] == "一日游")
 
-    # ── Markdown ──
-    L = [f"# 🔥 涨停概念排行 · 板块分级 {today}", "",
-         f"> 数据源：全主板 {len(pool)} 只（westock 日线）｜题材映射 {len(code_sector)} 只（{sec_date}）",
+    ups_codes = {u["c6"] for u in ups}
+    icon = {"主线": "🔴", "支线": "🟡", "一日游": "⚪"}
+
+    L = [f"# 🔥 热板作战面板 {today}", "",
+         f"> 数据源：全主板 {len(pool)} 只（westock 日线 {a.days}日）｜题材映射 {len(code_sector)} 只（{sec_date}）｜涨停池 {len(ztpool)} 只",
          f"> 当日涨停 **{len(ups)}** 只｜连板 **{n_lb}** 只｜首板 **{n_first}** 只", "",
          "## 📊 市场情绪刻度",
          f"- 昨日涨停 **{prev_zt_n}** 只 → 今日连板 **{n_lb}** 只，**连板晋级率 {mkt_lb_jj:.0f}%**" if prev_zt_n else "- 连板晋级率 —",
          f"- 昨日首板 {len(prev_first_codes)} 只 → 今日晋级 {prev_first_jinji} 只，**首板晋级率 {mkt_first_jj:.0f}%**" if prev_first_codes else "- 首板晋级率 —",
-         f"- 情绪档位：**{mood}**（首板晋级率阈值 活跃≥{JJ_HOT:.0f}% / 退潮<{JJ_COLD:.0f}%，参考 xzz 二期）", "",
+         f"- 情绪档位：**{mood}**（首板晋级率阈值 活跃≥{JJ_HOT:.0f}% / 退潮<{JJ_COLD:.0f}%）", "",
          "## 🧭 板块分级",
-         f"| 级别 | 概念数 | 判定标准 |",
-         "|---|---|---|",
+         "| 级别 | 概念数 | 判定标准 |", "|---|---|---|",
          f"| 🔴 主线 | {n_main} | 涨停≥{a.main_zt}家 且 晋级率≥{a.main_jj:.0f}% |",
          f"| 🟡 支线 | {n_sub} | 涨停3-7家 或 晋级率{a.sub_jj:.0f}-{a.main_jj:.0f}% |",
          f"| ⚪ 一日游 | {n_day} | 涨停≤2家 或 晋级率<{a.sub_jj:.0f}% |", "",
          "## 概念排行（按级别 + 涨停家数）", "",
          "| 级别 | 概念 | 涨停 | 连板 | 昨日涨停 | 晋级率 | 最高板 | 首板 | 代表龙头（连板数） |",
          "|---|---|---|---|---|---|---|---|---|"]
-    icon = {"主线": "🔴", "支线": "🟡", "一日游": "⚪"}
     for s, v in rank:
         tops = sorted(v["stocks"], key=lambda x: -x["lianban"])[:4]
         names = "、".join(f"{t['name']}({t['lianban']}板)" if t["lianban"] >= 2 else t["name"] for t in tops)
         L.append(f"| {icon.get(v['grade'],'')} {v['grade']} | **{s}** | {v['n']} | {v['lb']} | "
                  f"{v['prev']} | {fmt_jj(v['jj'], v['prev'])} | {v['maxlb']} | {v['first']} | {names} |")
+
+    # ── 模块二：龙头榜 · 五步法 ──
+    L += ["", "## 👑 龙头榜 · 五步法（各热门板块龙头）", "",
+          "| 板块 | 龙头 | 板数 | 首封 | 封单/流通 | 5日涨幅 | 带动(后涨) | 辨识 | 龙头分 | 五维构成(启动/弹性/封单/带动/辨识) |",
+          "|---|---|---|---|---|---|---|---|---|---|"]
+    leaders_json = []
+    for s, v in rank:
+        if v["n"] < 3:
+            continue
+        lead, allm = leader_pick(v["stocks"])
+        ratio = f"{(lead['fdratio']*100):.1f}%" if lead.get("fdratio") is not None else "—"
+        r5 = f"{lead['ret5']:.1f}%" if lead.get("ret5") is not None else "—"
+        later = lead["s_danda"] // 20 * (len(allm) - 1) if len(allm) > 1 else 0
+        con = f"{lead['s_qidong']}/{lead['s_elastic']}/{lead['s_fengdan']}/{lead['s_danda']}/{max(0,lead['s_bianshi'])}"
+        L.append(f"| {s} | **{lead['name']}**({lead['code']}) | {lead['lianban']} | {fmt_t(lead.get('fbt'))} | "
+                 f"{ratio} | {r5} | {later} | {max(0,lead['s_bianshi'])} | **{lead['leader_score']}** | {con} |")
+        leaders_json.append({"concept": s, "leader": lead["name"], "code": lead["code"],
+                             "lianban": lead["lianban"], "score": lead["leader_score"],
+                             "fbt": fmt_t(lead.get("fbt")),
+                             "fd_ratio": round(lead["fdratio"] * 100, 2) if lead.get("fdratio") is not None else None,
+                             "ret5": round(lead["ret5"], 2) if lead.get("ret5") is not None else None})
+    if not leaders_json:
+        L.append("| — | 无（当日无≥3家涨停的板块） | | | | | | | | |")
+
+    # ── 模块三：中军榜 ──
+    L += ["", "## 🛡️ 中军榜（趋势压舱石 · 概念内成交额前列 · 沿MA5/MA10）", "",
+          "> 中军口径：概念内**非涨停**、多头排列(收盘>MA5>MA10)、成交额前列（以成交额近似市值/流动性，市值接口沙箱不可用）", "",
+          "| 板块 | 中军 | 成交额(亿) | 收盘 | MA5 | MA10 | 5日涨幅 | 近10日回撤 |", "|---|---|---|---|---|---|---|---|"]
+    zj_json = []
+    for s, v in rank[:10]:
+        zjs = find_zhongjun(sectors.get(s) or [], km, ups_codes, code_name)
+        if not zjs:
+            L.append(f"| {s} | —（无符合均线多头的中军） | | | | | | |")
+            continue
+        for i, z in enumerate(zjs):
+            L.append(f"| {s if i == 0 else ''} | {z['name']}({z['code']}) | {z['amt']/1e8:.1f} | {z['price']:.2f} | "
+                     f"{z['ma5']:.2f} | {z['ma10']:.2f} | {z['ret5']*100:+.1f}% | {z['mdd']*100:.1f}% |")
+            zj_json.append({"concept": s, "name": z["name"], "code": z["code"],
+                            "amount_yi": round(z["amt"] / 1e8, 2),
+                            "ret5": round(z["ret5"] * 100, 2), "mdd": round(z["mdd"] * 100, 2)})
+
     L += ["", "## 涨停明细（按连板数）", "",
-          "| 代码 | 名称 | 连板 | 涨幅% | 所属题材 |", "|---|---|---|---|---|"]
+          "| 代码 | 名称 | 连板 | 涨幅% | 首封 | 封单(万) | 流通(亿) | 所属题材 |",
+          "|---|---|---|---|---|---|---|---|"]
     for u in sorted(ups, key=lambda x: (-x["lianban"], -x["chg"])):
         secs = code_sector.get(u["c6"]) or []
-        L.append(f"| {u['code']} | {u['name']} | {u['lianban']} | {u['chg']} | {'/'.join(secs[:4])} |")
+        fd = f"{u['fund']/1e4:.0f}" if u.get("fund") else "—"
+        lz = f"{u['ltsz']/1e8:.0f}" if u.get("ltsz") else "—"
+        L.append(f"| {u['code']} | {u['name']} | {u['lianban']} | {u['chg']} | {fmt_t(u.get('fbt'))} | "
+                 f"{fd} | {lz} | {'/'.join(secs[:4])} |")
     L += ["", "---",
-          "⚠️ 概念分类来自东财板块成分（一票可属多个概念，家数会放大）；晋级率 = 今日连板家数 / 昨日涨停家数，"
-          "昨日涨停<3只的概念标注 `!`（样本小、噪声大）。此为**统计口径**，实际热点须结合新闻面人工复核（方法第③步）。"]
+          "⚠️ 概念分类来自东财板块成分（一票可属多个概念，家数会放大）；晋级率=今日连板家数/昨日涨停家数（昨日涨停<3标 `!`）；"
+          "龙头五步法为板块内相对排名打分（启动=首封时间最早、弹性=5日涨幅、封单=封单/流通市值、带动=首封后跟涨家数、辨识=最高板+未炸板）；"
+          "中军以成交额近似市值。以上均为**统计口径**，实际热点须结合新闻面人工复核。"]
     md = "\n".join(L)
     mp = os.path.join(outdir, f"涨停概念排行_{today}.md")
     open(mp, "w", encoding="utf-8").write(md)
@@ -315,6 +449,8 @@ def main():
                                  "jinji_rate": round(v["jj"], 1) if v["jj"] is not None else None,
                                  "maxlb": v["maxlb"], "first": v["first"], "grade": v["grade"],
                                  "stocks": [x["name"] for x in v["stocks"]]} for k, v in rank],
+               "leaders": leaders_json,
+               "zhongjun": zj_json,
                "stocks": ups},
               open(os.path.join(outdir, "涨停概念排行_latest.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
