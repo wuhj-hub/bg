@@ -191,6 +191,16 @@ jobs:
           cp outputs/yearline_breadth_latest.json yearline_breadth_latest.json 2>/dev/null || true
           echo "年线广度: $(python3 -c "import json;d=json.load(open('outputs/yearline_breadth_latest.json'));print(f\"{d['above']}/{d['total']}={d['ratio_pct']}%\" )" 2>/dev/null || echo '计算失败')"
 
+      # ─── 第二步.1.5b：西湖广度温度计（下雨图：强势股/第二阶段/新高/新低）───
+      #   复刻自西湖区的孩纸《西湖大盘量化分析系统升级版（解决无卡顿）》(2020-03-04)
+      - name: 西湖广度扫描（下雨图：强势股/第二阶段/新高/新低）
+        continue-on-error: true
+        timeout-minutes: 25
+        run: |
+          python3 quant_scripts/xihu_breadth.py --list all_mainboard.csv --batch 40
+          cp outputs/xihu_breadth_latest.json xihu_breadth_latest.json 2>/dev/null || true
+          echo "西湖广度: $(python3 -c "import json;d=json.load(open('outputs/xihu_breadth_latest.json'));print(f\"QSG%={d['qsg_pct']} EJD%={d['ejd_pct']} 新高{d['new_high']}/新低{d['new_low']} 净值{d['net_high']:+d}\")" 2>/dev/null || echo '计算失败')"
+
       # ─── 第二步.1.6a：断档分歧板块择时（龚夫财经：连续≥3日强度前五后首次跌出=买点）───
       - name: 断档分歧板块择时信号
         continue-on-error: true
@@ -434,7 +444,7 @@ jobs:
               outputs/market_width_latest.json \
               outputs/qiankun_a_latest.json qiankun_a_latest.json \
               outputs/资金快照_$(date +%Y-%m-%d).csv \
-              mode_aggregate_latest.json 板块共振_latest.json yearline_breadth_latest.json 双弦观察池_latest.json \
+              mode_aggregate_latest.json 板块共振_latest.json yearline_breadth_latest.json xihu_breadth_latest.json 双弦观察池_latest.json \
               123_2b_latest.json rsv_strength_latest.json xihu_rsv_latest.json monthly_macd_latest.json 断档分歧_latest.json \
               top_signal_latest.json board_top_latest.json 情绪预判_latest.json panhou_lianghua.csv \
               all_mainboard.csv ima_cred_last_ok.json liangxue_latest.json \

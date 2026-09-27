@@ -496,6 +496,10 @@ def gen_report(today_str):
         yl_icon = {"bull": "🟢", "mixed": "🟡", "bear": "🟠", "deep_bear": "🔴"}.get(yl_level, "")
         yl_label = {"bull": "牛市结构", "mixed": "结构分化", "bear": "熊市结构", "deep_bear": "深度熊市"}.get(yl_level, yl_level)
         lines.append(f"| 📈 年线广度 | 站上年线 **{yl.get('above','—')}/{yl.get('total','—')}**（{yl.get('ratio_pct','—')}%）{yl_icon} {yl_label} |")
+    # 西湖广度温度计（西湖区的孩纸：下雨图+大盘量化，强势股/第二阶段占比/新高新低）
+    xb = read_xihu_breadth()
+    if xb:
+        lines.append(f"| 🌧️ 西湖广度 | 强势股 **{xb.get('qsg_pct','—')}%** · 第二阶段 **{xb.get('ejd_pct','—')}%** · 新高{xb.get('new_high','—')}/新低{xb.get('new_low','—')}（净值{xb.get('net_high',0):+d}）→ {xb.get('qsg_level','')} {xb.get('rain','')} |")
     # RSV均相对强度（腰缠万贯144日：启动/持有/离场）
     rsv = read_rsv_strength()
     if rsv:
@@ -806,6 +810,18 @@ def read_yearline_breadth():
     for p in ("yearline_breadth_latest.json", "outputs/yearline_breadth_latest.json", "../outputs/yearline_breadth_latest.json",
               "/sandbox/workspace/github_bg/outputs/yearline_breadth_latest.json",
               "/sandbox/workspace/yearline/outputs/yearline_breadth_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def read_xihu_breadth():
+    """读西湖广度温度计（xihu_breadth_latest.json，西湖区的孩纸·下雨图+大盘量化），失败返回None"""
+    for p in ("xihu_breadth_latest.json", "outputs/xihu_breadth_latest.json", "../outputs/xihu_breadth_latest.json",
+              "/sandbox/workspace/github_bg/xihu_breadth_latest.json",
+              "/sandbox/workspace/github_bg/outputs/xihu_breadth_latest.json"):
         try:
             return json.load(open(p, encoding="utf-8"))
         except Exception:
