@@ -1,5 +1,5 @@
 {
- "date": "2026-09-25",
+ "date": "2026-09-27",
  "writes": {
   "all_mainboard.csv": [
    ".github/workflows/quant_scan.yml",
@@ -8,6 +8,8 @@
    "quant_scripts/execution_card.py",
    "quant_scripts/fetch_mainboard_data.py",
    "quant_scripts/hot_emotion.py",
+   "quant_scripts/jinji_emotion_backtest.py",
+   "quant_scripts/limitup_concept_rank.py",
    "quant_scripts/market_regime.py",
    "quant_scripts/yitong_guaili_screener.py",
    "skills_backup/板块个股入牛时点/scripts/scan_inbull.py"
@@ -258,6 +260,22 @@
   "才哥战法股池_{var}.json": [
    "quant_scripts/caige_pool.py"
   ],
+  "sector_component_em.json": [
+   ".github/workflows/probe_em.yml",
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/limitup_concept_rank.py"
+  ],
+  "涨停概念排行_{var}.md": [
+   "quant_scripts/limitup_concept_rank.py"
+  ],
+  "涨停概念排行_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/limitup_concept_rank.py"
+  ],
+  "情绪指标跟踪.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/limitup_concept_rank.py"
+  ],
   "123_2b_latest.json": [
    ".github/workflows/quant_scan.yml",
    "quant_scripts/scan_123_2b.py"
@@ -376,6 +394,15 @@
   "组合风控_{var}.md": [
    "quant_scripts/portfolio_risk.py"
   ],
+  ".bt_kline_cache.json": [
+   "quant_scripts/jinji_emotion_backtest.py"
+  ],
+  "情绪温度计回测_{var}.md": [
+   "quant_scripts/jinji_emotion_backtest.py"
+  ],
+  "情绪温度计回测_latest.json": [
+   "quant_scripts/jinji_emotion_backtest.py"
+  ],
   "yao_pool.txt": [
    "quant_scripts/yao_gu_pool.py"
   ],
@@ -394,8 +421,22 @@
   "beast_timing_exit.json": [
    "quant_scripts/bt_beast_timing.py"
   ],
+  "xihu_turns_latest.json": [
+   "quant_scripts/xihu_turns_check.py"
+  ],
   "liangxue_winrate_latest.json": [
    "quant_scripts/win_rate_liangxue.py"
+  ],
+  "xihu_breadth_history.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/xihu_breadth.py"
+  ],
+  "xihu_breadth_{var}.md": [
+   "quant_scripts/xihu_breadth.py"
+  ],
+  "xihu_breadth_latest.json": [
+   ".github/workflows/quant_scan.yml",
+   "quant_scripts/xihu_breadth.py"
   ],
   "wangzhe_exit_bt_v2.json": [
    "quant_scripts/bt_wangzhe_exit_v2.py"
@@ -420,10 +461,6 @@
   ],
   "四维共振_chinext_kcb_latest.json": [
    ".github/workflows/quant_report.yml"
-  ],
-  "sector_component_em.json": [
-   ".github/workflows/probe_em.yml",
-   ".github/workflows/quant_scan.yml"
   ],
   "xihu_rsv_latest.json": [
    ".github/workflows/quant_scan.yml"
@@ -584,6 +621,9 @@
   "yearline_breadth_latest.json": [
    "quant_scan.yml"
   ],
+  "xihu_breadth_latest.json": [
+   "quant_scan.yml"
+  ],
   "双弦观察池_latest.json": [
    "quant_scan.yml"
   ],
@@ -641,6 +681,12 @@
   "一统天下建仓区股池_latest.md": [
    "quant_scan.yml"
   ],
+  "涨停概念排行_latest.json": [
+   "quant_scan.yml"
+  ],
+  "情绪指标跟踪.json": [
+   "quant_scan.yml"
+  ],
   "premarket_judgment_latest.json": [
    "premarket_report.yml"
   ],
@@ -659,6 +705,10 @@
    "gen_premarket_report.py",
    "gen_review_report.py",
    "signal_arbiter.py"
+  ],
+  "涨停概念排行_latest.json": [
+   "gen_premarket_report.py",
+   "gen_review_report.py"
   ],
   "板块共振_latest.json": [
    "gen_premarket_report.py",
@@ -681,6 +731,10 @@
    "gen_premarket_report.py",
    "gen_review_report.py",
    "signal_arbiter.py"
+  ],
+  "xihu_breadth_latest.json": [
+   "gen_premarket_report.py",
+   "gen_review_report.py"
   ],
   "rsv_strength_latest.json": [
    "gen_premarket_report.py",
@@ -706,6 +760,12 @@
   ],
   "乖离低买_latest.json": [
    "gen_premarket_report.py"
+  ],
+  "xihu_breadth_history.json": [
+   "gen_review_report.py"
+  ],
+  "xihu_turns_latest.json": [
+   "gen_review_report.py"
   ],
   "qiankun_a_latest.json": [
    "gen_review_report.py",
@@ -749,8 +809,12 @@
    "portfolio_risk.py"
   ]
  },
- "high_risk": [],
+ "high_risk": [
+  "xihu_breadth_history.json",
+  "xihu_turns_latest.json"
+ ],
  "missing": [
+  ".bt_kline_cache.json",
   "ai_chain_pool.json",
   "ai_chokepoint_watch_{var}.md",
   "beast_hy_bt.json",
@@ -789,6 +853,9 @@
   "wangzhe_three_tier.json",
   "wangzhe_two_lines.json",
   "wuwei_verify_result.json",
+  "xihu_breadth_history.json",
+  "xihu_breadth_{var}.md",
+  "xihu_turns_latest.json",
   "{var}_day.json",
   "{var}_month.json",
   "{var}_w.csv",
@@ -804,6 +871,8 @@
   "回测周期_{var}.md",
   "年线广度_{var}.md",
   "开盘强形态_{var}.json",
+  "情绪温度计回测_latest.json",
+  "情绪温度计回测_{var}.md",
   "才哥战法股池_{var}.json",
   "才哥战法股池_{var}.md",
   "执行纪律_{var}.md",
@@ -811,6 +880,7 @@
   "断档分歧_{var}.md",
   "无为显性建仓标准_回测报告_{var}.md",
   "板块共振对照_{var}.md",
+  "涨停概念排行_{var}.md",
   "猛兽本月股池_{var}.md",
   "猛兽股池_{var}.md",
   "环境切换决策表_验证.md",
@@ -854,6 +924,7 @@
   "top_signal_latest.json",
   "wangzhe_signals.csv",
   "wangzhe_stats.json",
+  "xihu_breadth_latest.json",
   "xihu_rsv_latest.json",
   "yao_pool.txt",
   "yearline_breadth_latest.json",
@@ -870,10 +941,12 @@
   "四维共振_chinext_kcb_latest.json",
   "四维共振_latest.json",
   "市场状态判定_{var}.md",
+  "情绪指标跟踪.json",
   "情绪预判_latest.json",
   "执行纪律_latest.json",
   "断档分歧_latest.json",
   "板块共振_latest.json",
+  "涨停概念排行_latest.json",
   "组合风控_latest.json",
   "鱼身报告_latest.md"
  ],
