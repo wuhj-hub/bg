@@ -1017,6 +1017,15 @@ def gen_report(today_str):
                 seq = " → ".join(f"{hist[k].get('net_high',0):+d}" for k in ks)
                 trend = "抬升" if hist[ks[-1]].get('net_high',0) > hist[ks[-2]].get('net_high',0) else "回落"
                 lines.append(f"→ 📈 净值近5日：{seq}（环比**{trend}**）")
+            tp = read_xihu_turns()
+            if tp and tp.get("variants"):
+                v = tp["variants"]
+                r, fa = v.get("raw") or {}, v.get("filtA") or {}
+                base = tp.get("baseline") or {}
+                if r and fa:
+                    lines.append(f"→ 🔬 拐点过滤验证（前瞻上证5日）：原始 {r.get('n')}次(均{r.get('avg5')}%/胜{r.get('win5')}%)"
+                                 f" → 连续≥{(tp.get('params') or {}).get('run','?')}日 {fa.get('n')}次(均{fa.get('avg5')}%/胜{fa.get('win5')}%)"
+                                 f" ｜ 基线 均{base.get('avg5','—')}%/胜{base.get('win5','—')}%")
         # RSV均相对强度（腰缠万贯144日：启动/持有/离场）
         rsv = read_rsv_strength()
         if rsv:
