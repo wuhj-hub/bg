@@ -364,6 +364,16 @@ def make_chart(history, out_png, title="西湖广度温度计", turn_run=3):
     for i in dn_idx:
         ax1.axvline(i, color="#2ca02c", ls=":", lw=0.7, alpha=0.3)
         ax1.plot([i], [min(net[i], -1)], marker="v", ms=6, color="#a5d6a7", zorder=4)
+    from matplotlib.lines import Line2D
+    ax1.legend(handles=[
+        Line2D([0], [0], marker="^", color="w", markerfacecolor="#b71c1c", markersize=11,
+               label=f"确认转正 ▲（转正后连续≥{turn_run}日为正）"),
+        Line2D([0], [0], marker="^", color="w", markerfacecolor="white", markeredgecolor="#ef9a9a",
+               markersize=7, label="未确认转正 △（疑似假突破）"),
+        Line2D([0], [0], marker="v", color="w", markerfacecolor="#a5d6a7", markersize=7, label="转负 ▽"),
+        Line2D([0], [0], color="#d62728", lw=6, label="净值>0 晴（新高>新低）"),
+        Line2D([0], [0], color="#2ca02c", lw=6, label="净值<0 雨（新高<新低）"),
+    ], loc="upper left", fontsize=8, framealpha=0.9, ncol=2)
     print(f"[拐点] 净值转正{len(up_idx)}次（其中确认≥{turn_run}日 {len(conf_up)}次）: "
           + "、".join(ks[i] for i in up_idx))
     print(f"[拐点] 净值转负{len(dn_idx)}次: " + "、".join(ks[i] for i in dn_idx))
@@ -377,7 +387,9 @@ def make_chart(history, out_png, title="西湖广度温度计", turn_run=3):
     step = max(1, len(dates) // 15)
     ax2.set_xticks(range(0, len(dates), step))
     ax2.set_xticklabels([dates[i] for i in range(0, len(dates), step)], rotation=45, fontsize=8)
-    fig.tight_layout()
+    fig.text(0.5, 0.02, "口径：全主板逐股信号→全市场计数｜净值=新高家数−新低家数｜下栏6/20为强势股占比参考线(偏冷/极热)｜▲为广度转暖确认信号，非个股买卖建议",
+             ha="center", fontsize=7.5, color="#777")
+    fig.tight_layout(rect=(0, 0.045, 1, 1))
     fig.savefig(out_png, dpi=130)
     plt.close(fig)
     return True
