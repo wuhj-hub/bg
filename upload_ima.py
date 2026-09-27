@@ -179,9 +179,13 @@ def main():
     fp = a.file
     filename = a.name or os.path.basename(fp)
     size = os.path.getsize(fp)
-    media_type = 7  # Markdown
-    content_type = "text/markdown"
-    file_ext = "md"
+    # 按扩展名推断 media_type/content_type（2026-09-27：支持 png 等图片上传）
+    _ext = os.path.splitext(filename)[1].lower().lstrip(".")
+    _MT = {"md": (7, "text/markdown"), "markdown": (7, "text/markdown"),
+           "png": (9, "image/png"), "jpg": (9, "image/jpeg"), "jpeg": (9, "image/jpeg"),
+           "pdf": (1, "application/pdf"), "txt": (13, "text/plain"), "csv": (5, "text/csv")}
+    media_type, content_type = _MT.get(_ext, (7, "text/markdown"))
+    file_ext = _ext or "md"
 
     # Step 0: 查重（默认开启，设 IMA_SKIP_DUP=0 可关闭）
     if os.environ.get("IMA_SKIP_DUP", "1") == "1":

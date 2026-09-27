@@ -474,6 +474,11 @@ jobs:
               fi
             done
           fi
+          # 西湖广度净值曲线图（下雨图趋势，上传「复盘报告」文件夹；history 由 quant_scan 每日累积）
+          python3 quant_scripts/xihu_breadth.py --chart-only || echo "西湖净值图生成失败, 不阻断复盘"
+          if [ -f "outputs/xihu_breadth_chart.png" ]; then
+            python3 upload_ima.py --file "outputs/xihu_breadth_chart.png" --name "西湖广度净值曲线_$(date +%Y-%m-%d).png" || echo "西湖净值图上传失败(非致命)"
+          fi
 
       # ─── 第五.6步：股池信号实盘胜率跟踪（每日累积，2-4周后可对比回测）───
       - name: 股池信号实盘胜率跟踪

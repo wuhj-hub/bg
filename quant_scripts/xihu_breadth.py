@@ -446,6 +446,7 @@ def main():
     ap.add_argument("--backfill", type=int, default=0,
                     help="回算最近 N 个交易日的广度序列并写入 history（0=仅当日）")
     ap.add_argument("--chart", action="store_true", help="读 history 画净值曲线图 PNG")
+    ap.add_argument("--chart-only", action="store_true", help="仅读 history 画图，跳过扫描（供 CI 复用已累积的 history）")
     ap.add_argument("--outdir", default="outputs")
     args = ap.parse_args()
 
@@ -453,6 +454,24 @@ def main():
     os.makedirs(args.outdir, exist_ok=True)
     p = {"batch": args.batch, "limit": args.limit, "window": args.window,
          "strong_thr": args.strong_thr, "stage2_n": args.stage2_n, "stage2_t": args.stage2_t}
+
+    if args.chart_only:
+        hist = {}
+        for hp in (os.path.join(args.outdir, "xihu_breadth_history.json"),
+                   "xihu_breadth_history.json", "../outputs/xihu_breadth_history.json"):
+            if os.path.exists(hp):
+                try:
+                    hist = json.load(open(hp, encoding="utf-8"))
+                    break
+                except Exception:
+                    pass
+        if len(hist) < 2:
+            print("[WARN] history 数据点不足(<2)，未生成图")
+            return
+        chart_path = os.path.join(args.outdir, "xihu_breadth_chart.png")
+        ok = make_chart(hist, chart_path)
+        print(f"[{'OK' if ok else 'WARN'}] {chart_path}")
+        return
 
     if args.quick:
         qsg, ejd, nh, nl = args.quick
