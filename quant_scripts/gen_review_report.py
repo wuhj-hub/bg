@@ -370,6 +370,29 @@ def read_yearline_breadth():
     return None
 
 
+def read_xihu_breadth():
+    """读西湖广度温度计（xihu_breadth_latest.json，西湖区的孩纸·下雨图+大盘量化），失败返回None"""
+    for p in ("xihu_breadth_latest.json", "outputs/xihu_breadth_latest.json", "../outputs/xihu_breadth_latest.json",
+              "/sandbox/workspace/github_bg/xihu_breadth_latest.json",
+              "/sandbox/workspace/github_bg/outputs/xihu_breadth_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def read_xihu_breadth_history():
+    """读西湖广度历史序列（xihu_breadth_history.json），失败返回None"""
+    for p in ("outputs/xihu_breadth_history.json", "../outputs/xihu_breadth_history.json",
+              "/sandbox/workspace/github_bg/outputs/xihu_breadth_history.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
 def read_rsv_strength():
     """读RSV均相对强度（rsv_strength_latest.json，腰缠万贯144日），失败返回None"""
     for p in ("rsv_strength_latest.json", "outputs/rsv_strength_latest.json", "../outputs/rsv_strength_latest.json",
@@ -968,6 +991,21 @@ def gen_report(today_str):
                 near = stocks[:5]
                 nlist = "、".join(f"{s['name']}({s['code']}+{s['dist_pct']}%)" for s in near)
                 lines.append(f"→ 临界站上年线（距年线最近）：{nlist}")
+        # 西湖广度温度计（西湖区的孩纸：下雨图 + 大盘量化）
+        xb = read_xihu_breadth()
+        if xb:
+            lines.append("")
+            lines.append(f"**西湖广度 · 下雨图**（西湖区的孩纸·大盘量化）：强势股占比 **{xb.get('qsg_pct','—')}%** · 第二阶段占比 **{xb.get('ejd_pct','—')}%** · 创250日新高 **{xb.get('new_high','—')}** 家 / 创新低 **{xb.get('new_low','—')}** 家 → 下雨图净值 **{xb.get('net_high',0):+d}** {xb.get('rain','')}")
+            nh = xb.get("new_high_list") or []
+            if nh:
+                nlist = "、".join(f"{s['name']}({s['code']})" for s in nh[:8])
+                lines.append(f"→ ☀️ 创250日新高：{nlist}")
+            hist = read_xihu_breadth_history()
+            if hist and len(hist) >= 5:
+                ks = sorted(hist.keys())[-5:]
+                seq = " → ".join(f"{hist[k].get('net_high',0):+d}" for k in ks)
+                trend = "抬升" if hist[ks[-1]].get('net_high',0) > hist[ks[-2]].get('net_high',0) else "回落"
+                lines.append(f"→ 📈 净值近5日：{seq}（环比**{trend}**）")
         # RSV均相对强度（腰缠万贯144日：启动/持有/离场）
         rsv = read_rsv_strength()
         if rsv:

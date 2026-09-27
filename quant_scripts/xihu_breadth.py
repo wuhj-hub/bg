@@ -194,18 +194,25 @@ def _apply(chunk, codes, data, result, p):
     return got
 
 
-def scan(stocks, p):
+def scan(stocks, p, cache=None):
     """批量扫描，返回 {code: {name, ...signals}}。
-    runner 上 westock 批量偶发丢股票 → 收集缺口后小批(10)补取，仍缺则逐只补。"""
+    runner 上 westock 批量偶发丢股票 → 收集缺口后小批(10)补取，仍缺则逐只补。
+    cache 不为 None 时把每只原始K线存入 cache（供历史回算）。"""
     result = {}
     n = len(stocks)
     batch = p["batch"]
     lacks = []
+
+    def _keep(data):
+        if cache is not None:
+            cache.update(data)
+
     for i in range(0, n, batch):
         chunk = stocks[i:i + batch]
         codes = [norm_code(c) for c, _ in chunk]
         raw = run(["kline", ",".join(codes), "--period", "day", "--limit", str(p["limit"])])
         data = parse_kline(raw)
+        _keep(data)
         got = _apply(chunk, codes, data, result, p)
         missing = [c for c, w in zip(chunk, codes) if not data.get(w)]
         print(f"[{i + len(chunk)}/{n}] 本批有效 {got}/{len(chunk)}"
@@ -220,12 +227,16 @@ def scan(stocks, p):
             sub = miss_stocks[j:j + 10]
             codes = [norm_code(c[0]) for c in sub]
             raw = run(["kline", ",".join(codes), "--period", "day", "--limit", str(p["limit"])])
-            _apply(sub, codes, parse_kline(raw), result, p)
+            data = parse_kline(raw)
+            _keep(data)
+            _apply(sub, codes, data, result, p)
         still = [c for c in miss_stocks if result.get(c[0], {}).get("strong") is None]
         for (code, name) in still:
             wcode = norm_code(code)
             raw = run(["kline", wcode, "--period", "day", "--limit", str(p["limit"])])
-            _apply([(code, name)], [wcode], parse_kline(raw), result, p)
+            data = parse_kline(raw)
+            _keep(data)
+            _apply([(code, name)], [wcode], data, result, p)
         fixed = sum(1 for c in miss_stocks if result.get(c[0], {}).get("strong") is not None)
         print(f"[补齐] 成功补回 {fixed}/{len(miss_stocks)} 只", flush=True)
     return result
@@ -249,6 +260,110 @@ def aggregate(result):
         "ejd_pct": round(stage2 / n * 100, 2) if n else 0.0,
         "net_high": new_high - new_low,
     }
+
+
+def eval_series(kl, p, days):
+    """对单只股票回算最近 days 个交易日的四信号，返回 [(date, strong, stage2, new_high, new_low), ...]。
+    与 eval_signals 同口径，用 numpy 向量化加速。"""
+    import numpy as np
+    n = len(kl)
+    if n < 2:
+        return []
+    C = np.array([r[2] for r in kl], dtype=float)
+    H = np.array([r[3] for r in kl], dtype=float)
+    L = np.array([r[4] for r in kl], dtype=float)
+    D = [r[0] for r in kl]
+    win = p["window"]
+    csum = np.concatenate([[0.0], np.cumsum(C)])
+
+    def ma(i, k):
+        if i + 1 < k:
+            return None
+        return (csum[i + 1] - csum[i + 1 - k]) / k
+
+    out = []
+    start = max(0, n - days)
+    for i in range(start, n):
+        lo = max(0, i - win + 1)
+        hhv_h = H[lo:i + 1].max()
+        strong = bool(hhv_h and C[i] / hhv_h > p["strong_thr"])
+        new_high = bool(hhv_h and H[i] >= hhv_h - 1e-6 and (i + 1) > 60)
+        new_low = bool(i >= win and L[i] < L[i - win:i].min())
+        stage2 = False
+        if i + 1 >= 220:
+            m50, m150, m200 = ma(i, 50), ma(i, 150), ma(i, 200)
+            if m50 and m150 and m200 and C[i] > m50 > m150 > m200:
+                rising = True
+                for j in range(i - p["stage2_n"] + 1, i + 1):
+                    a, b = ma(j, 200), ma(j - 1, 200)
+                    if a is None or b is None or not a > b:
+                        rising = False
+                        break
+                if rising:
+                    c200l = C[max(0, i - 199):i + 1].min()
+                    c200h = C[max(0, i - 199):i + 1].max()
+                    if c200l and c200h and (C[i] / c200l > 1.3) and (C[i] / c200h > p["stage2_t"]):
+                        stage2 = True
+        out.append((D[i], strong, stage2, new_high, new_low))
+    return out
+
+
+def build_history(cache, p, days, existing=None):
+    """对 cache 中所有股票回算最近 days 日广度序列，合并 existing，返回按日期升序的 dict。"""
+    daily = {}
+    for kl in cache.values():
+        for (d, s, s2, nh, nl) in eval_series(kl, p, days):
+            a = daily.setdefault(d, [0, 0, 0, 0, 0])
+            a[0] += 1
+            a[1] += 1 if s else 0
+            a[2] += 1 if s2 else 0
+            a[3] += 1 if nh else 0
+            a[4] += 1 if nl else 0
+    hist = dict(existing or {})
+    for d, (n, s, s2, nh, nl) in daily.items():
+        if n < 50:      # 样本过少（早期数据不足）不记录
+            continue
+        hist[d] = {"qsg_pct": round(s / n * 100, 2), "ejd_pct": round(s2 / n * 100, 2),
+                   "new_high": nh, "new_low": nl, "net_high": nh - nl, "total": n}
+    return {k: hist[k] for k in sorted(hist.keys())}
+
+
+def make_chart(history, out_png, title="西湖广度温度计"):
+    """把历史序列画成净值曲线图（下雨图净值柱 + 强势股/第二阶段占比线）。"""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.rcParams["font.sans-serif"] = ["Noto Sans SC", "WenQuanYi Zen Hei", "SimHei", "DejaVu Sans"]
+    plt.rcParams["axes.unicode_minus"] = False
+    ks = sorted(history.keys())
+    if len(ks) < 2:
+        return False
+    dates = [k[5:] for k in ks]
+    net = [history[k].get("net_high", 0) for k in ks]
+    qsg = [history[k].get("qsg_pct", 0) for k in ks]
+    ejd = [history[k].get("ejd_pct", 0) for k in ks]
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13, 7.5), sharex=True,
+                                   gridspec_kw={"height_ratios": [1.2, 1]})
+    colors = ["#d62728" if v >= 0 else "#2ca02c" for v in net]
+    ax1.bar(range(len(net)), net, color=colors, width=0.75)
+    ax1.axhline(0, color="#555", lw=0.8)
+    ax1.set_ylabel("下雨图净值（新高-新低）")
+    ax1.set_title(f"{title} · 下雨图净值曲线（红=晴/绿=雨）")
+    ax1.grid(alpha=0.25)
+    ax2.plot(range(len(qsg)), qsg, color="#d62728", marker="o", ms=2, lw=1.2, label="强势股占比 QSG%")
+    ax2.plot(range(len(ejd)), ejd, color="#1f77b4", marker="o", ms=2, lw=1.2, label="第二阶段占比 EJD%")
+    ax2.axhline(6, color="#999", ls="--", lw=0.8)
+    ax2.axhline(20, color="#999", ls="--", lw=0.8)
+    ax2.set_ylabel("占比 %")
+    ax2.legend(loc="upper left", fontsize=9)
+    ax2.grid(alpha=0.25)
+    step = max(1, len(dates) // 15)
+    ax2.set_xticks(range(0, len(dates), step))
+    ax2.set_xticklabels([dates[i] for i in range(0, len(dates), step)], rotation=45, fontsize=8)
+    fig.tight_layout()
+    fig.savefig(out_png, dpi=130)
+    plt.close(fig)
+    return True
 
 
 def judge(agg):
@@ -328,6 +443,9 @@ def main():
     ap.add_argument("--stage2-t", type=float, default=0.75)
     ap.add_argument("--quick", nargs=4, metavar=("QSG", "EJD", "NHIGH", "NLOW"),
                     help="快速模式：直接给定 QSG% EJD% 新高数 新低数，跳过扫描")
+    ap.add_argument("--backfill", type=int, default=0,
+                    help="回算最近 N 个交易日的广度序列并写入 history（0=仅当日）")
+    ap.add_argument("--chart", action="store_true", help="读 history 画净值曲线图 PNG")
     ap.add_argument("--outdir", default="outputs")
     args = ap.parse_args()
 
@@ -357,7 +475,8 @@ def main():
         stocks = load_list(args.list)
     print(f"[INFO] 股票池 {len(stocks)} 只", flush=True)
 
-    result = scan(stocks, p)
+    kl_cache = {} if args.backfill > 0 else None
+    result = scan(stocks, p, kl_cache)
     agg = aggregate(result)
     jd = judge(agg)
 
@@ -390,11 +509,23 @@ def main():
             hist = json.load(open(hist_path, encoding="utf-8"))
         except Exception:
             hist = {}
+    if args.backfill > 0:
+        print(f"[回算] 回填最近 {args.backfill} 个交易日的广度序列…", flush=True)
+        hist = build_history(kl_cache, p, args.backfill, existing=hist)
     hist[date_str] = {"qsg_pct": agg["qsg_pct"], "ejd_pct": agg["ejd_pct"],
                       "new_high": agg["new_high"], "new_low": agg["new_low"],
-                      "net_high": agg["net_high"]}
+                      "net_high": agg["net_high"], "total": agg["total"]}
     hist = {k: hist[k] for k in sorted(hist.keys())}
     open(hist_path, "w", encoding="utf-8").write(json.dumps(hist, ensure_ascii=False, indent=1))
+
+    # 净值曲线图
+    if args.chart:
+        chart_path = os.path.join(args.outdir, "xihu_breadth_chart.png")
+        try:
+            ok = make_chart(hist, chart_path)
+            print(f"[{'OK' if ok else 'WARN'}] {chart_path}" if ok else "[WARN] 数据点不足(<2)，未生成图")
+        except Exception as e:
+            print(f"[WARN] 绘图失败: {e}")
 
     print(f"[OK] QSG%={agg['qsg_pct']} EJD%={agg['ejd_pct']} "
           f"新高{agg['new_high']} 新低{agg['new_low']} 净值{agg['net_high']:+d} | {jd['rain']}")
