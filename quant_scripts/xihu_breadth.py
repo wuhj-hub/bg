@@ -463,6 +463,7 @@ def main():
     ap.add_argument("--chart", action="store_true", help="读 history 画净值曲线图 PNG")
     ap.add_argument("--chart-only", action="store_true", help="仅读 history 画图，跳过扫描（供 CI 复用已累积的 history）")
     ap.add_argument("--turn-run", type=int, default=3, help="确认拐点：转正后净值连续为正天数阈值（画图用）")
+    ap.add_argument("--chart-days", type=int, default=500, help="画图窗口：仅展示最近 N 个交易日（0=全部）")
     ap.add_argument("--outdir", default="outputs")
     args = ap.parse_args()
 
@@ -484,6 +485,8 @@ def main():
         if len(hist) < 2:
             print("[WARN] history 数据点不足(<2)，未生成图")
             return
+        if args.chart_days > 0:
+            hist = {k: hist[k] for k in sorted(hist.keys())[-args.chart_days:]}
         chart_path = os.path.join(args.outdir, "xihu_breadth_chart.png")
         ok = make_chart(hist, chart_path, turn_run=args.turn_run)
         print(f"[{'OK' if ok else 'WARN'}] {chart_path}")
@@ -557,6 +560,8 @@ def main():
     if args.chart:
         chart_path = os.path.join(args.outdir, "xihu_breadth_chart.png")
         try:
+            if args.chart_days > 0:
+                hist = {k: hist[k] for k in sorted(hist.keys())[-args.chart_days:]}
             ok = make_chart(hist, chart_path, turn_run=args.turn_run)
             print(f"[{'OK' if ok else 'WARN'}] {chart_path}" if ok else "[WARN] 数据点不足(<2)，未生成图")
         except Exception as e:
@@ -569,3 +574,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+main()
