@@ -5,7 +5,7 @@
   原始   : 净值由负转正（0轴穿越）
   过滤A  : 转正后净值连续 ≥N 日保持为正（确认非假突破）
   过滤B  : 过滤A + 当日 QSG% ≥ 阈值
-用法：python3 xihu_turns_check.py [--run 3] [--qsg 6]
+用法：python3 xihu_turns_check.py [--run 3] [--qsg 6] [--json]
 """
 import argparse
 import json
@@ -19,7 +19,8 @@ sys.path.insert(0, "/sandbox/workspace")
 import xihu_breadth as xb  # noqa
 
 
-def fetch_index(limit=320):
+def fetch_index(limit=900):
+    """拉上证指数日线；单只K线列序为 date|open|last|high|low（无 symbol 列）。"""
     try:
         raw = subprocess.run(["npx", "-y", "westock-data-skillhub@1.0.3", "kline",
                               "sh000001", "--period", "day", "--limit", str(limit)],
@@ -27,7 +28,6 @@ def fetch_index(limit=320):
     except Exception as e:
         print("指数拉取失败:", e)
         return [], []
-    # 单只K线列序为 date|open|last|high|low（无 symbol 列）
     rows = []
     for ln in raw.splitlines():
         s = ln.strip()
@@ -44,7 +44,7 @@ def fetch_index(limit=320):
     return [r[0] for r in rows], [r[1] for r in rows]
 
 
-def fwd_ret(dates, closes, di, d, nd):
+def fwd_ret(closes, di, d, nd):
     i = di.get(d)
     if i is None or i + nd >= len(closes):
         return None
@@ -55,6 +55,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", type=int, default=3, help="过滤A：连续为正天数阈值")
     ap.add_argument("--qsg", type=float, default=6.0, help="过滤B：QSG%% 阈值")
+    ap.add_argument("--json", action="store_true", help="输出 outputs/xihu_turns_latest.json（供复盘报告读取）")
     a = ap.parse_args()
 
     h = json.load(open("outputs/xihu_breadth_history.json", encoding="utf-8"))
@@ -66,16 +67,14 @@ def main():
 
     # 原始转正
     raw_up = [i for i in range(1, len(net)) if net[i] > 0 and net[i - 1] <= 0]
-
     # 过滤A：转正后净值连续 >=run 日为正
     fA = [i for i in raw_up if all(net[j] > 0 for j in range(i, min(i + a.run, len(net))))]
-
     # 过滤B：过滤A + 当日 QSG% >= 阈值
     fB = [i for i in fA if qsg[i] >= a.qsg]
 
     def stats(idxs):
-        r5 = [x for i in idxs if (x := fwd_ret(dates, closes, di, ks[i], 5)) is not None]
-        r10 = [x for i in idxs if (x := fwd_ret(dates, closes, di, ks[i], 10)) is not None]
+        r5 = [x for i in idxs if (x := fwd_ret(closes, di, ks[i], 5)) is not None]
+        r10 = [x for i in idxs if (x := fwd_ret(closes, di, ks[i], 10)) is not None]
         return {
             "n": len(idxs),
             "avg5": st.mean(r5) * 100 if r5 else None,
@@ -84,29 +83,58 @@ def main():
             "win10": sum(1 for x in r10 if x > 0) / len(r10) * 100 if r10 else None,
         }
 
-    # 基线：全样本
-    base5 = [x for d in ks if (x := fwd_ret(dates, closes, di, d, 5)) is not None]
-    base10 = [x for d in ks if (x := fwd_ret(dates, closes, di, d, 10)) is not None]
+    base5 = [x for d in ks if (x := fwd_ret(closes, di, d, 5)) is not None]
+    base10 = [x for d in ks if (x := fwd_ret(closes, di, d, 10)) is not None]
 
     print(f"样本 {len(ks)} 日（{ks[0]}~{ks[-1]}）｜参数 run>={a.run} QSG>={a.qsg}%")
-    print(f"基线(全样本任意日): 5日均{st.mean(base5)*100:+.2f}% 胜率{sum(1 for x in base5 if x>0)/len(base5)*100:.0f}%"
-          f" | 10日均{st.mean(base10)*100:+.2f}% 胜率{sum(1 for x in base10 if x>0)/len(base10)*100:.0f}%")
+    if base5:
+        print(f"基线(全样本任意日): 5日均{st.mean(base5)*100:+.2f}% 胜率{sum(1 for x in base5 if x>0)/len(base5)*100:.0f}%"
+              f" | 10日均{st.mean(base10)*100:+.2f}% 胜率{sum(1 for x in base10 if x>0)/len(base10)*100:.0f}%")
     print("-" * 78)
     print(f"{'口径':<28}{'信号数':>6}{'5日均':>10}{'5日胜率':>10}{'10日均':>10}{'10日胜率':>10}")
     rows = []
-    for name, idxs in [("原始(0轴穿越)", raw_up),
-                       (f"过滤A(连续>={a.run}日为正)", fA),
-                       (f"过滤B(A+QSG>={a.qsg}%)", fB)]:
+    for key, name, idxs in [("raw", "原始(0轴穿越)", raw_up),
+                            ("filtA", f"过滤A(连续>={a.run}日为正)", fA),
+                            ("filtB", f"过滤B(A+QSG>={a.qsg}%)", fB)]:
         s = stats(idxs)
-        rows.append((name, idxs, s))
-        f5 = f"{s['avg5']:+.2f}%" if s['avg5'] is not None else "—"
-        w5 = f"{s['win5']:.0f}%" if s['win5'] is not None else "—"
-        f10 = f"{s['avg10']:+.2f}%" if s['avg10'] is not None else "—"
-        w10 = f"{s['win10']:.0f}%" if s['win10'] is not None else "—"
+        rows.append((key, name, idxs, s))
+        f5 = f"{s['avg5']:+.2f}%" if s["avg5"] is not None else "—"
+        w5 = f"{s['win5']:.0f}%" if s["win5"] is not None else "—"
+        f10 = f"{s['avg10']:+.2f}%" if s["avg10"] is not None else "—"
+        w10 = f"{s['win10']:.0f}%" if s["win10"] is not None else "—"
         print(f"{name:<28}{s['n']:>6}{f5:>10}{w5:>10}{f10:>10}{w10:>10}")
     print("-" * 78)
-    for name, idxs, s in rows:
+    for key, name, idxs, s in rows:
         print(f"{name}: " + "、".join(ks[i] for i in idxs))
+
+    if a.json:
+        out = {
+            "date": ks[-1],
+            "sample_days": len(ks),
+            "span": f"{ks[0]}~{ks[-1]}",
+            "params": {"run": a.run, "qsg": a.qsg},
+            "baseline": {},
+            "variants": {},
+        }
+        if base5:
+            out["baseline"] = {
+                "avg5": round(st.mean(base5) * 100, 2),
+                "win5": round(sum(1 for x in base5 if x > 0) / len(base5) * 100),
+                "avg10": round(st.mean(base10) * 100, 2),
+                "win10": round(sum(1 for x in base10 if x > 0) / len(base10) * 100),
+            }
+        for key, name, idxs, s in rows:
+            out["variants"][key] = {
+                "label": name, "n": s["n"],
+                "avg5": None if s["avg5"] is None else round(s["avg5"], 2),
+                "win5": None if s["win5"] is None else round(s["win5"]),
+                "avg10": None if s["avg10"] is None else round(s["avg10"], 2),
+                "win10": None if s["win10"] is None else round(s["win10"]),
+            }
+        os.makedirs("outputs", exist_ok=True)
+        with open("outputs/xihu_turns_latest.json", "w", encoding="utf-8") as f:
+            json.dump(out, f, ensure_ascii=False, indent=1)
+        print("[OK] outputs/xihu_turns_latest.json")
 
 
 if __name__ == "__main__":

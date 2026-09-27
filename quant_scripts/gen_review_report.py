@@ -393,6 +393,17 @@ def read_xihu_breadth_history():
     return None
 
 
+def read_xihu_turns():
+    """读西湖广度拐点过滤验证（xihu_turns_latest.json，xihu_turns_check.py 产出），失败返回None"""
+    for p in ("outputs/xihu_turns_latest.json", "../outputs/xihu_turns_latest.json",
+              "/sandbox/workspace/github_bg/outputs/xihu_turns_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
 def read_rsv_strength():
     """读RSV均相对强度（rsv_strength_latest.json，腰缠万贯144日），失败返回None"""
     for p in ("rsv_strength_latest.json", "outputs/rsv_strength_latest.json", "../outputs/rsv_strength_latest.json",

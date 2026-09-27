@@ -23,11 +23,12 @@ xihu_breadth.py —— 西湖广度温度计（下雨图 + 大盘量化）
   outputs/xihu_breadth_{date}.md          报告
   outputs/xihu_breadth_latest.json         结构化 JSON（供盘前/复盘引用）
   outputs/xihu_breadth_history.json        按日累积（供趋势/画净值曲线）
+  outputs/xihu_breadth_chart.png           净值曲线图（--chart / --chart-only）
 
 用法：
-  python3 xihu_breadth.py --list all_mainboard.csv --batch 40   # 全量
-  python3 xihu_breadth.py --stocks sh600000,sz000001 --limit 260  # 小样本测试
-  python3 xihu_breadth.py --quick 12.5 30.0 850 120              # 快速模式（QSG% EJD% 新高 新低）
+  python3 xihu_breadth.py --list all_mainboard.csv --batch 40                              # 全量当日
+  python3 xihu_breadth.py --list all_mainboard.csv --batch 40 --limit 800 --backfill 550 --chart  # 回算2年+画图
+  python3 xihu_breadth.py --chart-only                                                     # 仅用已有 history 画图
 """
 import argparse
 import csv
@@ -97,8 +98,7 @@ def _ma(seq, i, n):
 
 
 def eval_signals(kl, p):
-    """对单只股票计算四信号。kl 为升序 (date,open,close,high,low)。
-    返回 dict 或 None（数据过少）。"""
+    """对单只股票计算四信号（最新一日）。kl 为升序 (date,open,close,high,low)。"""
     n = len(kl)
     if n < 2:
         return None
@@ -111,11 +111,9 @@ def eval_signals(kl, p):
     if not c_last or c_last <= 0:
         return None
 
-    win = p["window"]  # 250
+    win = p["window"]
     w = min(win, n)
     hhv_h = max(highs[-w:])
-    llv_c = min(closes[-w:]) if w else c_last
-    hhv_c = max(closes[-w:]) if w else c_last
 
     # 强势股：收盘价在 250 日最高价的 90% 以内
     strong = (c_last / hhv_h) > p["strong_thr"] if hhv_h else False
@@ -126,8 +124,7 @@ def eval_signals(kl, p):
     # 新低：当日最低价 < 前 250 日最低价（不含当日）
     new_low = False
     if n >= win + 1:
-        prev_llv = min(lows[-win - 1:-1])
-        new_low = l_last < prev_llv
+        new_low = l_last < min(lows[-win - 1:-1])
 
     # 第二阶段（Minervini 趋势模板变体）
     stage2 = False
@@ -137,16 +134,13 @@ def eval_signals(kl, p):
         ma200 = _ma(closes, n - 1, 200)
         if ma50 and ma150 and ma200:
             trend = (c_last > ma50 > ma150 > ma200)
-            # MA200 连升 N 日
             rising = True
-            last_n = p["stage2_n"]
-            for i in range(n - last_n, n):
+            for i in range(n - p["stage2_n"], n):
                 m_cur = _ma(closes, i, 200)
                 m_prev = _ma(closes, i - 1, 200)
                 if m_cur is None or m_prev is None or not (m_cur > m_prev):
                     rising = False
                     break
-            # 较 200 日最低收盘涨幅 > 30%，且贴近 200 日最高收盘 > T
             c200_l = min(closes[-min(200, n):])
             c200_h = max(closes[-min(200, n):])
             gain_ok = (c_last / c200_l) > 1.3 if c200_l else False
@@ -156,11 +150,8 @@ def eval_signals(kl, p):
     return {
         "close": round(c_last, 3),
         "pct_to_high": round(c_last / hhv_h * 100, 1) if hhv_h else None,
-        "strong": strong,
-        "stage2": stage2,
-        "new_high": new_high,
-        "new_low": new_low,
-        "bars": n,
+        "strong": strong, "stage2": stage2,
+        "new_high": new_high, "new_low": new_low, "bars": n,
     }
 
 
@@ -251,11 +242,8 @@ def aggregate(result):
     new_high = sum(1 for v in valid.values() if v["new_high"])
     new_low = sum(1 for v in valid.values() if v["new_low"])
     return {
-        "total": n,
-        "strong": strong,
-        "stage2": stage2,
-        "new_high": new_high,
-        "new_low": new_low,
+        "total": n, "strong": strong, "stage2": stage2,
+        "new_high": new_high, "new_low": new_low,
         "qsg_pct": round(strong / n * 100, 2) if n else 0.0,
         "ejd_pct": round(stage2 / n * 100, 2) if n else 0.0,
         "net_high": new_high - new_low,
@@ -328,12 +316,21 @@ def build_history(cache, p, days, existing=None):
     return {k: hist[k] for k in sorted(hist.keys())}
 
 
-def make_chart(history, out_png, title="西湖广度温度计"):
-    """把历史序列画成净值曲线图（下雨图净值柱 + 强势股/第二阶段占比线）。"""
+def make_chart(history, out_png, title="西湖广度温度计", turn_run=3):
+    """把历史序列画成净值曲线图（下雨图净值柱 + 强势股/第二阶段占比线）。
+    拐点：净值由负转正=▲（转正后连续 ≥turn_run 日为正记"确认"，实心大红▲；否则空心△）；由正转负=▽。"""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    plt.rcParams["font.sans-serif"] = ["Noto Sans SC", "WenQuanYi Zen Hei", "SimHei", "DejaVu Sans"]
+    import matplotlib.font_manager as fm
+    for _f in ("/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc",
+               "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+               "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc"):
+        try:
+            fm.fontManager.addfont(_f)
+        except Exception:
+            pass
+    plt.rcParams["font.sans-serif"] = ["Noto Sans SC", "Noto Sans CJK JP", "WenQuanYi Zen Hei", "SimHei", "DejaVu Sans"]
     plt.rcParams["axes.unicode_minus"] = False
     ks = sorted(history.keys())
     if len(ks) < 2:
@@ -348,23 +345,28 @@ def make_chart(history, out_png, title="西湖广度温度计"):
     ax1.bar(range(len(net)), net, color=colors, width=0.75)
     ax1.axhline(0, color="#555", lw=0.8)
     ax1.set_ylabel("下雨图净值（新高-新低）")
-    ax1.set_title(f"{title} · 下雨图净值曲线（红=晴/绿=雨；↑净值转正 ↓净值转负）")
+    ax1.set_title(f"{title} · 下雨图净值曲线（红=晴/绿=雨；实心▲=确认转正(连续≥{turn_run}日) △=未确认 ▽=转负）")
     ax1.grid(alpha=0.25)
-    # ── 拐点标注：新高/新低交叉（净值由负转正 ↑ / 由正转负 ↓）──
+    # ── 拐点标注：新高/新低交叉（净值由负转正 ↑ / 由正转负 ↓）
     up_idx = [i for i in range(1, len(net)) if net[i] > 0 and net[i - 1] <= 0]
     dn_idx = [i for i in range(1, len(net)) if net[i] <= 0 and net[i - 1] > 0]
+    conf_up = [i for i in up_idx if all(net[j] > 0 for j in range(i, min(i + turn_run, len(net))))]
+    conf_set = set(conf_up)
     for i in up_idx:
-        ax1.axvline(i, color="#d62728", ls=":", lw=0.8, alpha=0.45)
-        ax1.annotate("↑" + dates[i], xy=(i, max(net[i], 0)), xytext=(0, 12),
-                     textcoords="offset points", ha="center", fontsize=7,
-                     color="#b71c1c", fontweight="bold")
+        if i in conf_set:
+            ax1.plot([i], [max(net[i], 2)], marker="^", ms=12, color="#b71c1c", zorder=6)
+            ax1.annotate("↑" + dates[i], xy=(i, max(net[i], 0)), xytext=(0, 15),
+                         textcoords="offset points", ha="center", fontsize=8,
+                         color="#b71c1c", fontweight="bold", zorder=7)
+        else:
+            ax1.axvline(i, color="#d62728", ls=":", lw=0.7, alpha=0.3)
+            ax1.plot([i], [max(net[i], 1)], marker="^", ms=6, mfc="white", mec="#ef9a9a", mew=1.2, zorder=5)
     for i in dn_idx:
-        ax1.axvline(i, color="#2ca02c", ls=":", lw=0.8, alpha=0.45)
-        ax1.annotate("↓" + dates[i], xy=(i, min(net[i], 0)), xytext=(0, -14),
-                     textcoords="offset points", ha="center", fontsize=7,
-                     color="#1b5e20", fontweight="bold")
-    print(f"[拐点] 净值转正(↑{len(up_idx)}次): " + "、".join(ks[i] for i in up_idx))
-    print(f"[拐点] 净值转负(↓{len(dn_idx)}次): " + "、".join(ks[i] for i in dn_idx))
+        ax1.axvline(i, color="#2ca02c", ls=":", lw=0.7, alpha=0.3)
+        ax1.plot([i], [min(net[i], -1)], marker="v", ms=6, color="#a5d6a7", zorder=4)
+    print(f"[拐点] 净值转正{len(up_idx)}次（其中确认≥{turn_run}日 {len(conf_up)}次）: "
+          + "、".join(ks[i] for i in up_idx))
+    print(f"[拐点] 净值转负{len(dn_idx)}次: " + "、".join(ks[i] for i in dn_idx))
     ax2.plot(range(len(qsg)), qsg, color="#d62728", marker="o", ms=2, lw=1.2, label="强势股占比 QSG%")
     ax2.plot(range(len(ejd)), ejd, color="#1f77b4", marker="o", ms=2, lw=1.2, label="第二阶段占比 EJD%")
     ax2.axhline(6, color="#999", ls="--", lw=0.8)
@@ -403,8 +405,6 @@ def judge(agg):
 def build_report(agg, result, jd, date_str, p):
     top_high = sorted([(c, v) for c, v in result.items() if v.get("new_high")],
                       key=lambda x: -(x[1].get("pct_to_high") or 0))[:20]
-    strong_list = sorted([(c, v) for c, v in result.items() if v.get("strong")],
-                         key=lambda x: -(x[1].get("pct_to_high") or 0))
     stage2_list = sorted([(c, v) for c, v in result.items() if v.get("stage2")],
                          key=lambda x: -(x[1].get("pct_to_high") or 0))
 
@@ -462,6 +462,7 @@ def main():
                     help="回算最近 N 个交易日的广度序列并写入 history（0=仅当日）")
     ap.add_argument("--chart", action="store_true", help="读 history 画净值曲线图 PNG")
     ap.add_argument("--chart-only", action="store_true", help="仅读 history 画图，跳过扫描（供 CI 复用已累积的 history）")
+    ap.add_argument("--turn-run", type=int, default=3, help="确认拐点：转正后净值连续为正天数阈值（画图用）")
     ap.add_argument("--outdir", default="outputs")
     args = ap.parse_args()
 
@@ -484,7 +485,7 @@ def main():
             print("[WARN] history 数据点不足(<2)，未生成图")
             return
         chart_path = os.path.join(args.outdir, "xihu_breadth_chart.png")
-        ok = make_chart(hist, chart_path)
+        ok = make_chart(hist, chart_path, turn_run=args.turn_run)
         print(f"[{'OK' if ok else 'WARN'}] {chart_path}")
         return
 
@@ -556,7 +557,7 @@ def main():
     if args.chart:
         chart_path = os.path.join(args.outdir, "xihu_breadth_chart.png")
         try:
-            ok = make_chart(hist, chart_path)
+            ok = make_chart(hist, chart_path, turn_run=args.turn_run)
             print(f"[{'OK' if ok else 'WARN'}] {chart_path}" if ok else "[WARN] 数据点不足(<2)，未生成图")
         except Exception as e:
             print(f"[WARN] 绘图失败: {e}")
