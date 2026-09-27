@@ -357,6 +357,50 @@ def calc_zengxingzhi():
     qual = "🐻 熊市结构" if bear >= 6 else "🐂 牛市结构" if bull >= 6 else "🟡 震荡结构"
     return "\n".join(lines), qual, bear, bull
 
+def read_limitup_panel():
+    """读热板作战面板（涨停概念排行_latest.json），失败返回None"""
+    for p in ("涨停概念排行_latest.json", "outputs/涨停概念排行_latest.json",
+              "../outputs/涨停概念排行_latest.json",
+              "/sandbox/workspace/bg/outputs/涨停概念排行_latest.json",
+              "/sandbox/workspace/github_bg/outputs/涨停概念排行_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def render_limitup_panel():
+    """③.7 热板作战面板：板块分级 + 龙头榜 + 中军榜（涨停概念排行.py 产出，缺数据返回None）"""
+    d = read_limitup_panel()
+    if not d or not d.get("concept_rank"):
+        return None
+    mkt = d.get("market") or {}
+    cr = d.get("concept_rank") or []
+    lead = {x.get("concept"): x for x in (d.get("leaders") or [])}
+    zj = {}
+    for x in (d.get("zhongjun") or []):
+        zj.setdefault(x.get("concept"), x)
+    fj = mkt.get("first_jinji_rate")
+    L = ["\n### ③.7 🔥 热板作战面板（板块分级 · 龙头 · 中军）", ""]
+    head = f"- 情绪刻度：首板晋级率 {fj}%（{mkt.get('mood', '—')}）" if fj is not None else "- 情绪刻度：—"
+    L.append(head + f" · 涨停{d.get('limitup_total', '—')} · 连板{d.get('lianban_total', '—')}")
+    rows = [c for c in cr if c.get("grade") in ("主线", "支线")][:8] or cr[:6]
+    if rows:
+        icon = {"主线": "🔴", "支线": "🟡", "一日游": "⚪"}
+        L += ["", "| 级别 | 板块 | 涨停 | 晋级率 | 龙头(分) | 中军 |", "|---|---|---|---|---|---|"]
+        for c in rows:
+            jj = c.get("jinji_rate")
+            jjs = f"{jj:.0f}%" if isinstance(jj, (int, float)) else "—"
+            l = lead.get(c.get("concept"))
+            ls = f"{l['leader']}({l['score']})" if l else "—"
+            z = zj.get(c.get("concept"))
+            L.append(f"| {icon.get(c.get('grade'), '')}{c.get('grade')} | {c.get('concept')} | "
+                     f"{c.get('n')} | {jjs} | {ls} | {z['name'] if z else '—'} |")
+    L.append(f"\n> 数据 {d.get('date', '?')}｜概念口径（一票可属多概念，家数会放大）；龙头=五步法打分；中军以成交额近似市值")
+    return "\n".join(L)
+
+
 def gen_report(today_str):
     """生成完整盘前报告"""
     today = today_str
@@ -614,6 +658,14 @@ def gen_report(today_str):
             lines.append(_gl)
     except Exception as e:
         lines.append(f"- 乖离低买：读取失败({e})")
+
+    # ③.7 热板作战面板（板块分级·龙头·中军，limitup_concept_rank.py 产出）
+    try:
+        _lp = render_limitup_panel()
+        if _lp:
+            lines.append(_lp)
+    except Exception as e:
+        lines.append(f"- 热板作战面板：读取失败({e})")
 
     lines.append("\n## ④ 个股定点\n")
     lines.append("⏳ 每日量化数据由15:30全盘量化扫描生成，盘前时段引用昨日数据。\n")

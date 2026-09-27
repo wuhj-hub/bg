@@ -208,6 +208,7 @@ jobs:
           python3 quant_scripts/limitup_concept_rank.py --top 20
           cp outputs/涨停概念排行_latest.json 涨停概念排行_latest.json 2>/dev/null || true
           echo "涨停概念排行: $(python3 -c "import json;d=json.load(open('outputs/涨停概念排行_latest.json'));r=d.get('concept_rank',[]);print('涨停%d只 TOP概念=%s'%(d.get('limitup_total',0), r[0]['concept'] if r else '无'))" 2>/dev/null || echo '无数据')"
+          echo "热板面板: $(python3 -c "import json;d=json.load(open('outputs/涨停概念排行_latest.json'));g=d.get('grade_summary',{});m=d.get('market',{});L=d.get('leaders',[]);print('主线%d/支线%d/一日游%d | 首板晋级率%s%% | 龙头=%s'%(g.get('main',0),g.get('sub',0),g.get('oneday',0),m.get('first_jinji_rate','-'),(L[0]['concept']+'·'+L[0]['leader']+str(L[0]['score'])) if L else '无'))" 2>/dev/null || echo '无数据')"
 
       # ─── 第二步.1.6：123/2B/ABC反转扫描（斯波朗迪L3结构确认，panhou四态池驱动）───
       - name: 123/2B/ABC反转信号扫描

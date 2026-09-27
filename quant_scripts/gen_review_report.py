@@ -1112,6 +1112,12 @@ def gen_report(today_str):
     except Exception as e:
         lines.append(f"\n### ③.9 🔗 宁静AI卡位\n\n> 监测生成失败({e})\n")
 
+    # 五.5f 热板作战面板（③.10 板块分级·龙头·中军，limitup_concept_rank.py 产出）
+    try:
+        lines.append(limitup_panel_section(today))
+    except Exception as e:
+        lines.append(f"\n### ③.10 🔥 热板作战面板\n\n> 生成失败({e})\n")
+
     # ════════════════════════════════════════
     # 六、明日展望（新增！闭环收口）
     # ════════════════════════════════════════
@@ -1191,6 +1197,51 @@ def gen_report(today_str):
     lines.append("⚠️ 本报告基于公开市场数据整理，不构成投资建议。\n")
     
     return "\n".join(lines)
+
+def read_limitup_panel():
+    """读热板作战面板（涨停概念排行_latest.json），失败返回None"""
+    for p in ("涨停概念排行_latest.json", "outputs/涨停概念排行_latest.json",
+              "../outputs/涨停概念排行_latest.json",
+              "/sandbox/workspace/bg/outputs/涨停概念排行_latest.json",
+              "/sandbox/workspace/github_bg/outputs/涨停概念排行_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def limitup_panel_section(today=""):
+    """③.10 热板作战面板：板块分级 + 龙头榜 + 中军榜（limitup_concept_rank.py 产出）"""
+    d = read_limitup_panel()
+    if not d or not d.get("concept_rank"):
+        return ("\n### ③.10 🔥 热板作战面板\n\n> ⏳ 当日热板面板缺失（limitup_concept_rank.py 未产出）。"
+                "可运行 `python3 quant_scripts/limitup_concept_rank.py` 补生成。\n")
+    mkt = d.get("market") or {}
+    cr = d.get("concept_rank") or []
+    lead = {x.get("concept"): x for x in (d.get("leaders") or [])}
+    zj = {}
+    for x in (d.get("zhongjun") or []):
+        zj.setdefault(x.get("concept"), x)
+    fj = mkt.get("first_jinji_rate")
+    L = ["\n### ③.10 🔥 热板作战面板（板块分级 · 龙头 · 中军）", ""]
+    head = f"- 情绪刻度：首板晋级率 {fj}%（{mkt.get('mood', '—')}）" if fj is not None else "- 情绪刻度：—"
+    L.append(head + f" · 涨停{d.get('limitup_total', '—')} · 连板{d.get('lianban_total', '—')}")
+    rows = [c for c in cr if c.get("grade") in ("主线", "支线")][:8] or cr[:6]
+    if rows:
+        icon = {"主线": "🔴", "支线": "🟡", "一日游": "⚪"}
+        L += ["", "| 级别 | 板块 | 涨停 | 晋级率 | 龙头(分) | 中军 |", "|---|---|---|---|---|---|"]
+        for c in rows:
+            jj = c.get("jinji_rate")
+            jjs = f"{jj:.0f}%" if isinstance(jj, (int, float)) else "—"
+            l = lead.get(c.get("concept"))
+            ls = f"{l['leader']}({l['score']})" if l else "—"
+            z = zj.get(c.get("concept"))
+            L.append(f"| {icon.get(c.get('grade'), '')}{c.get('grade')} | {c.get('concept')} | "
+                     f"{c.get('n')} | {jjs} | {ls} | {z['name'] if z else '—'} |")
+    L.append(f"\n> 数据 {d.get('date', '?')}｜概念口径（一票可属多概念，家数会放大）；龙头=五步法打分；中军以成交额近似市值")
+    return "\n".join(L)
+
 
 def main():
     today = datetime.now().strftime("%Y-%m-%d")

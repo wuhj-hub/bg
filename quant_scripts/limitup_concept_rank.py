@@ -112,14 +112,15 @@ def load_sector():
 
 
 def fetch_ztpool(d8):
-    """东财涨停池 → {6位代码: {...}}；失败返回 {}（优雅降级）"""
+    """东财涨停池 → (实际数据日 qdate, {6位代码: {...}})；失败返回 (None, {})（优雅降级）"""
     try:
         raw = urllib.request.urlopen(
             urllib.request.Request(ZT_URL.format(d=d8), headers=UA), timeout=25).read().decode()
-        pool = (json.loads(raw).get("data") or {}).get("pool") or []
+        data = json.loads(raw).get("data") or {}
+        pool, qdate = data.get("pool") or [], data.get("qdate")
     except Exception as e:
         print(f"[WARN] 涨停池获取失败（{e}），龙头榜将降级", flush=True)
-        return {}
+        return None, {}
     d = {}
     for p in pool:
         c = p.get("c") or ""
@@ -127,8 +128,9 @@ def fetch_ztpool(d8):
             continue
         d[c] = {"fbt": p.get("fbt") or 0, "fund": p.get("fund") or 0,
                 "ltsz": p.get("ltsz") or 0, "zbc": p.get("zbc") or 0,
-                "amount": p.get("amount") or 0, "hybk": p.get("hybk") or ""}
-    return d
+                "amount": p.get("amount") or 0, "hybk": p.get("hybk") or "",
+                "name": p.get("n") or "", "lbc": p.get("lbc") or 1, "zdp": p.get("zdp") or 0}
+    return (str(qdate) if qdate else None), d
 
 
 def classify(zt, prev_zt, jj, a):
@@ -222,6 +224,66 @@ def find_zhongjun(codes, km, ups_codes, code_name):
     return cands[:2]
 
 
+def main_filter(c):
+    return bool(re.match(r"^(600|601|603|605|000|001|002|003)\d{3}$", c or ""))
+
+
+def fetch_pool_meta(d8):
+    """东财涨停池原始 list + 实际数据日 qdate（非交易日/未来日期会返回最近交易日数据）"""
+    try:
+        raw = urllib.request.urlopen(
+            urllib.request.Request(ZT_URL.format(d=d8), headers=UA), timeout=25).read().decode()
+        data = json.loads(raw).get("data") or {}
+        return data.get("qdate"), (data.get("pool") or [])
+    except Exception as e:
+        print(f"[WARN] 涨停池 {d8} 获取失败: {e}", flush=True)
+        return None, []
+
+
+def fast_prepare(a):
+    """轻量模式：仅用东财涨停池（今日+前一交易日），秒级，无K线/中军"""
+    if a.date:
+        cand = [a.date.replace("-", "")]
+    else:
+        base0 = datetime.now(BJ)
+        cand = [(base0 - timedelta(days=i)).strftime("%Y%m%d") for i in range(0, 6)]
+    qd, pool_today = None, []
+    for d8 in cand:
+        qd, pool_today = fetch_pool_meta(d8)
+        if pool_today:
+            break
+    if not pool_today or not qd:
+        return None
+    qd = str(qd)
+    # 前一交易日：从 qdate 往前取第一个非空涨停池（非交易日返回空）
+    base = datetime.strptime(qd, "%Y%m%d")
+    prev_pool = []
+    for i in range(1, 8):
+        _, prev_pool = fetch_pool_meta((base - timedelta(days=i)).strftime("%Y%m%d"))
+        if prev_pool:
+            break
+    today = f"{qd[:4]}-{qd[4:6]}-{qd[6:]}"
+    ups = []
+    for p in pool_today:
+        c = p.get("c") or ""
+        if not main_filter(c):
+            continue
+        ltsz = p.get("ltsz") or 0
+        fund = p.get("fund") or 0
+        ups.append({"code": ("sh" if c[0] == "6" else "sz") + c, "c6": c, "name": p.get("n", ""),
+                    "chg": round(p.get("zdp") or 0, 2), "lianban": p.get("lbc") or 1,
+                    "price": None, "ret5": None,
+                    "fbt": p.get("fbt"), "fund": fund, "ltsz": ltsz, "zbc": p.get("zbc"),
+                    "fdratio": (fund / ltsz) if ltsz else None})
+    prev_zt_codes = {p.get("c") for p in prev_pool if main_filter(p.get("c"))}
+    prev_first_codes = {p.get("c") for p in prev_pool if main_filter(p.get("c")) and (p.get("lbc") or 1) == 1}
+    today_codes = {u["c6"] for u in ups}
+    prev_first_jinji = len(prev_first_codes & today_codes)
+    ztpool = {u["c6"]: {"fbt": u["fbt"], "fund": u["fund"], "ltsz": u["ltsz"], "zbc": u["zbc"]}
+              for u in ups}
+    return today, ups, prev_zt_codes, prev_first_codes, prev_first_jinji, ztpool
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=20)
@@ -232,89 +294,123 @@ def main():
     ap.add_argument("--main-jj", type=float, default=35.0, dest="main_jj")
     ap.add_argument("--sub-jj", type=float, default=20.0, dest="sub_jj")
     ap.add_argument("--max-stocks", type=int, default=0, dest="max_stocks")
+    ap.add_argument("--fast", action="store_true", help="轻量模式：仅用东财涨停池（秒级，不含中军/5日弹性）")
     a = ap.parse_args()
     outdir = a.outdir or os.path.join(BASE, "outputs")
     os.makedirs(outdir, exist_ok=True)
     today = a.date or datetime.now(BJ).strftime("%Y-%m-%d")
 
-    # 股票池
-    pool = []
-    mb = None
-    for p in (os.path.join(BASE, "all_mainboard.csv"), "all_mainboard.csv"):
-        if os.path.exists(p):
-            mb = p
-            break
-    if not mb:
-        print("[ERR] 缺 all_mainboard.csv")
-        return 1
-    with open(mb, encoding="utf-8-sig") as f:
-        for r in csv.DictReader(f):
-            c = (r.get("code") or "").strip()
-            n = (r.get("name") or "").strip()
-            if not re.match(r"^\d{6}$", c):
-                continue
-            if c.startswith(("688", "300", "301")) or "ST" in n.upper() or "退" in n:
-                continue
-            pool.append((("sh" if c[0] == "6" else "sz") + c, c, n))
-    if a.max_stocks:
-        pool = pool[:a.max_stocks]
-    print(f"[INFO] 主板池 {len(pool)} 只，取最近 {a.days} 日K线...", flush=True)
-    km = fetch_all([x[0] for x in pool], a.days)
-    print(f"[INFO] 取到 {len(km)} 只", flush=True)
-
-    # 数据日期自适应
-    if not a.date:
-        dates = [bars[-1][0] for bars in km.values() if bars]
-        if dates:
-            latest = max(set(dates), key=dates.count)
-            if latest != today:
-                print(f"[WARN] {today} 无行情（周末/节假日/数据滞后），自动回退到 {latest}", flush=True)
-                today = latest
-
-    code_sector, code_name, sectors, sec_date = load_sector()
-    print(f"[INFO] 题材映射 {len(code_sector)} 只（更新于 {sec_date}）", flush=True)
-
-    # 涨停池（东财）
-    ztpool = fetch_ztpool(today.replace("-", ""))
-    print(f"[INFO] 涨停池 {len(ztpool)} 只（{today}）", flush=True)
-
-    # 逐股：涨停标记 + 连板 + 昨日截面
+    # ── 数据准备：默认全市场K线；--fast 改用东财涨停池（秒级，不含中军）──
+    km = {}
+    ztpool = {}
     ups = []
     prev_zt_codes = set()
     prev_first_codes = set()
     prev_first_jinji = 0
-    for wcode, c6, nm in pool:
-        bars = km.get(wcode)
-        if not bars or len(bars) < 4:
-            continue
-        if bars[-1][0] != today:
-            continue
-        closes = [b[2] for b in bars]
-        n = len(bars)
-        lim = [False] * n
-        for i in range(1, n):
-            if closes[i - 1] > 0 and (closes[i] / closes[i - 1] - 1) * 100 >= LIMIT_UP:
-                lim[i] = True
-        lb = [0] * n
-        for i in range(1, n):
-            lb[i] = (lb[i - 1] + 1) if (lim[i] and lim[i - 1]) else (1 if lim[i] else 0)
-        if lim[-2]:
-            prev_zt_codes.add(c6)
-            if lb[-2] == 1:
-                prev_first_codes.add(c6)
-                if lim[-1]:
-                    prev_first_jinji += 1
-        if not lim[-1]:
-            continue
-        chg = (closes[-1] / closes[-2] - 1) * 100 if closes[-2] else 0
-        ret5 = (closes[-1] / closes[-6] - 1) * 100 if len(closes) >= 6 else None
-        z = ztpool.get(c6, {})
-        ltsz = z.get("ltsz") or 0
-        fund = z.get("fund") or 0
-        ups.append({"code": wcode, "c6": c6, "name": nm, "chg": round(chg, 2),
-                    "lianban": lb[-1], "price": closes[-1], "ret5": ret5,
-                    "fbt": z.get("fbt"), "fund": fund, "ltsz": ltsz, "zbc": z.get("zbc"),
-                    "fdratio": (fund / ltsz) if ltsz else None})
+    pool = []
+
+    if a.fast:
+        r = fast_prepare(a)
+        if not r:
+            print("[ERR] 轻量模式：未取到涨停池数据")
+            return 1
+        today, ups, prev_zt_codes, prev_first_codes, prev_first_jinji, ztpool = r
+        srcdesc = "东财涨停池（轻量·无K线）"
+        print(f"[INFO][FAST] 涨停池日 {today}｜涨停 {len(ups)} 只", flush=True)
+    else:
+        mb = None
+        for p in (os.path.join(BASE, "all_mainboard.csv"), "all_mainboard.csv"):
+            if os.path.exists(p):
+                mb = p
+                break
+        if not mb:
+            print("[ERR] 缺 all_mainboard.csv")
+            return 1
+        with open(mb, encoding="utf-8-sig") as f:
+            for row in csv.DictReader(f):
+                c = (row.get("code") or "").strip()
+                nm0 = (row.get("name") or "").strip()
+                if not re.match(r"^\d{6}$", c):
+                    continue
+                if c.startswith(("688", "300", "301")) or "ST" in nm0.upper() or "退" in nm0:
+                    continue
+                pool.append((("sh" if c[0] == "6" else "sz") + c, c, nm0))
+        if a.max_stocks:
+            pool = pool[:a.max_stocks]
+        print(f"[INFO] 主板池 {len(pool)} 只，取最近 {a.days} 日K线...", flush=True)
+        km = fetch_all([x[0] for x in pool], a.days)
+        print(f"[INFO] 取到 {len(km)} 只", flush=True)
+        _ds = [bars[-1][0] for bars in km.values() if bars]
+        kd = max(set(_ds), key=_ds.count) if _ds else None
+        srcdesc = f"全主板 {len(pool)} 只（westock 日线 {a.days}日）"
+
+        # 涨停识别以【涨停池】为准（K线仅供 5日弹性 / 中军）；池不可用时回退 K线
+        target = a.date.replace("-", "") if a.date else datetime.now(BJ).strftime("%Y%m%d")
+        qd, ztpool = fetch_ztpool(target)
+        if qd:
+            today = f"{qd[:4]}-{qd[4:6]}-{qd[6:]}"
+        elif kd:
+            today = kd
+
+        if ztpool and qd:
+            base = datetime.strptime(qd, "%Y%m%d")
+            prev_pool = {}
+            for i in range(1, 8):
+                _, pp = fetch_ztpool((base - timedelta(days=i)).strftime("%Y%m%d"))
+                if pp:
+                    prev_pool = pp
+                    break
+            for c6, z in ztpool.items():
+                if not main_filter(c6):
+                    continue
+                w = ("sh" if c6[0] == "6" else "sz") + c6
+                bars = km.get(w)
+                ret5 = None
+                if bars and bars[-1][0] == today and len(bars) >= 6:
+                    ret5 = (bars[-1][2] / bars[-6][2] - 1) * 100
+                ltsz = z.get("ltsz") or 0
+                fund = z.get("fund") or 0
+                ups.append({"code": w, "c6": c6, "name": z.get("name") or "", "chg": round(z.get("zdp") or 0, 2),
+                            "lianban": z.get("lbc") or 1, "price": None, "ret5": ret5,
+                            "fbt": z.get("fbt"), "fund": fund, "ltsz": ltsz, "zbc": z.get("zbc"),
+                            "fdratio": (fund / ltsz) if ltsz else None})
+            prev_zt_codes = {c6 for c6 in prev_pool if main_filter(c6)}
+            prev_first_codes = {c6 for c6, z in prev_pool.items() if main_filter(c6) and (z.get("lbc") or 1) == 1}
+            prev_first_jinji = len(prev_first_codes & {u["c6"] for u in ups})
+            print(f"[INFO] 涨停池 {len(ztpool)} 只（{today}，主板涨停 {len(ups)}）", flush=True)
+        else:
+            print(f"[WARN] 涨停池不可用，回退 K线识别（涨跌幅≥{LIMIT_UP}%）", flush=True)
+            for wcode, c6, nm in pool:
+                bars = km.get(wcode)
+                if not bars or len(bars) < 4:
+                    continue
+                if bars[-1][0] != today:
+                    continue
+                closes = [b[2] for b in bars]
+                n = len(bars)
+                lim = [False] * n
+                for i in range(1, n):
+                    if closes[i - 1] > 0 and (closes[i] / closes[i - 1] - 1) * 100 >= LIMIT_UP:
+                        lim[i] = True
+                lb = [0] * n
+                for i in range(1, n):
+                    lb[i] = (lb[i - 1] + 1) if (lim[i] and lim[i - 1]) else (1 if lim[i] else 0)
+                if lim[-2]:
+                    prev_zt_codes.add(c6)
+                    if lb[-2] == 1:
+                        prev_first_codes.add(c6)
+                        if lim[-1]:
+                            prev_first_jinji += 1
+                if not lim[-1]:
+                    continue
+                chg = (closes[-1] / closes[-2] - 1) * 100 if closes[-2] else 0
+                ret5 = (closes[-1] / closes[-6] - 1) * 100 if len(closes) >= 6 else None
+                ups.append({"code": wcode, "c6": c6, "name": nm, "chg": round(chg, 2),
+                            "lianban": lb[-1], "price": closes[-1], "ret5": ret5,
+                            "fbt": None, "fund": 0, "ltsz": 0, "zbc": None, "fdratio": None})
+
+    code_sector, code_name, sectors, sec_date = load_sector()
+    print(f"[INFO] 题材映射 {len(code_sector)} 只（更新于 {sec_date}）", flush=True)
 
     n_lb = sum(1 for u in ups if u["lianban"] >= 2)
     n_first = sum(1 for u in ups if u["lianban"] == 1)
@@ -361,7 +457,7 @@ def main():
     icon = {"主线": "🔴", "支线": "🟡", "一日游": "⚪"}
 
     L = [f"# 🔥 热板作战面板 {today}", "",
-         f"> 数据源：全主板 {len(pool)} 只（westock 日线 {a.days}日）｜题材映射 {len(code_sector)} 只（{sec_date}）｜涨停池 {len(ztpool)} 只",
+         f"> 数据源：{srcdesc}｜题材映射 {len(code_sector)} 只（{sec_date}）｜涨停池 {len(ztpool)} 只",
          f"> 当日涨停 **{len(ups)}** 只｜连板 **{n_lb}** 只｜首板 **{n_first}** 只", "",
          "## 📊 市场情绪刻度",
          f"- 昨日涨停 **{prev_zt_n}** 只 → 今日连板 **{n_lb}** 只，**连板晋级率 {mkt_lb_jj:.0f}%**" if prev_zt_n else "- 连板晋级率 —",
