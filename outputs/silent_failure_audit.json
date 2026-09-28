@@ -1,5 +1,5 @@
 {
- "date": "2026-09-27",
+ "date": "2026-09-28",
  "workflows": 16,
  "high_risk": 0,
  "issues": {
@@ -99,7 +99,9 @@
    "selfcheck_daily.yml :: 异常告警到微信 (L102) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）",
    "selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L120) — 命中 continue-on-error: true, || echo（吞错误）",
    "wangzhe_track.yml :: 判断是否交易日 (L31) — 命中 continue-on-error: true",
-   "wangzhe_track.yml :: 才哥公众号文章跟踪 (L76) — 命中 continue-on-error: true"
+   "wangzhe_track.yml :: 涨停王者·合格标的漏斗 (L76) — 命中 continue-on-error: true",
+   "wangzhe_track.yml :: 合格标的上传知识库 + 推送 (L81) — 命中 continue-on-error: true, || echo（吞错误）",
+   "wangzhe_track.yml :: 才哥公众号文章跟踪 (L100) — 命中 continue-on-error: true"
   ],
   "🟡中危·依赖外部 cron": [
    "artifact_audit.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆",
@@ -666,7 +668,17 @@
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "才哥公众号文章跟踪 (L76)",
+    "step": "涨停王者·合格标的漏斗 (L76)",
+    "detail": "命中 continue-on-error: true"
+   },
+   {
+    "level": "🟡中危·吞错误",
+    "step": "合格标的上传知识库 + 推送 (L81)",
+    "detail": "命中 continue-on-error: true, || echo（吞错误）"
+   },
+   {
+    "level": "🟡中危·吞错误",
+    "step": "才哥公众号文章跟踪 (L100)",
     "detail": "命中 continue-on-error: true"
    },
    {

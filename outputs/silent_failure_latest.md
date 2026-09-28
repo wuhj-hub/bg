@@ -1,8 +1,8 @@
-# 🔍 体系自检元审计 · 2026-09-27
+# 🔍 体系自检元审计 · 2026-09-28
 
-> 扫描 16 个 workflow ｜ 风险项 **106** ｜ 🔴高危 **0**
+> 扫描 16 个 workflow ｜ 风险项 **108** ｜ 🔴高危 **0**
 
-## 🟡中危·吞错误（96）
+## 🟡中危·吞错误（98）
 
 - artifact_audit.yml :: 运行产物入库审计 (L35) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
 - artifact_audit.yml :: 提交审计报告 (L55) — 命中 2>/dev/null（屏蔽 stderr）, || true
@@ -99,7 +99,9 @@
 - selfcheck_daily.yml :: 异常告警到微信 (L102) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）
 - selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L120) — 命中 continue-on-error: true, || echo（吞错误）
 - wangzhe_track.yml :: 判断是否交易日 (L31) — 命中 continue-on-error: true
-- wangzhe_track.yml :: 才哥公众号文章跟踪 (L76) — 命中 continue-on-error: true
+- wangzhe_track.yml :: 涨停王者·合格标的漏斗 (L76) — 命中 continue-on-error: true
+- wangzhe_track.yml :: 合格标的上传知识库 + 推送 (L81) — 命中 continue-on-error: true, || echo（吞错误）
+- wangzhe_track.yml :: 才哥公众号文章跟踪 (L100) — 命中 continue-on-error: true
 
 ## 🟡中危·依赖外部 cron（10）
 
@@ -133,4 +135,4 @@
 | quant_report.yml | 30 | — |
 | quant_scan.yml | 29 | — |
 | selfcheck_daily.yml | 8 | — |
-| wangzhe_track.yml | 3 | — |
+| wangzhe_track.yml | 5 | — |

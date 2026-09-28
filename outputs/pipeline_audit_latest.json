@@ -1,57 +1,35 @@
 {
- "date": "2026-09-28 07:01",
+ "date": "2026-09-29 07:01",
  "runs": {
-  "total": 58,
+  "total": 70,
   "bad": []
  },
- "heavy_steps": [],
- "stale_products": [
+ "heavy_steps": [
   {
-   "path": "quant_results_latest.json",
-   "status": "停更3天",
-   "age": 3,
-   "max": 1
+   "workflow": "盘后报告生成",
+   "step": "一统天下建仓区股池扫描+跟踪（多周期共振）",
+   "minutes": 30.4
   },
   {
-   "path": "outputs/paper_portfolio.json",
-   "status": "停更3天",
-   "age": 3,
-   "max": 2
+   "workflow": "全盘量化扫描",
+   "step": "西湖广度扫描（下雨图：强势股/第二阶段/新高/新低）",
+   "minutes": 25.2
   },
   {
-   "path": "outputs/pool_entries.csv",
-   "status": "停更3天",
-   "age": 3,
-   "max": 2
+   "workflow": "全盘量化扫描",
+   "step": "一统天下多周期扫描（建仓区+月线反转+RSV50三线强度）",
+   "minutes": 26.9
   },
   {
-   "path": "market_width_latest.json",
-   "status": "停更3天",
-   "age": 3,
-   "max": 1
-  },
-  {
-   "path": "hot_emotion_latest.json",
-   "status": "停更3天",
-   "age": 3,
-   "max": 1
-  },
-  {
-   "path": "execution_cards_latest.json",
-   "status": "停更3天",
-   "age": 3,
-   "max": 1
-  },
-  {
-   "path": "market_regime_latest.json",
-   "status": "停更3天",
-   "age": 3,
-   "max": 2
+   "workflow": "全盘量化扫描",
+   "step": "四维共振评分（政策/资金/筹码/关联方四维证据链）",
+   "minutes": 28.1
   }
  ],
+ "stale_products": [],
  "script_errors": [],
  "issues": [
-  "⚠️ 产物停更：quant_results_latest.json(停更3天)、outputs/paper_portfolio.json(停更3天)、outputs/pool_entries.csv(停更3天)、market_width_latest.json(停更3天)、hot_emotion_latest.json(停更3天)"
+  "⚠️ 重步骤：盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 30.4min、全盘量化扫描/西湖广度扫描（下雨图：强势股/第二阶段/新高/新低） 25.2min、全盘量化扫描/一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） 26.9min、全盘量化扫描/四维共振评分（政策/资金/筹码/关联方四维证据链） 28.1min"
  ],
  "status": "WARN"
 }
