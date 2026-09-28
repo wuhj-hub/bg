@@ -16,6 +16,8 @@ br = os.environ.get("TARGET_BRANCH", "main")
 d = datetime.now(BJT).strftime("%Y-%m-%d")
 files = ["outputs/wangzhe_signals.csv", "outputs/wangzhe_stats.json",
          f"outputs/涨停型王者_成功率报告_{d}.md",
+         f"outputs/涨停王者_合格标的_{d}.md",
+         f"outputs/涨停王者_合格标的_{d}.csv",
          "outputs/caige_track.json"]
 # 才哥文章存档目录（逐篇提交）
 import glob
