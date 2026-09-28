@@ -1,33 +1,152 @@
 {
- "date": "2026-09-24",
+ "date": "2026-09-28",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 50,
- "resonance_boards": [],
- "grab_top": [],
- "entry_top": [
+ "pool_size": 49,
+ "resonance_boards": [
   {
-   "name": "通用设备",
-   "code": "pt01801072",
-   "value": 26.3
+   "name": "非白酒",
+   "code": "pt01801126",
+   "zdf": 1.73,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
   },
   {
-   "name": "水泥",
-   "code": "pt01801711",
-   "value": 3.4
+   "name": "小家电",
+   "code": "pt01801113",
+   "zdf": 1.15,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "商用车",
+   "code": "pt01801096",
+   "zdf": 3.34,
+   "strength": 6,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "煤炭开采",
+   "code": "pt01801951",
+   "zdf": 0.12,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  }
+ ],
+ "grab_top": [
+  {
+   "name": "非白酒",
+   "code": "pt01801126",
+   "value": 7
+  },
+  {
+   "name": "小家电",
+   "code": "pt01801113",
+   "value": 7
+  }
+ ],
+ "entry_top": [
+  {
+   "name": "商用车",
+   "code": "pt01801096",
+   "value": 21.7
+  },
+  {
+   "name": "汽车整车概念",
+   "code": "pt02101383",
+   "value": 11.3
+  },
+  {
+   "name": "汽车",
+   "code": "pt01801880",
+   "value": 9.0
+  },
+  {
+   "name": "非白酒",
+   "code": "pt01801126",
+   "value": 2.1
+  },
+  {
+   "name": "煤炭开采",
+   "code": "pt01801951",
+   "value": 2.0
+  },
+  {
+   "name": "小家电",
+   "code": "pt01801113",
+   "value": 0.1
   }
  ],
  "absorption_top": [
   {
-   "name": "水泥",
-   "code": "pt01801711",
-   "value": 2.58
+   "name": "商用车",
+   "code": "pt01801096",
+   "value": 6.68
   },
   {
-   "name": "通用设备",
-   "code": "pt01801072",
-   "value": 0.71
+   "name": "汽车整车概念",
+   "code": "pt02101383",
+   "value": 1.16
+  },
+  {
+   "name": "非白酒",
+   "code": "pt01801126",
+   "value": 0.77
+  },
+  {
+   "name": "煤炭开采",
+   "code": "pt01801951",
+   "value": 0.4
+  },
+  {
+   "name": "汽车",
+   "code": "pt01801880",
+   "value": 0.26
+  },
+  {
+   "name": "小家电",
+   "code": "pt01801113",
+   "value": 0.08
   }
  ],
  "control_top": [],
- "zhongjun_candidates": []
+ "zhongjun_candidates": [
+  {
+   "board": "商用车",
+   "stock": "江淮汽车",
+   "code": "sh600418",
+   "zdf": "9.99",
+   "main1": 5.51,
+   "main5": 13.79
+  },
+  {
+   "board": "小家电",
+   "stock": "九阳股份",
+   "code": "sz002242",
+   "zdf": "10.01",
+   "main1": 0.81,
+   "main5": -0.18
+  },
+  {
+   "board": "非白酒",
+   "stock": "会稽山",
+   "code": "sh601579",
+   "zdf": "9.99",
+   "main1": 2.92,
+   "main5": -3.39
+  }
+ ]
 }
