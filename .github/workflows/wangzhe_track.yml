@@ -91,7 +91,7 @@ jobs:
           F="outputs/涨停王者_合格标的_${D}.md"
           if [ -f "$F" ]; then
             python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "上传失败"
-            python3 push_md.py --file "$F" --title "涨停王者·合格标的 ${D}" || echo "推送失败"
+            python3 quant_scripts/push_md.py --file "$F" --title "涨停王者·合格标的 ${D}" || echo "推送失败"
           else
             echo "无当日合格标的文件，跳过"
           fi
