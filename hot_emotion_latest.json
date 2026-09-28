@@ -1,31 +1,30 @@
 {
- "date": "2026-09-24",
- "total": 45,
- "lianban_cnt": 12,
+ "date": "2026-09-28",
+ "total": 31,
+ "lianban_cnt": 7,
  "max_lb": 5,
- "shouban": 33,
+ "shouban": 24,
  "by_lb": {
   "5": 1,
-  "4": 3,
-  "3": 1,
-  "2": 7,
-  "1": 33
+  "3": 3,
+  "2": 3,
+  "1": 24
  },
  "score": {
-  "score": 71,
-  "level": "亢奋",
+  "score": 63,
+  "level": "活跃",
   "parts": {
-   "涨停家数": 8,
+   "涨停家数": 5,
    "连板高度": 28,
-   "连板占比": 35
+   "连板占比": 30
   }
  },
  "persistence": [],
  "alerts": [],
  "lianban_rows": [
   {
-   "code": "sh601811",
-   "name": "新华文轩",
+   "code": "sh600825",
+   "name": "新华传媒",
    "price": "",
    "chg": "",
    "lianban": 5,
@@ -38,131 +37,12 @@
    "sectors": []
   },
   {
-   "code": "sz001234",
-   "name": "泰慕士",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "运动服装",
-    "服装家纺"
-   ]
-  },
-  {
-   "code": "sz002614",
-   "name": "奥佳华",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "其他家电Ⅱ",
-    "其他家电Ⅲ",
-    "家用电器"
-   ]
-  },
-  {
-   "code": "sh600825",
-   "name": "新华传媒",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sz002238",
-   "name": "天威视讯",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "网络安全"
-   ]
-  },
-  {
-   "code": "sz000850",
-   "name": "华茂股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "棉纺"
-   ]
-  },
-  {
-   "code": "sz002119",
-   "name": "康强电子",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "半导体材料",
-    "半导体",
-    "电子",
-    "核能核电"
-   ]
-  },
-  {
-   "code": "sz002819",
-   "name": "东方中科",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "仪器仪表",
-    "通用设备",
-    "机械设备",
-    "网络安全"
-   ]
-  },
-  {
    "code": "sh600802",
    "name": "福建水泥",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -175,30 +55,12 @@
    ]
   },
   {
-   "code": "sh600843",
-   "name": "上工申贝",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "纺织服装设备",
-    "机械设备",
-    "专用设备"
-   ]
-  },
-  {
    "code": "sh603396",
    "name": "金辰股份",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -215,6 +77,24 @@
    "name": "雪龙集团",
    "price": "",
    "chg": "",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "汽车零部件",
+    "汽车",
+    "底盘与发动机系统"
+   ]
+  },
+  {
+   "code": "sz000678",
+   "name": "襄阳轴承",
+   "price": "",
+   "chg": "",
    "lianban": 2,
    "ji_ji_ban": "2天2板",
    "reason": "",
@@ -226,6 +106,38 @@
     "汽车零部件",
     "汽车",
     "底盘与发动机系统"
+   ]
+  },
+  {
+   "code": "sh601218",
+   "name": "吉鑫科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh603278",
+   "name": "大业股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "通用设备",
+    "机械设备",
+    "金属制品"
    ]
   }
  ],
