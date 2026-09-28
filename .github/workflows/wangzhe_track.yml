@@ -77,6 +77,25 @@ jobs:
         continue-on-error: true
         run: python3 quant_scripts/wangzhe_funnel.py --since 2026-08-01
 
+      # 合格标的 → 上传知识库（报告/全盘量化）+ 微信推送
+      - name: 合格标的上传知识库 + 推送
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          D=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          F="outputs/涨停王者_合格标的_${D}.md"
+          if [ -f "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "上传失败"
+            python3 push_md.py --file "$F" --title "涨停王者·合格标的 ${D}" || echo "推送失败"
+          else
+            echo "无当日合格标的文件，跳过"
+          fi
+
       # 才哥公众号跟踪：解析 caige_urls.txt 中尚未处理的新文章 → 存档 + 汇总
       - name: 才哥公众号文章跟踪
         continue-on-error: true
