@@ -1,5 +1,5 @@
 {
- "date": "2026-09-27",
+ "date": "2026-09-28",
  "writes": {
   "all_mainboard.csv": [
    ".github/workflows/quant_scan.yml",
@@ -239,6 +239,7 @@
    "quant_scripts/bt_beast_hy.py"
   ],
   "wangzhe_signals.csv": [
+   "quant_scripts/wangzhe_funnel.py",
    "quant_scripts/wangzhe_track.py"
   ],
   "wangzhe_benchmark.json": [
@@ -279,6 +280,12 @@
   "123_2b_latest.json": [
    ".github/workflows/quant_scan.yml",
    "quant_scripts/scan_123_2b.py"
+  ],
+  "涨停王者_合格标的_{var}.md": [
+   "quant_scripts/wangzhe_funnel.py"
+  ],
+  "涨停王者_合格标的_{var}.csv": [
+   "quant_scripts/wangzhe_funnel.py"
   ],
   "wangzhe_case_review.json": [
    "quant_scripts/wangzhe_case_review.py"
@@ -881,6 +888,8 @@
   "无为显性建仓标准_回测报告_{var}.md",
   "板块共振对照_{var}.md",
   "涨停概念排行_{var}.md",
+  "涨停王者_合格标的_{var}.csv",
+  "涨停王者_合格标的_{var}.md",
   "猛兽本月股池_{var}.md",
   "猛兽股池_{var}.md",
   "环境切换决策表_验证.md",
