@@ -1,7 +1,8 @@
 {
- "date": "2026-09-28",
+ "date": "2026-09-29",
  "writes": {
   "all_mainboard.csv": [
+   ".github/workflows/duowei_fish.yml",
    ".github/workflows/quant_scan.yml",
    "gen_mainboard.py",
    "quant_scripts/beast_pool_screener.py",
@@ -383,6 +384,16 @@
    ".github/workflows/quant_scan.yml",
    "quant_scripts/liangxue_screener.py"
   ],
+  "jingjia_auction.csv": [
+   "quant_scripts/jingjia_track.py"
+  ],
+  "jingjia_signals.csv": [
+   "quant_scripts/jingjia_track.py"
+  ],
+  "竞价统计_{var}.md": [
+   "quant_scripts/jingjia_stats.py",
+   "quant_scripts/jingjia_track.py"
+  ],
   "board_top_latest.json": [
    ".github/workflows/quant_scan.yml",
    "quant_scripts/top_signal.py"
@@ -421,6 +432,9 @@
   ],
   "caige_zxz_increment_bt.json": [
    "quant_scripts/bt_caige_increment.py"
+  ],
+  "竞价统计_{var}.json": [
+   "quant_scripts/jingjia_stats.py"
   ],
   "开盘强形态_{var}.json": [
    "quant_scripts/kaipan_8.py"
@@ -476,9 +490,11 @@
    ".github/workflows/quant_scan.yml"
   ],
   "fish_body_latest.json": [
+   ".github/workflows/duowei_fish.yml",
    ".github/workflows/quant_scan.yml"
   ],
   "鱼身报告_latest.md": [
+   ".github/workflows/duowei_fish.yml",
    ".github/workflows/quant_scan.yml"
   ],
   "pipeline_audit_latest.json": [
@@ -601,9 +617,11 @@
    "quant_scan.yml"
   ],
   "fish_body_latest.json": [
+   "duowei_fish.yml",
    "quant_scan.yml"
   ],
   "鱼身报告_latest.md": [
+   "duowei_fish.yml",
    "quant_scan.yml"
   ],
   "market_width_latest.json": [
@@ -705,6 +723,15 @@
   ],
   "glm_brief_{var}.md": [
    "premarket_report.yml"
+  ],
+  "jingjia_auction.csv": [
+   "jingjia_track.yml"
+  ],
+  "jingjia_signals.csv": [
+   "jingjia_track.yml"
+  ],
+  "竞价统计_{var}.md": [
+   "jingjia_track.yml"
   ]
  },
  "reads": {
@@ -893,6 +920,7 @@
   "猛兽本月股池_{var}.md",
   "猛兽股池_{var}.md",
   "环境切换决策表_验证.md",
+  "竞价统计_{var}.json",
   "组合风控_{var}.md",
   "股池标的跟踪报告_{var}.md",
   "自选清单_{var}.txt",
@@ -912,6 +940,8 @@
   "hot_emotion_history.json",
   "hot_emotion_latest.json",
   "hot_emotion_{var}.md",
+  "jingjia_auction.csv",
+  "jingjia_signals.csv",
   "liangxue_latest.json",
   "liangxue_minute_check_latest.json",
   "liangxue_month_join_latest.json",
@@ -956,6 +986,7 @@
   "断档分歧_latest.json",
   "板块共振_latest.json",
   "涨停概念排行_latest.json",
+  "竞价统计_{var}.md",
   "组合风控_latest.json",
   "鱼身报告_latest.md"
  ],
