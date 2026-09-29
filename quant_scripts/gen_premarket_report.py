@@ -611,6 +611,14 @@ def gen_report(today_str):
     except Exception as e:
         lines.append(f"- 牛熊双系统：计算失败({e})")
 
+    # ②.8b 熊市热点概念龙头表（曾星智·盘后涨停概念排行产出）
+    try:
+        _hc = render_hot_concepts()
+        if _hc:
+            lines.append(_hc)
+    except Exception as e:
+        lines.append(f"- 热点概念龙头表：计算失败({e})")
+
     # ②.9 ②.7 × ②.8 一致性校验
     try:
         _cc = render_env_cross_check()
@@ -1335,6 +1343,52 @@ def render_env_cross_check():
          f"- ②.7 关闭（{len(closed)}项）：{('、'.join(closed)) if closed else '无'}",
          f"- **结论**：{conc}",
          "- 说明：②.8 为个人实盘定性经验，②.7 为 3,120 只全历史统计口径；两者冲突时**以 ②.7 为准**。\n"]
+    return "\n".join(L)
+
+
+def read_hot_concepts():
+    """读盘后《涨停概念排行》产出（涨停归类→热点概念→龙头）"""
+    for pth in ("涨停概念排行_latest.json", "outputs/涨停概念排行_latest.json",
+                "/sandbox/workspace/github_bg/涨停概念排行_latest.json",
+                "/sandbox/workspace/github_bg/outputs/涨停概念排行_latest.json"):
+        try:
+            return json.load(open(pth, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def render_hot_concepts():
+    """②.8b 熊市热点概念龙头表（曾星智：涨停归类→热点→龙头；源自盘后《涨停概念排行》，仅熊市附）"""
+    g = read_market_regime()
+    if not g:
+        return None
+    style = g.get("verdict", "震荡市") if g.get("verdict") in NB_PLAYBOOK else "震荡市"
+    if style != "熊市":
+        return None
+    j = read_hot_concepts()
+    if not j or not j.get("concept_rank"):
+        return None
+    lmap = {l.get("concept"): l for l in j.get("leaders", [])}
+    mk = j.get("market", {}) or {}
+    L = ["\n### ②.8b 🔥 今日热点概念龙头表（曾星智：涨停归类 → 热点 → 龙头）\n",
+         f"> 数据日 {j.get('date', '')} ｜ 涨停 {j.get('limitup_total', '?')}(非ST) ｜ 连板 {j.get('lianban_total', '?')} ｜ "
+         f"首板 {j.get('first_total', '?')} ｜ 情绪：{mk.get('mood', '—')}"
+         f"（连板晋级 {mk.get('lianban_jinji_rate', '?')}% / 首板晋级 {mk.get('first_jinji_rate', '?')}%）"
+         " ｜ 源自盘后《涨停概念排行》。\n",
+         "| 级别 | 热点概念 | 涨停 | 连板 | 晋级率 | 龙头 | 板数 | 龙头分 | 主力净流入(万) |",
+         "|---|---|---|---|---|---|---|---|---|"]
+    for c in j["concept_rank"][:8]:
+        l = lmap.get(c.get("concept"), {})
+        fund = l.get("fund_net")
+        fund_s = f"{fund / 10000:+.0f}" if isinstance(fund, (int, float)) else "—"
+        jj = c.get("jinji_rate")
+        jj_s = f"{jj:.0f}%" if isinstance(jj, (int, float)) else "—"
+        L.append(f"| {c.get('grade', '')} | {c.get('concept', '')} | {c.get('n', '')} | {c.get('lb', '')} | {jj_s} | "
+                 f"{l.get('leader', '—')} | {l.get('lianban', '')} | {l.get('score', '')} | {fund_s} |")
+    L.append("")
+    L.append("- 说明：熊市用「题材炒作」打法，本表给出当日**热点概念及其龙头**（六维打分：启动/弹性/封单/带动/辨识/资金）；"
+             "执行需结合**退潮判断与止损**。完整名单见盘后《涨停概念排行》。\n")
     return "\n".join(L)
 
 
