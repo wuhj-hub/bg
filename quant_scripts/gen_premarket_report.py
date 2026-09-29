@@ -603,6 +603,14 @@ def gen_report(today_str):
     except Exception as e:
         lines.append(f"- 环境切换：计算失败({e})")
 
+    # ②.8 牛熊双系统·打法风格开关（曾星智·2026-09-30）
+    try:
+        _nb = render_niuxiong_playbook()
+        if _nb:
+            lines.append(_nb)
+    except Exception as e:
+        lines.append(f"- 牛熊双系统：计算失败({e})")
+
     lines.append("\n## ③ 板块排行\n")
     board = get_board_data()
     if board:
@@ -1231,6 +1239,39 @@ def render_env_switch():
              "一统·日周双共振 2/6｜猛兽RS_D 1/6；**鱼身·均线回踩/箱体突破、猛兽·伏击线、猛兽Setup≥50、123买入 "
              "在全部6环境显著为负**（t≈-4~-10）。数值为日均超额，受右尾影响偏大（中位约为其1/3）。"
              "详见技能《板块个股入牛时点》第九节。\n")
+    return "\n".join(L)
+
+
+NB_PLAYBOOK = {
+    "牛市": ("🔥 牛市系统：**龙头突破**",
+             "热点板块的**龙头股**做突破；今买明卖、只做刚突破且涨势最强的那一段；不追已涨高的。",
+             "龙头/涨停概念排行(limitup_concept_rank)、猛兽体系(趋势)、强势体系(突破)"),
+    "熊市": ("❄️ 熊市系统：**题材炒作**",
+             "长期底部启动 + **日线涨停突破** + 热点题材；放弃高位龙头，做投机（吃连板）。",
+             "首板/题材、武威量价、双弦(低吸/共振)、一统·乖离低买"),
+    "震荡市": ("⚖️ 震荡市：**降仓·择优**",
+             "两套均无绝对优势：控制仓位、只做最强分支；偏防守（低吸/抗跌）。",
+             "一统·乖离低买(6/6环境显著)、RSV相对强度、双弦共振"),
+}
+
+
+def render_niuxiong_playbook():
+    """②.8 曾星智『牛熊双系统』打法风格开关（2026-09-30 落地，源自公众号《2年短线总结》）"""
+    g = read_market_regime()
+    if not g:
+        return None
+    lb = ENV_BUCKET.get((g.get("long") or {}).get("state", ""), "震荡市")
+    sb = ENV_BUCKET.get((g.get("short") or {}).get("state", ""), "震荡市")
+    style = g.get("verdict", "震荡市") if g.get("verdict") in NB_PLAYBOOK else "震荡市"
+    head, core, use = NB_PLAYBOOK.get(style, NB_PLAYBOOK["震荡市"])
+    L = ["\n### ②.8 🀄 牛熊双系统·打法风格开关（曾星智）\n",
+         f"> 源自曾星智《2年短线总结：牛市做龙头突破，熊市做题材炒作》(2026-09-29)。"
+         f"口径=`market_regime`：长期力量(月线)=**{lb}** · 短期力量(日线)=**{sb}** · 综合 **{g.get('verdict', '—')}**（{g.get('date', '')}）。\n",
+         f"- **今日打法**：{head}",
+         f"  - 核心：{core}",
+         f"  - 优先工具：{use}",
+         "- **每日自问**：现在是牛市还是熊市？上涨还是调整？→ 再决定用哪套系统。",
+         "- ⚠️ 定性经验（个人实盘叙事，非统计结论）；具体执行仍以 ②.7 环境切换表与个股信号为准。\n"]
     return "\n".join(L)
 
 
