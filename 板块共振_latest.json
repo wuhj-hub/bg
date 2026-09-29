@@ -1,46 +1,122 @@
 {
  "date": "2026-09-29",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 52,
+ "pool_size": 51,
  "resonance_boards": [
   {
-   "name": "焦炭Ⅱ",
-   "code": "pt01801952",
-   "zdf": 0.95,
-   "strength": 8,
+   "name": "房地产开发",
+   "code": "pt01801181",
+   "zdf": 4.16,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "房地产服务",
+   "code": "pt01801183",
+   "zdf": 2.7,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "影视院线",
+   "code": "pt01801766",
+   "zdf": 2.05,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "汽车",
+   "code": "pt01801880",
+   "zdf": 0.19,
+   "strength": 5,
    "factors": [
     "进场",
-    "吸筹",
-    "控盘"
+    "吸筹"
    ]
   }
  ],
- "grab_top": [],
+ "grab_top": [
+  {
+   "name": "房地产开发",
+   "code": "pt01801181",
+   "value": 7
+  },
+  {
+   "name": "房地产服务",
+   "code": "pt01801183",
+   "value": 7
+  },
+  {
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 7
+  }
+ ],
  "entry_top": [
   {
-   "name": "焦炭Ⅱ",
-   "code": "pt01801952",
-   "value": 3.1
+   "name": "汽车",
+   "code": "pt01801880",
+   "value": 16.0
+  },
+  {
+   "name": "房地产服务",
+   "code": "pt01801183",
+   "value": 4.8
+  },
+  {
+   "name": "房地产开发",
+   "code": "pt01801181",
+   "value": 2.5
+  },
+  {
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 1.4
   }
  ],
  "absorption_top": [
   {
-   "name": "焦炭Ⅱ",
-   "code": "pt01801952",
-   "value": 3.27
-  }
- ],
- "control_top": [
-  {
-   "name": "商用车",
-   "code": "pt01801096",
-   "value": 6.89
+   "name": "房地产服务",
+   "code": "pt01801183",
+   "value": 1.72
   },
   {
-   "name": "焦炭Ⅱ",
-   "code": "pt01801952",
-   "value": 3.27
+   "name": "汽车",
+   "code": "pt01801880",
+   "value": 0.47
+  },
+  {
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 0.38
+  },
+  {
+   "name": "房地产开发",
+   "code": "pt01801181",
+   "value": 0.19
   }
  ],
- "zhongjun_candidates": []
+ "control_top": [],
+ "zhongjun_candidates": [
+  {
+   "board": "房地产开发",
+   "stock": "信达地产",
+   "code": "sh600657",
+   "zdf": "10.10",
+   "main1": 0.79,
+   "main5": -0.86
+  }
+ ]
 }
