@@ -1,0 +1,134 @@
+name: 多维度·鱼身报告更新
+
+# 用途：独立维护「多维量化」订阅知识库（7位订阅）→「多维度」文件夹的每日盘后更新。
+#       与主流水线（全盘量化扫描 / 盘后报告生成）完全解耦，互不影响。
+# 内容：鱼身交易系统报告 · 动态股票池（近20日日均成交额排名前300，非固定池）
+# 目标：kb_id=RgPmCvOW2CgN3I-HVGEYfmBS_W0mkiYzHRuTGHP8_6o=  folder_id=folder_7478204537267754
+on:
+  # 外部精确触发（cron-job.org → repository_dispatch，规避 GitHub 原生 cron 延迟）
+  repository_dispatch:
+    types: [duowei-fish-run]
+  # 原生 cron 兜底：交易日盘后 16:00（北京）= UTC 08:00，周一至周五。
+  # ⚠️ 若另配 cron-job.org 外部触发（event_type=duowei-fish-run），请注释掉下方 schedule 避免双跑。
+  schedule:
+    - cron: '0 8 * * 1-5'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write  # 提交产物需要写权限
+
+concurrency:
+  group: duowei-fish
+  cancel-in-progress: false
+
+jobs:
+  # ─── 交易日守卫（与体系内其余 workflow 统一）───
+  trade_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ok: ${{ steps.g.outputs.is_trade_day }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 判断是否交易日
+        id: g
+        continue-on-error: true
+        run: python3 quant_scripts/trade_day_check.py --github-output
+
+  dimfish:
+    needs: trade_gate
+    if: needs.trade_gate.outputs.ok == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 沙箱路径兼容层：鱼身等脚本硬编码 /sandbox/workspace（沙箱路径），runner 上不存在
+      - name: 沙箱路径兼容层（/sandbox/workspace → 仓库根）
+        run: |
+          sudo mkdir -p /sandbox
+          sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
+          ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪: /sandbox/workspace -> $GITHUB_WORKSPACE"
+
+      - name: Setup Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装 Python 依赖
+        run: pip install pandas numpy
+
+      # ─── 第一步：生成沪深主板清单（鱼身池与过滤均依赖）───
+      - name: 生成沪深主板清单（失败回退仓库缓存）
+        continue-on-error: true
+        run: |
+          python3 gen_mainboard.py || echo "⚠️ gen_mainboard失败，回退仓库缓存"
+          if [ ! -s all_mainboard.csv ] && [ -f ../all_mainboard.csv ]; then cp ../all_mainboard.csv all_mainboard.csv; fi
+          if [ ! -s all_mainboard.csv ]; then echo "❌ 无主板清单可用"; exit 1; fi
+          echo "主板清单: $(wc -l < all_mainboard.csv) 行"
+
+      - name: 预热westock数据包
+        continue-on-error: true
+        run: |
+          npx -y westock-data-skillhub@1.0.3 hot board --limit 3 > /dev/null 2>&1 || true
+          npx -y westock-data-skillhub@1.0.3 kline sh000001 --period day --limit 5 > /dev/null 2>&1 || true
+          echo "✅ 预热完成"
+
+      # ─── 第二步：动态生成鱼身股票池（不固定股池）───
+      - name: 动态生成鱼身股票池（近20日日均成交额排名前300）
+        run: python3 quant_scripts/gen_fish_pool.py
+      - name: 校验股票池
+        run: |
+          if [ ! -s quant_scripts/stock_pool.txt ]; then echo "❌ 股票池为空"; exit 1; fi
+          echo "股票池标的数: $(grep -vc '^#' quant_scripts/stock_pool.txt)"
+
+      # ─── 第三步：运行鱼身扫描（生成 JSON + Markdown 报告）───
+      - name: 鱼身交易系统扫描（动态股票池）
+        run: python3 quant_scripts/fish_body_enhanced.py --pool quant_scripts/stock_pool.txt
+
+      # ─── 第四步：上传鱼身报告到「多维量化 → 多维度」文件夹 ───
+      - name: 上传鱼身报告到「多维量化→多维度」文件夹
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: RgPmCvOW2CgN3I-HVGEYfmBS_W0mkiYzHRuTGHP8_6o=
+          IMA_FOLDER_ID: folder_7478204537267754
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set +e
+          MD=$(ls -t outputs/鱼身报告_*.md 2>/dev/null | head -1)
+          if [ -z "$MD" ]; then
+            echo "::error::未生成鱼身报告，无法上传"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️多维度鱼身报告缺失&content=duowei_fish 未生成 outputs/鱼身报告_*.md（可能大盘温度低于阈值提前退出，或扫描异常）&template=txt" > /dev/null || true
+            exit 1
+          fi
+          echo "待上传报告: $MD"
+          python3 upload_ima.py --file "$MD" --name "鱼身报告_$(date +%Y-%m-%d)"
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::error::上传「多维度」文件夹失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️多维度上传失败&content=duowei_fish 上传知识库失败(rc=$RC)，订阅用户将看不到今日更新&template=txt" > /dev/null || true
+            exit 1
+          fi
+
+      # ─── 第五步：提交产物到仓库（防丢 + 可追溯）───
+      - name: 提交产物到仓库
+        if: always()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          cp outputs/鱼身报告_*.md 鱼身报告_latest.md 2>/dev/null || true
+          cp outputs/fish_body_enhanced_*.json fish_body_latest.json 2>/dev/null || true
+          python3 git_api_commit.py --msg "chore: 多维度鱼身报告 ($(date +%Y-%m-%d))" \
+            鱼身报告_latest.md fish_body_latest.json || echo "⚠️ 产物提交失败（不阻断）"
