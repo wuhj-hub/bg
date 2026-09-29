@@ -9,6 +9,9 @@ from datetime import datetime
 
 WESTOCK_CMD = "npx -y westock-data-skillhub@1.0.3"
 
+# 报告排除名单：以下标的不在鱼身报告中体现（2026-09-29 起）
+EXCLUDE_CODES = {"sh603669"}  # 灵康药业
+
 class C:
     G='\033[92m'; Y='\033[93m'; R='\033[91m'; C='\033[96m'; B='\033[1m'; N='\033[0m'
 def c(t,color): return f"{color}{t}{C.N}"
@@ -494,7 +497,7 @@ def main():
     p.add_argument('--min-temp',type=int,default=40)
     args=p.parse_args()
     
-    core=['sh603669','sh600400','sz002520']
+    core=[c for c in ['sh603669','sh600400','sz002520'] if c not in EXCLUDE_CODES]
     if args.pool=='core': pool=core
     elif args.pool=='all':
         pool=[]
@@ -512,7 +515,7 @@ def main():
         try:
             with open(args.pool) as f:
                 raw=[l.strip() for l in f if l.strip() and not l.startswith('#')]
-            pool=[c for c in raw if is_valid_stock(c)]
+            pool=[c for c in raw if is_valid_stock(c) and c not in EXCLUDE_CODES]
             filtered=len(raw)-len(pool)
             if filtered>0:
                 print(f"  ⚠️ 过滤了 {filtered} 只不符合条件的标的（创业板/科创板/北交所/ST）")
@@ -566,6 +569,10 @@ def main():
         mm={'1':1,'2':2,'3':3}
         tm=mm.get(args.mode)
         if tm: all_sigs=[s for s in all_sigs if s.get('mode')==tm]
+    
+    # 排除名单过滤：整体不体现（2026-09-29 灵康药业）
+    if EXCLUDE_CODES:
+        all_sigs=[s for s in all_sigs if s.get('code') not in EXCLUDE_CODES]
     
     # 月线框架确认（曾星智体系: MA6半年线/MA12年线 + 月线反转）——日线买点的月线闸门
     try:
@@ -691,7 +698,7 @@ def main():
                 md+=f"| {s['code']} | {s['name']} | {s['final_score']}分 | {s['price']:.2f} | {s['stop_loss']} | {s['target']} | {res} | {rsg_txt} | {tag} |\n"
         
         # 核心标的详情
-        core=['sh603669','sh600400','sz002520']
+        core=[c for c in ['sh603669','sh600400','sz002520'] if c not in EXCLUDE_CODES]
         core_sigs=[s for s in all_sigs if s['code'] in core]
         if core_sigs:
             md+="\n## 核心标的详情\n\n"

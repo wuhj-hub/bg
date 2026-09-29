@@ -9,7 +9,7 @@ gen_fish_pool.py — 动态生成鱼身股票池（近20日日均成交额排名
   1. 读取主板清单
   2. 对每只拉近20日日K线，按 成交量(手)×100×均价 估算成交额，算近20日日均
   3. 按日均成交额降序取前 TOP_N(300) 只
-  4. 强制纳入核心关注3只（灵康/红豆/日发精机）
+  4. 强制纳入核心关注2只（红豆/日发精机）
   5. 写出 stock_pool.txt（与鱼身 skill 原有格式兼容）
 
 说明：腾讯K线接口仅返回 [date,open,close,high,low,volume(手)]，无直接成交额字段，
@@ -28,7 +28,7 @@ KLINE = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
 HEADERS = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com"}
 TOP_N = 300  # 2026-08-11 恢复：鱼身并发4workers已修复超时，扩回300提升覆盖（代表性优化B）
 RECENT = 20
-CORE = [("sh603669", "灵康药业"), ("sh600400", "红豆股份"), ("sz002520", "日发精机")]
+CORE = [("sh600400", "红豆股份"), ("sz002520", "日发精机")]
 
 
 def get_json(url, retries=3):
