@@ -611,6 +611,14 @@ def gen_report(today_str):
     except Exception as e:
         lines.append(f"- 牛熊双系统：计算失败({e})")
 
+    # ②.9 ②.7 × ②.8 一致性校验
+    try:
+        _cc = render_env_cross_check()
+        if _cc:
+            lines.append(_cc)
+    except Exception as e:
+        lines.append(f"- 一致性校验：计算失败({e})")
+
     lines.append("\n## ③ 板块排行\n")
     board = get_board_data()
     if board:
@@ -1272,6 +1280,61 @@ def render_niuxiong_playbook():
          f"  - 优先工具：{use}",
          "- **每日自问**：现在是牛市还是熊市？上涨还是调整？→ 再决定用哪套系统。",
          "- ⚠️ 定性经验（个人实盘叙事，非统计结论）；具体执行仍以 ②.7 环境切换表与个股信号为准。\n"]
+    return "\n".join(L)
+
+
+STRONG_KW = ("Setup≥60", "RSV启动", "123买入", "箱体突破", "日周双共振")
+WEAK_KW = ("乖离低买", "超跌", "RS_D低吸", "低价共振", "2B买入", "均线回踩", "双阴", "伏击线", "建仓区")
+
+
+def _env_tag(m, lb):
+    """与 ②.7 同口径：按长期力量桶给出 主用/可用/中性/关闭"""
+    v = m.get(lb, m["震荡市"])
+    lv, sv, lsign, ssign = v[0], v[1], v[2], v[3]
+    avg = (lv + sv) / 2
+    sig_pos = sum(1 for x in (lsign, ssign) if x >= .5)
+    sig_neg = sum(1 for x in (lsign, ssign) if x <= -.5)
+    if lv > 0 and sv > 0:
+        return ("主用" if (avg >= 2.0 and sig_pos >= 2) else ("可用" if sig_pos >= 1 else "中性")), lv, sv
+    if lv < 0 and sv < 0:
+        return ("关闭" if sig_neg >= 1 else "中性"), lv, sv
+    return "中性", lv, sv
+
+
+def render_env_cross_check():
+    """②.9 ②.7(环境切换=用哪些工具) × ②.8(打法风格) 一致性校验"""
+    g = read_market_regime()
+    if not g:
+        return None
+    lb = ENV_BUCKET.get((g.get("long") or {}).get("state", ""), "震荡市")
+    style = g.get("verdict", "震荡市") if g.get("verdict") in NB_PLAYBOOK else "震荡市"
+    active, closed = [], []
+    for nm, m in ENV_SWITCH.items():
+        tag, _lv, _sv = _env_tag(m, lb)
+        if tag in ("主用", "可用"):
+            active.append((nm, tag))
+        elif tag == "关闭":
+            closed.append(nm)
+    strong_act = [nm for nm, _ in active if any(k in nm for k in STRONG_KW)]
+    weak_act = [nm for nm, _ in active if any(k in nm for k in WEAK_KW)]
+    expected = "龙头/突破类" if style == "牛市" else ("低吸/题材类" if style == "熊市" else "任一（震荡市不强制）")
+    if style == "牛市":
+        ok = bool(strong_act)
+    elif style == "熊市":
+        ok = bool(weak_act)
+    else:
+        ok = True
+    conc = ("✅ **一致** —— ②.7 的活跃工具与 ②.8 打法方向吻合。"
+            if ok else
+            "⚠️ **分歧** —— ②.8 指向「" + expected + "」，但 ②.7 未见对应方向的活跃工具（或反而活跃了对立方向），**以 ②.7（20年统计口径）为准**。")
+    L = ["\n### ②.9 🔗 ②.7 × ②.8 一致性校验\n",
+         f"> 校验「②.7 环境切换（用哪些工具）」与「②.8 打法风格（{style}系统）」是否自洽。"
+         f"口径：按长期力量桶(月线/**{lb}**)重算 ②.7 标签。\n",
+         f"- ②.8 打法：**{style}系统** → 理论上应主用 **{expected}** 工具。",
+         f"- ②.7 主用/可用（{len(active)}项）：{('、'.join(nm for nm, _ in active)) if active else '无'}",
+         f"- ②.7 关闭（{len(closed)}项）：{('、'.join(closed)) if closed else '无'}",
+         f"- **结论**：{conc}",
+         "- 说明：②.8 为个人实盘定性经验，②.7 为 3,120 只全历史统计口径；两者冲突时**以 ②.7 为准**。\n"]
     return "\n".join(L)
 
 
