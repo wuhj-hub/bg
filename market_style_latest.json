@@ -1,76 +1,77 @@
 {
  "date": "2026-09-29",
  "data_date": "2026-09-29",
- "style": "均衡市",
- "icon": "⚖️",
- "score": 14,
+ "style": "情绪市",
+ "icon": "🔥",
+ "score": 26,
  "score_detail": {
   "size_style": -12,
-  "limitup_structure": 9,
-  "volume_structure": 7,
+  "limitup_structure": 29,
+  "volume_structure": -1,
   "sector_fund": 10
  },
  "size_style": {
-  "hs300_5d": -4.35,
-  "hs300_10d": -3.08,
-  "zz1000_5d": -5.61,
-  "zz1000_10d": -1.84,
-  "rel_5d": -1.26,
-  "rel_10d": 1.24,
-  "rel_20d": 0.46,
-  "zz500_5d": -5.33
+  "hs300_5d": -4.28,
+  "hs300_10d": -3.01,
+  "zz1000_5d": -5.68,
+  "zz1000_10d": -1.91,
+  "rel_5d": -1.4,
+  "rel_10d": 1.1,
+  "rel_20d": 0.32,
+  "zz500_5d": -5.23
  },
  "limitup_structure": {
-  "limitup": 33,
-  "strong": 54,
-  "width_score": 50.3,
-  "level": "震荡（多空均衡）",
+  "limitup": 51,
+  "strong": 111,
+  "width_score": 90.0,
+  "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 1.8,
-  "zhaban_rate": 48.4,
-  "lianban": 7
+  "strong_ratio": 3.6,
+  "zhaban_rate": 32.0,
+  "lianban": 9
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.136,
+  "small_big_ratio_now": 1.066,
   "small_big_ratio_5d": 1.221,
-  "small_vol_pulse": 47.66
+  "vol_shift": "资金回流大盘",
+  "small_vol_pulse": 76.54
  },
  "sector_fund": {
   "sectors": [
    {
+    "name": "房地产开发",
+    "zdf": "4.16",
+    "main_net5d": -5.4,
+    "retail_net": -13.8,
+    "tag": "游资型"
+   },
+   {
     "name": "元件",
-    "zdf": "2.62",
+    "zdf": "2.51",
     "main_net5d": -173.4,
-    "retail_net": -11.7,
+    "retail_net": -29.5,
     "tag": "游资型"
    },
    {
     "name": "电池",
-    "zdf": "0.97",
-    "main_net5d": -46.5,
-    "retail_net": -17.9,
-    "tag": "游资型"
-   },
-   {
-    "name": "房地产开发",
-    "zdf": "3.83",
-    "main_net5d": -5.4,
-    "retail_net": -9.0,
-    "tag": "游资型"
-   },
-   {
-    "name": "半导体",
     "zdf": "0.44",
-    "main_net5d": -336.6,
-    "retail_net": 8.7,
+    "main_net5d": -46.5,
+    "retail_net": -21.0,
     "tag": "游资型"
    },
    {
-    "name": "数字媒体",
-    "zdf": "4.26",
-    "main_net5d": -5.3,
-    "retail_net": -3.5,
+    "name": "房地产",
+    "zdf": "4.06",
+    "main_net5d": -0.6,
+    "retail_net": -15.9,
+    "tag": "游资型"
+   },
+   {
+    "name": "昨日涨停",
+    "zdf": "2.58",
+    "main_net5d": -96.1,
+    "retail_net": -2.8,
     "tag": "游资型"
    }
   ]
@@ -78,19 +79,18 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 15
+   "堆量模式": 14,
+   "": 1
   },
   "leaders": {
    "堆量模式": 8
   },
-  "pullbacks": {
-   "堆量模式": 1
-  },
+  "pullbacks": {},
   "gpoints": {
    "堆量模式": 1
   },
-  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
+  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
   "total_scored": 15
  },
- "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
+ "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
 }
