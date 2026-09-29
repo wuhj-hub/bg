@@ -537,6 +537,7 @@ def main():
     print(f"[data] caps={len(caps)} daily={len(daily)} m1_dates={len(m1_dates)} auction={len(auc)}", file=sys.stderr)
 
     strat = {"超级竞价": [], "紫霞牛": [], "一进二": []}
+    strat_n = {"超级竞价": [], "紫霞牛": [], "一进二": []}   # 次日9:30买入（可交易口径）
     for code, name, w in uni:
         d = daily.get(w)
         if not d or len(d) < 80:
@@ -545,43 +546,58 @@ def main():
         start = max(0, len(d) - args.dwin - 6)
         for i in range(start, len(d) - 1):
             if sig[i]:
-                r = forward_returns(d, i)
-                if r:
-                    r.update(code=code, name=name, date=d[i]["date"])
-                    strat["超级竞价"].append(r)
+                rs = forward_returns(d, i)
+                rn = forward_returns(d, i + 1)
+                for store, rr in ((strat, rs), (strat_n, rn)):
+                    if rr:
+                        rr.update(code=code, name=name, date=d[i]["date"])
+                        store["超级竞价"].append(rr)
         cap = caps.get(w, {})
         a = auc.get(w, {})
         if not a or not cap:
             continue
         idx = {r["date"]: k for k, r in enumerate(d)}
-        for dt in list(zixia_niu(d, a, cap)) + list(yijiner(d, a, cap)):
-            k = idx.get(dt)
-            if k is not None and k < len(d) - 1:
-                r = forward_returns(d, k)
-                if r:
-                    nm = "紫霞牛" if dt in zixia_niu(d, a, cap) else "一进二"
-                    r.update(code=code, name=name, date=dt)
-                    strat[nm].append(r)
+        zx = zixia_niu(d, a, cap)
+        ye = yijiner(d, a, cap)
+        for nm, hits in (("紫霞牛", zx), ("一进二", ye)):
+            for dt in hits:
+                k = idx.get(dt)
+                if k is not None and k < len(d) - 1:
+                    rs = forward_returns(d, k)
+                    rn = forward_returns(d, k + 1)
+                    for store, rr in ((strat, rs), (strat_n, rn)):
+                        if rr:
+                            rr.update(code=code, name=name, date=dt)
+                            store[nm].append(rr)
+
+    LBL = {"R1": "次日", "R2": "+2日", "R3": "+3日", "R5": "+5日"}
+
+    def table(md_list, title, entries):
+        md_list += ["", f"## {title}", "",
+                    "| 策略 | 期 | 样本 | 胜率 | 均值 | 中位 | 最大 | 最小 |",
+                    "|---|---|---|---|---|---|---|---|"]
+        for name, rets in entries.items():
+            s2 = summarize(rets)
+            for k in ["R0", "R1", "R2", "R3", "R5"]:
+                v = s2[k]
+                lab = "买入日" if k == "R0" else LBL[k]
+                md_list.append((f"| {name} | {lab} | {v['n']} | {v['win']:.1%} | {v['mean']:+.2%} | "
+                                f"{v['med']:+.2%} | {v['max']:+.1%} | {v['min']:+.1%} |")
+                               if v else f"| {name} | {lab} | 0 | - | - | - | - | - |")
 
     md = [f"# 竞价统计对比 · {args.date}", "",
-          "- 口径：信号日 T 当天 **9:30 集合竞价开盘价买入** → 统计当天(T)及 T+1/T+2/T+3/T+5 收盘收益",
-          "- 注意：三策略最终条件均含当日收盘(CLOSE)确认，故当天开盘买入含后验",
           "- universe：沪深主板非ST（剔创业板/科创板/北交所/ST），价格不限",
-          f"- 日线窗口：近 {args.dwin} 交易日；竞价窗口：{m1_dates[0] if m1_dates else '-'} ~ {m1_dates[-1] if m1_dates else '-'}（{len(m1_dates)}日）", "",
-          "## 一、三策略收益对比（信号当天 9:30 竞价开盘买入）", "",
-          "| 策略 | 期 | 样本 | 胜率 | 均值 | 中位 | 最大 | 最小 |", "|---|---|---|---|---|---|---|---|"]
+          f"- 日线窗口：近 {args.dwin} 交易日；竞价窗口：{m1_dates[0] if m1_dates else '-'} ~ {m1_dates[-1] if m1_dates else '-'}（{len(m1_dates)}日）",
+          "- ⚠️ 三策略最终条件均含**当日收盘(CLOSE)**确认，故「当天开盘买入」含后验（尤其超级竞价）；**「次日开盘买入」才是可交易口径**。"]
+    table(md, "一、当天 9:30 竞价开盘买入（含后验，参考）", strat)
+    table(md, "二、次日 9:30 竞价开盘买入（可交易口径）", strat_n)
     summary = {}
+    for nm in strat:
+        summary[nm] = {"count": len(strat[nm]),
+                       "same_day": summarize(strat[nm]), "next_day": summarize(strat_n[nm])}
+    md += ["", "## 三、信号清单（最近20条/策略，当天口径）"]
     for name, rets in strat.items():
-        s = summarize(rets)
-        summary[name] = {"count": len(rets), "stats": s}
-        LBL = {"R0": "当天", "R1": "次日", "R2": "+2日", "R3": "+3日", "R5": "+5日"}
-        for k in ["R0", "R1", "R2", "R3", "R5"]:
-            v = s[k]
-            md.append(f"| {name} | {LBL[k]} | {v['n']} | {v['win']:.1%} | {v['mean']:+.2%} | {v['med']:+.2%} | {v['max']:+.1%} | {v['min']:+.1%} |"
-                      if v else f"| {name} | {LBL[k]} | 0 | - | - | - | - | - |")
-    md += ["", "## 二、信号清单（最近20条/策略）"]
-    for name, rets in strat.items():
-        md += [f"### {name}（共 {len(rets)} 条）", "| 日期 | 代码 | 名称 | R0 | R1 | R3 |", "|---|---|---|---|---|---|"]
+        md += [f"### {name}（共 {len(rets)} 条）", "| 日期 | 代码 | 名称 | 当天 | 次日 | +3日 |", "|---|---|---|---|---|---|"]
         for r in sorted(rets, key=lambda x: x["date"], reverse=True)[:20]:
             md.append(f"| {r['date']} | {r['code']} | {r['name']} | {r.get('R0', 0):+.2%} | {r.get('R1', 0):+.2%} | {r.get('R3', 0):+.2%} |")
         md.append("")
