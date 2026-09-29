@@ -1,0 +1,80 @@
+name: 竞价统计·逐日跟踪
+
+on:
+  # 交易日盘前 09:35（北京）= UTC 01:35。⚠️ 与体系其他 workflow 一致：
+  # 原生 cron 不可靠（延迟/降频），以 repository_dispatch（cron-job.org 外部触发）为主通道；
+  # 如需启用原生 schedule，去掉下方注释即可。
+#  schedule:
+#    - cron: '35 1 * * 1-5'
+  repository_dispatch:
+    types: [jingjia-track-run]
+  workflow_dispatch:
+
+# 显式写权限：github.token 默认只读，否则 commit 403
+permissions:
+  contents: write
+
+jobs:
+  # ─── 交易日守卫 ───
+  trade_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ok: ${{ steps.g.outputs.is_trade_day }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 判断是否交易日
+        id: g
+        continue-on-error: true
+        run: python3 quant_scripts/trade_day_check.py --github-output
+
+  jingjia-track:
+    needs: trade_gate
+    if: needs.trade_gate.outputs.ok == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 沙箱路径兼容层
+        run: |
+          sudo mkdir -p /sandbox
+          sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
+          ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪"
+
+      - name: 设置 Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安装依赖
+        run: pip install pandas numpy -q
+
+      # ① 采集当日集合竞价（westock m1 的 09:30 竞价 bar = 开盘金额）
+      #    → 追加 data/jingjia_auction.csv（去重）
+      # ② 回算三策略(紫霞牛/一进二/超级竞价)信号 → 追加 data/jingjia_signals.csv
+      # ③ 更新历史信号 T+1~T+5 收益 → 生成 outputs/竞价统计_{date}.md
+      # 说明：--backfill 2 顺手补齐近 2 个交易日缺口（如上次运行失败），保证连续
+      - name: 采集竞价 + 逐日跟踪 + 报告
+        run: |
+          python3 quant_scripts/jingjia_track.py \
+            --universe all_mainboard.csv --fetch --backfill 2 --report
+
+      - name: 提交竞价库 / 信号库 / 报告
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          D=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          python3 git_api_commit.py --msg "chore: 竞价统计逐日更新 ${D}" \
+            data/jingjia_auction.csv data/jingjia_signals.csv \
+            "outputs/竞价统计_${D}.md"
