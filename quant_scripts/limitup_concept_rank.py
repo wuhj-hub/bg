@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""limitup_concept_rank.py —— 热板作战面板 v3（2026-09-27）
+"""limitup_concept_rank.py —— 热板作战面板 v4（2026-09-29）
 
 灵感来源：
   ① 曾星智《中秋快乐及短线核心方法》(2026-09-25)：汇总涨停 → 按概念归类 → 涨停家数最多者=热点。
@@ -8,22 +8,26 @@
        模块一 板块热度筛选（分级）→ 模块二 龙头先锋识别（五步法）→ 模块三 中军配置。
        主线：涨停≥8家 + 梯队完整 + 晋级率≥35% / 支线：3-7家 + 20-35% / 一日游：≤2家 或 <20%
        龙头五步法：启动最早 / 涨幅最大 / 封单最强(封单/流通≥5%) / 带动性强 / 辨识度最高
-       中军：板块内市值前3、沿5/10日线慢涨、少连板、调整抗跌（趋势压舱石）
+       中军：板块内市值前3、沿5/10日线慢涨、少连板、调整抗跌（趋势压舱石）。
   ③ 曾星智「短线备选池·晋级率」二期：晋级率=次日继续涨停比例，作情绪温度计。
+  ④ 曾星智《中秋快乐及短线核心方法》第③步「看新闻/收盘点评修正概念」→ 由 GLM 新闻面校验落地。
 
 版本演进：
   v1 (2026-09-25) 涨停家数 / 连板家数排行
   v2 (2026-09-27) ★概念晋级率 ★板块三级分档 ★梯队指标 ★市场情绪刻度 ★数据日期自适应
   v3 (2026-09-27) ★龙头榜·五步法（接东财涨停池，量化封单/首封时间/带动性/弹性/辨识）
                   ★中军榜（板块内成交额前列 + 非涨停 + 沿MA5/MA10 + 近10日回撤）
+  v4 (2026-09-29) ★龙头评分纳入「首板/二板资金流向」（westock asfund 主力净流入，权重20）
+                  ★新增「🧠 新闻面校验（GLM）」章节（曾星智第③步：概念新闻面修正）
 
-数据源：all_mainboard.csv + westock 日线 + outputs/sector_component_em.json + 东财涨停池(push2ex)。
+数据源：all_mainboard.csv + westock 日线 + westock asfund 资金 + outputs/sector_component_em.json + 东财涨停池(push2ex)。
 口径提示：概念来自东财板块成分（一票多概念会放大家数）；市值接口在沙箱不可用，
   故"中军"以**成交额**近似市值/流动性（与仓库 longtou.py 现行中军口径一致）。
 
 用法：
   python3 quant_scripts/limitup_concept_rank.py [--days 20] [--top 20] [--date YYYY-MM-DD]
          [--main-zt 8] [--main-jj 35] [--sub-jj 20] [--max-stocks N] [--outdir DIR]
+         [--no-fund] [--no-glm]
 """
 import os, re, sys, csv, json, time, argparse, subprocess, urllib.request
 from datetime import datetime, timezone, timedelta
@@ -133,6 +137,48 @@ def fetch_ztpool(d8):
     return (str(qdate) if qdate else None), d
 
 
+def fetch_fund(codes, date):
+    """westock asfund → {6位代码: {net: 当日主力净流入, rate: 主力净流入/流通(%), net5: 5日主力净流入}}
+    date: YYYY-MM-DD（asfund 需带横线；带日期无数据时回退取最新）。失败/无数据 → 该股无资金分（不阻断）。"""
+    out = {}
+    codes = [c for c in codes if re.match(r"^\d{6}$", c or "")]
+    batches = [codes[i:i + CHUNK] for i in range(0, len(codes), CHUNK)]
+    def one(b):
+        syms = ",".join(("sh" if c[0] == "6" else "sz") + c for c in b)
+        txt = cli(["asfund", syms, "--date", date], timeout=240)
+        if "数据为空" in txt or "MainNetFlow" not in txt:
+            txt = cli(["asfund", syms], timeout=240)   # 回退：不带日期（取最新）
+        r = {}
+        header = None
+        for ln in txt.splitlines():
+            s = ln.strip()
+            if not s.startswith("|"):
+                continue
+            p = [q.strip() for q in s.strip("|").split("|")]
+            if "MainNetFlow" in p:
+                header = p
+                continue
+            if not header or "---" in p[0]:
+                continue
+            m = re.search(r"\d{6}", p[0])
+            if not m:
+                continue
+            def g(k):
+                if k in header:
+                    try:
+                        return float(p[header.index(k)])
+                    except Exception:
+                        return None
+                return None
+            r[m.group(0)] = {"net": g("MainNetFlow"), "rate": g("MainInflowCircRate"),
+                             "net5": g("MainNetFlow5D")}
+        return r
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        for d in ex.map(one, batches):
+            out.update(d)
+    return out
+
+
 def classify(zt, prev_zt, jj, a):
     if zt <= 2:
         return "一日游"
@@ -175,22 +221,29 @@ def rank_frac(values, asc):
 
 
 def leader_pick(members):
-    """龙头五步法：对同一概念内今日涨停股打分（0-100），返回 (龙头dict, 明细list)"""
+    """龙头评分（六维，0-100）：启动(首封最早18) / 弹性(5日涨幅15) / 封单(封单/流通20)
+    / 带动(首封后跟涨15) / 辨识(最高板+未炸板12) / 资金(主力净流入强度20)。
+    资金维度=曾星智「首板/二板当日资金流向」；缺资金数据则该维为0（不惩罚其余维度）。"""
     k = len(members)
     fbt = rank_frac([m.get("fbt") or None for m in members], asc=True)       # 启动最早
     ret = rank_frac([m.get("ret5") for m in members], asc=False)            # 涨幅最大
     fd = rank_frac([m.get("fdratio") for m in members], asc=False)          # 封单最强
+    # 资金流向：优先用「主力净流入/流通(%)」，缺失则退回绝对净流入
+    fund_vals = [(m.get("fund_rate") if m.get("fund_rate") is not None else m.get("fund_net"))
+                 for m in members]
+    fund = rank_frac(fund_vals, asc=False)
     maxlb = max([m.get("lianban") or 0 for m in members] + [1])
     for i, m in enumerate(members):
-        s = 20 * fbt[i] + 20 * ret[i] + 25 * fd[i]
         f = m.get("fbt")
         later = sum(1 for y in members if f and y.get("fbt") and y["fbt"] > f)
-        m["s_qidong"] = round(20 * fbt[i])
-        m["s_danda"] = round(20 * (later / (k - 1))) if k > 1 else 20
-        m["s_fengdan"] = round(25 * fd[i])
-        m["s_bianshi"] = round(15 * ((m.get("lianban") or 0) / maxlb) - (5 if m.get("zbc") else 0))
-        m["s_elastic"] = round(20 * ret[i])
-        s += m["s_danda"] + max(0, m["s_bianshi"])
+        m["s_qidong"] = round(18 * fbt[i])
+        m["s_danda"] = round(15 * (later / (k - 1))) if k > 1 else 15
+        m["s_fengdan"] = round(20 * fd[i])
+        m["s_elastic"] = round(15 * ret[i])
+        m["s_bianshi"] = round(12 * ((m.get("lianban") or 0) / maxlb) - (5 if m.get("zbc") else 0))
+        m["s_fund"] = round(20 * fund[i])
+        s = m["s_qidong"] + m["s_danda"] + m["s_fengdan"] + m["s_elastic"] \
+            + max(0, m["s_bianshi"]) + m["s_fund"]
         m["leader_score"] = int(max(0, round(s)))
     leaders = sorted(members, key=lambda x: -x["leader_score"])
     return leaders[0], leaders
@@ -284,6 +337,26 @@ def fast_prepare(a):
     return today, ups, prev_zt_codes, prev_first_codes, prev_first_jinji, ztpool
 
 
+def glm_news_check(rank, ups_total, mood, today):
+    """曾星智第③步：概念新闻面修正。调 GLM 对热门概念做新闻/主流方向研判。返回 Markdown 文本。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from llm_glm import chat
+    items = []
+    for s, v in rank[:8]:
+        jj = "—" if v["jj"] is None else f"{v['jj']:.0f}%"
+        names = "、".join(x["name"] for x in sorted(v["stocks"], key=lambda z: -z["lianban"])[:3])
+        items.append(f"- {s}：涨停{v['n']}家 / 最高{v['maxlb']}板 / 晋级率{jj} / 代表股 {names}")
+    prompt = (
+        f"日期 {today}，A股当日涨停 {ups_total} 只，情绪档位「{mood}」。\n"
+        f"以下是按涨停家数排出的热门概念：\n" + "\n".join(items) + "\n\n"
+        "请完成：① 逐个判断该概念是否属于当前市场资金的主流炒作方向、是否具备持续性（结合你对这些题材近期新闻/政策/产业催化的了解），"
+        "每行给一句结论（可持续/分歧/一日游 + 理由）；② 最后给出「建议重点关注的概念」不超过 3 个（按优先级）。"
+        "语言精炼、结论明确；若某概念你缺乏信息，请直接说明不确定，不要编造。")
+    reply, _ = chat(prompt, max_tokens=800,
+                    system="你是A股短线热点与题材分析师，语言精炼、结论明确，只基于事实，不编造。")
+    return reply
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=20)
@@ -295,6 +368,8 @@ def main():
     ap.add_argument("--sub-jj", type=float, default=20.0, dest="sub_jj")
     ap.add_argument("--max-stocks", type=int, default=0, dest="max_stocks")
     ap.add_argument("--fast", action="store_true", help="轻量模式：仅用东财涨停池（秒级，不含中军/5日弹性）")
+    ap.add_argument("--no-fund", action="store_true", dest="no_fund", help="跳过资金流向维度")
+    ap.add_argument("--no-glm", action="store_true", dest="no_glm", help="跳过 GLM 新闻面校验")
     a = ap.parse_args()
     outdir = a.outdir or os.path.join(BASE, "outputs")
     os.makedirs(outdir, exist_ok=True)
@@ -409,6 +484,24 @@ def main():
                             "lianban": lb[-1], "price": closes[-1], "ret5": ret5,
                             "fbt": None, "fund": 0, "ltsz": 0, "zbc": None, "fdratio": None})
 
+    # ── 资金流向（首板/二板重点；曾星智第④步）──
+    if ups and not a.no_fund:
+        fmap = fetch_fund([u["c6"] for u in ups], today)
+        hit = 0
+        for u in ups:
+            f = fmap.get(u["c6"]) or {}
+            u["fund_net"] = f.get("net")
+            u["fund_rate"] = f.get("rate")
+            u["fund_net5"] = f.get("net5")
+            if f.get("net") is not None:
+                hit += 1
+        print(f"[INFO] 资金流向取到 {hit}/{len(ups)} 只（asfund）", flush=True)
+    else:
+        for u in ups:
+            u.setdefault("fund_net", None)
+            u.setdefault("fund_rate", None)
+            u.setdefault("fund_net5", None)
+
     code_sector, code_name, sectors, sec_date = load_sector()
     print(f"[INFO] 题材映射 {len(code_sector)} 只（更新于 {sec_date}）", flush=True)
 
@@ -477,10 +570,10 @@ def main():
         L.append(f"| {icon.get(v['grade'],'')} {v['grade']} | **{s}** | {v['n']} | {v['lb']} | "
                  f"{v['prev']} | {fmt_jj(v['jj'], v['prev'])} | {v['maxlb']} | {v['first']} | {names} |")
 
-    # ── 模块二：龙头榜 · 五步法 ──
-    L += ["", "## 👑 龙头榜 · 五步法（各热门板块龙头）", "",
-          "| 板块 | 龙头 | 板数 | 首封 | 封单/流通 | 5日涨幅 | 带动(后涨) | 辨识 | 龙头分 | 五维构成(启动/弹性/封单/带动/辨识) |",
-          "|---|---|---|---|---|---|---|---|---|---|"]
+    # ── 模块二：龙头榜 · 六维（含首板/二板资金流向）──
+    L += ["", "## 👑 龙头榜 · 六维（各热门板块龙头 · 含资金流向）", "",
+          "| 板块 | 龙头 | 板数 | 首封 | 封单/流通 | 5日涨幅 | 主力净流入(万) | 带动(后涨) | 辨识 | 龙头分 | 构成(启动/弹性/封单/带动/辨识/资金) |",
+          "|---|---|---|---|---|---|---|---|---|---|---|"]
     leaders_json = []
     for s, v in rank:
         if v["n"] < 3:
@@ -488,17 +581,31 @@ def main():
         lead, allm = leader_pick(v["stocks"])
         ratio = f"{(lead['fdratio']*100):.1f}%" if lead.get("fdratio") is not None else "—"
         r5 = f"{lead['ret5']:.1f}%" if lead.get("ret5") is not None else "—"
-        later = lead["s_danda"] // 20 * (len(allm) - 1) if len(allm) > 1 else 0
-        con = f"{lead['s_qidong']}/{lead['s_elastic']}/{lead['s_fengdan']}/{lead['s_danda']}/{max(0,lead['s_bianshi'])}"
+        fn = f"{lead['fund_net']/1e4:,.0f}" if lead.get("fund_net") is not None else "—"
+        later = lead["s_danda"] // 15 * (len(allm) - 1) if len(allm) > 1 else 0
+        con = (f"{lead['s_qidong']}/{lead['s_elastic']}/{lead['s_fengdan']}/"
+               f"{lead['s_danda']}/{max(0,lead['s_bianshi'])}/{lead['s_fund']}")
         L.append(f"| {s} | **{lead['name']}**({lead['code']}) | {lead['lianban']} | {fmt_t(lead.get('fbt'))} | "
-                 f"{ratio} | {r5} | {later} | {max(0,lead['s_bianshi'])} | **{lead['leader_score']}** | {con} |")
+                 f"{ratio} | {r5} | {fn} | {later} | {max(0,lead['s_bianshi'])} | **{lead['leader_score']}** | {con} |")
         leaders_json.append({"concept": s, "leader": lead["name"], "code": lead["code"],
                              "lianban": lead["lianban"], "score": lead["leader_score"],
                              "fbt": fmt_t(lead.get("fbt")),
                              "fd_ratio": round(lead["fdratio"] * 100, 2) if lead.get("fdratio") is not None else None,
+                             "fund_net": round(lead["fund_net"], 0) if lead.get("fund_net") is not None else None,
+                             "fund_rate": round(lead["fund_rate"], 3) if lead.get("fund_rate") is not None else None,
+                             "s_fund": lead["s_fund"],
                              "ret5": round(lead["ret5"], 2) if lead.get("ret5") is not None else None})
     if not leaders_json:
-        L.append("| — | 无（当日无≥3家涨停的板块） | | | | | | | | |")
+        L.append("| — | 无（当日无≥3家涨停的板块） | | | | | | | | | |")
+
+    # ── 模块二.5：GLM 新闻面校验（曾星智第③步）──
+    if not a.no_glm:
+        L += ["", "## 🧠 新闻面校验（GLM · 曾星智第③步）", ""]
+        try:
+            reply = glm_news_check(rank, len(ups), mood, today)
+            L.append(reply.strip())
+        except Exception as e:
+            L.append(f"> 跳过（GLM 不可用：{e}）")
 
     # ── 模块三：中军榜 ──
     L += ["", "## 🛡️ 中军榜（趋势压舱石 · 概念内成交额前列 · 沿MA5/MA10）", "",
@@ -518,18 +625,20 @@ def main():
                             "ret5": round(z["ret5"] * 100, 2), "mdd": round(z["mdd"] * 100, 2)})
 
     L += ["", "## 涨停明细（按连板数）", "",
-          "| 代码 | 名称 | 连板 | 涨幅% | 首封 | 封单(万) | 流通(亿) | 所属题材 |",
-          "|---|---|---|---|---|---|---|---|"]
+          "| 代码 | 名称 | 连板 | 涨幅% | 首封 | 封单(万) | 主力净流入(万) | 流通(亿) | 所属题材 |",
+          "|---|---|---|---|---|---|---|---|---|"]
     for u in sorted(ups, key=lambda x: (-x["lianban"], -x["chg"])):
         secs = code_sector.get(u["c6"]) or []
         fd = f"{u['fund']/1e4:.0f}" if u.get("fund") else "—"
+        fn = f"{u['fund_net']/1e4:,.0f}" if u.get("fund_net") is not None else "—"
         lz = f"{u['ltsz']/1e8:.0f}" if u.get("ltsz") else "—"
         L.append(f"| {u['code']} | {u['name']} | {u['lianban']} | {u['chg']} | {fmt_t(u.get('fbt'))} | "
-                 f"{fd} | {lz} | {'/'.join(secs[:4])} |")
+                 f"{fd} | {fn} | {lz} | {'/'.join(secs[:4])} |")
     L += ["", "---",
-          "⚠️ 概念分类来自东财板块成分（一票可属多个概念，家数会放大）；晋级率=今日连板家数/昨日涨停家数（昨日涨停<3标 `!`）；"
-          "龙头五步法为板块内相对排名打分（启动=首封时间最早、弹性=5日涨幅、封单=封单/流通市值、带动=首封后跟涨家数、辨识=最高板+未炸板）；"
-          "中军以成交额近似市值。以上均为**统计口径**，实际热点须结合新闻面人工复核。"]
+          "⚠️ 概念分类来自东财板块成分（一票可属多个概念，家数会放大）；晋级率=今日连板家数/昨日涨停家数（昨日涨停<3标 `!`）；",
+          "龙头为板块内相对排名打分（六维：启动=首封最早 / 弹性=5日涨幅 / 封单=封单/流通 / 带动=首封后跟涨 / 辨识=最高板+未炸板 / **资金=当日主力净流入强度**）；",
+          "资金流向来自 westock asfund（首板/二板当日主力净流入是关键，缺失则该维为0）；中军以成交额近似市值；",
+          "新闻面校验来自 GLM（glm-4-flash），仅作参考、可能有误，请结合实盘判断。"]
     md = "\n".join(L)
     mp = os.path.join(outdir, f"涨停概念排行_{today}.md")
     open(mp, "w", encoding="utf-8").write(md)

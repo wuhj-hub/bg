@@ -215,6 +215,8 @@ jobs:
       - name: 涨停概念排行（涨停股×概念聚合，热点概念排序）
         continue-on-error: true
         timeout-minutes: 20
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
         run: |
           python3 quant_scripts/limitup_concept_rank.py --top 20
           cp outputs/涨停概念排行_latest.json 涨停概念排行_latest.json 2>/dev/null || true
