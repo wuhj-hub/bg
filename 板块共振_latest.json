@@ -1,152 +1,46 @@
 {
- "date": "2026-09-28",
+ "date": "2026-09-29",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 49,
+ "pool_size": 52,
  "resonance_boards": [
   {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "zdf": 1.73,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "小家电",
-   "code": "pt01801113",
-   "zdf": 1.15,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "商用车",
-   "code": "pt01801096",
-   "zdf": 3.34,
-   "strength": 6,
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "zdf": 0.95,
+   "strength": 8,
    "factors": [
     "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "煤炭开采",
-   "code": "pt01801951",
-   "zdf": 0.12,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
+    "吸筹",
+    "控盘"
    ]
   }
  ],
- "grab_top": [
-  {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "value": 7
-  },
-  {
-   "name": "小家电",
-   "code": "pt01801113",
-   "value": 7
-  }
- ],
+ "grab_top": [],
  "entry_top": [
   {
-   "name": "商用车",
-   "code": "pt01801096",
-   "value": 21.7
-  },
-  {
-   "name": "汽车整车概念",
-   "code": "pt02101383",
-   "value": 11.3
-  },
-  {
-   "name": "汽车",
-   "code": "pt01801880",
-   "value": 9.0
-  },
-  {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "value": 2.1
-  },
-  {
-   "name": "煤炭开采",
-   "code": "pt01801951",
-   "value": 2.0
-  },
-  {
-   "name": "小家电",
-   "code": "pt01801113",
-   "value": 0.1
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "value": 3.1
   }
  ],
  "absorption_top": [
   {
-   "name": "商用车",
-   "code": "pt01801096",
-   "value": 6.68
-  },
-  {
-   "name": "汽车整车概念",
-   "code": "pt02101383",
-   "value": 1.16
-  },
-  {
-   "name": "非白酒",
-   "code": "pt01801126",
-   "value": 0.77
-  },
-  {
-   "name": "煤炭开采",
-   "code": "pt01801951",
-   "value": 0.4
-  },
-  {
-   "name": "汽车",
-   "code": "pt01801880",
-   "value": 0.26
-  },
-  {
-   "name": "小家电",
-   "code": "pt01801113",
-   "value": 0.08
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "value": 3.27
   }
  ],
- "control_top": [],
- "zhongjun_candidates": [
+ "control_top": [
   {
-   "board": "商用车",
-   "stock": "江淮汽车",
-   "code": "sh600418",
-   "zdf": "9.99",
-   "main1": 5.51,
-   "main5": 13.79
+   "name": "商用车",
+   "code": "pt01801096",
+   "value": 6.89
   },
   {
-   "board": "小家电",
-   "stock": "九阳股份",
-   "code": "sz002242",
-   "zdf": "10.01",
-   "main1": 0.81,
-   "main5": -0.18
-  },
-  {
-   "board": "非白酒",
-   "stock": "会稽山",
-   "code": "sh601579",
-   "zdf": "9.99",
-   "main1": 2.92,
-   "main5": -3.39
+   "name": "焦炭Ⅱ",
+   "code": "pt01801952",
+   "value": 3.27
   }
- ]
+ ],
+ "zhongjun_candidates": []
 }
