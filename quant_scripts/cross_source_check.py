@@ -8,7 +8,7 @@
 
 本脚本用【三个相互独立的源】对拍关键标的的收盘价与涨跌幅：
   A 主源 : westock（npx westock-data-skillhub，腾讯数据）
-  B 独立 : 东财 push2delay（完全不同的数据体系）
+  B 独立 : 新浪 hq.sinajs（完全不同的数据体系）
   C 仲裁 : 腾讯 qt.gtimg.cn（同体系不同接口，用于三方定位）
 
 判定：|A-B| 归一化价差 > THRESHOLD%  或  涨跌幅差 > PCT_THRESHOLD → 告警（exit 1）
@@ -25,7 +25,7 @@ from datetime import datetime
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 THRESHOLD = 0.5       # 收盘价差异阈值 %
 PCT_THRESHOLD = 0.5   # 涨跌幅差异阈值 pct
-EM_API = "https://push2delay.eastmoney.com/api/qt/stock/get?secid={sid}&fields=f43,f57,f58,f59,f60,f170"
+SINA_API = "https://hq.sinajs.cn/list={codes}"
 TX_API = "https://qt.gtimg.cn/q={codes}"
 
 # 内置标的池：指数（大盘基准）+ 持仓股 + 高流动性基准票
@@ -40,15 +40,6 @@ DEFAULT_POOL = [
     ("sz000839", "国安股份"),
     ("sh600863", "华能蒙电"),
 ]
-
-
-def em_secid(code):
-    """sh600519 → 1.600519 ; sz000001 → 0.000001 ; 指数同理"""
-    if code.startswith("sh"):
-        return "1." + code[2:]
-    if code.startswith("sz"):
-        return "0." + code[2:]
-    return None
 
 
 def _get(url, timeout=20, encoding=None):
@@ -84,23 +75,34 @@ def westock_close(code):
         return None
 
 
-# ─────────── 源 B：东财 push2delay ───────────
-def em_quote(code):
-    sid = em_secid(code)
-    if not sid:
-        return None
+# ─────────── 源 B：新浪 hq.sinajs ───────────
+def sina_quote(codes):
+    """批量 → {code: {name, close, pct}}。
+    2026-09-30 由东财 push2delay 迁移至此：东财 push2/push2delay 主机自 09-29 起对 CI 取不到；
+    新浪为完全独立的行情体系，实测上证 3830.4513 / 茅台 1235.58 与 westock 一致。"""
+    out = {}
     try:
-        j = json.loads(_get(EM_API.format(sid=sid)))
-        d = j.get("data") or {}
-        if not d or d.get("f43") in (None, "-"):
-            return None
-        scale = 10 ** int(d.get("f59") if isinstance(d.get("f59"), int) else 2)
-        close = d["f43"] / scale
-        pct = d.get("f170") / 100 if isinstance(d.get("f170"), (int, float)) else None
-        return {"name": d.get("f58"), "close": round(close, 3),
-                "pct": round(pct, 2) if pct is not None else None}
+        req = urllib.request.Request(SINA_API.format(codes=",".join(codes)),
+                                     headers={"User-Agent": "Mozilla/5.0",
+                                              "Referer": "https://finance.sina.com.cn"})
+        raw = urllib.request.urlopen(req, timeout=20).read().decode("gbk", "ignore")
+        for ln in raw.splitlines():
+            m = re.match(r'var hq_str_(\w+)="([^"]*)"', ln.strip())
+            if not m:
+                continue
+            f = m.group(2).split(",")
+            if len(f) < 4:
+                continue
+            try:
+                close = float(f[3]); prev = float(f[2])
+                pct = (close - prev) / prev * 100 if prev else None
+                out[m.group(1)] = {"name": f[0], "close": round(close, 3),
+                                   "pct": round(pct, 2) if pct is not None else None}
+            except Exception:
+                pass
     except Exception:
-        return None
+        pass
+    return out
 
 
 # ─────────── 源 C：腾讯 qt.gtimg ───────────
@@ -137,15 +139,17 @@ def main():
     codes = [c for c, _ in pool]
     date = datetime.now().strftime("%Y-%m-%d")
 
-    print(f"[INFO] 交叉验证 {len(codes)} 只标的（westock × 东财 × 腾讯）", flush=True)
+    print(f"[INFO] 交叉验证 {len(codes)} 只标的（westock × 新浪 × 腾讯）", flush=True)
 
     tx = tx_quote(codes)
+    sn = sina_quote(codes)
     print(f"[INFO] 腾讯源取到 {len(tx)}/{len(codes)}", flush=True)
+    print(f"[INFO] 新浪源取到 {len(sn)}/{len(codes)}", flush=True)
 
     results, alerts = [], []
     for code, name in pool:
         w = westock_close(code)
-        e = em_quote(code)
+        e = sn.get(code)
         t = tx.get(code)
         nm = (e or {}).get("name") or (t or {}).get("name") or name or code
 
@@ -160,31 +164,31 @@ def main():
         row = {
             "code": code, "name": nm,
             "westock": {"date": w[0], "close": w[1], "pct": w[2]} if w else None,
-            "em": e, "tx": t,
+            "sina": e, "tx": t,
             "price_diff_pct": round(diff, 3) if diff is not None else None,
             "pct_diff": round(pdiff, 2) if pdiff is not None else None,
         }
         results.append(row)
 
         if w is None or e is None:
-            alerts.append(f"{nm}({code}) 源缺失：westock={'OK' if w else '❌'} 东财={'OK' if e else '❌'}")
+            alerts.append(f"{nm}({code}) 源缺失：westock={'OK' if w else '❌'} 新浪={'OK' if e else '❌'}")
         elif diff is not None and diff > a.threshold:
-            alerts.append(f"{nm}({code}) 价差 {diff:.2f}% > {a.threshold}%（westock {w[1]} vs 东财 {e['close']}）")
+            alerts.append(f"{nm}({code}) 价差 {diff:.2f}% > {a.threshold}%（westock {w[1]} vs 新浪 {e['close']}）")
         elif pdiff is not None and pdiff > PCT_THRESHOLD:
-            alerts.append(f"{nm}({code}) 涨跌幅差 {pdiff:.2f}pct（westock {w[2]}% vs 东财 {e['pct']}%）")
+            alerts.append(f"{nm}({code}) 涨跌幅差 {pdiff:.2f}pct（westock {w[2]}% vs 新浪 {e['pct']}%）")
 
     # ───── 报告 ─────
     ok = len(results) - len(alerts)
     L = [f"# 🔀 数据源交叉验证 · {date}", "",
-         f"> westock × 东财 push2delay × 腾讯 qt.gtimg ｜ 标的 {len(results)} 只 ｜ ✅一致 **{ok}** ｜ ⚠️异常 **{len(alerts)}**", ""]
+         f"> westock × 新浪 hq.sinajs × 腾讯 qt.gtimg ｜ 标的 {len(results)} 只 ｜ ✅一致 **{ok}** ｜ ⚠️异常 **{len(alerts)}**", ""]
     if alerts:
         L += ["## ⚠️ 数据源不一致（需人工核实）", ""] + [f"- {x}" for x in alerts] + [""]
     else:
         L += ["## ✅ 三源一致，数据源可信", ""]
-    L += ["| 标的 | 代码 | westock收盘 | 东财收盘 | 腾讯收盘 | 价差 | 涨跌幅差 |",
+    L += ["| 标的 | 代码 | westock收盘 | 新浪收盘 | 腾讯收盘 | 价差 | 涨跌幅差 |",
           "|---|---|---|---|---|---|---|"]
     for r in results:
-        w, e, t = r["westock"], r["em"], r["tx"]
+        w, e, t = r["westock"], r["sina"], r["tx"]
         L.append("| {} | {} | {} | {} | {} | {} | {} |".format(
             r["name"], r["code"],
             w["close"] if w else "❌", e["close"] if e else "❌",
