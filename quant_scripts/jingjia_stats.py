@@ -106,7 +106,7 @@ def fetch_daily(codes, limit, batch=25, workers=1, tag=""):
     return res
 
 
-def fetch_m1(codes, dates, batch=40, workers=6):
+def fetch_m1(codes, dates, batch=15, workers=1):
     """逐交易日批量抓 m1（接口每次仅返回一天），提取09:30竞价bar → {sym:{date:{o,v,amt}}}"""
     tag = f"{dates[0]}_{dates[-1]}_{len(dates)}"
     cachef = os.path.join(CACHE, f"m1_{tag}_{len(codes)}.json.gz")
@@ -120,7 +120,7 @@ def fetch_m1(codes, dates, batch=40, workers=6):
     def work(t):
         d, chunk = t
         rows = parse_kline_txt(_run_westock(["kline", ",".join(chunk), "--period", "m1",
-                                             "--start", d, "--end", d], timeout=120, retries=2))
+                                             "--start", d, "--end", d], timeout=120, retries=4))
         out = defaultdict(dict)
         for sym, rs in rows.items():
             for r in rs:
