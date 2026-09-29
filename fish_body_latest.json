@@ -330,6 +330,71 @@
       "rsg_strong": true
     },
     {
+      "code": "sz002767",
+      "name": "先锋电子",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 67,
+      "multi_score": 53,
+      "resonance": "共振向下",
+      "price": 18.39,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.18)>=DEA(0.14)金叉",
+        "MACD柱0.080刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=58未超买"
+      ],
+      "stop_loss": "17.67",
+      "target": "21.15",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002962",
+      "name": "五方光电",
+      "pattern": "高阳强势",
+      "raw_score": 85,
+      "final_score": 66,
+      "multi_score": 74,
+      "resonance": "共振向下",
+      "price": 14.7,
+      "reasons": [
+        "MA20(13.38)>MA60(13.02)多头",
+        "近3日涨幅9.5%（高阳）",
+        "放量4.3倍",
+        "收盘14.7>MA514.05",
+        "MACD金叉0轴上"
+      ],
+      "stop_loss": "13.07",
+      "target": "16.90",
+      "mode": 4,
+      "tag": "高阳强势",
+      "trend_exit": "趋势跟踪止盈：MA20破位或MACD死叉（不等回落）",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
       "code": "sz002880",
       "name": "卫光生物",
       "pattern": "MACD空中加油",
@@ -491,6 +556,120 @@
       "month_reversal": "平台突破(12月新高)",
       "rsg_dev": 733.7,
       "rsg_strong": true
+    },
+    {
+      "code": "sz002774",
+      "name": "快意电梯",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 64,
+      "multi_score": 41,
+      "resonance": "共振向下",
+      "price": 16.76,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.32)>=DEA(0.26)金叉",
+        "MACD柱0.130刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=51未超买"
+      ],
+      "stop_loss": "16.29",
+      "target": "19.27",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股弱势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": 478.4,
+      "rsg_strong": true
+    },
+    {
+      "code": "sz002962",
+      "name": "五方光电",
+      "pattern": "MACD空中加油",
+      "raw_score": 80,
+      "final_score": 63,
+      "multi_score": 74,
+      "resonance": "共振向下",
+      "price": 14.7,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.29)>=DEA(0.13)金叉",
+        "MACD柱0.34>0但已走高",
+        "收盘14.7>MA514.05",
+        "MA20>MA60多头排列"
+      ],
+      "stop_loss": "13.35",
+      "target": "16.90",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002962",
+      "name": "五方光电",
+      "pattern": "箱体突破",
+      "raw_score": 80,
+      "final_score": 63,
+      "multi_score": 74,
+      "resonance": "共振向下",
+      "price": 14.7,
+      "reasons": [
+        "MA20(13.38)>MA60(13.02)",
+        "MACD金叉(DIF=0.29)",
+        "KDJ向上(J=87)",
+        "收盘14.7>MA514.05",
+        "突破验证通过：量3.7倍/回踩守住/位置-10%"
+      ],
+      "stop_loss": "13.07",
+      "target": "16.90",
+      "mode": 3,
+      "tag": "有效突破",
+      "breakout": {
+        "valid": true,
+        "reason": "量3.7倍/回踩守住/位置-10%",
+        "checks": {
+          "volume": true,
+          "pullback": true,
+          "position": true,
+          "pullback_state": "hold"
+        },
+        "box": {
+          "top": 13.71,
+          "bottom": 11.61,
+          "height": 18.1,
+          "break_date": "2026-09-28",
+          "vol_ratio": 3.66,
+          "pos_dev": -9.7
+        }
+      },
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
     },
     {
       "code": "sz002819",
@@ -847,70 +1026,6 @@
       "month_reversal": "平台突破(12月新高)",
       "rsg_dev": 733.7,
       "rsg_strong": true
-    },
-    {
-      "code": "sz002774",
-      "name": "快意电梯",
-      "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 57,
-      "multi_score": 0,
-      "resonance": "共振向下",
-      "price": 16.76,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.32)>=DEA(0.26)金叉",
-        "MACD柱0.130刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=51未超买"
-      ],
-      "stop_loss": "16.29",
-      "target": "19.27",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": 478.4,
-      "rsg_strong": true
-    },
-    {
-      "code": "sz002767",
-      "name": "先锋电子",
-      "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 57,
-      "multi_score": 0,
-      "resonance": "共振向下",
-      "price": 18.39,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.18)>=DEA(0.14)金叉",
-        "MACD柱0.080刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=58未超买"
-      ],
-      "stop_loss": "17.67",
-      "target": "21.15",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
     },
     {
       "code": "sh603669",
