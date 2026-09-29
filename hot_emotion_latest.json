@@ -1,22 +1,22 @@
 {
- "date": "2026-09-28",
- "total": 31,
- "lianban_cnt": 7,
+ "date": "2026-09-29",
+ "total": 29,
+ "lianban_cnt": 5,
  "max_lb": 5,
  "shouban": 24,
  "by_lb": {
   "5": 1,
   "3": 3,
-  "2": 3,
+  "2": 1,
   "1": 24
  },
  "score": {
-  "score": 63,
+  "score": 57,
   "level": "活跃",
   "parts": {
    "涨停家数": 5,
    "连板高度": 28,
-   "连板占比": 30
+   "连板占比": 24
   }
  },
  "persistence": [],
@@ -106,38 +106,6 @@
     "汽车零部件",
     "汽车",
     "底盘与发动机系统"
-   ]
-  },
-  {
-   "code": "sh601218",
-   "name": "吉鑫科技",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sh603278",
-   "name": "大业股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "金属制品"
    ]
   }
  ],
