@@ -1,11 +1,10 @@
 name: 竞价统计·逐日跟踪
 
 on:
-  # 交易日盘前 09:35（北京）= UTC 01:35。⚠️ 与体系其他 workflow 一致：
-  # 原生 cron 不可靠（延迟/降频），以 repository_dispatch（cron-job.org 外部触发）为主通道；
-  # 如需启用原生 schedule，去掉下方注释即可。
-#  schedule:
-#    - cron: '35 1 * * 1-5'
+  # 交易日盘前 09:35（北京）= UTC 01:35。已启用原生 schedule（用户选择）；
+  # repository_dispatch（cron-job.org）保留为备用补触发通道。
+  schedule:
+    - cron: '35 1 * * 1-5'
   repository_dispatch:
     types: [jingjia-track-run]
   workflow_dispatch:
