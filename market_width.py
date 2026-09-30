@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 """市场宽度指标（黑石marketChangeDist启发）——全主板涨跌家数分布→市场温度
-用法: python3 market_width.py [--pool all_mainboard.csv] [--batch 100]
+用法: python3 market_width.py [--pool all_mainboard.csv] [--batch 250]
 输出: outputs/market_width_{date}.md + market_width_latest.json（供盘前/复盘引用）
 """
-import csv, json, os, re, subprocess, sys, time
+import csv, json, os, re, shutil, subprocess, sys, time
 from collections import Counter
 from datetime import datetime
 
 POOL = "all_mainboard.csv"
-BATCH = 40        # ⚠️ 2026-09-18：50→40（对齐 beast_pool 在 runner 上 96% 成功率的 chunk）；
-                  #    即便仍丢数，下方"缺失补齐"会兜底
+BATCH = 250       # ⭐2026-10-01：40→250（npx 调用 78→13；大批量在 CI/沙箱实测整批成功、零丢失；
+                  #    仍偶发丢股 → 下方"缺失补齐"（小批10 + 逐只兜底）会补回）
 OUT_DIR = "outputs"
+
+# ⭐2026-10-01 免 npx：runner 上装了全局包就走直调（~0.7s/次），未装自动回退 npx（零风险）
+WESTOCK = ([shutil.which("westock-data-skillhub")] if shutil.which("westock-data-skillhub")
+           else ["npx", "-y", "westock-data-skillhub@1.0.3"])
 
 
 def run(args, timeout=150):
     for i in range(4):
         try:
-            r = subprocess.run(["npx", "-y", "westock-data-skillhub@1.0.3"] + args,
+            r = subprocess.run(WESTOCK + args,
                                capture_output=True, text=True, timeout=timeout)
             if r.returncode == 0 and r.stdout:
                 return r.stdout
@@ -98,7 +102,7 @@ def main():
     # 过滤退市/僵尸股（2026-09-18 补 PT：PT金田A/PT中浩A 等无行情老股）
     rows = [r for r in rows if "退" not in r.get("name", "") and not r.get("name", "").strip().startswith("PT")]
     total = len(rows)
-    print(f"[INFO] 股票池 {total}只（已过滤退市）", flush=True)
+    print(f"[INFO] 股票池 {total}只（已过滤退市）| westock={'直调 ' + WESTOCK[0] if len(WESTOCK) == 1 else 'npx（未装全局包）'}", flush=True)
 
     chg = []  # (code, name, pct)
     bar_dates = []  # 最新K线日期（防倒灌基准：按「交易日」对比，而非运行日）
