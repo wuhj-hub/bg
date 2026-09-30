@@ -1,37 +1,14 @@
 {
- "date": "2026-09-29",
+ "date": "2026-09-30",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 51,
+ "pool_size": 53,
  "resonance_boards": [
   {
-   "name": "房地产开发",
-   "code": "pt01801181",
-   "zdf": 4.16,
-   "strength": 7,
+   "name": "商用车",
+   "code": "pt01801096",
+   "zdf": 2.56,
+   "strength": 6,
    "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "房地产服务",
-   "code": "pt01801183",
-   "zdf": 2.7,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "zdf": 2.05,
-   "strength": 7,
-   "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -39,7 +16,17 @@
   {
    "name": "汽车",
    "code": "pt01801880",
-   "zdf": 0.19,
+   "zdf": 0.9,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "煤炭开采",
+   "code": "pt01801951",
+   "zdf": 1.22,
    "strength": 5,
    "factors": [
     "进场",
@@ -47,76 +34,50 @@
    ]
   }
  ],
- "grab_top": [
-  {
-   "name": "房地产开发",
-   "code": "pt01801181",
-   "value": 7
-  },
-  {
-   "name": "房地产服务",
-   "code": "pt01801183",
-   "value": 7
-  },
-  {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "value": 7
-  }
- ],
+ "grab_top": [],
  "entry_top": [
+  {
+   "name": "商用车",
+   "code": "pt01801096",
+   "value": 22.5
+  },
   {
    "name": "汽车",
    "code": "pt01801880",
-   "value": 16.0
+   "value": 7.7
   },
   {
-   "name": "房地产服务",
-   "code": "pt01801183",
-   "value": 4.8
-  },
-  {
-   "name": "房地产开发",
-   "code": "pt01801181",
-   "value": 2.5
-  },
-  {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "value": 1.4
+   "name": "煤炭开采",
+   "code": "pt01801951",
+   "value": 3.9
   }
  ],
  "absorption_top": [
   {
-   "name": "房地产服务",
-   "code": "pt01801183",
-   "value": 1.72
+   "name": "商用车",
+   "code": "pt01801096",
+   "value": 5.5
+  },
+  {
+   "name": "煤炭开采",
+   "code": "pt01801951",
+   "value": 0.83
   },
   {
    "name": "汽车",
    "code": "pt01801880",
-   "value": 0.47
-  },
-  {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "value": 0.38
-  },
-  {
-   "name": "房地产开发",
-   "code": "pt01801181",
-   "value": 0.19
+   "value": 0.24
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "房地产开发",
-   "stock": "信达地产",
-   "code": "sh600657",
-   "zdf": "10.10",
-   "main1": 0.79,
-   "main5": -0.86
+   "board": "商用车",
+   "stock": "江淮汽车",
+   "code": "sh600418",
+   "zdf": "5.65",
+   "main1": 2.31,
+   "main5": 19.64
   }
  ]
 }
