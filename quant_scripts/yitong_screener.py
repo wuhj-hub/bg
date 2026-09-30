@@ -78,8 +78,8 @@ def fetch_kline_gap(symbols, period, limit):
     逐只复取纯属空耗；小批已可挽回大batch的偶发抖动丢股。"""
     symbols = [s for s in symbols]
     extra = {}
-    for j in range(0, len(symbols), 40):
-        extra.update(fetch_kline(symbols[j:j + 40], period, limit))
+    for j in range(0, len(symbols), 250):
+        extra.update(fetch_kline(symbols[j:j + 250], period, limit))
     return extra
 
 def fetch_sina_5m(symbol, datalen=1023):

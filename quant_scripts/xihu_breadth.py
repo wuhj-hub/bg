@@ -215,8 +215,8 @@ def scan(stocks, p, cache=None):
     miss_stocks = [c for _, m in lacks for c in m]
     if miss_stocks:
         print(f"[补齐] 共 {len(miss_stocks)} 只缺数据，启动补偿…", flush=True)
-        for j in range(0, len(miss_stocks), 40):
-            sub = miss_stocks[j:j + 40]
+        for j in range(0, len(miss_stocks), 250):
+            sub = miss_stocks[j:j + 250]
             codes = [norm_code(c[0]) for c in sub]
             raw = run(["kline", ",".join(codes), "--period", "day", "--limit", str(p["limit"])])
             data = parse_kline(raw)

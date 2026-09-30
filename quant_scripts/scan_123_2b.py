@@ -226,17 +226,6 @@ def analyze(code, name=""):
     return to_result(code, name, rows)
 
 
-def _is_st(code):
-    """ST/退市兜底判定。"""
-    try:
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from st_guard import check_st_batch
-        st, _ = check_st_batch([code])
-        return bool(st)
-    except Exception:
-        return False
-
-
 def load_pool(args):
     """加载候选池：--pool 文件或代码列表，或默认 stock_pool.txt"""
     pool = []
@@ -313,8 +302,8 @@ def main():
     if misses:
         print(f"[补齐] {len(misses)} 只缺数据，小批复取…", file=sys.stderr)
         still = []
-        for j in range(0, len(misses), 40):
-            sub = misses[j:j + 40]
+        for j in range(0, len(misses), 250):
+            sub = misses[j:j + 250]
             txt = cli(["kline", ",".join(c for c, _ in sub), "--period", "day",
                        "--limit", str(KLINE_LIMIT), "--fq", "qfq"], timeout=180)
             d = parse_kline_batch(txt, limit=KLINE_LIMIT)
@@ -336,8 +325,15 @@ def main():
     for c, name in pool:
         if c in rows_by:
             r = to_result(c, name, rows_by[c][1])
-            if r and not _is_st(c):
+            if r:
                 results.append(r)
+    # ST/退市 兜底：整表一次批量校验（腾讯 batch=50），切勿逐只调用（会退化为数千次串行网络请求）
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from st_guard import filter_st
+        results, _dropped = filter_st(results)
+    except Exception:
+        pass
 
     # 输出
     os.makedirs(args.outdir, exist_ok=True)

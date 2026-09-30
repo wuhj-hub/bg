@@ -346,7 +346,7 @@ def main():
     FUND_PREFETCH.update(batch_asfund(codes_all))
     miss = [c for c in codes_all if c not in FUND_PREFETCH]
     if miss:   # 小批(40)复取缺口，避免落入 work() 的逐只兜底（对退市票是空耗）
-        FUND_PREFETCH.update(batch_asfund(miss, chunk=40))
+        FUND_PREFETCH.update(batch_asfund(miss, chunk=250))
     print(f"[INFO] asfund 批量预取 {len(FUND_PREFETCH)}/{len(codes_all)} 只，"
           f"耗时 {time.time()-t0:.1f}s（替代逐只调用，原需约 20min）", flush=True)
 
