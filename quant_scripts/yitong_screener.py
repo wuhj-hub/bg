@@ -22,8 +22,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 BJ = timezone(timedelta(hours=8))
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
-BATCH = 40   # ⭐2026-09-25: 20→40（减少 npx 启动次数，批次数 150→75）
-WORKERS = 8   # ⭐2026-09-25: 4→8（IO密集，全市场3000+只，150批/4并发=38轮串行过久）
+BATCH = 250   # ⭐2026-09-30: 40→250（npx调用 237→39；实测单批400只12s零丢失，250更稳）
+WORKERS = 8   # 大batch后总调用数骤减，保留并发以重叠网络；缺口由 fetch_kline_gap 兜底
 # ⭐2026-09-25: 日线取数 120→80 根（varo7 自 i=33 起算+指数平滑，80根收敛充分；
 #             实测 200只 候选名单与 120 根完全一致，数据量 -33%）
 # 路径兼容：沙箱用 /sandbox/workspace，GitHub runner 用仓库根(cwd)
@@ -72,6 +72,15 @@ def fetch_kline(symbols, period, limit):
     for sym in groups:
         groups[sym].sort(key=lambda x: x["date"])
     return groups
+
+def fetch_kline_gap(symbols, period, limit):
+    """缺口兜底：对未取到的 symbols 小批(40)复取。不做逐只——全市场约7.6%为退市票（本就无数据），
+    逐只复取纯属空耗；小批已可挽回大batch的偶发抖动丢股。"""
+    symbols = [s for s in symbols]
+    extra = {}
+    for j in range(0, len(symbols), 40):
+        extra.update(fetch_kline(symbols[j:j + 40], period, limit))
+    return extra
 
 def fetch_sina_5m(symbol, datalen=1023):
     from urllib.request import urlopen
@@ -190,6 +199,9 @@ def main():
             for k, v in f.result().items():
                 if len(v) > 40:
                     day_map[k] = v
+        for k, v in fetch_kline_gap([s for s in syms if s not in day_map], "day", 80).items():
+            if len(v) > 40 and k not in day_map:
+                day_map[k] = v
     cand = []  # (code, name, entry_date, guaili_flag)
     for code, name in pool:
         bars = day_map.get(code)
@@ -213,6 +225,9 @@ def main():
             for k, v in f.result().items():
                 if len(v) > 10:
                     week_map[k] = v
+        for k, v in fetch_kline_gap([s for s in c_syms if s not in week_map], "week", 80).items():
+            if len(v) > 10 and k not in week_map:
+                week_map[k] = v
     cand2 = []
     for code, name, entry, gl, in_now in cand:
         wb = week_map.get(code)
@@ -227,16 +242,23 @@ def main():
     print(f"[INFO] Step2.5 月线反转检测（{len(cand2)} 只）...", flush=True)
     rev_map = {}
     c_syms2 = [c for c, *_ in cand2]
+    got2 = set()
     with ThreadPoolExecutor(max_workers=WORKERS) as ex:
         futs = {}
         for i in range(0, len(c_syms2), BATCH):
             futs[ex.submit(fetch_kline, c_syms2[i:i + BATCH], "month", 40)] = 1
         for f in as_completed(futs):
             for k, v in f.result().items():
+                got2.add(k)
                 if len(v) >= 13:
                     rv = detect_reversal(v)
                     if rv:
                         rev_map[k] = rv
+        for k, v in fetch_kline_gap([s for s in c_syms2 if s not in got2], "month", 40).items():
+            if len(v) >= 13:
+                rv = detect_reversal(v)
+                if rv:
+                    rev_map[k] = rv
     print(f"[INFO] 月线反转: {len(rev_map)} 只", flush=True)
 
     # Step2.6: RSV50三线相对强度（50日相对强度：个股>行业>大盘）

@@ -13,8 +13,11 @@ scan_123_2b.py —— 123法则 / 2B法则 / ABC修正 反转扫描器
 用法：
   python3 scan_123_2b.py --pool stock_pool.txt          # 从池文件扫描
   python3 scan_123_2b.py --pool "sh600519,sz000001"     # 指定代码
-  python3 scan_123_2b.py --pool panhou_lianghua.csv --panhou   # 从panhou csv读池
+  python3 scan_123_2b.py --pool panhou_lianghua.csv     # 从panhou csv读池
   python3 scan_123_2b.py --limit 200                    # 只扫前200只（默认池）
+
+性能：2026-09-30 由「逐只取数（全池 3039 次 npx）」改为「批量取数 BATCH=250 只/次」，
+      调用数 3039 → ≈13，单步 27min → ~2min；并对缺口做小批(40)+逐只兜底。
 
 输出：outputs/123_2b反转信号_{date}.md + 123_2b_latest.json
 """
@@ -29,6 +32,9 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+BATCH = 250       # ⭐2026-09-30 性能优化：逐只(3039次)→批量250(≈13次)
+KLINE_LIMIT = 90
+GAP_PERSTOCK_CAP = 20   # 缺口逐只补齐上限（退市票无数据，逐只=空耗 npx 启动）
 
 
 def cli(args, timeout=60):
@@ -46,8 +52,8 @@ def norm(code):
     return ("sh" if code.startswith(("6", "9", "5")) else "sz") + code
 
 
-def parse_kline(txt, limit=90):
-    """解析日K线（升序），返回 [{date, open, high, low, close}, ...]"""
+def parse_kline(txt, limit=KLINE_LIMIT):
+    """解析单只日K线（升序），返回 [{date, open, high, low, close}, ...]"""
     rows, header = [], None
     for ln in txt.splitlines():
         s = ln.strip()
@@ -72,6 +78,44 @@ def parse_kline(txt, limit=90):
             pass
     rows.sort(key=lambda r: r["date"])
     return rows[-limit:] if limit else rows
+
+
+def parse_kline_batch(txt, limit=KLINE_LIMIT):
+    """解析（批量或单只）日K线 → {wcode: [rows 升序]}。
+    批量表头：symbol|date|open|last|high|low|volume|amount|exchange；单只无 symbol 列（键为 ''）。"""
+    by, header = {}, None
+    for ln in txt.splitlines():
+        s = ln.strip()
+        if not s.startswith("|"):
+            continue
+        parts = [p.strip() for p in s.strip("|").split("|")]
+        if "date" in parts:
+            header = parts
+            continue
+        if not header or "---" in parts[0] or len(parts) < 6:
+            continue
+        try:
+            di = header.index("date")
+            if not re.match(r"^\d{4}-\d{2}-\d{2}$", parts[di]):
+                continue
+            row = {"date": parts[di]}
+            for key, hk in (("open", "open"), ("high", "high"), ("low", "low"), ("close", "last")):
+                if hk in header:
+                    row[key] = float(parts[header.index(hk)])
+            if "symbol" in header and header.index("symbol") < len(parts):
+                sym = parts[header.index("symbol")]
+            elif re.match(r"^(sh|sz|bj)\d{6}$", parts[0]):
+                sym = parts[0]
+            else:
+                sym = ""
+            by.setdefault(sym, []).append(row)
+        except (ValueError, IndexError):
+            pass
+    for sym in by:
+        by[sym].sort(key=lambda r: r["date"])
+        if limit:
+            by[sym] = by[sym][-limit:]
+    return by
 
 
 def trendline_slope(rows, window=5):
@@ -157,10 +201,8 @@ def detect_abc(rows):
     return None, None
 
 
-def analyze(code, name=""):
-    """单只检测，返回 {code, name, signals: [...]}"""
-    txt = cli(["kline", code, "--period", "day", "--limit", "90", "--fq", "qfq"])
-    rows = parse_kline(txt)
+def to_result(code, name, rows):
+    """由K线 → 结果 dict（无信号返回 None）"""
     if len(rows) < 30:
         return None
     sigs = []
@@ -176,6 +218,23 @@ def analyze(code, name=""):
         return None
     return {"code": code, "name": name, "close": rows[-1]["close"],
             "date": rows[-1]["date"], "signals": sigs}
+
+
+def analyze(code, name=""):
+    """单只检测（逐只兜底用）"""
+    rows = parse_kline(cli(["kline", code, "--period", "day", "--limit", str(KLINE_LIMIT), "--fq", "qfq"]))
+    return to_result(code, name, rows)
+
+
+def _is_st(code):
+    """ST/退市兜底判定。"""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from st_guard import check_st_batch
+        st, _ = check_st_batch([code])
+        return bool(st)
+    except Exception:
+        return False
 
 
 def load_pool(args):
@@ -227,27 +286,57 @@ def main():
     pool = load_pool(args)
     if args.limit:
         pool = pool[:args.limit]
-    print(f"[INFO] 123/2B扫描: {len(pool)} 只", file=sys.stderr)
+    print(f"[INFO] 123/2B扫描: {len(pool)} 只（批量 {BATCH}/次）", file=sys.stderr)
+
+    n = len(pool)
+    rows_by, misses = {}, []
+
+    # ── 批量取数 ──
+    for i in range(0, n, BATCH):
+        chunk = pool[i:i + BATCH]
+        syms = [c for c, _ in chunk]
+        txt = cli(["kline", ",".join(syms), "--period", "day", "--limit", str(KLINE_LIMIT), "--fq", "qfq"],
+                  timeout=180)
+        d = parse_kline_batch(txt, limit=KLINE_LIMIT)
+        got = 0
+        for c, name in chunk:
+            rows = d.get(c) or d.get("")
+            if rows:
+                rows_by[c] = (name, rows)
+                got += 1
+            else:
+                misses.append((c, name))
+        print(f"[{i + len(chunk)}/{n}] 本批有效 {got}/{len(chunk)}"
+              + (f" | ⚠️缺 {len(chunk) - got}" if got < len(chunk) else ""), file=sys.stderr)
+
+    # ── 缺口兜底：小批(40)复取 → 仍缺逐只 ──
+    if misses:
+        print(f"[补齐] {len(misses)} 只缺数据，小批复取…", file=sys.stderr)
+        still = []
+        for j in range(0, len(misses), 40):
+            sub = misses[j:j + 40]
+            txt = cli(["kline", ",".join(c for c, _ in sub), "--period", "day",
+                       "--limit", str(KLINE_LIMIT), "--fq", "qfq"], timeout=180)
+            d = parse_kline_batch(txt, limit=KLINE_LIMIT)
+            for c, name in sub:
+                rows = d.get(c) or d.get("")
+                if rows:
+                    rows_by[c] = (name, rows)
+                else:
+                    still.append((c, name))
+        for c, name in still[:GAP_PERSTOCK_CAP]:
+            rows = parse_kline(cli(["kline", c, "--period", "day", "--limit", str(KLINE_LIMIT), "--fq", "qfq"]))
+            if rows:
+                rows_by[c] = (name, rows)
+        if len(still) > GAP_PERSTOCK_CAP:
+            print(f"[补齐] 仍缺 {len(still)} 只（多为退市票），仅逐只补前 {GAP_PERSTOCK_CAP} 只，余者跳过", file=sys.stderr)
+        print(f"[补齐] 补回 {len(misses) - len(still)}/{len(misses)} 只", file=sys.stderr)
 
     results = []
-    def _one(item):
-        code, name = item
-        r = analyze(code, name)
-        if r:
-            # ST/退市兜底
-            try:
-                sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-                from st_guard import check_st_batch
-                st, _ = check_st_batch([code])
-                if st:
-                    return None
-            except Exception:
-                pass
-        return r
-
-    with ThreadPoolExecutor(max_workers=8) as ex:   # ⭐2026-09-25: 4→8（该步实测32.9min）
-        for r in ex.map(_one, pool):
-            if r:
+    for c, name in pool:
+        if c in rows_by:
+            r = to_result(c, name, rows_by[c][1])
+            if r and not _is_st(c):
                 results.append(r)
 
     # 输出

@@ -41,6 +41,7 @@ import time
 from datetime import datetime
 
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+GAP_PERSTOCK_CAP = 10   # ⭐2026-09-30: 缺口逐只补齐上限（退市票无数据，逐只=空耗 npx 启动）
 DATA_ROW = re.compile(r"^(sh|sz|bj)\d{6}$")
 
 
@@ -210,19 +211,21 @@ def scan(stocks, p, cache=None):
               + (f" | ⚠️缺 {len(missing)} 只" if missing else ""), flush=True)
         lacks.append((chunk, missing))
 
-    # ── 缺口补齐：小批(10)复取 → 仍缺逐只补
+    # ── 缺口补齐：小批(40)复取 → 仍缺仅少量逐只补（退市票本就无数据，逐只是空耗）
     miss_stocks = [c for _, m in lacks for c in m]
     if miss_stocks:
         print(f"[补齐] 共 {len(miss_stocks)} 只缺数据，启动补偿…", flush=True)
-        for j in range(0, len(miss_stocks), 10):
-            sub = miss_stocks[j:j + 10]
+        for j in range(0, len(miss_stocks), 40):
+            sub = miss_stocks[j:j + 40]
             codes = [norm_code(c[0]) for c in sub]
             raw = run(["kline", ",".join(codes), "--period", "day", "--limit", str(p["limit"])])
             data = parse_kline(raw)
             _keep(data)
             _apply(sub, codes, data, result, p)
         still = [c for c in miss_stocks if result.get(c[0], {}).get("strong") is None]
-        for (code, name) in still:
+        if len(still) > GAP_PERSTOCK_CAP:
+            print(f"[补齐] 仍缺 {len(still)} 只（多为退市票），仅逐只补前 {GAP_PERSTOCK_CAP} 只，余者跳过", flush=True)
+        for (code, name) in still[:GAP_PERSTOCK_CAP]:
             wcode = norm_code(code)
             raw = run(["kline", wcode, "--period", "day", "--limit", str(p["limit"])])
             data = parse_kline(raw)
@@ -462,7 +465,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--list", default="all_mainboard.csv")
     ap.add_argument("--stocks", help="逗号分隔的代码，直接指定股票池（测试用）")
-    ap.add_argument("--batch", type=int, default=40)
+    ap.add_argument("--batch", type=int, default=250)   # ⭐2026-09-30: 40→250（npx调用 79→13，实测单批12s零丢失）
     ap.add_argument("--limit", type=int, default=260)
     ap.add_argument("--window", type=int, default=250)
     ap.add_argument("--strong-thr", type=float, default=0.9)
