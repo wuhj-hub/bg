@@ -21,7 +21,9 @@ from datetime import datetime, timezone, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 BJ = timezone(timedelta(hours=8))
-WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+import shutil as _shutil
+WESTOCK = ([_shutil.which("westock-data-skillhub")] if _shutil.which("westock-data-skillhub")
+           else ["npx", "-y", "westock-data-skillhub@1.0.3"])   # ⭐2026-09-30 优先直调已装 bin（免 npx ~2.8s/次），未装回退 npx
 BATCH = 250   # ⭐2026-09-30: 40→250（npx调用 237→39；实测单批400只12s零丢失，250更稳）
 WORKERS = 8   # 大batch后总调用数骤减，保留并发以重叠网络；缺口由 fetch_kline_gap 兜底
 # ⭐2026-09-25: 日线取数 120→80 根（varo7 自 i=33 起算+指数平滑，80根收敛充分；
@@ -264,8 +266,8 @@ def main():
     # Step2.6: RSV50三线相对强度（50日相对强度：个股>行业>大盘）
     print("[INFO] Step2.6 RSV50三线强度检测...", flush=True)
     ind_map6 = {}
-    for i in range(0, len(syms), 60):
-        md6 = cli(f"profile {','.join(syms[i:i+60])}")
+    for i in range(0, len(syms), 250):   # ⭐2026-09-30: 60→250（profile 调用 ~52→13 次）
+        md6 = cli(f"profile {','.join(syms[i:i+250])}")
         for ln6 in md6.splitlines():
             ln6 = ln6.strip()
             if ln6.startswith("|") and "code" not in ln6 and "---" not in ln6:

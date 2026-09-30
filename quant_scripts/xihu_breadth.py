@@ -40,7 +40,9 @@ import sys
 import time
 from datetime import datetime
 
-WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+import shutil as _shutil
+WESTOCK = ([_shutil.which("westock-data-skillhub")] if _shutil.which("westock-data-skillhub")
+           else ["npx", "-y", "westock-data-skillhub@1.0.3"])   # ⭐2026-09-30 优先直调已装 bin（免 npx ~2.8s/次），未装回退 npx
 GAP_PERSTOCK_CAP = 10   # ⭐2026-09-30: 缺口逐只补齐上限（退市票无数据，逐只=空耗 npx 启动）
 DATA_ROW = re.compile(r"^(sh|sz|bj)\d{6}$")
 
@@ -589,4 +591,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-main()

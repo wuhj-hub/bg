@@ -31,7 +31,9 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
-WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+import shutil as _shutil
+WESTOCK = ([_shutil.which("westock-data-skillhub")] if _shutil.which("westock-data-skillhub")
+           else ["npx", "-y", "westock-data-skillhub@1.0.3"])   # ⭐2026-09-30 优先直调已装 bin（免 npx ~2.8s/次），未装回退 npx
 BATCH = 250       # ⭐2026-09-30 性能优化：逐只(3039次)→批量250(≈13次)
 KLINE_LIMIT = 90
 GAP_PERSTOCK_CAP = 20   # 缺口逐只补齐上限（退市票无数据，逐只=空耗 npx 启动）

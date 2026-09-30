@@ -22,7 +22,9 @@ import csv, json, os, re, subprocess, sys, time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
-WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+import shutil as _shutil
+WESTOCK = ([_shutil.which("westock-data-skillhub")] if _shutil.which("westock-data-skillhub")
+           else ["npx", "-y", "westock-data-skillhub@1.0.3"])   # ⭐2026-09-30 优先直调已装 bin（免 npx ~2.8s/次），未装回退 npx
 OUT_DIR = "outputs"
 
 
