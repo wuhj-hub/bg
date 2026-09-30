@@ -145,6 +145,33 @@ def save_signals(sig):
             w.writerow([r.get(c, "") for c in cols])
 
 
+# ---------------- 报告：紫霞牛 / 一进二 明细（2026-09-30 新增） ----------------
+def special_section(by_strat):
+    """紫霞牛 / 一进二 明细（信号稀少，单列便于跟踪）。返回 markdown 行列表。"""
+    md = ["", "## 四、紫霞牛 / 一进二 明细", "",
+          "> 这两个策略信号稀少（累计样本小），单列便于跟踪；收益=信号日 9:30 竞价开盘价买入。", ""]
+    for st in ["紫霞牛", "一进二"]:
+        rows = sorted(by_strat.get(st, []), key=lambda r: r.get("date", ""), reverse=True)
+        md.append(f"### {st}（累计 {len(rows)} 条）")
+        if not rows:
+            md += ["（暂无信号）", ""]
+            continue
+        md += ["| 日期 | 代码 | 名称 | 竞价开盘 | 当天 | 次日 | +2日 | +3日 | +5日 |",
+               "|---|---|---|---|---|---|---|---|---|"]
+        for r in rows:
+            cells = [r.get("date", ""), r.get("code", ""), r.get("name", ""), str(r.get("buy_open", "-"))]
+            for k in ["R0", "R1", "R2", "R3", "R5"]:
+                v = r.get(k)
+                cells.append(f"{float(v):+.2%}" if v not in (None, "") else "-")
+            md.append("| " + " | ".join(cells) + " |")
+        r0 = [float(r["R0"]) for r in rows if r.get("R0") not in (None, "")]
+        if r0:
+            a = np.array(r0)
+            md += ["", f"*小结：当天(R0) 样本 {len(a)}，胜率 {(a > 0).mean():.0%}，均值 {a.mean():+.2%}*"]
+        md.append("")
+    return md
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--universe", default="all_mainboard.csv")
@@ -271,6 +298,7 @@ def main():
             r0 = f"{float(r['R0']):+.2%}" if r.get("R0") else "-"
             r1 = f"{float(r['R1']):+.2%}" if r.get("R1") else "-"
             md.append(f"| {r['date']} | {r['code']} | {r['name']} | {r['strategy']} | {r0} | {r1} |")
+        md += special_section(by_strat)
         outmd = os.path.join(OUT_DIR, f"竞价统计_{args.date}.md")
         with open(outmd, "w", encoding="utf-8") as f:
             f.write("\n".join(md))
