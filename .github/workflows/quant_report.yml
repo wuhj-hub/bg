@@ -72,6 +72,8 @@ jobs:
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
+          # ⭐2026-09-30：全局安装 westock（供脚本直调 bin，免每次 npx 启动 ~2.8s）
+          npm i -g westock-data-skillhub@1.0.3 > /dev/null 2>&1 || true
           mkdir -p /tmp/pool_bak
           for f in caige_pool yitong_pool yao_pool longtou_pool; do
             cp "quant_scripts/$f.txt" "/tmp/pool_bak/$f.txt" 2>/dev/null || true
