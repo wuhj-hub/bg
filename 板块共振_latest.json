@@ -1,33 +1,13 @@
 {
  "date": "2026-09-30",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 53,
+ "pool_size": 49,
  "resonance_boards": [
   {
    "name": "商用车",
    "code": "pt01801096",
-   "zdf": 2.56,
+   "zdf": 2.57,
    "strength": 6,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "汽车",
-   "code": "pt01801880",
-   "zdf": 0.9,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "煤炭开采",
-   "code": "pt01801951",
-   "zdf": 1.22,
-   "strength": 5,
    "factors": [
     "进场",
     "吸筹"
@@ -40,33 +20,13 @@
    "name": "商用车",
    "code": "pt01801096",
    "value": 22.5
-  },
-  {
-   "name": "汽车",
-   "code": "pt01801880",
-   "value": 7.7
-  },
-  {
-   "name": "煤炭开采",
-   "code": "pt01801951",
-   "value": 3.9
   }
  ],
  "absorption_top": [
   {
    "name": "商用车",
    "code": "pt01801096",
-   "value": 5.5
-  },
-  {
-   "name": "煤炭开采",
-   "code": "pt01801951",
-   "value": 0.83
-  },
-  {
-   "name": "汽车",
-   "code": "pt01801880",
-   "value": 0.24
+   "value": 5.22
   }
  ],
  "control_top": [],
@@ -75,8 +35,8 @@
    "board": "商用车",
    "stock": "江淮汽车",
    "code": "sh600418",
-   "zdf": "5.65",
-   "main1": 2.31,
+   "zdf": "5.49",
+   "main1": 2.85,
    "main5": 19.64
   }
  ]
