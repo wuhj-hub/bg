@@ -45,11 +45,11 @@ def parse_batch(txt):
 
 
 def width_score(up_pct, strong_cnt, limitup_cnt, total):
-    """市场宽度分0-100：上涨占比为主 + 强势/涨停加成"""
-    score = up_pct * 100
-    score += min(strong_cnt * 3, 20)
-    score += min(limitup_cnt * 2, 10)
-    return round(min(100, score), 1)
+    """市场宽度分0-100：上涨占比(广度分) + 强势/涨停(赚钱效应加成)。
+    返回 (总分, 广度分, 赚钱效应加成) —— 拆分展示，避免把加成误读为普涨。"""
+    breadth = round(up_pct * 100, 1)
+    bonus = round(min(strong_cnt * 3, 20) + min(limitup_cnt * 2, 10), 1)
+    return round(min(100, breadth + bonus), 1), breadth, bonus
 
 
 def _harvest(c, kl, chg, touched, zhaban, lianban, lianban3, lianban_cnt):
@@ -187,13 +187,19 @@ def main():
     lu = [x for x in chg if x[2] >= 9.8]
     ld = [x for x in chg if x[2] <= -9.8]
     up_pct = len(up) / n if n else 0
-    score = width_score(up_pct, len(strong), len(lu), n)
+    score, breadth, bonus = width_score(up_pct, len(strong), len(lu), n)
 
     if score >= 70:
-        # 赚钱效应强但涨少跌多 → 结构性行情（涨停潮+分化）
-        level = "🔥 结构性强（涨停潮·涨少跌多分化）" if up_pct < 0.45 else "🔥 强势（普涨格局）"
+        # 赚钱效应强，但须按「上涨广度」区分：普涨 / 涨多跌少 / 涨少跌多分化
+        if up_pct >= 0.65:
+            level = "🔥 强势（普涨格局）"
+        elif up_pct >= 0.45:
+            level = "🔥 结构性偏强（涨多跌少·赚钱效应强）"
+        else:
+            level = "🔥 结构性强（涨停潮·涨少跌多分化）"
     elif score >= 55:
-        level = "偏强（涨多跌少）"
+        # 同样按上涨广度区分，避免「涨少跌多」被误标为「涨多跌少」
+        level = "偏强（涨多跌少）" if up_pct >= 0.45 else "结构性偏强（涨停潮·涨少跌多分化）"
     elif score >= 40:
         level = "震荡（多空均衡）"
     elif score >= 25:
@@ -206,7 +212,7 @@ def main():
 
 > 全主板{total}只（过滤退市），有效{n}只 | 数据源：westock批量日K（最新交易日收盘）
 
-## 市场温度：{level}（宽度分 {score}/100）
+## 市场温度：{level}（宽度分 {score}/100 = 广度 {breadth} + 赚钱效应 {bonus}）
 
 ## 涨跌家数分布
 | 分类 | 家数 | 占比 |
@@ -292,6 +298,7 @@ def main():
         "strong": len(strong), "weak": len(weak),
         "limitup": len(lu), "limitdown": len(ld),
         "up_pct": round(up_pct * 100, 1), "score": score, "level": level,
+        "breadth": breadth, "bonus": bonus,
         "top": sorted(chg, key=lambda x: -x[2])[:10],
         # 涨停/强势完整名单（供市场风格轴判中军结构）
         "limitup_list": [{"code": c, "name": nm, "pct": p} for c, nm, p in sorted(lu, key=lambda x: -x[2])],
@@ -320,7 +327,7 @@ def main():
         print(f"[WARN] 根目录同步失败: {_e}")
     print(f"[OK] {md_path}")
     print(f"[OK] {json_path}")
-    print(f"宽度分={score} 等级={level} 上涨{len(up)} 强势{len(strong)} 涨停{len(lu)} 弱势{len(weak)} 跌停{len(ld)} | 触板{n_touch} 炸板{n_zhaban}({zhaban_rate}%) 二连板{n_lianban}")
+    print(f"宽度分={score}(广度{breadth}+赚钱效应{bonus}) 等级={level} 上涨{len(up)} 强势{len(strong)} 涨停{len(lu)} 弱势{len(weak)} 跌停{len(ld)} | 触板{n_touch} 炸板{n_zhaban}({zhaban_rate}%) 二连板{n_lianban}")
 
 
 if __name__ == "__main__":
