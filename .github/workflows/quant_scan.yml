@@ -197,7 +197,7 @@ jobs:
         continue-on-error: true
         timeout-minutes: 25
         run: |
-          python3 quant_scripts/xihu_breadth.py --list all_mainboard.csv --batch 40
+          python3 quant_scripts/xihu_breadth.py --list all_mainboard.csv --batch 250
           cp outputs/xihu_breadth_latest.json xihu_breadth_latest.json 2>/dev/null || true
           cp outputs/xihu_breadth_history.json xihu_breadth_history.json 2>/dev/null || true
           echo "西湖广度: $(python3 -c "import json;d=json.load(open('outputs/xihu_breadth_latest.json'));print(f\"QSG%={d['qsg_pct']} EJD%={d['ejd_pct']} 新高{d['new_high']}/新低{d['new_low']} 净值{d['net_high']:+d}\")" 2>/dev/null || echo '计算失败')"
