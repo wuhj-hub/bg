@@ -19,23 +19,6 @@
    "evidence_note": "中国大陆唯一通过英伟达NPN Tier1认证的液冷供应商；CDU国内市占第一、微通道冷板市占>40%；Coolinside全链条(冷板/快接头/Manifold/CDU/机柜/工质/管路/冷源)；GB300快接头份额15-20%，Rubin新增MiniUQD+MLCP微通道冷板直供；2026H1营收30.2亿(+17.24%)、Q2环比+1934%；海外订单增速>180%，在手订单排至2027；2024中国液冷数据中心CDU厂商排名第一"
   },
   {
-   "code": "002428",
-   "name": "云南锗业",
-   "chain": "光互连算力",
-   "segment": "InP/锗衬底材料",
-   "tier": "材料耗材",
-   "coef": 1.0,
-   "base": 72,
-   "relabel": 14,
-   "chokepoint": 86,
-   "evidence": "strong",
-   "four_dim_total": 3,
-   "four_dim_level": "无共振",
-   "chg120": "+60%",
-   "note": "A股最正宗InP衬底标的",
-   "evidence_note": "7/23公告子公司签磷化铟晶片供货协议5.7-8.55亿(占25年营收53-80%)；扩产30万片推进"
-  },
-  {
    "code": "001270",
    "name": "铖昌科技",
    "chain": "商业航天",
@@ -48,7 +31,7 @@
    "evidence": "strong",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "-18%",
+   "chg120": "-19%",
    "note": "最正宗卡位·卫星相控阵刚需",
    "evidence_note": "半年报+互动易(8-9月): 星载T/R芯片批量应用于多系列卫星,毛利率83%,净利+34.7%;5月*ST摘帽"
   },
@@ -65,9 +48,26 @@
    "evidence": "strong",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "-10%",
+   "chg120": "-11%",
    "note": "被市场归类为消费电子，液冷属性被低估（子公司立敏达为其Manifold主体）",
    "evidence_note": "控股子公司立敏达为英伟达Vera Rubin架构Manifold(分歧管)生态中国大陆核心供应商；UQD/MQD快接头、Inner Manifold深融全液冷循环；已供GB200/GB300液冷板；同时具备液冷+电源一体化，英伟达双供应链准入资质稀缺；2025冷板出货10万套→2026产能扩至百万套级、冷板出货额25亿元规模；立敏达为北美算力龙头核心供应商，持续批量交付"
+  },
+  {
+   "code": "002428",
+   "name": "云南锗业",
+   "chain": "光互连算力",
+   "segment": "InP/锗衬底材料",
+   "tier": "材料耗材",
+   "coef": 1.0,
+   "base": 72,
+   "relabel": 10,
+   "chokepoint": 82,
+   "evidence": "strong",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "+60%",
+   "note": "A股最正宗InP衬底标的",
+   "evidence_note": "7/23公告子公司签磷化铟晶片供货协议5.7-8.55亿(占25年营收53-80%)；扩产30万片推进"
   },
   {
    "code": "002460",
@@ -116,7 +116,7 @@
    "evidence": "medium",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "+4%",
+   "chg120": "+3%",
    "note": "人形+工业双赛道",
    "evidence_note": "中报减速器放量；特斯拉认证/宇树长协仅媒体无公告级证实"
   },
@@ -172,23 +172,6 @@
    "evidence_note": "⚠️中报称丝杠仍处验证期未量产；'小鹏订单'仅自媒体无公告，不可作为升级依据"
   },
   {
-   "code": "603662",
-   "name": "柯力传感",
-   "chain": "具身智能",
-   "segment": "六维力传感器",
-   "tier": "芯片器件",
-   "coef": 0.78,
-   "base": 60,
-   "relabel": 18,
-   "chokepoint": 78,
-   "evidence": "strong",
-   "four_dim_total": 2,
-   "four_dim_level": "无共振",
-   "chg120": "-14%",
-   "note": "高毛利环节",
-   "evidence_note": "半年报8/28官方表述：90+机器人企业送样、部分客户已获批量订单并批量出货"
-  },
-  {
    "code": "002709",
    "name": "天赐材料",
    "chain": "固态电池",
@@ -204,6 +187,23 @@
    "chg120": "-30%",
    "note": "电解液龙头跨界硫化物",
    "evidence_note": "百吨级硫化锂及电解质中试线8月建成Q3试生产；宁德/华为送样验证(公开报道)"
+  },
+  {
+   "code": "603662",
+   "name": "柯力传感",
+   "chain": "具身智能",
+   "segment": "六维力传感器",
+   "tier": "芯片器件",
+   "coef": 0.78,
+   "base": 60,
+   "relabel": 18,
+   "chokepoint": 78,
+   "evidence": "strong",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "-14%",
+   "note": "高毛利环节",
+   "evidence_note": "半年报8/28官方表述：90+机器人企业送样、部分客户已获批量订单并批量出货"
   },
   {
    "code": "603728",
@@ -252,7 +252,7 @@
    "evidence": "strong",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "-17%",
+   "chg120": "-16%",
    "note": "材料层卡位质地强",
    "evidence_note": "公告+投关(3-6月)确认: 轻快世界占eVTOL预浸料80%份额合作28家,部分订单已批量交付;业务运营初期收入占比小"
   },
@@ -269,7 +269,7 @@
    "evidence": "strong",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "-15%",
+   "chg120": "-16%",
    "note": "",
    "evidence_note": "半年报+互动易(8月): 宇航FPGA/回读刷新芯片商业航天持续出货,完整宇航方案获核心用户应用"
   },
@@ -289,23 +289,6 @@
    "chg120": "-29%",
    "note": "",
    "evidence_note": "商飞合作4座eVTOL电机在研(功率密度3.7kW/kg)+小功率供样物流无人机;⚠️仅券商研报,无公司公告定点/量产；等主机厂定点/中标公告"
-  },
-  {
-   "code": "003021",
-   "name": "兆威机电",
-   "chain": "具身智能",
-   "segment": "灵巧手执行器",
-   "tier": "模块子系统",
-   "coef": 0.62,
-   "base": 56,
-   "relabel": 18,
-   "chokepoint": 74,
-   "evidence": "medium",
-   "four_dim_total": 2,
-   "four_dim_level": "无共振",
-   "chg120": "-29%",
-   "note": "",
-   "evidence_note": "⚠️投关4/1称灵巧手批量生产推进中；'专项订单32亿'仅自媒体与扣非-44%相悖"
   },
   {
    "code": "002281",
@@ -354,7 +337,7 @@
    "evidence": "strong",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "+38%",
+   "chg120": "+39%",
    "note": "PCB环节中卡位相对强",
    "evidence_note": "投关记录确认泰国基地规模化运营、400G交换机批量量产；订单排至2027"
   },
@@ -374,6 +357,23 @@
    "chg120": "-11%",
    "note": "",
    "evidence_note": "券商研报称线性执行器量产(丝杠7万套/年)；公司无订单/定点公告"
+  },
+  {
+   "code": "003021",
+   "name": "兆威机电",
+   "chain": "具身智能",
+   "segment": "灵巧手执行器",
+   "tier": "模块子系统",
+   "coef": 0.62,
+   "base": 56,
+   "relabel": 18,
+   "chokepoint": 74,
+   "evidence": "medium",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "-29%",
+   "note": "",
+   "evidence_note": "⚠️投关4/1称灵巧手批量生产推进中；'专项订单32亿'仅自媒体与扣非-44%相悖"
   },
   {
    "code": "603267",
@@ -405,7 +405,7 @@
    "evidence": "medium",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "-5%",
+   "chg120": "-6%",
    "note": "",
    "evidence_note": "互动易6/22官方: ⚠️26H1航天领域订单与去年同期持平(卫星批产爆发叙事不成立);增长来自高速互连新域；等卫星批产大单"
   },
@@ -439,7 +439,7 @@
    "evidence": "medium",
    "four_dim_total": 1,
    "four_dim_level": "无共振",
-   "chg120": "-19%",
+   "chg120": "-20%",
    "note": "",
    "evidence_note": "中报智能执行单元2.5亿占42%；宇树/智元供货仅媒体供应链信息"
   },
@@ -456,7 +456,7 @@
    "evidence": "strong",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "-17%",
+   "chg120": "-18%",
    "note": "低空基建卖铲人",
    "evidence_note": "半年报: 联合中标四川省低空运行管理服务+绵阳无人机管控;互动易确认东台/深圳/凉山多试点中标"
   },
@@ -488,8 +488,8 @@
    "relabel": 14,
    "chokepoint": 72,
    "evidence": "strong",
-   "four_dim_total": 7,
-   "four_dim_level": "★★ 高置信",
+   "four_dim_total": 6,
+   "four_dim_level": "★ 弱共振",
    "chg120": "+59%",
    "note": "",
    "evidence_note": "投关9月确认FC-BGA基板多客户规模化量产；H1净利+66%"
@@ -677,7 +677,7 @@
    "evidence": "strong",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "-8%",
+   "chg120": "-7%",
    "note": "",
    "evidence_note": "半年报8/25：Micro直显持续供货国内外头部客户、湖北基地15万片/月产能"
   },
@@ -728,7 +728,7 @@
    "evidence": "weak",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "+6%",
+   "chg120": "+5%",
    "note": "",
    "evidence_note": "⚠️互动易4/1明确固态为聚合物/凝胶体系;6N硫化锂3000吨量产仅自媒体无公告,硫化物叙事与官方口径相悖；降级观察"
   },
@@ -743,7 +743,7 @@
    "relabel": 18,
    "chokepoint": 68,
    "evidence": "medium",
-   "four_dim_total": 0,
+   "four_dim_total": 2,
    "four_dim_level": "无共振",
    "chg120": "-21%",
    "note": "",
@@ -777,8 +777,8 @@
    "relabel": 18,
    "chokepoint": 66,
    "evidence": "medium",
-   "four_dim_total": 3,
-   "four_dim_level": "无共振",
+   "four_dim_total": 5,
+   "four_dim_level": "★ 弱共振",
    "chg120": "-30%",
    "note": "卡位弱，观察",
    "evidence_note": "券商研报(含盈利预测)+证券时报报道+半年报确认恒丰特导AI渗透；无公告级订单量化"
@@ -813,7 +813,7 @@
    "evidence": "strong",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "+124%",
+   "chg120": "+123%",
    "note": "CCL为PCB上游材料",
    "evidence_note": "4/24公告52亿投建高性能覆铜板扩产；26H1预告净利+117~131%"
   },
@@ -915,7 +915,7 @@
    "evidence": "strong",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "+124%",
+   "chg120": "+120%",
    "note": "材料平台型",
    "evidence_note": "7/30董事会公告靶材二期扩产4.86亿(3万块/年)，半年报电板块营收49亿"
   },
@@ -966,7 +966,7 @@
    "evidence": "medium",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "+31%",
+   "chg120": "+30%",
    "note": "",
    "evidence_note": "互动易(25-12): ⚠️仅'参与部分客户配套'表述,无订单无金额;H1净利-7%靠贸易撑营收；降级观察"
   },
@@ -981,28 +981,11 @@
    "relabel": 14,
    "chokepoint": 62,
    "evidence": "medium",
-   "four_dim_total": 3,
+   "four_dim_total": 2,
    "four_dim_level": "无共振",
    "chg120": "+44%",
    "note": "大盘股，卡位叙事弱",
    "evidence_note": "投关7/7：Micro LED光互连处技术攻关预研未量产"
-  },
-  {
-   "code": "002812",
-   "name": "恩捷股份",
-   "chain": "固态电池",
-   "segment": "隔膜/固态电解质膜",
-   "tier": "材料耗材",
-   "coef": 1.0,
-   "base": 44,
-   "relabel": 18,
-   "chokepoint": 62,
-   "evidence": "strong",
-   "four_dim_total": 2,
-   "four_dim_level": "无共振",
-   "chg120": "-34%",
-   "note": "半固态受益/全固态受损",
-   "evidence_note": "湖南恩捷硫化物电解质10吨产线投产+吨级出货;半固态隔膜量产供卫蓝签2025-30框架(8月调研口径)；全固态普及隔膜有结构性风险但已跨界自救"
   },
   {
    "code": "603019",
@@ -1017,7 +1000,7 @@
    "evidence": "medium",
    "four_dim_total": 0,
    "four_dim_level": "无共振",
-   "chg120": "-3%",
+   "chg120": "-4%",
    "note": "整机集成层卡位低",
    "evidence_note": "半年报仅确认移动存储/中车存储中标；阿里云50亿液冷大单仅媒体披露无公司公告"
   },
@@ -1037,6 +1020,23 @@
    "chg120": "-16%",
    "note": "无人机链主但卡位低",
    "evidence_note": "业绩预告: 无人机手持+意向订单充足下半年按计划交付扭亏;⚠️订单以海外军贸为主,低空民用占比小；军贸无人机非低空民用核心"
+  },
+  {
+   "code": "002812",
+   "name": "恩捷股份",
+   "chain": "固态电池",
+   "segment": "隔膜/固态电解质膜",
+   "tier": "材料耗材",
+   "coef": 1.0,
+   "base": 44,
+   "relabel": 18,
+   "chokepoint": 62,
+   "evidence": "strong",
+   "four_dim_total": 0,
+   "four_dim_level": "无共振",
+   "chg120": "-34%",
+   "note": "半固态受益/全固态受损",
+   "evidence_note": "湖南恩捷硫化物电解质10吨产线投产+吨级出货;半固态隔膜量产供卫蓝签2025-30框架(8月调研口径)；全固态普及隔膜有结构性风险但已跨界自救"
   },
   {
    "code": "002805",
