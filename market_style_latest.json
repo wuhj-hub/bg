@@ -3,84 +3,85 @@
  "data_date": "2026-09-30",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 24,
+ "score": 22,
  "score_detail": {
   "size_style": -12,
-  "limitup_structure": 29,
+  "limitup_structure": 25,
   "volume_structure": -1,
-  "sector_fund": 8
+  "sector_fund": 10
  },
  "size_style": {
-  "hs300_5d": -4.23,
-  "hs300_10d": -2.2,
-  "zz1000_5d": -5.69,
-  "zz1000_10d": -1.62,
-  "rel_5d": -1.46,
-  "rel_10d": 0.58,
-  "rel_20d": 0.76,
-  "zz500_5d": -4.95
+  "hs300_5d": -3.99,
+  "hs300_10d": -1.95,
+  "zz1000_5d": -5.8,
+  "zz1000_10d": -1.73,
+  "rel_5d": -1.81,
+  "rel_10d": 0.22,
+  "rel_20d": 0.41,
+  "zz500_5d": -4.96
  },
  "limitup_structure": {
-  "limitup": 51,
-  "strong": 111,
-  "width_score": 90.0,
+  "limitup": 36,
+  "strong": 64,
+  "width_score": 76.5,
   "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 3.6,
-  "zhaban_rate": 32.0,
-  "lianban": 9
+  "strong_ratio": 2.1,
+  "zhaban_rate": 34.5,
+  "lianban": 10
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.066,
+  "small_big_ratio_now": 1.02,
   "small_big_ratio_5d": 1.198,
   "vol_shift": "资金回流大盘",
-  "small_vol_pulse": 52.45
+  "small_vol_pulse": 67.82
  },
  "sector_fund": {
   "sectors": [
    {
     "name": "房地产开发",
-    "zdf": "1.11",
+    "zdf": "0.97",
     "main_net5d": 2.5,
-    "retail_net": 3.3,
+    "retail_net": 2.6,
     "tag": "混合"
+   },
+   {
+    "name": "白酒Ⅱ",
+    "zdf": "2.72",
+    "main_net5d": -10.5,
+    "retail_net": -8.6,
+    "tag": "游资型"
    },
    {
     "name": "半导体",
-    "zdf": "-2.48",
+    "zdf": "-2.84",
     "main_net5d": -286.4,
-    "retail_net": 61.8,
+    "retail_net": 80.3,
     "tag": "游资型"
    },
    {
-    "name": "化学制药",
-    "zdf": "2.68",
-    "main_net5d": -43.7,
-    "retail_net": -14.7,
+    "name": "医疗服务",
+    "zdf": "4.12",
+    "main_net5d": -51.1,
+    "retail_net": -22.7,
     "tag": "游资型"
-   },
-   {
-    "name": "房地产服务",
-    "zdf": "0.65",
-    "main_net5d": 4.2,
-    "retail_net": 1.1,
-    "tag": "混合"
    }
   ]
  },
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 14,
-   "": 1
+   "堆量模式": 15
   },
   "leaders": {
-   "堆量模式": 8
+   "堆量模式": 11
   },
-  "pullbacks": {},
-  "gpoints": {
+  "pullbacks": {
    "堆量模式": 1
+  },
+  "gpoints": {
+   "堆量模式": 3
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
