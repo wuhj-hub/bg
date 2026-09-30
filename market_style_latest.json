@@ -1,24 +1,24 @@
 {
- "date": "2026-09-29",
- "data_date": "2026-09-29",
- "style": "情绪市",
- "icon": "🔥",
- "score": 26,
+ "date": "2026-09-30",
+ "data_date": "2026-09-30",
+ "style": "均衡市",
+ "icon": "⚖️",
+ "score": 24,
  "score_detail": {
   "size_style": -12,
   "limitup_structure": 29,
   "volume_structure": -1,
-  "sector_fund": 10
+  "sector_fund": 8
  },
  "size_style": {
-  "hs300_5d": -4.28,
-  "hs300_10d": -3.01,
-  "zz1000_5d": -5.68,
-  "zz1000_10d": -1.91,
-  "rel_5d": -1.4,
-  "rel_10d": 1.1,
-  "rel_20d": 0.32,
-  "zz500_5d": -5.23
+  "hs300_5d": -4.23,
+  "hs300_10d": -2.2,
+  "zz1000_5d": -5.69,
+  "zz1000_10d": -1.62,
+  "rel_5d": -1.46,
+  "rel_10d": 0.58,
+  "rel_20d": 0.76,
+  "zz500_5d": -4.95
  },
  "limitup_structure": {
   "limitup": 51,
@@ -33,46 +33,39 @@
  },
  "volume_structure": {
   "small_big_ratio_now": 1.066,
-  "small_big_ratio_5d": 1.221,
+  "small_big_ratio_5d": 1.198,
   "vol_shift": "资金回流大盘",
-  "small_vol_pulse": 76.54
+  "small_vol_pulse": 52.45
  },
  "sector_fund": {
   "sectors": [
    {
     "name": "房地产开发",
-    "zdf": "4.16",
-    "main_net5d": -5.4,
-    "retail_net": -13.8,
+    "zdf": "1.11",
+    "main_net5d": 2.5,
+    "retail_net": 3.3,
+    "tag": "混合"
+   },
+   {
+    "name": "半导体",
+    "zdf": "-2.48",
+    "main_net5d": -286.4,
+    "retail_net": 61.8,
     "tag": "游资型"
    },
    {
-    "name": "元件",
-    "zdf": "2.51",
-    "main_net5d": -173.4,
-    "retail_net": -29.5,
+    "name": "化学制药",
+    "zdf": "2.68",
+    "main_net5d": -43.7,
+    "retail_net": -14.7,
     "tag": "游资型"
    },
    {
-    "name": "电池",
-    "zdf": "0.44",
-    "main_net5d": -46.5,
-    "retail_net": -21.0,
-    "tag": "游资型"
-   },
-   {
-    "name": "房地产",
-    "zdf": "4.06",
-    "main_net5d": -0.6,
-    "retail_net": -15.9,
-    "tag": "游资型"
-   },
-   {
-    "name": "昨日涨停",
-    "zdf": "2.58",
-    "main_net5d": -96.1,
-    "retail_net": -2.8,
-    "tag": "游资型"
+    "name": "房地产服务",
+    "zdf": "0.65",
+    "main_net5d": 4.2,
+    "retail_net": 1.1,
+    "tag": "混合"
    }
   ]
  },
@@ -89,8 +82,8 @@
   "gpoints": {
    "堆量模式": 1
   },
-  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
+  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
- "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
+ "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
 }
