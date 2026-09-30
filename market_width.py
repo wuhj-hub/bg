@@ -4,6 +4,7 @@
 输出: outputs/market_width_{date}.md + market_width_latest.json（供盘前/复盘引用）
 """
 import csv, json, os, re, subprocess, sys, time
+from collections import Counter
 from datetime import datetime
 
 POOL = "all_mainboard.csv"
@@ -100,6 +101,7 @@ def main():
     print(f"[INFO] 股票池 {total}只（已过滤退市）", flush=True)
 
     chg = []  # (code, name, pct)
+    bar_dates = []  # 最新K线日期（防倒灌基准：按「交易日」对比，而非运行日）
     lacks = []  # (chunk, missing_codes) 供缺失补齐
     touched, zhaban, lianban, lianban3 = [], [], [], []  # 涨停池代理：触板/炸板/连板(≥2)/高连板(≥3)
     lianban_cnt = {}  # code -> 连续涨停天数
@@ -117,6 +119,7 @@ def main():
                 if c_prev and c_prev > 0:
                     pct = (c_last - c_prev) / c_prev * 100
                     chg.append((c["code"], c["name"], round(pct, 2)))
+                    bar_dates.append(d_last)
                     # 涨停池代理（2026-08-10）：触板/炸板
                     limit_p = c_prev * 1.10
                     if h_last and h_last >= limit_p * 0.99:
@@ -179,6 +182,10 @@ def main():
         print(f"[补齐] 完成：补回 {fixed}/{len(all_missing)} 只，最终有效 {len(chg)} 只", flush=True)
 
     n = len(chg)
+    # 快照对应的「交易日」= 多数股票的最新K线日期（2026-10-01 新增：防倒灌按交易日比对，
+    # 避免盘前/盘中运行拿到前一日K线却被打上今日日期，从而覆盖收盘后的较新快照）
+    bar_date = Counter(bar_dates).most_common(1)[0][0] if bar_dates else datetime.now().strftime("%Y-%m-%d")
+    print(f"[INFO] 快照交易日 bar_date={bar_date}（样本 {len(bar_dates)} 只）", flush=True)
     up = [x for x in chg if x[2] > 0]
     down = [x for x in chg if x[2] < 0]
     flat = [x for x in chg if x[2] == 0]
@@ -299,7 +306,7 @@ def main():
     open(md_path, "w", encoding="utf-8").write(md)
 
     js = {
-        "date": today, "total": total, "valid": n,
+        "date": today, "bar_date": bar_date, "total": total, "valid": n,
         "up": len(up), "down": len(down), "flat": len(flat),
         "strong": len(strong), "weak": len(weak),
         "limitup": len(lu), "limitdown": len(ld),
@@ -326,21 +333,24 @@ def main():
     _root_json = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(json_path)), "..", "market_width_latest.json"))
 
     def _read_meta(_p):
-        """读现有快照的 (date, valid)，用于防倒灌判断"""
+        """读现有快照的 (运行日, 交易日, valid)，用于防倒灌判断"""
         try:
             with open(_p, encoding="utf-8") as _f:
                 _d = json.load(_f)
-            return _d.get("date"), _d.get("valid")
+            return _d.get("date"), _d.get("bar_date"), _d.get("valid")
         except Exception:
-            return None, None
+            return None, None, None
 
-    # 防倒灌（2026-10-01）：旧日期的运行不得覆盖较新快照
-    _prev_date, _prev_valid = _read_meta(json_path)
-    if _prev_date and str(_prev_date) > str(today):
-        print(f"[WARN] 防倒灌：现有 latest 快照日期 {_prev_date} 晚于本次 {today} → 跳过写入（保留较新快照）")
+    # 防倒灌（2026-10-01）：按「交易日」优先比对——旧交易日的快照不得覆盖较新的；
+    # 老快照无 bar_date 时回退用运行日 date 比对。
+    _prev_date, _prev_bar, _prev_valid = _read_meta(json_path)
+    _new_key = str(bar_date)
+    _prev_key = str(_prev_bar or _prev_date or "")
+    if _prev_key and _prev_key > _new_key:
+        print(f"[WARN] 防倒灌：现有快照交易日 {_prev_key} 晚于本次 {_new_key} → 跳过写入（保留较新快照）")
     else:
-        if _prev_date == today:
-            print(f"[WARN] 同日重复运行：latest 快照将被本次覆盖（date={today}，有效样本 {_prev_valid}→{n}）")
+        if _prev_key == _new_key:
+            print(f"[WARN] 同一交易日重复写入：{_new_key} 的快照将被本次覆盖（有效样本 {_prev_valid}→{n}）")
         _js_txt = json.dumps(js, ensure_ascii=False, indent=1)
         open(json_path, "w", encoding="utf-8").write(_js_txt)
         try:

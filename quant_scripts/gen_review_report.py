@@ -984,8 +984,8 @@ def gen_report(today_str):
         mw = read_market_width()
         if mw:
             lines.append("")
-            lines.append(f"**市场宽度**（全主板涨跌家数，黑石启发）：上涨{mw.get('up','—')}/{mw.get('valid','—')}只 · 强势≥5% {mw.get('strong','—')} · 涨停{mw.get('limitup','—')} · 弱势≤-5% {mw.get('weak','—')} · 跌停{mw.get('limitdown','—')}")
-            lines.append(f"→ 宽度分 {mw.get('score','—')}/100 **{mw.get('level','')}**")
+            lines.append(f"**市场宽度**（全主板涨跌家数，黑石启发）：上涨{mw.get('up','—')}/{mw.get('valid','—')}只 · 强势≥5% {mw.get('strong','—')} · 涨停{mw.get('limitup','—')} · 弱势≤-5% {mw.get('weak','—')} · 跌停{mw.get('limitdown','—')} · 快照日 {mw.get('bar_date') or mw.get('date','—')}")
+            lines.append(f"→ 宽度分 {mw.get('score','—')}/100 = 广度 {mw.get('breadth','—')} + 赚钱效应 {mw.get('bonus','—')} **{mw.get('level','')}**")
             cl = mw.get("cost_line") or {}
             if cl:
                 lines.append(f"→ **200日成本线**（猛兽派启发）：现价{cl.get('cur','—')} vs 成本{cl.get('cost200','—')}（{cl.get('ratio','—')}%·斜率{cl.get('slope','—')}）→ {cl.get('zone','')}")
