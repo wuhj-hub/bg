@@ -1,5 +1,5 @@
 {
- "date": "2026-09-29",
+ "date": "2026-09-30",
  "workflows": 18,
  "high_risk": 0,
  "issues": {
@@ -28,6 +28,7 @@
    "intraday_monitor.yml :: 判断是否交易日 (L32) — 命中 continue-on-error: true",
    "intraday_monitor.yml :: 开盘八法强形态扫描+突破监控 (L116) — 命中 continue-on-error: true",
    "jingjia_track.yml :: 判断是否交易日 (L28) — 命中 continue-on-error: true",
+   "jingjia_track.yml :: 上传竞价报告到知识库「报告/竞价」 (L81) — 命中 continue-on-error: true, || echo（吞错误）",
    "market_regime.yml :: 判断是否交易日 (L36) — 命中 continue-on-error: true",
    "market_regime.yml :: 提交判定结果到仓库 (L68) — 命中 continue-on-error: true, set +e, || true",
    "premarket_report.yml :: 判断是否交易日 (L39) — 命中 continue-on-error: true",
@@ -40,63 +41,63 @@
    "probe_em.yml :: 提交东财板块映射到仓库 (L85) — 命中 continue-on-error: true",
    "quant_report.yml :: 判断是否交易日 (L32) — 命中 continue-on-error: true",
    "quant_report.yml :: 数据源连通性预检 + 股池备份 (L69) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true",
-   "quant_report.yml :: 上游扫描结果检查（失败则告警退出） (L93) — 命中 || true",
-   "quant_report.yml :: 猛兽本月股池同步（主池/观察池分层 + 剔除不符合） (L103) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
-   "quant_report.yml :: 双弦每日报告+月度股池同步（收编sx2单一出口） (L118) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
-   "quant_report.yml :: 才哥战法股池扫描+跟踪（四战法独立股池） (L142) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
-   "quant_report.yml :: 龙头战法池扫描（dragon_leader·100分五维） (L168) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
-   "quant_report.yml :: 一统天下建仓区股池扫描+跟踪（多周期共振） (L185) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
-   "quant_report.yml :: 妖股发现与跟踪池（启动入池+出货预警推送） (L210) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
-   "quant_report.yml :: 龙头定位扫描（连板梯队+见顶五维预警） (L227) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
-   "quant_report.yml :: 市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证） (L244) — 命中 continue-on-error: true",
-   "quant_report.yml :: 四维共振评分（复用上游 quant_scan 产物，缺失则本地补跑兜底） (L251) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）",
-   "quant_report.yml :: 全系统信号仲裁（统一出口·今日操作清单） (L272) — 命中 continue-on-error: true",
-   "quant_report.yml :: 宁静AI卡位每日观察清单 (L277) — 命中 continue-on-error: true, || true",
-   "quant_report.yml :: 创业板/科创四维补充扫描（代表性补充通道） (L285) — 命中 continue-on-error: true",
-   "quant_report.yml :: 生成并上传股池标的跟踪报告（三阶漏斗） (L295) — 命中 continue-on-error: true",
-   "quant_report.yml :: 持仓组合风控（portfolio_risk） (L312) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_report.yml :: 实盘执行纪律报告（trade_journal） (L322) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_report.yml :: 个股执行卡生成（持仓 + 当日信号仲裁候选） (L330) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
-   "quant_report.yml :: 乖离低买扫描（一统天下·跌破MA5>7%） (L337) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true",
-   "quant_report.yml :: 市场状态判定（三级别力量·内联刷新） (L358) — 命中 continue-on-error: true, set +e, || true",
-   "quant_report.yml :: 股池守护（数据源故障则不覆盖历史股池） (L386) — 命中 continue-on-error: true",
-   "quant_report.yml :: 盘后数据健康审计（产物可信度） (L398) — 命中 continue-on-error: true, set +e, || true",
-   "quant_report.yml :: 提交报告产物到仓库（供盘前报告引用） (L412) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true",
-   "quant_report.yml :: 自动生成复盘报告并上传 (L451) — 命中 continue-on-error: true, || echo（吞错误）",
-   "quant_report.yml :: 股池信号实盘胜率跟踪 (L486) — 命中 continue-on-error: true, || echo（吞错误）, || true",
-   "quant_report.yml :: 纸面组合跟踪（选股方法对比） (L511) — 命中 continue-on-error: true, set +e, || true",
-   "quant_report.yml :: 反转数值周线信号上传推送 (L552) — 命中 continue-on-error: true, || true",
-   "quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L590) — 命中 continue-on-error: true, set +e, || true",
-   "quant_report.yml :: 推送自检报告到微信 (L608) — 命中 continue-on-error: true",
+   "quant_report.yml :: 上游扫描结果检查（失败则告警退出） (L95) — 命中 || true",
+   "quant_report.yml :: 猛兽本月股池同步（主池/观察池分层 + 剔除不符合） (L105) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
+   "quant_report.yml :: 双弦每日报告+月度股池同步（收编sx2单一出口） (L120) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
+   "quant_report.yml :: 才哥战法股池扫描+跟踪（四战法独立股池） (L144) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
+   "quant_report.yml :: 龙头战法池扫描（dragon_leader·100分五维） (L170) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
+   "quant_report.yml :: 一统天下建仓区股池扫描+跟踪（多周期共振） (L187) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
+   "quant_report.yml :: 妖股发现与跟踪池（启动入池+出货预警推送） (L212) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
+   "quant_report.yml :: 龙头定位扫描（连板梯队+见顶五维预警） (L229) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
+   "quant_report.yml :: 市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证） (L246) — 命中 continue-on-error: true",
+   "quant_report.yml :: 四维共振评分（复用上游 quant_scan 产物，缺失则本地补跑兜底） (L253) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）",
+   "quant_report.yml :: 全系统信号仲裁（统一出口·今日操作清单） (L274) — 命中 continue-on-error: true",
+   "quant_report.yml :: 宁静AI卡位每日观察清单 (L279) — 命中 continue-on-error: true, || true",
+   "quant_report.yml :: 创业板/科创四维补充扫描（代表性补充通道） (L287) — 命中 continue-on-error: true",
+   "quant_report.yml :: 生成并上传股池标的跟踪报告（三阶漏斗） (L297) — 命中 continue-on-error: true",
+   "quant_report.yml :: 持仓组合风控（portfolio_risk） (L314) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_report.yml :: 实盘执行纪律报告（trade_journal） (L324) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_report.yml :: 个股执行卡生成（持仓 + 当日信号仲裁候选） (L332) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
+   "quant_report.yml :: 乖离低买扫描（一统天下·跌破MA5>7%） (L339) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true",
+   "quant_report.yml :: 市场状态判定（三级别力量·内联刷新） (L360) — 命中 continue-on-error: true, set +e, || true",
+   "quant_report.yml :: 股池守护（数据源故障则不覆盖历史股池） (L388) — 命中 continue-on-error: true",
+   "quant_report.yml :: 盘后数据健康审计（产物可信度） (L400) — 命中 continue-on-error: true, set +e, || true",
+   "quant_report.yml :: 提交报告产物到仓库（供盘前报告引用） (L414) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true",
+   "quant_report.yml :: 自动生成复盘报告并上传 (L453) — 命中 continue-on-error: true, || echo（吞错误）",
+   "quant_report.yml :: 股池信号实盘胜率跟踪 (L488) — 命中 continue-on-error: true, || echo（吞错误）, || true",
+   "quant_report.yml :: 纸面组合跟踪（选股方法对比） (L513) — 命中 continue-on-error: true, set +e, || true",
+   "quant_report.yml :: 反转数值周线信号上传推送 (L554) — 命中 continue-on-error: true, || true",
+   "quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L592) — 命中 continue-on-error: true, set +e, || true",
+   "quant_report.yml :: 推送自检报告到微信 (L610) — 命中 continue-on-error: true",
    "quant_scan.yml :: 判断是否交易日 (L35) — 命中 continue-on-error: true",
    "quant_scan.yml :: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断） (L73) — 命中 continue-on-error: true, || echo（吞错误）",
    "quant_scan.yml :: IMA 凭证早期预检（失效立即微信告警，不阻断扫描） (L81) — 命中 continue-on-error: true, || true",
    "quant_scan.yml :: 预热westock数据包 (L91) — 命中 set +e, || true",
-   "quant_scan.yml :: 板块成分映射（东财·runner 可达） (L118) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true",
-   "quant_scan.yml :: 全量量化扫描（盘后量化） (L139) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）",
-   "quant_scan.yml :: 热点情绪扫描（hot_emotion 连板梯队+情绪温度） (L155) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true",
-   "quant_scan.yml :: 市场情绪状态与次日预判（emotion_forecast） (L179) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 年线广度扫描（站上年线个股占比） (L187) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 西湖广度扫描（下雨图：强势股/第二阶段/新高/新低） (L196) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 断档分歧板块择时信号 (L206) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true",
-   "quant_scan.yml :: 涨停概念排行（涨停股×概念聚合，热点概念排序） (L215) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 123/2B/ABC反转信号扫描 (L228) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: RSV相对强度扫描 (L236) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 西湖-RSV 多周期相对强度扫描（全市场） (L244) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 月线MACD监控 (L255) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true",
-   "quant_scan.yml :: 市场见顶五维监测（top_signal） (L262) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 量学扫描（黑马王子体系，与曾星智月线闸门同级） (L271) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 量学×月线联合输出（月线多头∩量学PASS） (L279) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 量学PASS分时量波验证（人线偏离检测） (L287) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
-   "quant_scan.yml :: 分时强度分析（信号股分时MACD） (L295) — 命中 continue-on-error: true",
-   "quant_scan.yml :: 板块资金共振（本地复算·无外部依赖） (L300) — 命中 continue-on-error: true",
-   "quant_scan.yml :: 一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） (L317) — 命中 continue-on-error: true",
-   "quant_scan.yml :: 四维共振评分（政策/资金/筹码/关联方四维证据链） (L326) — 命中 continue-on-error: true",
-   "quant_scan.yml :: 上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源） (L332) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true",
-   "quant_scan.yml :: 上传全盘量化报告到全盘量化文件夹 (L366) — 命中 || true",
-   "quant_scan.yml :: 扫描产物可信度审计 (L398) — 命中 continue-on-error: true, set +e, || true",
-   "quant_scan.yml :: 提交扫描产物到仓库（供盘前引用/报告workflow读取） (L413) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true",
-   "quant_scan.yml :: 关键扫描产物检查（缺失即告警） (L469) — 命中 continue-on-error: true, || true",
+   "quant_scan.yml :: 板块成分映射（东财·runner 可达） (L121) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true",
+   "quant_scan.yml :: 全量量化扫描（盘后量化） (L142) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）",
+   "quant_scan.yml :: 热点情绪扫描（hot_emotion 连板梯队+情绪温度） (L158) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true",
+   "quant_scan.yml :: 市场情绪状态与次日预判（emotion_forecast） (L182) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 年线广度扫描（站上年线个股占比） (L190) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 西湖广度扫描（下雨图：强势股/第二阶段/新高/新低） (L199) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 断档分歧板块择时信号 (L209) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true",
+   "quant_scan.yml :: 涨停概念排行（涨停股×概念聚合，热点概念排序） (L218) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 123/2B/ABC反转信号扫描 (L231) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: RSV相对强度扫描 (L239) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 西湖-RSV 多周期相对强度扫描（全市场） (L247) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 月线MACD监控 (L258) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true",
+   "quant_scan.yml :: 市场见顶五维监测（top_signal） (L265) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 量学扫描（黑马王子体系，与曾星智月线闸门同级） (L274) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 量学×月线联合输出（月线多头∩量学PASS） (L282) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 量学PASS分时量波验证（人线偏离检测） (L290) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
+   "quant_scan.yml :: 分时强度分析（信号股分时MACD） (L298) — 命中 continue-on-error: true",
+   "quant_scan.yml :: 板块资金共振（本地复算·无外部依赖） (L303) — 命中 continue-on-error: true",
+   "quant_scan.yml :: 一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） (L320) — 命中 continue-on-error: true",
+   "quant_scan.yml :: 四维共振评分（政策/资金/筹码/关联方四维证据链） (L329) — 命中 continue-on-error: true",
+   "quant_scan.yml :: 上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源） (L335) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true",
+   "quant_scan.yml :: 上传全盘量化报告到全盘量化文件夹 (L369) — 命中 || true",
+   "quant_scan.yml :: 扫描产物可信度审计 (L401) — 命中 continue-on-error: true, set +e, || true",
+   "quant_scan.yml :: 提交扫描产物到仓库（供盘前引用/报告workflow读取） (L416) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true",
+   "quant_scan.yml :: 关键扫描产物检查（缺失即告警） (L472) — 命中 continue-on-error: true, || true",
    "selfcheck_daily.yml :: 预热 westock 数据包（避免首个 kl 调用冷启动失败） (L38) — 命中 || echo（吞错误）",
    "selfcheck_daily.yml :: ① 数据源交叉验证（westock × 东财 × 腾讯） (L43) — 命中 continue-on-error: true, set +e",
    "selfcheck_daily.yml :: ② 静默失败元审计（扫 workflow 自身的假绿风险） (L55) — 命中 continue-on-error: true, set +e",
@@ -289,6 +290,11 @@
     "level": "🟡中危·吞错误",
     "step": "判断是否交易日 (L28)",
     "detail": "命中 continue-on-error: true"
+   },
+   {
+    "level": "🟡中危·吞错误",
+    "step": "上传竞价报告到知识库「报告/竞价」 (L81)",
+    "detail": "命中 continue-on-error: true, || echo（吞错误）"
    }
   ],
   "market_regime.yml": [
@@ -372,142 +378,142 @@
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "上游扫描结果检查（失败则告警退出） (L93)",
+    "step": "上游扫描结果检查（失败则告警退出） (L95)",
     "detail": "命中 || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "猛兽本月股池同步（主池/观察池分层 + 剔除不符合） (L103)",
+    "step": "猛兽本月股池同步（主池/观察池分层 + 剔除不符合） (L105)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "双弦每日报告+月度股池同步（收编sx2单一出口） (L118)",
+    "step": "双弦每日报告+月度股池同步（收编sx2单一出口） (L120)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "才哥战法股池扫描+跟踪（四战法独立股池） (L142)",
+    "step": "才哥战法股池扫描+跟踪（四战法独立股池） (L144)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "龙头战法池扫描（dragon_leader·100分五维） (L168)",
+    "step": "龙头战法池扫描（dragon_leader·100分五维） (L170)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "一统天下建仓区股池扫描+跟踪（多周期共振） (L185)",
+    "step": "一统天下建仓区股池扫描+跟踪（多周期共振） (L187)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "妖股发现与跟踪池（启动入池+出货预警推送） (L210)",
+    "step": "妖股发现与跟踪池（启动入池+出货预警推送） (L212)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "龙头定位扫描（连板梯队+见顶五维预警） (L227)",
+    "step": "龙头定位扫描（连板梯队+见顶五维预警） (L229)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证） (L244)",
+    "step": "市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证） (L246)",
     "detail": "命中 continue-on-error: true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "四维共振评分（复用上游 quant_scan 产物，缺失则本地补跑兜底） (L251)",
+    "step": "四维共振评分（复用上游 quant_scan 产物，缺失则本地补跑兜底） (L253)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "全系统信号仲裁（统一出口·今日操作清单） (L272)",
+    "step": "全系统信号仲裁（统一出口·今日操作清单） (L274)",
     "detail": "命中 continue-on-error: true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "宁静AI卡位每日观察清单 (L277)",
+    "step": "宁静AI卡位每日观察清单 (L279)",
     "detail": "命中 continue-on-error: true, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "创业板/科创四维补充扫描（代表性补充通道） (L285)",
+    "step": "创业板/科创四维补充扫描（代表性补充通道） (L287)",
     "detail": "命中 continue-on-error: true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "生成并上传股池标的跟踪报告（三阶漏斗） (L295)",
+    "step": "生成并上传股池标的跟踪报告（三阶漏斗） (L297)",
     "detail": "命中 continue-on-error: true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "持仓组合风控（portfolio_risk） (L312)",
+    "step": "持仓组合风控（portfolio_risk） (L314)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "实盘执行纪律报告（trade_journal） (L322)",
+    "step": "实盘执行纪律报告（trade_journal） (L324)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "个股执行卡生成（持仓 + 当日信号仲裁候选） (L330)",
+    "step": "个股执行卡生成（持仓 + 当日信号仲裁候选） (L332)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "乖离低买扫描（一统天下·跌破MA5>7%） (L337)",
+    "step": "乖离低买扫描（一统天下·跌破MA5>7%） (L339)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "市场状态判定（三级别力量·内联刷新） (L358)",
+    "step": "市场状态判定（三级别力量·内联刷新） (L360)",
     "detail": "命中 continue-on-error: true, set +e, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "股池守护（数据源故障则不覆盖历史股池） (L386)",
+    "step": "股池守护（数据源故障则不覆盖历史股池） (L388)",
     "detail": "命中 continue-on-error: true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "盘后数据健康审计（产物可信度） (L398)",
+    "step": "盘后数据健康审计（产物可信度） (L400)",
     "detail": "命中 continue-on-error: true, set +e, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "提交报告产物到仓库（供盘前报告引用） (L412)",
+    "step": "提交报告产物到仓库（供盘前报告引用） (L414)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "自动生成复盘报告并上传 (L451)",
+    "step": "自动生成复盘报告并上传 (L453)",
     "detail": "命中 continue-on-error: true, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "股池信号实盘胜率跟踪 (L486)",
+    "step": "股池信号实盘胜率跟踪 (L488)",
     "detail": "命中 continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "纸面组合跟踪（选股方法对比） (L511)",
+    "step": "纸面组合跟踪（选股方法对比） (L513)",
     "detail": "命中 continue-on-error: true, set +e, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "反转数值周线信号上传推送 (L552)",
+    "step": "反转数值周线信号上传推送 (L554)",
     "detail": "命中 continue-on-error: true, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "体系自检 — 健康评分 / 市场状态 / 异常检测 (L590)",
+    "step": "体系自检 — 健康评分 / 市场状态 / 异常检测 (L592)",
     "detail": "命中 continue-on-error: true, set +e, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "推送自检报告到微信 (L608)",
+    "step": "推送自检报告到微信 (L610)",
     "detail": "命中 continue-on-error: true"
    }
   ],
@@ -534,127 +540,127 @@
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "板块成分映射（东财·runner 可达） (L118)",
+    "step": "板块成分映射（东财·runner 可达） (L121)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "全量量化扫描（盘后量化） (L139)",
+    "step": "全量量化扫描（盘后量化） (L142)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "热点情绪扫描（hot_emotion 连板梯队+情绪温度） (L155)",
+    "step": "热点情绪扫描（hot_emotion 连板梯队+情绪温度） (L158)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "市场情绪状态与次日预判（emotion_forecast） (L179)",
+    "step": "市场情绪状态与次日预判（emotion_forecast） (L182)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "年线广度扫描（站上年线个股占比） (L187)",
+    "step": "年线广度扫描（站上年线个股占比） (L190)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "西湖广度扫描（下雨图：强势股/第二阶段/新高/新低） (L196)",
+    "step": "西湖广度扫描（下雨图：强势股/第二阶段/新高/新低） (L199)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "断档分歧板块择时信号 (L206)",
+    "step": "断档分歧板块择时信号 (L209)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "涨停概念排行（涨停股×概念聚合，热点概念排序） (L215)",
+    "step": "涨停概念排行（涨停股×概念聚合，热点概念排序） (L218)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "123/2B/ABC反转信号扫描 (L228)",
+    "step": "123/2B/ABC反转信号扫描 (L231)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "RSV相对强度扫描 (L236)",
+    "step": "RSV相对强度扫描 (L239)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "西湖-RSV 多周期相对强度扫描（全市场） (L244)",
+    "step": "西湖-RSV 多周期相对强度扫描（全市场） (L247)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "月线MACD监控 (L255)",
+    "step": "月线MACD监控 (L258)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "市场见顶五维监测（top_signal） (L262)",
+    "step": "市场见顶五维监测（top_signal） (L265)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "量学扫描（黑马王子体系，与曾星智月线闸门同级） (L271)",
+    "step": "量学扫描（黑马王子体系，与曾星智月线闸门同级） (L274)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "量学×月线联合输出（月线多头∩量学PASS） (L279)",
+    "step": "量学×月线联合输出（月线多头∩量学PASS） (L282)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "量学PASS分时量波验证（人线偏离检测） (L287)",
+    "step": "量学PASS分时量波验证（人线偏离检测） (L290)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "分时强度分析（信号股分时MACD） (L295)",
+    "step": "分时强度分析（信号股分时MACD） (L298)",
     "detail": "命中 continue-on-error: true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "板块资金共振（本地复算·无外部依赖） (L300)",
+    "step": "板块资金共振（本地复算·无外部依赖） (L303)",
     "detail": "命中 continue-on-error: true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） (L317)",
+    "step": "一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） (L320)",
     "detail": "命中 continue-on-error: true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "四维共振评分（政策/资金/筹码/关联方四维证据链） (L326)",
+    "step": "四维共振评分（政策/资金/筹码/关联方四维证据链） (L329)",
     "detail": "命中 continue-on-error: true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源） (L332)",
+    "step": "上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源） (L335)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "上传全盘量化报告到全盘量化文件夹 (L366)",
+    "step": "上传全盘量化报告到全盘量化文件夹 (L369)",
     "detail": "命中 || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "扫描产物可信度审计 (L398)",
+    "step": "扫描产物可信度审计 (L401)",
     "detail": "命中 continue-on-error: true, set +e, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "提交扫描产物到仓库（供盘前引用/报告workflow读取） (L413)",
+    "step": "提交扫描产物到仓库（供盘前引用/报告workflow读取） (L416)",
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true"
    },
    {
     "level": "🟡中危·吞错误",
-    "step": "关键扫描产物检查（缺失即告警） (L469)",
+    "step": "关键扫描产物检查（缺失即告警） (L472)",
     "detail": "命中 continue-on-error: true, || true"
    }
   ],
