@@ -77,3 +77,20 @@ jobs:
           python3 git_api_commit.py --msg "chore: 竞价统计逐日更新 ${D}" \
             data/jingjia_auction.csv data/jingjia_signals.csv \
             "outputs/竞价统计_${D}.md"
+ 
+      - name: 上传竞价报告到知识库「报告/竞价」
+        if: always()
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: 6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs=
+          IMA_FOLDER_ID: folder_7511006091703733
+          IMA_SKIP_DUP: "1"
+        run: |
+          F="outputs/竞价统计_$(TZ=Asia/Shanghai date +%Y-%m-%d).md"
+          if [ -f "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "⚠️ 竞价报告上传失败(非致命)"
+          else
+            echo "未找到 $F，跳过上传"
+          fi
