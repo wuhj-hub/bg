@@ -155,6 +155,7 @@ def eval_signals(kl, p):
         "pct_to_high": round(c_last / hhv_h * 100, 1) if hhv_h else None,
         "strong": strong, "stage2": stage2,
         "new_high": new_high, "new_low": new_low, "bars": n,
+        "bar_date": kl[-1][0],   # ⭐2026-10-02: 该股最新K线日期（供 bar_date 绑定，防非交易日灌假数据）
     }
 
 
@@ -502,6 +503,10 @@ def main():
         if len(hist) < 2:
             print("[WARN] history 数据点不足(<2)，未生成图")
             return
+        _last = max(hist)
+        if _last != date_str:
+            print(f"[WARN] history 最新数据日 {_last}（≠ 运行日 {date_str}）→ 图可能滞后"
+                  f"，请检查上游是否已提交 history（非交易日正常）", flush=True)
         if args.chart_days > 0:
             hist = {k: hist[k] for k in sorted(hist.keys())[-args.chart_days:]}
         chart_path = os.path.join(args.outdir, "xihu_breadth_chart.png")
@@ -535,12 +540,23 @@ def main():
     agg = aggregate(result)
     jd = judge(agg)
 
-    md = build_report(agg, result, jd, date_str, p)
-    md_path = os.path.join(args.outdir, f"xihu_breadth_{date_str}.md")
+    # ⭐2026-10-02: 绑定"数据日"而非"运行日"——取最多数股票的最新K线日期作为 bar_date，
+    #   避免非交易日/行情未更新时，把上一交易日的数据打上"运行日"日期灌进 history（图与拐点分析随之失真）
+    from collections import Counter
+    _bd = Counter(v.get("bar_date") for v in result.values() if v.get("bar_date"))
+    bar_str = _bd.most_common(1)[0][0] if _bd else date_str
+    if bar_str != date_str:
+        print(f"[INFO] 数据日 {bar_str} ≠ 运行日 {date_str}（非交易日或行情未更新）→ 产物以数据日为准", flush=True)
+    elif _bd:
+        print(f"[INFO] 数据日 {bar_str}（{sum(_bd.values())} 只样本一致）", flush=True)
+
+    md = build_report(agg, result, jd, bar_str, p)
+    md_path = os.path.join(args.outdir, f"xihu_breadth_{bar_str}.md")
     open(md_path, "w", encoding="utf-8").write(md)
 
     js = {
-        "date": date_str,
+        "date": bar_str,
+        "run_date": date_str,
         "total": agg["total"],
         "strong": agg["strong"], "qsg_pct": agg["qsg_pct"],
         "stage2": agg["stage2"], "ejd_pct": agg["ejd_pct"],
@@ -567,9 +583,11 @@ def main():
     if args.backfill > 0:
         print(f"[回算] 回填最近 {args.backfill} 个交易日的广度序列…", flush=True)
         hist = build_history(kl_cache, p, args.backfill, existing=hist)
-    hist[date_str] = {"qsg_pct": agg["qsg_pct"], "ejd_pct": agg["ejd_pct"],
-                      "new_high": agg["new_high"], "new_low": agg["new_low"],
-                      "net_high": agg["net_high"], "total": agg["total"]}
+    if bar_str in hist:
+        print(f"[WARN] history 已存在 {bar_str}（同一交易日重复运行），以本次扫描结果覆盖", flush=True)
+    hist[bar_str] = {"qsg_pct": agg["qsg_pct"], "ejd_pct": agg["ejd_pct"],
+                     "new_high": agg["new_high"], "new_low": agg["new_low"],
+                     "net_high": agg["net_high"], "total": agg["total"]}
     hist = {k: hist[k] for k in sorted(hist.keys())}
     open(hist_path, "w", encoding="utf-8").write(json.dumps(hist, ensure_ascii=False, indent=1))
 

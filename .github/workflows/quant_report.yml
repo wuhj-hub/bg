@@ -454,6 +454,7 @@ jobs:
         if: always()  # 防阻断：前置步骤失败仍执行
         continue-on-error: true
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
@@ -465,6 +466,11 @@ jobs:
           python3 quant_scripts/glm_brief.py --out "outputs/glm_brief_review_$(date +%Y-%m-%d).md" || echo "GLM 复盘研判跳过"
           # 西湖广度拐点过滤验证（先于复盘报告生成，供其引用）
           python3 quant_scripts/xihu_turns_check.py --json || echo "西湖拐点分析失败, 不阻断复盘"
+          # ⭐2026-10-02: turns 产物此前从未提交（被 gen_review_report 消费 → 静默断链），此处补提交
+          if [ -f outputs/xihu_turns_latest.json ]; then
+            python3 git_api_commit.py --msg "chore: xihu turns ($(date +%Y-%m-%d))" outputs/xihu_turns_latest.json \
+              || echo "西湖拐点产物提交失败(非致命)"
+          fi
           python3 quant_scripts/gen_review_report.py
           python3 quant_scripts/report_selfcheck.py --review "outputs/复盘报告_$(date +%Y-%m-%d).md" --today "$(date +%Y-%m-%d)" --alert || echo "自检发现问题(已推送报警), 不阻断流程"
           # 市场图表生成（情绪图+三系统温度图，温度从 quant_results 自动提取）
