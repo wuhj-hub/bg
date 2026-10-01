@@ -1,10 +1,10 @@
 {
- "date": "2026-09-30",
+ "date": "2026-10-01",
  "threshold": 0.5,
  "total": 9,
  "ok": 9,
  "alerts": [],
- "em_online": false,
+ "em_online": true,
  "results": [
   {
    "code": "sh000001",
@@ -24,7 +24,11 @@
     "close": 3842.19,
     "pct": 0.31
    },
-   "em": null,
+   "em": {
+    "name": "上证指数",
+    "close": 3842.19,
+    "pct": 0.31
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -46,7 +50,11 @@
     "close": 12887.62,
     "pct": -0.11
    },
-   "em": null,
+   "em": {
+    "name": "深证成指",
+    "close": 12887.62,
+    "pct": -0.11
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -68,7 +76,11 @@
     "close": 3135.28,
     "pct": -0.23
    },
-   "em": null,
+   "em": {
+    "name": "创业板指",
+    "close": 3135.28,
+    "pct": -0.23
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -90,7 +102,11 @@
     "close": 1258.62,
     "pct": 1.86
    },
-   "em": null,
+   "em": {
+    "name": "贵州茅台",
+    "close": 1258.62,
+    "pct": 1.86
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -112,7 +128,11 @@
     "close": 11.57,
     "pct": 1.94
    },
-   "em": null,
+   "em": {
+    "name": "平安银行",
+    "close": 11.57,
+    "pct": 1.94
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -134,7 +154,11 @@
     "close": 53.29,
     "pct": 1.5
    },
-   "em": null,
+   "em": {
+    "name": "中国平安",
+    "close": 53.29,
+    "pct": 1.5
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -156,7 +180,11 @@
     "close": 6.45,
     "pct": -0.62
    },
-   "em": null,
+   "em": {
+    "name": "浙大网新",
+    "close": 6.45,
+    "pct": -0.62
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -178,7 +206,11 @@
     "close": 2.85,
     "pct": -1.38
    },
-   "em": null,
+   "em": {
+    "name": "国安股份",
+    "close": 2.85,
+    "pct": -1.38
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -200,7 +232,11 @@
     "close": 4.72,
     "pct": 0.85
    },
-   "em": null,
+   "em": {
+    "name": "华能蒙电",
+    "close": 4.72,
+    "pct": 0.85
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   }

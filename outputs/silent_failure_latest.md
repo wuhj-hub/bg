@@ -1,4 +1,4 @@
-# 🔍 体系自检元审计 · 2026-09-30
+# 🔍 体系自检元审计 · 2026-10-01
 
 > 扫描 18 个 workflow ｜ 风险项 **115** ｜ 🔴高危 **0**
 
@@ -64,11 +64,11 @@
 - quant_report.yml :: 盘后数据健康审计（产物可信度） (L400) — 命中 continue-on-error: true, set +e, || true
 - quant_report.yml :: 提交报告产物到仓库（供盘前报告引用） (L414) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
 - quant_report.yml :: 自动生成复盘报告并上传 (L453) — 命中 continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 股池信号实盘胜率跟踪 (L488) — 命中 continue-on-error: true, || echo（吞错误）, || true
-- quant_report.yml :: 纸面组合跟踪（选股方法对比） (L513) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 反转数值周线信号上传推送 (L554) — 命中 continue-on-error: true, || true
-- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L592) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 推送自检报告到微信 (L610) — 命中 continue-on-error: true
+- quant_report.yml :: 股池信号实盘胜率跟踪 (L490) — 命中 continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: 纸面组合跟踪（选股方法对比） (L515) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 反转数值周线信号上传推送 (L556) — 命中 continue-on-error: true, || true
+- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L594) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 推送自检报告到微信 (L612) — 命中 continue-on-error: true
 - quant_scan.yml :: 判断是否交易日 (L35) — 命中 continue-on-error: true
 - quant_scan.yml :: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断） (L73) — 命中 continue-on-error: true, || echo（吞错误）
 - quant_scan.yml :: IMA 凭证早期预检（失效立即微信告警，不阻断扫描） (L81) — 命中 continue-on-error: true, || true

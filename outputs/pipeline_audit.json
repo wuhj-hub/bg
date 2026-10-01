@@ -1,7 +1,7 @@
 {
- "date": "2026-10-01 07:01",
+ "date": "2026-10-02 07:01",
  "runs": {
-  "total": 84,
+  "total": 85,
   "bad": [
    {
     "name": "盘后报告生成",
@@ -19,28 +19,11 @@
    }
   ]
  },
- "heavy_steps": [
-  {
-   "workflow": "盘后报告生成",
-   "step": "一统天下建仓区股池扫描+跟踪（多周期共振）",
-   "minutes": 32.3
-  },
-  {
-   "workflow": "盘后报告生成",
-   "step": "股池信号实盘胜率跟踪",
-   "minutes": 26.3
-  },
-  {
-   "workflow": "竞价统计·逐日跟踪",
-   "step": "采集竞价 + 逐日跟踪 + 报告",
-   "minutes": 34.9
-  }
- ],
+ "heavy_steps": [],
  "stale_products": [],
  "script_errors": [],
  "issues": [
-  "❌ run 异常 2 个（盘后报告生成:cancelled、全盘量化扫描:cancelled）",
-  "⚠️ 重步骤：盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 32.3min、盘后报告生成/股池信号实盘胜率跟踪 26.3min、竞价统计·逐日跟踪/采集竞价 + 逐日跟踪 + 报告 34.9min"
+  "❌ run 异常 2 个（盘后报告生成:cancelled、全盘量化扫描:cancelled）"
  ],
  "status": "FAIL"
 }
