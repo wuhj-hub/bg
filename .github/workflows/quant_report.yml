@@ -479,7 +479,9 @@ jobs:
             done
           fi
           # 西湖广度净值曲线图（下雨图趋势，上传「复盘报告」文件夹；history 由 quant_scan 每日累积）
-          python3 quant_scripts/xihu_breadth.py --chart-only --chart-days 500 || echo "西湖净值图生成失败, 不阻断复盘"
+          # ⭐2026-10-01：画图窗口 500→120 交易日。500日下拐点标记达30个、过于密集；
+          #    120日（≈半年）正好覆盖当前拐点周期（2026-04 起），标记降至 18 个（兼顾可读+周期位置）
+          python3 quant_scripts/xihu_breadth.py --chart-only --chart-days 120 || echo "西湖净值图生成失败, 不阻断复盘"
           if [ -f "outputs/xihu_breadth_chart.png" ]; then
             python3 upload_ima.py --file "outputs/xihu_breadth_chart.png" --name "西湖广度净值曲线_$(date +%Y-%m-%d).png" || echo "西湖净值图上传失败(非致命)"
           fi

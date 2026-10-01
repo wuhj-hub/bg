@@ -480,7 +480,7 @@ def main():
     ap.add_argument("--chart", action="store_true", help="读 history 画净值曲线图 PNG")
     ap.add_argument("--chart-only", action="store_true", help="仅读 history 画图，跳过扫描（供 CI 复用已累积的 history）")
     ap.add_argument("--turn-run", type=int, default=3, help="确认拐点：转正后净值连续为正天数阈值（画图用）")
-    ap.add_argument("--chart-days", type=int, default=500, help="画图窗口：仅展示最近 N 个交易日（0=全部）")
+    ap.add_argument("--chart-days", type=int, default=120, help="画图窗口：仅展示最近 N 个交易日（0=全部；默认120≈半年，兼顾可读+周期位置）")
     ap.add_argument("--outdir", default="outputs")
     args = ap.parse_args()
 
