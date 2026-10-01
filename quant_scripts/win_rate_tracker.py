@@ -13,11 +13,13 @@ win_rate_tracker.py —— 股池信号实盘胜率跟踪报告 v1.0
   python3 win_rate_tracker.py                  # 全量统计
   python3 win_rate_tracker.py --min-days 5     # 仅统计信号后≥5日的样本
 """
-import subprocess, sys, os, re, csv, argparse, json
+import subprocess, sys, os, re, csv, argparse, json, shutil
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+# ⭐2026-10-01 免 npx：装了全局包直调（~0.7s/次），未装回退 npx（零风险）
+WESTOCK = ([shutil.which("westock-data-skillhub")] if shutil.which("westock-data-skillhub")
+           else ["npx", "-y", "westock-data-skillhub@1.0.3"])
 
 def run(args, timeout=45):
     try:
@@ -74,14 +76,91 @@ def signal_return(code, signal_date):
     days = (datetime.strptime(rows[-1][0], "%Y-%m-%d") - datetime.strptime(signal_date, "%Y-%m-%d")).days
     return (cur / entry - 1) * 100, days
 
-def by_phase(min_days=3, workers=8, top=50, max_snaps=10):
+def parse_batch_kline(txt):
+    """批量K线 → {code: [(date, close)]}（升序）"""
+    out, hdr = {}, None
+    for ln in txt.splitlines():
+        s = ln.strip()
+        if not s.startswith("|"):
+            continue
+        p = [x.strip() for x in s.strip("|").split("|")]
+        if "date" in p:
+            hdr = p
+            continue
+        if not hdr or "---" in p[0]:
+            continue
+        try:
+            di, ci = hdr.index("date"), hdr.index("last")
+            if re.match(r"^(sh|sz|bj)\d{6}$", p[0]) and re.match(r"^\d{4}-\d{2}-\d{2}$", p[di]):
+                out.setdefault(p[0], []).append((p[di], float(p[ci])))
+        except (ValueError, IndexError):
+            pass
+    for k in out:
+        out[k].sort(key=lambda r: r[0])
+    return out
+
+
+def market_baseline(snaps, sample=200):
+    """全市场等权基线（2026-10-01 新增）：{快照日: 该日至最新交易日等权收益%}
+
+    抽样 all_mainboard.csv 中 sample 只（等间隔抽），**一次批量**取日线即可，
+    不逐只请求 → 对 workflow 几乎零成本。用于把「平均收益」换算成「超额」。
+    """
+    path = "all_mainboard.csv"
+    if not os.path.exists(path):
+        return {}, "未找到 all_mainboard.csv"
+    codes = []
+    with open(path, encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            code = (row.get("code") or "").strip()
+            name = (row.get("name") or "").strip()
+            if not re.match(r"^\d{6}$", code) or "退" in name or name.startswith("PT"):
+                continue
+            codes.append(("sh" if code.startswith("6") else "sz") + code)
+    if not codes:
+        return {}, "股票池为空"
+    step = max(1, len(codes) // sample)
+    pick = codes[::step][:sample]
+    data = {}
+    for i in range(0, len(pick), 200):
+        txt = run(["kline", ",".join(pick[i:i + 200]), "--period", "day", "--limit", "120"], timeout=180)
+        data.update(parse_batch_kline(txt))
+    if not data:
+        return {}, "基线取数失败"
+    base, last_dates = {}, []
+    for fp in snaps:
+        d = os.path.basename(fp).replace("资金快照_", "").replace(".csv", "")
+        vals = []
+        for c, arr in data.items():
+            if not arr:
+                continue
+            entry = next((cl for dd, cl in arr if dd >= d), None)
+            if entry:
+                vals.append((arr[-1][1] / entry - 1) * 100)
+        if vals:
+            base[d] = sum(vals) / len(vals)
+    for arr in data.values():
+        if arr:
+            last_dates.append(arr[-1][0])
+    last = max(set(last_dates), key=last_dates.count) if last_dates else "?"
+    return base, f"抽样 {len(data)} 只·等权·截至 {last}"
+
+
+
+def by_phase(min_days=3, workers=8, top=50, max_snaps=10, cohort_step=1):
     """按资金行为四态分组统计胜率（读 outputs/资金快照_*.csv 归档）
 
     ⚠️ 2026-09-16 加限流参数：快照是全市场 3000+ 只/天，逐只取行情会拖垮 workflow
        → top= 每态按沉淀率取前 N 只；max_snaps= 只用最近 N 个交易日快照。
+    ⭐2026-10-01：①新增「超额」列（vs 全市场等权基线，market_baseline 一次批量算出）
+                ②补上「吸筹」态（原 order 漏列 → 该态被静默丢弃）
+                ③新增 cohort_step：>1 时每 N 个交易日只取 1 个快照，降低持有期重叠
     """
     import glob
-    snaps = sorted(glob.glob("outputs/资金快照_*.csv"))[-max_snaps:]
+    snaps = sorted(glob.glob("outputs/资金快照_*.csv"))
+    if cohort_step > 1:
+        snaps = snaps[::cohort_step]
+    snaps = snaps[-max_snaps:]
     if not snaps:
         print("❌ 无资金快照归档（workflow全量扫描后自动生成）")
         return
@@ -113,10 +192,13 @@ def by_phase(min_days=3, workers=8, top=50, max_snaps=10):
                 if ret is not None and days >= min_days:
                     rets.append({"ret": ret, "days": days, "code": code, "name": name, "date": d})
         results[ph] = rets
+    # ── 基线（全市场等权，2026-10-01 新增）──
+    base, bdesc = market_baseline(snaps)
+    print(f"📏 基线：{bdesc}（超额 = 信号组平均 − 同日基线）\n" if base else "📏 基线不可用，超额列留空\n")
     print(f"有效样本（≥{min_days}日）按资金行为四态:\n")
-    print(f"{'资金行为':<8}{'样本':>7}{'胜率':>8}{'平均':>8}{'中位':>8}{'盈亏比':>7}{'最差':>8}")
-    print("-" * 60)
-    order = ["抢筹", "进场", "控盘", "观望"]
+    print(f"{'资金行为':<8}{'样本':>7}{'胜率':>8}{'平均':>8}{'中位':>8}{'盈亏比':>7}{'最差':>8}{'超额':>9}")
+    print("-" * 70)
+    order = ["抢筹", "吸筹", "进场", "控盘", "观望"]
     for ph in order:
         rets = results.get(ph, [])
         if len(rets) < 10:
@@ -127,10 +209,13 @@ def by_phase(min_days=3, workers=8, top=50, max_snaps=10):
         avg = sum(rs) / len(rs)
         pl = sum(r for r in rs if r > 0) / max(1, len(wins))
         ls = abs(sum(r for r in rs if r <= 0) / max(1, len(rs) - len(wins)))
+        exs = [r["ret"] - base[r["date"]] for r in rets if base.get(r["date"]) is not None]
+        ex_s = f"{sum(exs)/len(exs):>+8.2f}%" if exs else f"{'—':>9}"
         print(f"{ph:<8}{len(rs):>7}{len(wins)/len(rs)*100:>7.1f}%{avg:>+8.2f}%"
-              f"{sorted(rs)[len(rs)//2]:>+8.2f}%{pl/ls if ls else 99:>7.2f}{min(rs):>+8.2f}%")
-    print("\n> 📌 四态定义：抢筹=超大单+放量(最强)/ 进场=今日净流转正 / 控盘=缩量高沉淀 / 观望")
-    print("> ⚠️ 样本按快照日逐日累积，2-4周后四态对比更有意义")
+              f"{sorted(rs)[len(rs)//2]:>+8.2f}%{pl/ls if ls else 99:>7.2f}{min(rs):>+8.2f}%{ex_s}")
+    print("\n> 📌 四态定义：抢筹=超大单+放量(最强)/ 吸筹 / 进场=今日净流转正 / 控盘=缩量高沉淀 / 观望")
+    print("> 📏 超额 = 该态平均收益 − 同日全市场等权基线（market_baseline 一次批量算出，不逐只请求）")
+    print("> ⚠️ 样本按快照日逐日累积，2-4周后四态对比更有意义；持有期重叠时可用 --cohort-step 5 复检")
 
 
 def main():
@@ -141,9 +226,10 @@ def main():
     ap.add_argument("--by-phase", action="store_true", help="按资金行为四态分组统计(读资金快照)")
     ap.add_argument("--top", type=int, default=50, help="--by-phase 时每态取沉淀率前 N 只")
     ap.add_argument("--max-snaps", type=int, default=10, help="--by-phase 时只用最近 N 个交易日快照")
+    ap.add_argument("--cohort-step", type=int, default=1, help="--by-phase 时每 N 个交易日取 1 个快照（去重叠；默认1=全取）")
     a = ap.parse_args()
     if a.by_phase:
-        return by_phase(a.min_days, a.workers, a.top, a.max_snaps)
+        return by_phase(a.min_days, a.workers, a.top, a.max_snaps, a.cohort_step)
 
     if not os.path.exists(a.log):
         print(f"❌ 信号日志不存在: {a.log}\n提示: 先运行 pool_tracking_report.py 累积日志")
