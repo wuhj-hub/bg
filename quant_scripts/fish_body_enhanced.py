@@ -722,16 +722,14 @@ def main():
             f.write(md)
         print(f"  Markdown报告: {md_file}")
         
-        # 上传到多维度知识库
-        kb_id="RgPmCvOW2CgN3I-HVGEYfmBS_W0mkiYzHRuTGHP8_6o="
-        folder_id="folder_7478204537267754"
-        rename=f"鱼身报告_{now.strftime('%Y-%m-%d')}"
-        upload_cmd=f"python3 upload_ima.py --file-path {md_file} --knowledge-base-id {kb_id} --folder-id {folder_id} --rename '{rename}' 2>/dev/null"
-        upload_result=run(upload_cmd)
-        if '成功' in upload_result or 'success' in upload_result.lower():
-            print(f"  ✅ 已上传到「多维量化→多维度」文件夹")
-        else:
-            print(f"  ⚠️ 上传结果: {upload_result.strip()[:80]}")
+        # ⚠️2026-10-03 删除此处的「内置上传多维度知识库」死代码：
+        #   原调用用的是 upload_ima.py 并不存在的参数（--file-path/--knowledge-base-id/--folder-id/--rename，
+        #   实际接口为 --file/--name + env IMA_KB_ID/IMA_FOLDER_ID）→ 每次运行必然失败、被 2>/dev/null 吞掉，
+        #   只留下一行「⚠️ 上传结果:」噪音；且它让 bg 主流水线每天白跑一次"往多维 KB 写"的动作。
+        #   知识库上传统一由 workflow 负责：
+        #     · duowei_fish.yml →「多维量化 → 多维度」文件夹
+        #     · quant_scan.yml  →「报告」知识库（三系统原始数据）
+        #   若将来需要脚本内上传，请改用 --file/--name + env IMA_KB_ID/IMA_FOLDER_ID。
     except Exception as e:
         print(f"  ⚠️ 报告生成/上传: {e}")
     
