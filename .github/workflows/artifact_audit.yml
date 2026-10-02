@@ -23,6 +23,15 @@ jobs:
   artifact-audit:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    concurrency:
+      group: artifact-audit
+      cancel-in-progress: false
+    env:
+      # ⭐2026-10-02 时区修正：本 job 由外部 cron 在 UTC 22:05（= 北京次日 06:05）触发，
+      #   而 runner 默认 UTC → 裸 `date`/`datetime.now()` 会把报告命名成「北京日 - 1」
+      #   （实证：2026-10-02 06:05 生成的报告名为 artifact_audit_2026-10-01.md）。
+      #   设 TZ 后 shell 的 date 与 Python 的 now() 同时变为北京时间，与复盘报告等产物口径一致。
+      TZ: Asia/Shanghai
     steps:
       - name: 检出代码
         uses: actions/checkout@v4

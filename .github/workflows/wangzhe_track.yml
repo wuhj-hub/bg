@@ -13,6 +13,11 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  # ⭐2026-10-02: 防「外部 dispatch + 手动 dispatch」同时触发导致并发写仓库/重复推送
+  group: wangzhe-track
+  cancel-in-progress: false
+
 jobs:
   # ─── 交易日守卫（2026-09-25 统一新增）───
   # cron-job.org 只能按"周一至周五"触发，无法感知 A股节假日（中秋/国庆等休市日仍触发→空跑）。

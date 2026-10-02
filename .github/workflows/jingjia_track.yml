@@ -13,6 +13,11 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  # ⭐2026-10-02: 防「原生 schedule 09:35 + 外部 dispatch 09:27」并发写 data/*.csv
+  group: jingjia-track
+  cancel-in-progress: false
+
 jobs:
   # ─── 交易日守卫 ───
   trade_gate:
