@@ -29,14 +29,21 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import numpy as np
 
-# 中文字体
+# 中文字体（⭐2026-10-02：补 Noto CJK 家族名与更多候选路径。CI runner 原本无中文字体，
+#   中文全部渲染成方块□（见 2026-09-30 日志 "Glyph ... missing from font(s) DejaVu Sans"）。
+#   需配合 workflow 安装 fonts-noto-cjk。）
 for _f in ['/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc',
-           '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc']:
+           '/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc',
+           '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
+           '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc',
+           '/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc']:
     try:
         fm.fontManager.addfont(_f)
     except Exception:
         pass
-matplotlib.rcParams['font.sans-serif'] = ['Noto Sans SC', 'Noto Serif CJK JP']
+matplotlib.rcParams['font.sans-serif'] = ['Noto Sans CJK SC', 'Noto Sans SC',
+                                          'Noto Sans CJK JP', 'Noto Serif CJK SC',
+                                          'WenQuanYi Zen Hei', 'SimHei', 'DejaVu Sans']
 matplotlib.rcParams['axes.unicode_minus'] = False
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -206,7 +213,10 @@ def extract_from_quant(date):
         # 仓库根（workflow cwd）
         path = f'quant_results_{date}.json'
     if not os.path.exists(path):
-        print(f'⚠️ 未找到 quant_results_{date}.json，跳过温度提取')
+        # ⭐2026-10-02 兜底：CI 只提交 quant_results_latest.json（无带日期版本），此前因此每天跳过温度提取
+        path = 'quant_results_latest.json'
+    if not os.path.exists(path):
+        print(f'⚠️ 未找到 quant_results_{date}.json / quant_results_latest.json，跳过温度提取')
         return None
     try:
         with open(path, encoding='utf-8') as f:
@@ -254,9 +264,19 @@ def main():
     if args.hist_dir:
         os.makedirs(args.hist_dir, exist_ok=True)
         OUT_DIR = args.hist_dir
-        EMOTION_HIST = os.path.join(OUT_DIR, "hot_emotion_history.json")
-        TEMP_HIST = os.path.join(OUT_DIR, "system_temp_history.json")
+    # ⭐2026-10-02: 历史文件路径改为「仓库根优先」解析。
+    #   此前写死 OUT_DIR（workflow 传 --hist-dir outputs/），但 hot_emotion_history.json 实际在仓库根、
+    #   system_temp_history.json 从未入库 → 每天静默跳过「情绪图 / 三系统温度图」（见 2026-09-30 CI 日志）。
+    #   解析顺序：仓库根(cwd) → OUT_DIR → 两者都没有则建在仓库根（便于随复盘 workflow 提交）
+    def _pick_hist(name):
+        for _p in (name, os.path.join(OUT_DIR, name)):
+            if os.path.exists(_p):
+                return _p
+        return name
+    EMOTION_HIST = _pick_hist("hot_emotion_history.json")
+    TEMP_HIST = _pick_hist("system_temp_history.json")
     os.makedirs(OUT_DIR, exist_ok=True)
+    print(f"📁 输出目录={OUT_DIR} | 情绪历史={EMOTION_HIST} | 温度历史={TEMP_HIST}")
 
     if args.append_temp:
         append_temp(args.append_temp[0], args.append_temp[1], args.append_temp[2], args.date)

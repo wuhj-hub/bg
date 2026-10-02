@@ -336,7 +336,8 @@ def make_chart(history, out_png, title="西湖广度温度计", turn_run=3):
             fm.fontManager.addfont(_f)
         except Exception:
             pass
-    plt.rcParams["font.sans-serif"] = ["Noto Sans SC", "Noto Sans CJK JP", "WenQuanYi Zen Hei", "SimHei", "DejaVu Sans"]
+    plt.rcParams["font.sans-serif"] = ["Noto Sans CJK SC", "Noto Sans SC", "Noto Sans CJK JP",
+                                       "Noto Serif CJK SC", "WenQuanYi Zen Hei", "SimHei", "DejaVu Sans"]
     plt.rcParams["axes.unicode_minus"] = False
     ks = sorted(history.keys())
     if len(ks) < 2:

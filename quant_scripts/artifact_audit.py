@@ -40,6 +40,37 @@ WHITELIST = (
     "docs/", "skills_backup/", "backtest.py", "backtest_", "bt_2b", "bt_30m",
     "bt_divergence", "bt_results", "combo_results", "_d.csv", "_m30.csv",
     "artifact_audit", "000001.json",
+    # ─────────────────────────────────────────────────────────────
+    # 2026-10-02 三轮降噪：逐项审阅 76 个「写而未提交」产物，确认属下列四类 → 登记为「已审阅·不提交」。
+    # ⚠️ 刻意不列入白名单（保留断链监控）：
+    #     xihu_breadth_history.json / xihu_turns_latest.json  → 已改为提交（commit eb12d479）
+    #     system_temp_history.json                            → 已接入复盘 workflow 提交清单（2026-10-02）
+    # ① 研究/回测一次性产物
+    "{var}_w.csv", "{var}_day.json", "{var}_month.json", "funnel_results.json", "samples.json",
+    "pool_51.txt", "wuwei_verify_result.json", "finance.json", "ai_chain_pool.json",
+    "beast_hy_bt.json", "beast_timing_exit.json", "bt_cycle_latest.json", "回测周期_",
+    "caige_zxz_increment_bt.json", "wangzhe_benchmark.json", "wangzhe_case_review.json",
+    "wangzhe_combo_bt.json", "wangzhe_entry_bt.json", "wangzhe_exit_bt_v2.json",
+    "wangzhe_golden_bt.json", "wangzhe_golden_combo.json", "wangzhe_ma_exit_bt.json",
+    "wangzhe_three_tier.json", "wangzhe_two_lines.json", "回测卡_",
+    "无为显性建仓标准_回测报告_", "情绪温度计回测_", "evidence_review_{var}.md",
+    "环境切换决策表_验证",
+    # ② 脚本临时/中间文件
+    ".bt_kline_cache.json", "kline_month_adj.csv", "kline_week_adj.csv", "pool.csv",
+    "pipeline_audit_latest.json", "silent_failure_audit.json", "cross_source_latest.json",
+    # ③ 日常/定期报告（已有 _latest 版本或已进知识库留档）
+    "market_width_{var}.md", "xihu_breadth_{var}.md", "年线广度_{var}.md", "rsv_strength_{var}.md",
+    "涨停概念排行_{var}.md", "断档分歧_{var}.md", "板块共振对照_{var}.md", "信号仲裁_{var}.md",
+    "组合风控_{var}.md", "执行纪律_{var}.md", "数据源交叉验证_{var}.md", "静默失败审计_{var}.md",
+    "反转数值周线信号_{var}.md", "反转数值融合股池.csv", "入牛时点扫描_{var}.md",
+    "双弦本月股池_{var}.md", "猛兽本月股池_{var}.md", "猛兽股池_{var}.md", "beast_pool_latest.json",
+    "才哥战法股池_{var}.json", "才哥战法股池_{var}.md", "股池标的跟踪报告_{var}.md",
+    "涨停王者_合格标的_{var}.csv", "涨停王者_合格标的_{var}.md", "乖离低买_{var}.md",
+    "自选清单_{var}.txt", "见顶五维监测", "龙头定位_{var}.json", "竞价统计_{var}.json",
+    "开盘强形态_{var}.json", "ai_chokepoint_watch_{var}.md", "fish_body_enhanced_.json",
+    "panhou_lianghua.md", "holdings.txt", "beast_results.txt", "liangxue_winrate_latest.json",
+    # ④ 状态型（已审阅：仓库根存量 / 由专用逻辑维护，无需按日提交）
+    "caige_urls.txt",
 )
 # 已知由「非 git_api_commit」方式提交的（如 wangzhe_commit.py / intraday cache）
 ALT_COMMIT = {

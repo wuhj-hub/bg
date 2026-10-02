@@ -59,9 +59,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: 安装 Python 依赖（pandas+numpy+matplotlib）
+      - name: 安装 Python 依赖（pandas+numpy+matplotlib）+ 中文字体
         run: |
           pip install pandas numpy matplotlib akshare
+          # ⭐2026-10-02: runner 默认只有 DejaVu 字体，matplotlib 画中文全部渲染成方块□
+          #   （2026-09-30 日志刷屏 "Glyph ... missing from font(s) DejaVu Sans"，
+          #    导致每日上传知识库的西湖广度净值曲线图中文不可读）
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk \
+            || echo "::warning::中文字体安装失败，图表中文可能缺字"
 
       # ─── 数据源连通性预检 + 股池文件备份（2026-09-14 加固）───
       # 背景：9/14 盘后 job 全绿但数据全空（才哥战法「有效 0 只」，9/11-9/12 均 3051 只），
@@ -477,11 +482,13 @@ jobs:
           if [ -f "outputs/quant_results_$(date +%Y-%m-%d).json" ] || [ -f "quant_results_latest.json" ]; then
             python3 skills_backup/盘前市场报告/scripts/market_charts.py --from-quant --date "$(date +%Y-%m-%d)" --hist-dir outputs/ || echo "图表生成失败, 不阻断复盘"
             # 上传两张图到知识库「复盘报告」文件夹
+            # ⭐2026-10-02: 图表文件名里的月份取自「窗口首日」（month = days[0][:7]），
+            #   此前用 $(date +%Y-%m) 拼路径 → 每月初之后永远对不上 → 上传被静默跳过。改为 glob 匹配。
             for CHART in 市场情绪走势 三系统温度走势; do
-              F="outputs/${CHART}_$(date +%Y-%m).png"
-              if [ -f "$F" ]; then
+              for F in outputs/${CHART}_*.png; do
+                [ -f "$F" ] || continue
                 python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "图表上传失败(非致命)"
-              fi
+              done
             done
           fi
           # 西湖广度净值曲线图（下雨图趋势，上传「复盘报告」文件夹；history 由 quant_scan 每日累积）
@@ -490,6 +497,12 @@ jobs:
           python3 quant_scripts/xihu_breadth.py --chart-only --chart-days 120 || echo "西湖净值图生成失败, 不阻断复盘"
           if [ -f "outputs/xihu_breadth_chart.png" ]; then
             python3 upload_ima.py --file "outputs/xihu_breadth_chart.png" --name "西湖广度净值曲线_$(date +%Y-%m-%d).png" || echo "西湖净值图上传失败(非致命)"
+          fi
+          # ⭐2026-10-02: 三系统温度历史（由 market_charts.py 追加）此前从未入库 → 图每天从零开始。
+          #   与 hot_emotion_history.json 同放仓库根（canonical），随复盘一并提交，温度序列才能累积。
+          if [ -f "system_temp_history.json" ]; then
+            python3 git_api_commit.py --msg "chore: system temp history ($(date +%Y-%m-%d))" system_temp_history.json \
+              || echo "三系统温度历史提交失败(非致命)"
           fi
 
       # ─── 第五.6步：股池信号实盘胜率跟踪（每日累积，2-4周后可对比回测）───
