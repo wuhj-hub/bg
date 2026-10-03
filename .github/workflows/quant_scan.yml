@@ -413,6 +413,25 @@ jobs:
             curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️扫描产物可信度异常&content=新鲜度/非空/字段完整率/样本率审计发现异常,详见 outputs/data_guard_audit_$(date +%Y-%m-%d).md&template=txt" > /dev/null || true
           fi
 
+      # ─── 第二步.9：环境唯一化引擎（env：5 子分→1 温度→仓位总闸；2026-10-03 上线，先只对照、不动模型）───
+      - name: 环境唯一化引擎（env 温度 → 仓位总闸）
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          # 先拉取历史累积（KB/仓库无删除 API，env_history 靠逐日 append）
+          mkdir -p outputs
+          curl -fsSL --retry 2 "https://raw.githubusercontent.com/wuhj-hub/bg/main/outputs/env_history.json" -o outputs/env_history.json || echo "{}" > outputs/env_history.json
+          set +e
+          python3 quant_scripts/env_engine.py --outdir outputs
+          RC=$?
+          set -e
+          echo "env: $(python3 -c "import json;d=json.load(open('outputs/env_latest.json'));print(f\"温度{d['temp']} {d['level']}｜仓位上限{d['position_cap']}%｜degraded={d['degraded']}\")" 2>/dev/null || echo '计算失败')"
+          if [ "$RC" != "0" ]; then
+            echo "::warning::env 引擎失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️env引擎失败&content=env_engine.py 失败(rc=$RC),环境温度停更&template=txt" > /dev/null || true
+          fi
+
       - name: 提交扫描产物到仓库（供盘前引用/报告workflow读取）
         continue-on-error: true
         env:
@@ -460,6 +479,7 @@ jobs:
               pools/pool_$(date +%Y-%m).json \
               一统天下建仓区股池_latest.json 一统天下建仓区股池_latest.md yitong_pool.txt \
               sector_component_em.json 涨停概念排行_latest.json 情绪指标跟踪.json \
+              env_latest.json outputs/env_latest.json outputs/env_history.json \
               outputs/四维共振_latest.json
             RC=$?
             set -e
