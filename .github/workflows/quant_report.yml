@@ -505,6 +505,20 @@ jobs:
               || echo "三系统温度历史提交失败(非致命)"
           fi
 
+      # ─── 第五.5步：env 对照三系统温度（第1层环境唯一化·观察期，2026-10-03 上线）───
+      - name: env 对照三系统温度（观察期）
+        if: always()  # 防阻断：前置步骤失败仍执行
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          # env_history 由 quant_scan 每日累积；本工具只读它 + premarket_judgment_*.json，不改任何模型
+          python3 quant_scripts/env_compare.py --outdir outputs || echo "env 对照生成失败, 不阻断"
+          if [ -f "outputs/env_对照_latest.md" ]; then
+            python3 git_api_commit.py --msg "chore: env compare ($(date +%Y-%m-%d))" outputs/env_对照_latest.md \
+              || echo "env 对照提交失败(非致命)"
+          fi
+
       # ─── 第五.6步：股池信号实盘胜率跟踪（每日累积，2-4周后可对比回测）───
       - name: 股池信号实盘胜率跟踪
         if: always()  # 防阻断：前置步骤失败仍执行

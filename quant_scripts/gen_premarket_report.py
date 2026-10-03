@@ -135,11 +135,23 @@ def build_judgment(idx_rows, sectors, quant):
     pos = max(10, min(70, base_pos + style_fix + temp_fix))
     if bearish >= 2:
         pos = min(pos, 30)
+    pos_uncapped = pos
+    # 🌡️ env 总闸（第1层环境唯一化，2026-10-03）：env.position_cap 作为最终上限
+    env = read_env()
+    env_cap = None
+    if env and env.get("position_cap") is not None:
+        try:
+            env_cap = int(round(float(env["position_cap"])))
+            pos = min(pos, env_cap)
+        except (TypeError, ValueError):
+            env_cap = None
     operation = f"仓位≤{pos}%，{note}"
     if style_txt:
         operation += f"（{style_txt}）"
     if mode_txt:
         operation += mode_txt
+    if env_cap is not None and env_cap < pos_uncapped:
+        operation += f"（🌡️env总闸≤{env_cap}%）"
     # 板块方向：领涨板块前3 + 提示
     sec_names = [r.get("name", "") for r in sectors[:3]]
     sector_hint = "、".join(sec_names) if sec_names else "关注领涨板块持续性"
@@ -166,6 +178,9 @@ def build_judgment(idx_rows, sectors, quant):
         "style_score": (ms or {}).get("score"),
         "style_name": (ms or {}).get("style"),
         "base_pos": base_pos, "style_fix": style_fix, "temp_fix": temp_fix, "final_pos": pos,
+        "pos_uncapped": pos_uncapped,
+        "env_temp": (env or {}).get("temp"), "env_level": (env or {}).get("level"),
+        "env_cap": env_cap, "env_degraded": (env or {}).get("degraded"),
     }
 
 
@@ -478,6 +493,13 @@ def gen_report(today_str):
     lines.append(f"| 🌡️ 鱼身温度 | {ft_v}/100" if ft_v is not None else "| 🌡️ 鱼身温度 | ⏳ 待量化运行 |")
     lines.append(f"| 🛡️ 猛兽安全评分 | {bs}/100" if bs is not None else "| 🛡️ 猛兽安全评分 | ⏳ 待量化运行 |")
     lines.append(f"| 🧭 双弦 | 温度{tl}/100·空头{sx_air}/8" if tl is not None else f"| 🧭 双弦 | 空头{sx_air}/8" if sx_air is not None else "| 🧭 双弦 | ⏳ 待量化运行 |")
+    # 🌡️ env 环境温度（第1层环境唯一化：5子分→1温度→仓位总闸，2026-10-03）
+    env = read_env()
+    if env and env.get("temp") is not None:
+        _deg = " ⚠️降级" if env.get("degraded") else ""
+        lines.append(f"| 🌡️ env 环境温度 | **{env.get('temp')}**/100（{env.get('level','')}）→ 仓位总闸 **{env.get('position_cap','—')}%**{_deg} |")
+    elif env:
+        lines.append("| 🌡️ env 环境温度 | ⚠️数据缺失（temp=null） |")
     # 资金行为四态（读昨日全盘量化 panhou_lianghua.md 一.5章节）
     ph = read_fund_phase()
     if ph:
@@ -880,6 +902,18 @@ def read_hot_emotion():
     for p in ("hot_emotion_latest.json", "outputs/hot_emotion_latest.json", "../outputs/hot_emotion_latest.json",
               "/sandbox/workspace/github_bg/outputs/hot_emotion_latest.json",
               "/sandbox/workspace/skills/盘前市场报告/scripts/outputs/hot_emotion_latest.json"):
+        try:
+            return json.load(open(p, encoding="utf-8"))
+        except Exception:
+            continue
+    return None
+
+
+def read_env():
+    """读环境唯一化引擎（env_latest.json，第1层：5子分→温度→仓位总闸），失败返回None"""
+    for p in ("env_latest.json", "outputs/env_latest.json", "../outputs/env_latest.json",
+              "/sandbox/workspace/github_bg/env_latest.json",
+              "/sandbox/workspace/github_bg/outputs/env_latest.json"):
         try:
             return json.load(open(p, encoding="utf-8"))
         except Exception:
