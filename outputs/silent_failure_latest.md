@@ -1,11 +1,11 @@
-# 🔍 体系自检元审计 · 2026-10-01
+# 🔍 体系自检元审计 · 2026-10-05
 
-> 扫描 18 个 workflow ｜ 风险项 **115** ｜ 🔴高危 **0**
+> 扫描 18 个 workflow ｜ 风险项 **118** ｜ 🔴高危 **0**
 
-## 🟡中危·吞错误（105）
+## 🟡中危·吞错误（108）
 
-- artifact_audit.yml :: 运行产物入库审计 (L35) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
-- artifact_audit.yml :: 提交审计报告 (L55) — 命中 2>/dev/null（屏蔽 stderr）, || true
+- artifact_audit.yml :: 运行产物入库审计 (L44) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
+- artifact_audit.yml :: 提交审计报告 (L64) — 命中 2>/dev/null（屏蔽 stderr）, || true
 - beast_pool.yml :: 判断是否交易日 (L34) — 命中 continue-on-error: true
 - beast_pool.yml :: 预热 westock 数据包 (L66) — 命中 || true
 - beast_pool.yml :: 准备候选池 (L71) — 命中 2>/dev/null（屏蔽 stderr）, || true
@@ -27,48 +27,50 @@
 - guard_selfcheck.yml :: 上传自检报告到盘后量化文件夹（供查阅） (L44) — 命中 continue-on-error: true, || echo（吞错误）
 - intraday_monitor.yml :: 判断是否交易日 (L32) — 命中 continue-on-error: true
 - intraday_monitor.yml :: 开盘八法强形态扫描+突破监控 (L116) — 命中 continue-on-error: true
-- jingjia_track.yml :: 判断是否交易日 (L28) — 命中 continue-on-error: true
-- jingjia_track.yml :: 上传竞价报告到知识库「报告/竞价」 (L81) — 命中 continue-on-error: true, || echo（吞错误）
+- jingjia_track.yml :: 判断是否交易日 (L33) — 命中 continue-on-error: true
+- jingjia_track.yml :: 上传竞价报告到知识库「报告/竞价」 (L86) — 命中 continue-on-error: true, || echo（吞错误）
 - market_regime.yml :: 判断是否交易日 (L36) — 命中 continue-on-error: true
 - market_regime.yml :: 提交判定结果到仓库 (L68) — 命中 continue-on-error: true, set +e, || true
-- premarket_report.yml :: 判断是否交易日 (L39) — 命中 continue-on-error: true
-- premarket_report.yml :: 生成盘前市场报告 (L65) — 命中 || echo（吞错误）
-- premarket_report.yml :: 提交盘前预判到仓库（供复盘报告真实验证） (L77) — 命中 continue-on-error: true, set +e, || true
+- premarket_report.yml :: 判断是否交易日 (L44) — 命中 continue-on-error: true
+- premarket_report.yml :: 生成盘前市场报告 (L70) — 命中 || echo（吞错误）
+- premarket_report.yml :: 提交盘前预判到仓库（供复盘报告真实验证） (L82) — 命中 continue-on-error: true, set +e, || true
 - probe_em.yml :: 东财板块接口参数探测（找可用 fs/ 端点） (L21) — 命中 continue-on-error: true
 - probe_em.yml :: 同花顺页面数据内容验证（防hexin-v反爬空表） (L25) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）
 - probe_em.yml :: 同花顺板块页结构验证（行业列表+成分页） (L39) — 命中 2>/dev/null（屏蔽 stderr）
 - probe_em.yml :: 东财板块成分拉取（行业+概念，覆盖全市场含次新） (L79) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）, || true
 - probe_em.yml :: 提交东财板块映射到仓库 (L85) — 命中 continue-on-error: true
 - quant_report.yml :: 判断是否交易日 (L32) — 命中 continue-on-error: true
-- quant_report.yml :: 数据源连通性预检 + 股池备份 (L69) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
-- quant_report.yml :: 上游扫描结果检查（失败则告警退出） (L95) — 命中 || true
-- quant_report.yml :: 猛兽本月股池同步（主池/观察池分层 + 剔除不符合） (L105) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 双弦每日报告+月度股池同步（收编sx2单一出口） (L120) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 才哥战法股池扫描+跟踪（四战法独立股池） (L144) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 龙头战法池扫描（dragon_leader·100分五维） (L170) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 一统天下建仓区股池扫描+跟踪（多周期共振） (L187) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 妖股发现与跟踪池（启动入池+出货预警推送） (L212) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 龙头定位扫描（连板梯队+见顶五维预警） (L229) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证） (L246) — 命中 continue-on-error: true
-- quant_report.yml :: 四维共振评分（复用上游 quant_scan 产物，缺失则本地补跑兜底） (L253) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）
-- quant_report.yml :: 全系统信号仲裁（统一出口·今日操作清单） (L274) — 命中 continue-on-error: true
-- quant_report.yml :: 宁静AI卡位每日观察清单 (L279) — 命中 continue-on-error: true, || true
-- quant_report.yml :: 创业板/科创四维补充扫描（代表性补充通道） (L287) — 命中 continue-on-error: true
-- quant_report.yml :: 生成并上传股池标的跟踪报告（三阶漏斗） (L297) — 命中 continue-on-error: true
-- quant_report.yml :: 持仓组合风控（portfolio_risk） (L314) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
-- quant_report.yml :: 实盘执行纪律报告（trade_journal） (L324) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
-- quant_report.yml :: 个股执行卡生成（持仓 + 当日信号仲裁候选） (L332) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 乖离低买扫描（一统天下·跌破MA5>7%） (L339) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true
-- quant_report.yml :: 市场状态判定（三级别力量·内联刷新） (L360) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 股池守护（数据源故障则不覆盖历史股池） (L388) — 命中 continue-on-error: true
-- quant_report.yml :: 盘后数据健康审计（产物可信度） (L400) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 提交报告产物到仓库（供盘前报告引用） (L414) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
-- quant_report.yml :: 自动生成复盘报告并上传 (L453) — 命中 continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 股池信号实盘胜率跟踪 (L490) — 命中 continue-on-error: true, || echo（吞错误）, || true
-- quant_report.yml :: 纸面组合跟踪（选股方法对比） (L515) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 反转数值周线信号上传推送 (L556) — 命中 continue-on-error: true, || true
-- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L594) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 推送自检报告到微信 (L612) — 命中 continue-on-error: true
+- quant_report.yml :: 安装 Python 依赖（pandas+numpy+matplotlib）+ 中文字体 (L62) — 命中 || echo（吞错误）
+- quant_report.yml :: 数据源连通性预检 + 股池备份 (L74) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
+- quant_report.yml :: 上游扫描结果检查（失败则告警退出） (L100) — 命中 || true
+- quant_report.yml :: 猛兽本月股池同步（主池/观察池分层 + 剔除不符合） (L110) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 双弦每日报告+月度股池同步（收编sx2单一出口） (L125) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 才哥战法股池扫描+跟踪（四战法独立股池） (L149) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 龙头战法池扫描（dragon_leader·100分五维） (L175) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 一统天下建仓区股池扫描+跟踪（多周期共振） (L192) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 妖股发现与跟踪池（启动入池+出货预警推送） (L217) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 龙头定位扫描（连板梯队+见顶五维预警） (L234) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 市场风格轴扫描（机构主导 vs 游资主导 + 猛兽双模式交叉验证） (L251) — 命中 continue-on-error: true
+- quant_report.yml :: 四维共振评分（复用上游 quant_scan 产物，缺失则本地补跑兜底） (L258) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）
+- quant_report.yml :: 全系统信号仲裁（统一出口·今日操作清单） (L279) — 命中 continue-on-error: true
+- quant_report.yml :: 宁静AI卡位每日观察清单 (L284) — 命中 continue-on-error: true, || true
+- quant_report.yml :: 创业板/科创四维补充扫描（代表性补充通道） (L292) — 命中 continue-on-error: true
+- quant_report.yml :: 生成并上传股池标的跟踪报告（三阶漏斗） (L302) — 命中 continue-on-error: true
+- quant_report.yml :: 持仓组合风控（portfolio_risk） (L319) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: 实盘执行纪律报告（trade_journal） (L329) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: 个股执行卡生成（持仓 + 当日信号仲裁候选） (L337) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 乖离低买扫描（一统天下·跌破MA5>7%） (L344) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true
+- quant_report.yml :: 市场状态判定（三级别力量·内联刷新） (L365) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 股池守护（数据源故障则不覆盖历史股池） (L393) — 命中 continue-on-error: true
+- quant_report.yml :: 盘后数据健康审计（产物可信度） (L405) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 提交报告产物到仓库（供盘前报告引用） (L419) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
+- quant_report.yml :: 自动生成复盘报告并上传 (L458) — 命中 continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: env 对照三系统温度（观察期） (L509) — 命中 continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 股池信号实盘胜率跟踪 (L523) — 命中 continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: 纸面组合跟踪（选股方法对比） (L548) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 反转数值周线信号上传推送 (L589) — 命中 continue-on-error: true, || true
+- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L627) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 推送自检报告到微信 (L645) — 命中 continue-on-error: true
 - quant_scan.yml :: 判断是否交易日 (L35) — 命中 continue-on-error: true
 - quant_scan.yml :: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断） (L73) — 命中 continue-on-error: true, || echo（吞错误）
 - quant_scan.yml :: IMA 凭证早期预检（失效立即微信告警，不阻断扫描） (L81) — 命中 continue-on-error: true, || true
@@ -96,19 +98,20 @@
 - quant_scan.yml :: 上传三系统原始数据（鱼身/双弦/猛兽，盘前引用数据源） (L335) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || true
 - quant_scan.yml :: 上传全盘量化报告到全盘量化文件夹 (L369) — 命中 || true
 - quant_scan.yml :: 扫描产物可信度审计 (L401) — 命中 continue-on-error: true, set +e, || true
-- quant_scan.yml :: 提交扫描产物到仓库（供盘前引用/报告workflow读取） (L416) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
-- quant_scan.yml :: 关键扫描产物检查（缺失即告警） (L472) — 命中 continue-on-error: true, || true
-- selfcheck_daily.yml :: 预热 westock 数据包（避免首个 kl 调用冷启动失败） (L38) — 命中 || echo（吞错误）
-- selfcheck_daily.yml :: ① 数据源交叉验证（westock × 东财 × 腾讯） (L43) — 命中 continue-on-error: true, set +e
-- selfcheck_daily.yml :: ② 静默失败元审计（扫 workflow 自身的假绿风险） (L55) — 命中 continue-on-error: true, set +e
-- selfcheck_daily.yml :: ③ 流水线自愈巡检（run状态/步骤耗时/产物新鲜度/脚本异常） (L67) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e
-- selfcheck_daily.yml :: 提交自检产物到仓库 (L82) — 命中 2>/dev/null（屏蔽 stderr）
-- selfcheck_daily.yml :: 异常告警到微信 (L102) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）
-- selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L120) — 命中 continue-on-error: true, || echo（吞错误）
-- wangzhe_track.yml :: 判断是否交易日 (L31) — 命中 continue-on-error: true
-- wangzhe_track.yml :: 涨停王者·合格标的漏斗 (L76) — 命中 continue-on-error: true
-- wangzhe_track.yml :: 合格标的上传知识库 + 推送 (L81) — 命中 continue-on-error: true, || echo（吞错误）
-- wangzhe_track.yml :: 才哥公众号文章跟踪 (L100) — 命中 continue-on-error: true
+- quant_scan.yml :: 环境唯一化引擎（env 温度 → 仓位总闸） (L417) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true
+- quant_scan.yml :: 提交扫描产物到仓库（供盘前引用/报告workflow读取） (L435) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
+- quant_scan.yml :: 关键扫描产物检查（缺失即告警） (L493) — 命中 continue-on-error: true, || true
+- selfcheck_daily.yml :: 预热 westock 数据包（避免首个 kl 调用冷启动失败） (L43) — 命中 || echo（吞错误）
+- selfcheck_daily.yml :: ① 数据源交叉验证（westock × 东财 × 腾讯） (L48) — 命中 continue-on-error: true, set +e
+- selfcheck_daily.yml :: ② 静默失败元审计（扫 workflow 自身的假绿风险） (L60) — 命中 continue-on-error: true, set +e
+- selfcheck_daily.yml :: ③ 流水线自愈巡检（run状态/步骤耗时/产物新鲜度/脚本异常） (L72) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e
+- selfcheck_daily.yml :: 提交自检产物到仓库 (L87) — 命中 2>/dev/null（屏蔽 stderr）
+- selfcheck_daily.yml :: 异常告警到微信 (L107) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）
+- selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L125) — 命中 continue-on-error: true, || echo（吞错误）
+- wangzhe_track.yml :: 判断是否交易日 (L36) — 命中 continue-on-error: true
+- wangzhe_track.yml :: 涨停王者·合格标的漏斗 (L81) — 命中 continue-on-error: true
+- wangzhe_track.yml :: 合格标的上传知识库 + 推送 (L86) — 命中 continue-on-error: true, || echo（吞错误）
+- wangzhe_track.yml :: 才哥公众号文章跟踪 (L105) — 命中 continue-on-error: true
 
 ## 🟡中危·依赖外部 cron（10）
 
@@ -141,7 +144,7 @@
 | probe_em.yml | 5 | — |
 | probe_kpl.yml | 0 | — |
 | probe_search.yml | 0 | — |
-| quant_report.yml | 30 | — |
-| quant_scan.yml | 29 | — |
+| quant_report.yml | 32 | — |
+| quant_scan.yml | 30 | — |
 | selfcheck_daily.yml | 8 | — |
 | wangzhe_track.yml | 5 | — |
