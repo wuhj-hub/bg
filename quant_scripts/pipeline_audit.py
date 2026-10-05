@@ -15,7 +15,7 @@
 用法：
   python3 pipeline_audit.py [--days 2] [--step-min 25] [--json outputs/pipeline_audit.json] [--push]
 """
-import os, re, json, time, argparse, urllib.request, urllib.parse
+import os, re, sys, json, time, argparse, urllib.request, urllib.parse
 from datetime import datetime, timezone, timedelta
 
 BJT = timezone(timedelta(hours=8))
@@ -103,7 +103,22 @@ def check_steps(step_min=25, sample=30):
 
 
 # ── C. 产物新鲜度 ─────────────────────────────────────────────
+def is_trading_today():
+    """今天(北京时)是否交易日。无法判定时按『是』处理（保守，不漏报真异常）。"""
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from trade_day_check import judge as _td_judge
+        ok, _ = _td_judge(datetime.now(BJT))
+        return ok
+    except Exception:
+        return True
+
+
 def check_freshness():
+    # ⭐2026-10-05: 休市日跳过停更检查 —— 休市期 quant_scan/quant_report 本就不运行，关键产物
+    #   "停更 N 天"属预期而非故障；此前按自然日计龄 → 每个休市日必然 WARN → 误推微信告警（狼来了）。
+    if not is_trading_today():
+        return None   # None = 本次跳过（区别于 [] = 已检查且无停更）
     stale = []
     for path, maxd in FRESH.items():
         c = api_commits(path, 1)
@@ -157,7 +172,9 @@ def main():
 
     runs = check_runs(a.days)
     heavy = check_steps(a.step_min)
-    stale = check_freshness()
+    stale_raw = check_freshness()
+    freshness_skipped = stale_raw is None
+    stale = stale_raw or []
     scripterr = check_script_errors()
 
     issues = []
@@ -173,6 +190,7 @@ def main():
 
     rep = {"date": datetime.now(BJT).strftime("%Y-%m-%d %H:%M"),
            "runs": runs, "heavy_steps": heavy, "stale_products": stale,
+           "freshness_skipped": freshness_skipped,
            "script_errors": scripterr, "issues": issues,
            "status": "FAIL" if (runs["bad"] or scripterr) else ("WARN" if (heavy or stale) else "PASS")}
     os.makedirs(os.path.dirname(a.json) or ".", exist_ok=True)
@@ -185,7 +203,10 @@ def main():
     print(f"重步骤(≥{a.step_min}min): {len(heavy)}")
     for h in heavy[:8]:
         print(f"   ⚠️ {h['workflow']} / {h['step']} = {h['minutes']}min")
-    print(f"产物停更: {len(stale)}")
+    if freshness_skipped:
+        print("产物停更: ⏭️ 休市日跳过")
+    else:
+        print(f"产物停更: {len(stale)}")
     for s in stale:
         print(f"   ⚠️ {s['path']} → {s['status']}")
     print(f"脚本异常: {len(scripterr)}")
