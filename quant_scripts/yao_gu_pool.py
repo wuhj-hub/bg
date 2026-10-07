@@ -27,13 +27,16 @@ from datetime import datetime, timezone, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import sys as _sys
 _sys.path.insert(0, "/sandbox/workspace")
+_sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
     import emotion_forecast as emo
 except Exception:
     emo = None
 
 BJ = timezone(timedelta(hours=8))
-WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+import shutil as _shutil
+_ws = _shutil.which("westock-data-skillhub")
+WESTOCK = [_ws] if _ws else ["npx", "-y", "westock-data-skillhub@1.0.3"]
 BATCH = 20
 KLIMIT = 90
 WORKERS = 4
@@ -207,9 +210,81 @@ def track(bars, fund):
             "kdj_j": round(j, 1), "level": level, "alert": alert, "price": cur}
 
 # ============================================================
+# 概念第一特征校验（曾星智《连板妖股的第一特征》2026-10-07）
+# ============================================================
+def load_hot_concepts(limit=12):
+    """读当日热门概念（涨停概念排行_latest.json，limitup_concept_rank 产出）。读不到返回 ([], "")。"""
+    for p in ("/sandbox/workspace/outputs/涨停概念排行_latest.json",
+              "/sandbox/workspace/涨停概念排行_latest.json",
+              "涨停概念排行_latest.json"):
+        try:
+            if os.path.exists(p):
+                d = json.load(open(p, encoding="utf-8"))
+                return (d.get("concept_rank", []) or [])[:limit], d.get("date", "")
+        except Exception:
+            continue
+    return [], ""
+
+
+def glm_concept_check(results, hot, date_str):
+    """判定妖股候选「属不属于最近的热点概念」。
+    返回 (markdown 文本, verdict_map{6位代码: (概念, 判定, 理由)})。调用方须 try/except 兜底。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from llm_glm import chat
+    hot_lines = []
+    for c in (hot or []):
+        stocks = "、".join((c.get("stocks") or [])[:3])
+        hot_lines.append(f"- {c.get('concept')}（{c.get('grade', '')}，涨停{c.get('n')}家，最高{c.get('maxlb')}板）"
+                         + (f"：{stocks}" if stocks else ""))
+    cand_lines = [f"- {r['name']}({r['code']}) 连板{r['boards']} 现价{r['price']:.2f} {r['level']}"
+                  for r in results[:40]]
+    prompt = (
+        f"日期 {date_str}，A股短线。当日「热门概念（按涨停家数）」：\n" + "\n".join(hot_lines)
+        + "\n\n「妖股候选」（近期低位启动的连板/涨停股）：\n" + "\n".join(cand_lines)
+        + "\n\n判断每只候选是否符合短线第一特征：属不属于最近的热点概念。"
+        "逐只严格按此格式输出一行（四段用 | 分隔，第一段务必含 6 位股票代码）：\n"
+        "名称 代码 | 归属概念 | 判定 | 理由\n"
+        "「归属概念」从上面概念里选最贴近的1个，都不沾边写“不属于热点”；"
+        "「判定」只能是 ✅属于 或 ⚠️存疑 或 ❌不属于；「理由」一句(≤30字，结合该概念与个股业务的真实关联)。\n"
+        "最后另起一行：关注：名称1、名称2…（≤5只，仅取自判定为✅的；若无则写“暂无”）。"
+        "只基于给定信息与公开常识，不确定写“信息不足”，不要编造。")
+    reply, _ = chat(prompt, max_tokens=1200,
+                    system="你是A股短线热点与题材分析师，语言精炼、结论明确，只基于事实，不编造。")
+    def _clean(s, pres):
+        s = s.strip()
+        for p in pres:
+            if s.startswith(p):
+                s = s[len(p):].strip("：: \u3000").strip()
+        return s
+
+    vmap = {}
+    name2code = {r["name"]: r["code"][-6:] for r in results if r.get("name")}
+    for ln in reply.splitlines():
+        if "|" not in ln:
+            continue
+        parts = [p.strip() for p in ln.split("|")]
+        if len(parts) < 3:
+            continue
+        m = re.search(r"\d{6}", parts[0])
+        c6 = m.group(0) if m else ""
+        if not c6:                      # 模型漏写代码 → 回退按名称匹配
+            for nm, cd in name2code.items():
+                if nm and nm in parts[0]:
+                    c6 = cd
+                    break
+        if not c6:
+            continue
+        vmap[c6] = (_clean(parts[1] if len(parts) > 1 else "", ["归属概念", "概念"]),
+                    _clean(parts[2] if len(parts) > 2 else "", ["判定"]),
+                    _clean(parts[3] if len(parts) > 3 else "", ["理由"]))
+    return reply.strip(), vmap
+
+
+# ============================================================
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--no-glm", action="store_true", dest="no_glm", help="跳过概念第一特征校验")
     args = ap.parse_args()
     date_str = datetime.now(BJ).strftime("%Y-%m-%d")
 
@@ -304,6 +379,26 @@ def main():
           " ".join(f"{lvl}{sum(1 for r in results if r['level'] == lvl)}" for lvl in order) + "\n"]
     if emotion_block:
         md.insert(1, emotion_block)
+    # ── 概念第一特征校验（GLM · 曾星智《连板妖股的第一特征》）──
+    concept_md = ""
+    if not args.no_glm and results:
+        hot, _hotd = load_hot_concepts()
+        if hot:
+            try:
+                ck, vmap = glm_concept_check(results, hot, date_str)
+                for r in results:
+                    hit = vmap.get(r["code"][-6:])
+                    if hit:
+                        r["concept"], r["verdict"], r["concept_reason"] = hit
+                concept_md = ("\n## 🎯 概念第一特征校验（GLM · 曾星智第一特征）\n\n"
+                              "> 判定妖股候选「属不属于最近的热点概念」——文章第一特征：**不属于者应放弃**。\n\n"
+                              + ck + "\n\n> 模型 glm-4-flash ｜ 仅作参考、可能有误，请结合实盘判断。\n")
+            except Exception as e:
+                concept_md = f"\n## 🎯 概念第一特征校验（GLM）\n\n> 跳过（GLM 不可用：{e}）\n"
+        else:
+            print("[WARN] 未找到 涨停概念排行_latest.json，跳过概念校验", flush=True)
+    if concept_md:
+        md.append(concept_md)
     for lvl in ("💥出货", "⚡分歧", "🔥加速", "👀观察", "📉退潮"):
         grp = [r for r in results if r["level"] == lvl]
         if not grp:

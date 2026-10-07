@@ -1,0 +1,112 @@
+name: 妖股池扫描（概念第一特征）
+
+on:
+  # ⚠️ 原生 cron 已停用（体系惯例）：避免与 cron-job.org 外部触发双重跑；如需回退删掉下方 # 即可
+#  schedule:
+#    - cron: '0 8 * * 1-5'
+  repository_dispatch:
+    types: [yao-gu-run]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yao-gu-pool
+  cancel-in-progress: false
+
+jobs:
+  # ─── 交易日守卫（复用 quant_scripts/trade_day_check.py，与体系一致）───
+  trade_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ok: ${{ steps.g.outputs.is_trade_day }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 判断是否交易日
+        id: g
+        continue-on-error: true
+        run: python3 quant_scripts/trade_day_check.py --github-output
+
+  yao-gu-pool:
+    needs: trade_gate
+    if: needs.trade_gate.outputs.ok == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # 脚本内引用 /sandbox/workspace 兼容路径（与体系其他脚本保持一致）
+      - name: 沙箱路径兼容层
+        run: |
+          sudo mkdir -p /sandbox
+          sudo ln -sfn $GITHUB_WORKSPACE /sandbox/workspace
+          ls /sandbox/workspace/ > /dev/null 2>&1 && echo "✅ 兼容层就绪"
+
+      - name: 设置 Node.js（westock 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安装依赖
+        run: |
+          pip install --quiet numpy
+          # 全局装一次 → 脚本内 shutil.which 命中后直调 bin，免每次 npx 启动开销
+          npm i -g westock-data-skillhub@1.0.3 > /dev/null 2>&1 || true
+
+      - name: 预热 westock
+        run: npx -y westock-data-skillhub@1.0.3 kline sh000001 --period day --limit 5 || true
+
+      # 候选池：仓库根 all_mainboard.csv（gen_mainboard.py 产出）；失败回退仓库缓存
+      - name: 准备主板清单
+        run: |
+          python3 gen_mainboard.py || echo "⚠️ gen_mainboard 失败，回退仓库缓存"
+          if [ ! -s all_mainboard.csv ] && [ -f ../all_mainboard.csv ]; then cp ../all_mainboard.csv all_mainboard.csv; fi
+          if [ ! -s all_mainboard.csv ]; then echo "❌ 无主板清单可用"; exit 1; fi
+          echo "主板清单: $(wc -l < all_mainboard.csv) 行"
+
+      # 妖股发现（低位启动/低价活跃）→ 跟踪 → 概念第一特征校验（GLM）
+      # 概念校验读 outputs/涨停概念排行_latest.json（limitup_concept_rank 产出，quant_scan 每日更新）
+      - name: 妖股扫描 + 概念第一特征校验
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: python3 quant_scripts/yao_gu_pool.py
+
+      - name: 提交产物
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          D=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          for f in "outputs/妖股池_${D}.md" "outputs/妖股池_${D}.json" yao_pool.txt quant_scripts/yao_pool.txt; do
+            [ -f "$f" ] && git add -f "$f"
+          done
+          if git diff --cached --quiet; then
+            echo "无变更"
+          else
+            git commit -m "chore: 妖股池 ($D)"
+            set +e
+            git push
+            RC=$?
+            set -e
+            if [ "$RC" != "0" ]; then
+              echo "::warning::yao_gu_pool 提交失败(rc=$RC)"
+              curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️妖股池提交失败&content=git push 失败(rc=$RC),妖股池产物未入库&template=txt" > /dev/null || true
+            fi
+          fi
