@@ -103,15 +103,33 @@ def check_steps(step_min=25, sample=30):
 
 
 # ── C. 产物新鲜度 ─────────────────────────────────────────────
-def is_trading_today():
-    """今天(北京时)是否交易日。无法判定时按『是』处理（保守，不漏报真异常）。"""
+def _judge_trading(dt):
+    """dt 是否交易日。无法判定时按『是』处理（保守，不漏报真异常）。"""
     try:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from trade_day_check import judge as _td_judge
-        ok, _ = _td_judge(datetime.now(BJT))
+        ok, _ = _td_judge(dt)
         return ok
     except Exception:
         return True
+
+
+def is_trading_today():
+    """今天(北京时)是否交易日。"""
+    return _judge_trading(datetime.now(BJT))
+
+
+def trading_days_since(start_dt):
+    """从 start_dt『次日起』到今天(北京)之间的**交易日**数量。
+    用于产物新鲜度：周末/长假不累计，避免节后首日误报『停更 N 天』。"""
+    start_d = start_dt.astimezone(BJT).date() + timedelta(days=1)
+    end_d = datetime.now(BJT).date()
+    n, d = 0, start_d
+    while d <= end_d and n < 999:
+        if _judge_trading(datetime(d.year, d.month, d.day, tzinfo=BJT)):
+            n += 1
+        d += timedelta(days=1)
+    return n
 
 
 def check_freshness():
@@ -127,9 +145,10 @@ def check_freshness():
             continue
         try:
             dt = datetime.fromisoformat(c[0]["commit"]["committer"]["date"].replace("Z", "+00:00"))
-            age = (datetime.now(timezone.utc) - dt).days
+            age = trading_days_since(dt)          # 交易日计龄（周末/长假不累计）
             if age > maxd:
-                stale.append({"path": path, "status": f"停更{age}天", "age": age, "max": maxd})
+                nat = (datetime.now(timezone.utc) - dt).days
+                stale.append({"path": path, "status": f"停更{age}个交易日(自然{nat}天)", "age": age, "max": maxd})
         except Exception:
             pass
     return stale
