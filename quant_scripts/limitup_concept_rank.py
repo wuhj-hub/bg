@@ -11,6 +11,8 @@
        中军：板块内市值前3、沿5/10日线慢涨、少连板、调整抗跌（趋势压舱石）。
   ③ 曾星智「短线备选池·晋级率」二期：晋级率=次日继续涨停比例，作情绪温度计。
   ④ 曾星智《中秋快乐及短线核心方法》第③步「看新闻/收盘点评修正概念」→ 由 GLM 新闻面校验落地。
+  ⑤ 曾星智《连板妖股的第一特征》(2026-10-07)：第一特征=「属不属于最近的热点概念」
+       → GLM「概念催化链（催化事件→逻辑→持续性→验证点）+ 蹭概念真实性校验」落地。
 
 版本演进：
   v1 (2026-09-25) 涨停家数 / 连板家数排行
@@ -19,6 +21,8 @@
                   ★中军榜（板块内成交额前列 + 非涨停 + 沿MA5/MA10 + 近10日回撤）
   v4 (2026-09-29) ★龙头评分纳入「首板/二板资金流向」（westock asfund 主力净流入，权重20）
                   ★新增「🧠 新闻面校验（GLM）」章节（曾星智第③步：概念新闻面修正）
+  v4.1 (2026-10-08) ★GLM 章节升级为「概念催化链 + 蹭概念校验」（曾星智《连板妖股的第一特征》）
+                    ★入参新增当日涨停明细 + 近期要闻（新浪7x24）作为事实锚，降低幻觉
 
 数据源：all_mainboard.csv + westock 日线 + westock asfund 资金 + outputs/sector_component_em.json + 东财涨停池(push2ex)。
 口径提示：概念来自东财板块成分（一票多概念会放大家数）；市值接口在沙箱不可用，
@@ -337,23 +341,66 @@ def fast_prepare(a):
     return today, ups, prev_zt_codes, prev_first_codes, prev_first_jinji, ztpool
 
 
-def glm_news_check(rank, ups_total, mood, today):
-    """曾星智第③步：概念新闻面修正。调 GLM 对热门概念做新闻/主流方向研判。返回 Markdown 文本。"""
+def recent_news(n=8):
+    """近期要闻（新浪 7x24），失败静默返回 []。给 GLM 提供「催化事件」事实锚点。"""
+    try:
+        u = f"https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size={n}&zhibo_id=152"
+        req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
+        d = json.loads(urllib.request.urlopen(req, timeout=18).read().decode())
+        lst = d.get("result", {}).get("data", {}).get("feed", {}).get("list", [])
+        out = []
+        for it in lst:
+            t = re.sub(r"<[^>]+>", "", it.get("rich_text", "")).strip()
+            if t:
+                out.append(t[:80])
+        return out[:n]
+    except Exception:
+        return []
+
+
+def glm_news_check(rank, ups, mood, today, code_sector=None):
+    """曾星智《连板妖股的第一特征》落地：概念催化链 + 蹭概念校验。
+
+    ① 热门概念的「催化事件 → 炒作逻辑 → 持续性 → 关键验证点」链条；
+    ② 结合当日涨停名单做「蹭概念」真实度校验（对应文章"属不属于最近的热点概念"第一特征）；
+    ③ 重点概念（≤3）。
+    输入事实锚 = 当日涨停明细 + 近期要闻（避免模型凭记忆编造）。
+    调用方须 try/except 兜底，失败不影响主报告。
+    """
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from llm_glm import chat
+    code_sector = code_sector or {}
+    ups_total = len(ups)
     items = []
     for s, v in rank[:8]:
         jj = "—" if v["jj"] is None else f"{v['jj']:.0f}%"
         names = "、".join(x["name"] for x in sorted(v["stocks"], key=lambda z: -z["lianban"])[:3])
         items.append(f"- {s}：涨停{v['n']}家 / 最高{v['maxlb']}板 / 晋级率{jj} / 代表股 {names}")
+    # 当日涨停明细（连板优先，最多 30 只）——供「蹭概念」校验
+    up_lines = []
+    for u in sorted(ups, key=lambda x: (-(x.get("lianban") or 1), -(x.get("chg") or 0)))[:30]:
+        secs = code_sector.get(u["c6"]) or code_sector.get(u["code"]) or []
+        up_lines.append(f"- {u['name']}({u['code']}) {u.get('lianban') or 1}板"
+                        + (f" | {'/'.join(secs[:4])}" if secs else ""))
+    news = recent_news(8)
+    news_block = ("\n\n【近24小时财经要闻（仅当某条与某概念直接相关时才引用，否则忽略）】\n"
+                  + "\n".join("- " + x for x in news)) if news else ""
     prompt = (
         f"日期 {today}，A股当日涨停 {ups_total} 只，情绪档位「{mood}」。\n"
-        f"以下是按涨停家数排出的热门概念：\n" + "\n".join(items) + "\n\n"
-        "请完成：① 逐个判断该概念是否属于当前市场资金的主流炒作方向、是否具备持续性（结合你对这些题材近期新闻/政策/产业催化的了解），"
-        "每行给一句结论（可持续/分歧/一日游 + 理由）；② 最后给出「建议重点关注的概念」不超过 3 个（按优先级）。"
-        "语言精炼、结论明确；若某概念你缺乏信息，请直接说明不确定，不要编造。")
-    reply, _ = chat(prompt, max_tokens=800,
-                    system="你是A股短线热点与题材分析师，语言精炼、结论明确，只基于事实，不编造。")
+        "【热门概念（按涨停家数排序）】\n" + "\n".join(items)
+        + "\n\n【当日涨停个股（连板优先，最多30只）】\n" + "\n".join(up_lines)
+        + news_block + "\n\n"
+        "请完成三部分（总长≤700字，语言精炼、结论明确）：\n"
+        "①【概念催化链】对上面每个热门概念逐行输出：概念 → 「催化事件/政策/产业驱动」"
+        " → 「炒作逻辑（为什么是现在）」 → 持续性判定（可持续/分歧/一日游）"
+        " → 「关键验证点（后续看什么来确认）」；催化事件必须与该概念直接相关——"
+        "若你确实不了解、或近期无直接相关事件，写“无明确催化/信息不足”，切勿用无关新闻强行归因，不要编造。\n"
+        "②【蹭概念校验】结合「当日涨停个股」名单，指出哪些个股的题材归属很可能是“蹭概念”"
+        "（挂着板块标签、但当日涨停的真实驱动可能不在此概念，或市场未实质炒作）；"
+        "逐条给「个股/概念 + 判断理由」。若无明显蹭概念，写“未见明显蹭概念”。\n"
+        "③【重点概念】按优先级给出建议重点关注的概念（≤3个），各一句理由。")
+    reply, _ = chat(prompt, max_tokens=1100,
+                    system="你是A股短线热点与题材分析师，语言精炼、结论明确，只基于给定事实与公开信息，不编造。")
     return reply
 
 
@@ -598,11 +645,11 @@ def main():
     if not leaders_json:
         L.append("| — | 无（当日无≥3家涨停的板块） | | | | | | | | | |")
 
-    # ── 模块二.5：GLM 新闻面校验（曾星智第③步）──
+    # ── 模块二.5：GLM 概念催化链 + 蹭概念校验（曾星智《连板妖股的第一特征》）──
     if not a.no_glm:
-        L += ["", "## 🧠 新闻面校验（GLM · 曾星智第③步）", ""]
+        L += ["", "## 🧠 概念催化链 · 蹭概念校验（GLM · 曾星智第一特征）", ""]
         try:
-            reply = glm_news_check(rank, len(ups), mood, today)
+            reply = glm_news_check(rank, ups, mood, today, code_sector)
             L.append(reply.strip())
         except Exception as e:
             L.append(f"> 跳过（GLM 不可用：{e}）")
@@ -638,7 +685,7 @@ def main():
           "⚠️ 概念分类来自东财板块成分（一票可属多个概念，家数会放大）；晋级率=今日连板家数/昨日涨停家数（昨日涨停<3标 `!`）；",
           "龙头为板块内相对排名打分（六维：启动=首封最早 / 弹性=5日涨幅 / 封单=封单/流通 / 带动=首封后跟涨 / 辨识=最高板+未炸板 / **资金=当日主力净流入强度**）；",
           "资金流向来自 westock asfund（首板/二板当日主力净流入是关键，缺失则该维为0）；中军以成交额近似市值；",
-          "新闻面校验来自 GLM（glm-4-flash），仅作参考、可能有误，请结合实盘判断。"]
+          "概念催化链与蹭概念校验来自 GLM（glm-4-flash，输入=当日涨停明细+近期要闻），仅作参考、可能有误，请结合实盘判断。"]
     md = "\n".join(L)
     mp = os.path.join(outdir, f"涨停概念排行_{today}.md")
     open(mp, "w", encoding="utf-8").write(md)
