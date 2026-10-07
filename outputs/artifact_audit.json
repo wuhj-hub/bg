@@ -1,9 +1,10 @@
 {
- "date": "2026-10-05",
+ "date": "2026-10-08",
  "writes": {
   "all_mainboard.csv": [
    ".github/workflows/duowei_fish.yml",
    ".github/workflows/quant_scan.yml",
+   ".github/workflows/yao_gu_pool.yml",
    "gen_mainboard.py",
    "quant_scripts/beast_pool_screener.py",
    "quant_scripts/execution_card.py",
