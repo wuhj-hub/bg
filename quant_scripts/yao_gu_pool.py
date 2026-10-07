@@ -280,6 +280,45 @@ def glm_concept_check(results, hot, date_str):
     return reply.strip(), vmap
 
 
+def push_daily_summary(results, pool_n, cand_n, date_str, emotion_block=""):
+    """B 方案：每日固定推送一条妖股池摘要（分级统计 + 重点关注 + 风险）。
+    重点关注=GLM 判定 ✅属于热点者优先，缺失回退 🔥加速。返回是否已推送。"""
+    try:
+        import urllib.request, urllib.parse
+        _order = ["💥出货", "⚡分歧", "🔥加速", "👀观察", "📉退潮"]
+        stat = " ".join(f"{lvl}{sum(1 for r in results if r['level'] == lvl)}" for lvl in _order)
+        lines = [f"🐉 **妖股池 {date_str}**",
+                 f"扫描 {pool_n} 只主板 | 候选 {cand_n} | 分级：{stat}"]
+        if emotion_block:
+            lines.append(emotion_block.strip())
+        focus = [r for r in results if str(r.get("verdict", "")).startswith("✅")]
+        if not focus:
+            focus = [r for r in results if r["level"] == "🔥加速"]
+        if focus:
+            lines.append("\n**🎯 重点关注（概念属热点 / 连板加速）**")
+            for r in focus[:8]:
+                cpt = r.get("concept")
+                tag = f"｜{cpt}" if cpt and cpt != "不属于热点" else ""
+                lines.append(f"- {r['code']} {r['name']} {r['price']:.2f} 连板{r['boards']} [{r['level']}]{tag}")
+        alerts = [r for r in results if r["level"] in ("💥出货", "⚡分歧")]
+        if alerts:
+            lines.append("\n**⚠️ 出货/分歧（风险）**")
+            for r in alerts[:10]:
+                lines.append(f"- {r['code']} {r['name']} {r['price']:.2f} [{r['level']}] {r['alert']}")
+        if not os.environ.get("PUSH_TOKEN"):
+            print("[push] 无 PUSH_TOKEN，跳过推送")
+            return False
+        body = urllib.parse.urlencode({"token": os.environ["PUSH_TOKEN"],
+                                       "title": f"🐉妖股池 {date_str}",
+                                       "content": "\n".join(lines), "template": "markdown"}).encode()
+        urllib.request.urlopen(urllib.request.Request("https://pushplus.plus/send", data=body), timeout=15)
+        print("[push] 每日摘要已推送")
+        return True
+    except Exception as e:
+        print(f"[push] 失败: {e}")
+        return False
+
+
 # ============================================================
 def main():
     ap = argparse.ArgumentParser()
@@ -435,24 +474,8 @@ def main():
     print(report)
     print(f"\n[OK] 报告: {md_path}\n[OK] 池: /sandbox/workspace/yao_pool.txt")
 
-    # 预警推送（出货/分歧）
-    alerts = [r for r in results if r["level"] in ("💥出货", "⚡分歧")]
-    if alerts:
-        try:
-            import urllib.request, urllib.parse
-            lines = [f"🐉 妖股预警 {date_str}\n"]
-            if emotion_block:
-                lines.append(emotion_block.replace("\n", "\n").strip() + "\n")
-            for r in alerts[:10]:
-                lines.append(f"- {r['code']} {r['name']} {r['price']:.2f} [{r['level']}] {r['alert']}")
-            body = urllib.parse.urlencode({"token": os.environ.get("PUSH_TOKEN", ""),
-                                           "title": "🐉妖股预警", "content": "\n".join(lines),
-                                           "template": "markdown"}).encode()
-            if body and os.environ.get("PUSH_TOKEN"):
-                urllib.request.urlopen(urllib.request.Request("https://pushplus.plus/send", data=body), timeout=15)
-                print("[push] 预警已推送")
-        except Exception as e:
-            print(f"[push] 失败: {e}")
+    # ── 每日摘要推送（B 方案：固定推一条，见 push_daily_summary）──
+    push_daily_summary(results, len(pool), len(cand), date_str, emotion_block)
 
 if __name__ == "__main__":
     main()
