@@ -54,21 +54,17 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          for f in outputs/情绪温度计回测_*.md outputs/情绪温度计回测_latest.json; do
-            [ -f "$f" ] && git add -f "$f"
-          done
-          if git diff --cached --quiet; then
-            echo "无变更"
-          else
-            git commit -m "chore(情绪温度计回测): 月度更新 $(date +%F)"
+          # 改用 Contents API 提交（git push 浅克隆+并发冲突曾致失败，API 绕开；与 quant_scan 一致）
+          FILES=$(ls -1 outputs/情绪温度计回测_*.md outputs/情绪温度计回测_latest.json 2>/dev/null | tr '\n' ' ')
+          if [ -n "$FILES" ]; then
             set +e
-            git push
+            python3 git_api_commit.py --msg "chore(情绪温度计回测): 月度更新 $(date +%F)" $FILES
             RC=$?
             set -e
             if [ "$RC" != "0" ]; then
               echo "::warning::情绪温度计回测提交失败(rc=$RC)"
-              curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️情绪温度计回测提交失败&content=git push 失败(rc=$RC)&template=txt" > /dev/null || true
+              curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️情绪温度计回测提交失败&content=git_api_commit 失败(rc=$RC)&template=txt" > /dev/null || true
             fi
+          else
+            echo "无产物，跳过"
           fi

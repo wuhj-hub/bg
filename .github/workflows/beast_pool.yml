@@ -90,21 +90,13 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          for f in outputs/beast_pool_latest.json outputs/猛兽突破池_$(date +%Y%m%d).md; do
-            [ -f "$f" ] && git add -f "$f"
-          done
-          if git diff --cached --quiet; then
-            echo "无变更"
-          else
-            git commit -m "chore: 猛兽突破池 ($(date +%Y-%m-%d))"
-            set +e
-            git push
-            RC=$?
-            set -e
-            if [ "$RC" != "0" ]; then
-              echo "::warning::beast_pool 提交失败(rc=$RC)"
-              curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️猛兽突破池提交失败&content=git push 失败(rc=$RC),突破池产物未入库&template=txt" > /dev/null || true
-            fi
+          # 改用 Contents API 提交（git push 浅克隆+多 workflow 并发冲突曾致失败，API 绕开；与 quant_scan 一致）
+          set +e
+          python3 git_api_commit.py --msg "chore: 猛兽突破池 ($(date +%Y-%m-%d))" \
+            outputs/beast_pool_latest.json "outputs/猛兽突破池_$(date +%Y%m%d).md"
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::beast_pool 提交失败(rc=$RC)"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️猛兽突破池提交失败&content=git_api_commit 失败(rc=$RC),突破池产物未入库&template=txt" > /dev/null || true
           fi

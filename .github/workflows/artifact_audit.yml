@@ -82,13 +82,16 @@ jobs:
       - name: 提交审计报告
         if: always()
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
           cp "outputs/artifact_audit_$(date +%Y-%m-%d).md" outputs/artifact_audit_latest.md 2>/dev/null || true
-          git add outputs/artifact_audit*.md outputs/artifact_audit.json 2>/dev/null || true
-          git diff --cached --quiet && echo "无变更" || {
-            git commit -m "chore: 产物入库审计 ($(date +%Y-%m-%d))"
-            git push
-          }
+          # 改用 Contents API 提交（git push 浅克隆+并发冲突曾致失败，API 绕开；与 quant_scan 一致）
+          set +e
+          python3 git_api_commit.py --msg "chore: 产物入库审计 ($(date +%Y-%m-%d))" \
+            "outputs/artifact_audit_$(date +%Y-%m-%d).md" outputs/artifact_audit_latest.md outputs/artifact_audit.json
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::产物入库审计提交失败(rc=$RC)"
+          fi

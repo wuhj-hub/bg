@@ -104,22 +104,21 @@ jobs:
 
       - name: 提交自检产物到仓库
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
         run: |
           cp "outputs/数据源交叉验证_$(date +%Y-%m-%d).md" outputs/cross_source_latest.md 2>/dev/null || :
           cp "outputs/静默失败审计_$(date +%Y-%m-%d).md" outputs/silent_failure_latest.md 2>/dev/null || :
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          for f in outputs/cross_source_latest.md outputs/cross_source_latest.json \
-                   outputs/silent_failure_latest.md outputs/silent_failure_audit.json \
-                   outputs/pipeline_audit.json outputs/pipeline_audit_latest.json; do
-            if [ -f "$f" ]; then git add "$f"; fi
-          done
-          if git diff --cached --quiet; then
-            echo "无变更"
-          else
-            git commit -m "chore: 体系自检（数据源+静默失败+流水线巡检）$(date +%Y-%m-%d)"
-            git push
+          # 改用 Contents API 提交（git push 浅克隆+多 workflow 并发冲突曾致失败，API 绕开；与 quant_scan 一致）
+          set +e
+          python3 git_api_commit.py --msg "chore: 体系自检（数据源+静默失败+流水线巡检）$(date +%Y-%m-%d)" \
+            outputs/cross_source_latest.md outputs/cross_source_latest.json \
+            outputs/silent_failure_latest.md outputs/silent_failure_audit.json \
+            outputs/pipeline_audit.json outputs/pipeline_audit_latest.json
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::体系自检产物提交失败(rc=$RC)"
           fi
 
       - name: 异常告警到微信

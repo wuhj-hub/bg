@@ -49,17 +49,19 @@ jobs:
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
 
       - name: 提交回测报告
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          for f in outputs/回测周期_*.md outputs/bt_cycle_latest.json; do
-            if [ -f "$f" ]; then git add "$f"; fi
-          done
-          if git diff --cached --quiet; then
-            echo "无变更"
+          # 改用 Contents API 提交（git push 浅克隆+并发冲突曾致失败，API 绕开；与 quant_scan 一致）
+          FILES=$(ls -1 outputs/回测周期_*.md outputs/bt_cycle_latest.json 2>/dev/null | tr '\n' ' ')
+          if [ -n "$FILES" ]; then
+            set +e
+            python3 git_api_commit.py --msg "chore: 回测周期月度回归 $(date +%Y-%m)" $FILES
+            RC=$?
+            set -e
+            [ "$RC" != "0" ] && echo "::warning::回测周期提交失败(rc=$RC)"
           else
-            git commit -m "chore: 回测周期月度回归 $(date +%Y-%m)"
-            git push
+            echo "无产物，跳过"
           fi
 
       - name: 异常告警
