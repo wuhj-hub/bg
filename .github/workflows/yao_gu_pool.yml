@@ -85,6 +85,23 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: python3 quant_scripts/yao_gu_pool.py
 
+      # 报告归档到知识库「报告 → 全盘量化」
+      - name: 上传知识库（报告·全盘量化）
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          D=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          F="outputs/妖股池_${D}.md"
+          if [ -f "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "上传失败"
+          else
+            echo "无当日妖股池文件，跳过"
+          fi
+
       - name: 提交产物
         if: always()
         env:
