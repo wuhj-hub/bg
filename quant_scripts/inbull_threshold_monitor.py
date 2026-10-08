@@ -178,7 +178,7 @@ def analyze(rows, since="1996-01"):
     df = pd.DataFrame(rows, columns=["code", "ym", "close"]).dropna()
     df = df[df["close"] > 0]
     C = df.pivot_table(index="ym", columns="code", values="close", aggfunc="last").sort_index()
-    ret = C.pct_change(fill_method=None)
+    ret = C.ffill().pct_change(fill_method=None)   # 等价 pad，与基线 analyze_bulls.py 一致（避免弃用警告）
     mret = ret.mean(axis=1)
     mret.iloc[0] = 0.0
     mkt = (1 + mret.fillna(0)).cumprod()
