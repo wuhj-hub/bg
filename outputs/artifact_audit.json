@@ -1,5 +1,5 @@
 {
- "date": "2026-10-08",
+ "date": "2026-10-09",
  "writes": {
   "all_mainboard.csv": [
    ".github/workflows/duowei_fish.yml",
@@ -10,6 +10,7 @@
    "quant_scripts/execution_card.py",
    "quant_scripts/fetch_mainboard_data.py",
    "quant_scripts/hot_emotion.py",
+   "quant_scripts/inbull_scan.py",
    "quant_scripts/jinji_emotion_backtest.py",
    "quant_scripts/limitup_concept_rank.py",
    "quant_scripts/market_regime.py",
@@ -196,6 +197,17 @@
    ".github/workflows/quant_scan.yml",
    "quant_scripts/env_engine.py"
   ],
+  "em_industry.json": [
+   "quant_scripts/inbull_scan.py"
+  ],
+  "sw_l1_industry.json": [
+   "quant_scripts/inbull_scan.py"
+  ],
+  "入牛时点_latest.json": [
+   ".github/workflows/inbull_scan.yml",
+   ".github/workflows/quant_report.yml",
+   "quant_scripts/inbull_scan.py"
+  ],
   "env_对照_latest.md": [
    "quant_scripts/env_compare.py"
   ],
@@ -300,6 +312,14 @@
   "caige_articles": [
    "wangzhe_track.yml(via wangzhe_commit.py)"
   ],
+  "入牛时点_latest.json": [
+   "inbull_scan.yml",
+   "quant_report.yml"
+  ],
+  "入牛时点扫描_{var}.md": [
+   "inbull_scan.yml",
+   "quant_report.yml"
+  ],
   "market_regime_latest.json": [
    "market_regime.yml",
    "quant_report.yml"
@@ -356,7 +376,8 @@
    "quant_scan.yml"
   ],
   "yao_pool.txt": [
-   "quant_report.yml"
+   "quant_report.yml",
+   "yao_gu_pool.yml"
   ],
   "longtou_pool.txt": [
    "quant_report.yml"
@@ -538,6 +559,45 @@
   ],
   "竞价统计_{var}.md": [
    "jingjia_track.yml"
+  ],
+  "beast_pool_latest.json": [
+   "beast_pool.yml"
+  ],
+  "猛兽突破池_{var}.md": [
+   "beast_pool.yml"
+  ],
+  "artifact_audit_{var}.md": [
+   "artifact_audit.yml"
+  ],
+  "artifact_audit_latest.md": [
+   "artifact_audit.yml"
+  ],
+  "artifact_audit.json": [
+   "artifact_audit.yml"
+  ],
+  "cross_source_latest.md": [
+   "selfcheck_daily.yml"
+  ],
+  "cross_source_latest.json": [
+   "selfcheck_daily.yml"
+  ],
+  "silent_failure_latest.md": [
+   "selfcheck_daily.yml"
+  ],
+  "silent_failure_audit.json": [
+   "selfcheck_daily.yml"
+  ],
+  "pipeline_audit.json": [
+   "selfcheck_daily.yml"
+  ],
+  "pipeline_audit_latest.json": [
+   "selfcheck_daily.yml"
+  ],
+  "妖股池_{var}.md": [
+   "yao_gu_pool.yml"
+  ],
+  "妖股池_{var}.json": [
+   "yao_gu_pool.yml"
   ]
  },
  "reads": {
@@ -653,7 +713,10 @@
   ]
  },
  "high_risk": [],
- "missing": [],
+ "missing": [
+  "em_industry.json",
+  "sw_l1_industry.json"
+ ],
  "ok": [
   "123_2b_latest.json",
   "ai_chokepoint_watch_{var}.json",
@@ -710,6 +773,7 @@
   "乖离低买_latest.json",
   "仲裁信号日志.csv",
   "信号仲裁_latest.json",
+  "入牛时点_latest.json",
   "双弦观察池_latest.json",
   "四维共振_chinext_kcb_latest.json",
   "四维共振_latest.json",
@@ -726,8 +790,14 @@
  ],
  "orphan": [
   "ai_chokepoint_watch_latest.json",
+  "artifact_audit.json",
+  "artifact_audit_latest.md",
+  "artifact_audit_{var}.md",
+  "beast_pool_latest.json",
   "caige_articles",
   "caige_pool.txt",
+  "cross_source_latest.json",
+  "cross_source_latest.md",
   "dragon_pool.txt",
   "execution_cards_latest.json",
   "glm_brief_review_{var}.md",
@@ -736,13 +806,21 @@
   "ima_cred_last_ok.json",
   "market_style_latest.json",
   "paper_portfolio.json",
+  "pipeline_audit.json",
+  "pipeline_audit_latest.json",
   "pool_entries.csv",
   "pool_quality.json",
+  "silent_failure_audit.json",
+  "silent_failure_latest.md",
   "一统天下建仓区股池_latest.json",
   "一统天下建仓区股池_latest.md",
+  "入牛时点扫描_{var}.md",
   "四态胜率_{var}.md",
   "复盘报告_{var}.md",
+  "妖股池_{var}.json",
+  "妖股池_{var}.md",
   "涨停型王者_成功率报告",
+  "猛兽突破池_{var}.md",
   "盘前市场报告_{var}.md",
   "纸面组合跟踪报告_{var}.md",
   "西湖rsv全市场_{var}.md",
