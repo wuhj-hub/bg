@@ -1,0 +1,53 @@
+name: 入牛阈值漂移监控（季度）
+
+on:
+  # 每季度首月（1/4/7/10 月）5 日 02:00 UTC ≈ 北京 10:00
+  schedule:
+    - cron: '0 2 5 1,4,7,10 *'
+  # 手动触发（随时可跑 / 首次验证）
+  workflow_dispatch: {}
+  # 外部定时 / 按需（cron-job.org → repository_dispatch）
+  repository_dispatch:
+    types: [inbull-threshold-run]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: inbull-threshold
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 安装依赖（pandas + westock CLI 免npx 备用）
+        run: |
+          pip install -q pandas
+          npm i -g westock-data-skillhub@1.0.3 || true
+      - name: 季度复算 + 漂移对比 + 上传知识库 + 推送 + 提交
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          python3 quant_scripts/inbull_threshold_monitor.py --source ths --workers 12
+          F=$(ls -1 outputs/入牛阈值漂移_*.md 2>/dev/null | tail -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "阈值监控上传失败"
+          fi
+          if [ -n "$F" ]; then
+            python3 git_api_commit.py --msg "chore: inbull threshold monitor ($(date +%Y-%m-%d))" \
+              "$F" outputs/入牛阈值漂移_latest.json || echo "阈值监控提交失败(非致命)"
+          fi
