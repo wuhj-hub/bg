@@ -1,30 +1,12 @@
 {
- "date": "2026-09-30",
- "count": 85,
+ "date": "2026-10-08",
+ "count": 26,
  "entries": [
   {
-   "code": "sh601218",
-   "name": "吉鑫科技",
-   "price": 6.08,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002640",
-   "name": "跨境通",
-   "price": 3.91,
-   "score": 63,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002188",
-   "name": "中天服务",
-   "price": 6.4,
-   "score": 63,
+   "code": "sz000690",
+   "name": "宝新能源",
+   "price": 5.5,
+   "score": 64,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
@@ -32,26 +14,125 @@
   {
    "code": "sz000692",
    "name": "惠天热电",
-   "price": 4.59,
+   "price": 4.61,
    "score": 63,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sh600293",
-   "name": "三峡新材",
-   "price": 3.93,
+   "code": "sz001979",
+   "name": "招商蛇口",
+   "price": 7.82,
    "score": 62,
    "resonance_label": "中性",
    "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100"
+   "reason": "双弦门控通过"
   },
   {
-   "code": "sh600609",
-   "name": "金杯汽车",
-   "price": 3.62,
+   "code": "sz002030",
+   "name": "达安基因",
+   "price": 5.96,
    "score": 62,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002467",
+   "name": "二六三",
+   "price": 5.15,
+   "score": 62,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002584",
+   "name": "西陇科学",
+   "price": 8.96,
+   "score": 62,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sh600152",
+   "name": "维科技术",
+   "price": 9.18,
+   "score": 62,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz003816",
+   "name": "中国广核",
+   "price": 4.41,
+   "score": 61,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sh600027",
+   "name": "华电国际",
+   "price": 5.16,
+   "score": 61,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sh600310",
+   "name": "广西能源",
+   "price": 4.97,
+   "score": 61,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz001330",
+   "name": "博纳影业",
+   "price": 6.34,
+   "score": 60,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sh600032",
+   "name": "浙江新能",
+   "price": 7.78,
+   "score": 59,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sh600023",
+   "name": "浙能电力",
+   "price": 5.38,
+   "score": 58,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sh600303",
+   "name": "曙光股份",
+   "price": 3.17,
+   "score": 58,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过"
+  },
+  {
+   "code": "sz002005",
+   "name": "德豪润达",
+   "price": 2.68,
+   "score": 57,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
@@ -59,304 +140,7 @@
   {
    "code": "sz002029",
    "name": "七匹狼",
-   "price": 8.87,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000980",
-   "name": "众泰汽车",
-   "price": 2.26,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002531",
-   "name": "天顺风能",
-   "price": 7.98,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000725",
-   "name": "京东方Ａ",
-   "price": 5.72,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000100",
-   "name": "TCL科技",
-   "price": 4.79,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000503",
-   "name": "国新健康",
-   "price": 7.69,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600006",
-   "name": "东风股份",
-   "price": 5.73,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002513",
-   "name": "蓝丰生化",
-   "price": 5.86,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002419",
-   "name": "天虹股份",
-   "price": 5.09,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600400",
-   "name": "红豆股份",
-   "price": 3.29,
-   "score": 61,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600325",
-   "name": "华发股份",
-   "price": 2.92,
-   "score": 60,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600189",
-   "name": "泉阳泉",
-   "price": 8.95,
-   "score": 60,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100"
-  },
-  {
-   "code": "sh600901",
-   "name": "江苏金租",
-   "price": 6.94,
-   "score": 60,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100"
-  },
-  {
-   "code": "sh601988",
-   "name": "中国银行",
-   "price": 6.73,
-   "score": 60,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100"
-  },
-  {
-   "code": "sz000031",
-   "name": "大悦城",
-   "price": 2.46,
-   "score": 60,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002316",
-   "name": "亚联发展",
-   "price": 4.95,
-   "score": 60,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002372",
-   "name": "伟星新材",
-   "price": 8.74,
-   "score": 60,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002382",
-   "name": "蓝帆医疗",
-   "price": 6.32,
-   "score": 60,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002454",
-   "name": "松芝股份",
-   "price": 5.61,
-   "score": 60,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600792",
-   "name": "云煤能源",
-   "price": 5.04,
-   "score": 59,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600616",
-   "name": "金枫酒业",
-   "price": 5.27,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600064",
-   "name": "南京高科",
-   "price": 8.04,
-   "score": 58,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000910",
-   "name": "大亚圣象",
-   "price": 6.15,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600448",
-   "name": "华纺股份",
-   "price": 3.1,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002129",
-   "name": "TCL中环",
-   "price": 9.2,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002238",
-   "name": "天威视讯",
-   "price": 7.08,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002413",
-   "name": "雷科防务",
-   "price": 8.61,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600261",
-   "name": "阳光照明",
-   "price": 3.29,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600790",
-   "name": "轻纺城",
-   "price": 3.68,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002145",
-   "name": "钛能化学",
-   "price": 4.59,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600577",
-   "name": "精达股份",
-   "price": 8.71,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600207",
-   "name": "安彩高科",
-   "price": 5.26,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002617",
-   "name": "露笑科技",
-   "price": 6.9,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002342",
-   "name": "巨力索具",
-   "price": 8.25,
+   "price": 9.19,
    "score": 57,
    "resonance_label": "中性",
    "sector": "",
@@ -372,397 +156,82 @@
    "reason": "双弦门控通过"
   },
   {
-   "code": "sz002960",
-   "name": "青鸟智控",
-   "price": 8.7,
+   "code": "sz002263",
+   "name": "大东南",
+   "price": 3.26,
    "score": 57,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sz002728",
-   "name": "特一药业",
-   "price": 9.91,
+   "code": "sz002693",
+   "name": "双成药业",
+   "price": 9.1,
    "score": 57,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sz000863",
-   "name": "三湘印象",
-   "price": 4.46,
+   "code": "sh600019",
+   "name": "宝钢股份",
+   "price": 5.97,
    "score": 57,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sz000514",
-   "name": "渝开发",
-   "price": 4.6,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002314",
-   "name": "南山控股",
-   "price": 2.43,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000718",
-   "name": "苏宁环球",
-   "price": 2.13,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000516",
-   "name": "国际医学",
-   "price": 4.37,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002016",
-   "name": "世荣兆业",
-   "price": 4.95,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600011",
-   "name": "华能国际",
-   "price": 7.04,
-   "score": 57,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002172",
-   "name": "澳洋健康",
-   "price": 5.43,
-   "score": 56,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000088",
-   "name": "盐田港",
-   "price": 4.66,
-   "score": 56,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100"
-  },
-  {
-   "code": "sz002761",
-   "name": "浙江建投",
-   "price": 7.68,
-   "score": 56,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000560",
-   "name": "我爱我家",
-   "price": 3.7,
-   "score": 55,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100"
-  },
-  {
-   "code": "sz002638",
-   "name": "勤上股份",
-   "price": 4.77,
-   "score": 55,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100"
-  },
-  {
-   "code": "sz002259",
-   "name": "升达林业",
-   "price": 5.01,
-   "score": 55,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002584",
-   "name": "西陇科学",
-   "price": 8.79,
+   "code": "sz000509",
+   "name": "华塑控股",
+   "price": 3.4,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sz002285",
-   "name": "世联行",
-   "price": 3.02,
+   "code": "sz000573",
+   "name": "粤宏远Ａ",
+   "price": 3.93,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sz000002",
-   "name": "万科Ａ",
-   "price": 4.26,
+   "code": "sz000829",
+   "name": "天音控股",
+   "price": 9.19,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sz000571",
-   "name": "新大洲A",
-   "price": 6.47,
+   "code": "sz002133",
+   "name": "广宇集团",
+   "price": 2.99,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sz002062",
-   "name": "宏润建设",
-   "price": 9.05,
+   "code": "sh600218",
+   "name": "全柴动力",
+   "price": 8.05,
    "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
   },
   {
-   "code": "sh600639",
-   "name": "浦东金桥",
-   "price": 9.88,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000055",
-   "name": "方大集团",
-   "price": 3.86,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000782",
-   "name": "恒申新材",
-   "price": 8.1,
-   "score": 53,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600503",
-   "name": "华丽家族",
-   "price": 2.53,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002137",
-   "name": "实益达",
-   "price": 7.6,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002522",
-   "name": "浙江众成",
-   "price": 5.26,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002383",
-   "name": "合众思壮",
-   "price": 7.68,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000402",
-   "name": "金融街",
-   "price": 2.74,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600675",
-   "name": "中华企业",
-   "price": 2.52,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000859",
-   "name": "国风新材",
-   "price": 8.53,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600303",
-   "name": "曙光股份",
+   "code": "sz002445",
+   "name": "中南文化",
    "price": 3.11,
    "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002347",
-   "name": "泰尔股份",
-   "price": 6.39,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002434",
-   "name": "万里扬",
-   "price": 6.17,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002093",
-   "name": "国脉科技",
-   "price": 7.76,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz001914",
-   "name": "招商积余",
-   "price": 9.4,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600033",
-   "name": "福建高速",
-   "price": 3.67,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002295",
-   "name": "精艺股份",
-   "price": 9.77,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600429",
-   "name": "三元股份",
-   "price": 4.85,
-   "score": 52,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002005",
-   "name": "德豪润达",
-   "price": 2.73,
-   "score": 51,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002349",
-   "name": "精华制药",
-   "price": 8.55,
-   "score": 50,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100"
-  },
-  {
-   "code": "sz002031",
-   "name": "巨轮智能",
-   "price": 5.44,
-   "score": 50,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600163",
-   "name": "中闽能源",
-   "price": 5.6,
-   "score": 50,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002146",
-   "name": "荣盛发展",
-   "price": 1.31,
-   "score": 50,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz002252",
-   "name": "上海莱士",
-   "price": 5.32,
-   "score": 50,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
