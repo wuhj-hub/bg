@@ -20,8 +20,17 @@
  ],
  "sectors_bull_n": 14,
  "sectors_total": 125,
+ "sectors_bull_l1": [
+  "煤炭",
+  "银行"
+ ],
+ "sectors_bull_l1_n": 2,
+ "sectors_total_l1": 32,
  "stocks_bull_n": 281,
  "stocks_total": 3073,
+ "breadth_pct": 9.14,
+ "breadth_level": "🟢 退潮/非牛",
+ "breadth_range": "<10%",
  "sector_entry": {
   "元件": "2026-08",
   "农产品加工": "2026-08",
@@ -37,6 +46,10 @@
   "航运港口": "2026-09",
   "银行Ⅱ": "2026-07",
   "非白酒": "2026-09"
+ },
+ "sector_entry_l1": {
+  "煤炭": "2026-10",
+  "银行": "2026-07"
  },
  "stocks_bull": [
   {
