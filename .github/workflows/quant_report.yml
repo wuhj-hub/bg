@@ -359,6 +359,35 @@ jobs:
             curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️乖离低买扫描失败&content=yitong_guaili_screener 失败(rc=$RC),乖离低买池未更新&template=txt" > /dev/null || true
           fi
 
+      # ─── 第四步：入牛时点扫描（板块入牛 / 个股入牛 · 曾星智月线5线，2026-10-09 接入）───
+      - name: 入牛时点扫描（板块入牛/个股入牛·月线5线）
+        continue-on-error: true
+        timeout-minutes: 25
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          set +e
+          python3 quant_scripts/inbull_scan.py --date "$(date +%Y-%m-%d)"
+          RC=$?
+          set -e
+          echo "入牛时点: $(python3 -c "import json;d=json.load(open('outputs/入牛时点_latest.json'));print('大盘牛='+str(d['market_bull'])+' 行业'+str(d['sectors_bull_n'])+'/'+str(d['sectors_total'])+' 个股'+str(d['stocks_bull_n']))" 2>/dev/null || echo '无输出')"
+          if [ "$RC" != "0" ]; then
+            echo "::warning::入牛时点扫描失败(rc=$RC)"
+          fi
+          F=$(ls outputs/入牛时点扫描_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "入牛时点上传失败"
+          fi
+          if [ -f outputs/入牛时点_latest.json ]; then
+            cp outputs/入牛时点_latest.json 入牛时点_latest.json
+            python3 git_api_commit.py --msg "chore: inbull scan ($(date +%Y-%m-%d))" \
+              入牛时点_latest.json "outputs/入牛时点扫描_$(date +%Y-%m-%d).md" || echo "入牛时点提交失败(非致命)"
+          fi
+
       # ─── 第三步.6：提交报告阶段产物（供次日盘前报告引用）───
       # ─── 市场状态判定（三级别力量）内联刷新（2026-09-14 加固）───
       # 背景：独立 workflow 的原生 cron 从未触发（运行史仅 1 次手动），
