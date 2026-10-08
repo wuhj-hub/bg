@@ -72,6 +72,7 @@ jobs:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485319502904253   # 「报告」库 →「盘前报告」文件夹
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
         run: |
           # 🤖 GLM 外围传导研判（先跑，供报告插入；智谱免费模型，失败不阻断）
