@@ -5,6 +5,8 @@
 个股/行业/大盘「5根月线全部向上」判定：
     MA5↑ 且 MA10↑ 且 MA20↑ 且 MA30↑ 且 月线DIF↑
 行业指数 = 成分股月收益等权合成；大盘 = 全市场等权。
+行业口径：① em_industry.json（约125细分）② sw_l1_industry.json（32大类·申万一级）
+广度阈值（历史回测 1996-2026）：≥25%牛市确认(精确率88%) / ≥15%广度扩散 / <10%退潮。
 
 数据源：westock 批量月线（前复权）。
 输出：
@@ -107,6 +109,15 @@ def load_industry():
     return ind
 
 
+def load_sw_l1():
+    """sw_l1_industry.json -> {6位code: 申万一级行业}（32 大类口径）"""
+    fp = os.path.join(ROOT, "quant_scripts", "sw_l1_industry.json")
+    if not os.path.exists(fp):
+        print("[WARN] 缺少 sw_l1_industry.json，跳过 32 大类口径")
+        return {}
+    return json.load(open(fp, encoding="utf-8"))
+
+
 def fetch_all(codes):
     rows, n = [], len(codes)
     for i in range(0, n, BATCH):
@@ -138,6 +149,35 @@ def gg_of(C):
             (dif > dif.shift(1))).fillna(False)
 
 
+def ind_stats(ret, mapping, minmem=3):
+    """行业等权指数 5 线判定 -> ({行业:bool 当月入牛}, {行业:[入牛月]})"""
+    groups = {}
+    for c in ret.columns:
+        i = mapping.get(c[2:], "")
+        if i:
+            groups.setdefault(i, []).append(c)
+    bull, enter = {}, {}
+    for i, cs in groups.items():
+        if len(cs) < minmem:
+            continue
+        idx = (1 + ret[cs].mean(axis=1).fillna(0)).cumprod() * 1000
+        gg = gg_of(idx)
+        bull[i] = bool(gg.iloc[-1])
+        enter[i] = [gg.index[k] for k in range(1, len(gg)) if gg.iloc[k] and not gg.iloc[k - 1]]
+    return bull, enter
+
+
+def breadth_level(p):
+    """入牛个股占比 → 档位（历史回测阈值）"""
+    if p >= 25:
+        return "🔴 牛市确认", "≥25%"
+    if p >= 15:
+        return "🟠 广度扩散", "15~25%"
+    if p < 10:
+        return "🟢 退潮/非牛", "<10%"
+    return "⚪ 中性偏弱", "10~15%"
+
+
 def main():
     global WESTOCK
     WESTOCK = westock_bin()
@@ -155,6 +195,7 @@ def main():
     if sample:
         codes = codes[:sample]
     ind6 = load_industry()
+    l1map = load_sw_l1()
     print(f"[入牛时点] 标的 {len(codes)} 只, date={date_str}", flush=True)
 
     # 上次大盘牛市状态（用于「大盘入牛」预警）
@@ -185,22 +226,11 @@ def main():
         st_bull[code] = bool(gg.iloc[-1])
         st_enter[code] = [gg.index[k] for k in range(1, len(gg)) if gg.iloc[k] and not gg.iloc[k - 1]]
 
-    # 行业等权
+    # 行业等权（两种口径）
     piv = df.pivot_table(index="ym", columns="code", values="close")
     ret = piv.pct_change(fill_method=None)
-    ind_codes = {}
-    for c in ret.columns:
-        i = ind6.get(c[2:], "")
-        if i:
-            ind_codes.setdefault(i, []).append(c)
-    ind_bull, ind_enter = {}, {}
-    for i, cs in ind_codes.items():
-        if len(cs) < 3:
-            continue
-        idx = (1 + ret[cs].mean(axis=1).fillna(0)).cumprod() * 1000
-        gg = gg_of(idx)
-        ind_bull[i] = bool(gg.iloc[-1])
-        ind_enter[i] = [gg.index[k] for k in range(1, len(gg)) if gg.iloc[k] and not gg.iloc[k - 1]]
+    ind_bull, ind_enter = ind_stats(ret, ind6, 3)
+    l1_bull, l1_enter = (ind_stats(ret, l1map, 3) if l1map else ({}, {}))
 
     # 大盘等权
     mk = (1 + ret.mean(axis=1).fillna(0)).cumprod() * 1000
@@ -208,25 +238,44 @@ def main():
     mkt_bull = bool(mkg.iloc[-1]) if len(mkg) else False
 
     sectors_bull = sorted([k for k, v in ind_bull.items() if v])
+    sectors_bull_l1 = sorted([k for k, v in l1_bull.items() if v])
     stocks_bull = [{"code": c, "ind": ind6.get(c[2:], ""),
                     "entry": (st_enter[c][-1] if st_enter[c] else "")}
                    for c in st_bull if st_bull[c]]
+    total = int(df["code"].nunique())
+    breadth = round(len(stocks_bull) / total * 100, 2) if total else 0.0
+    blevel, brange = breadth_level(breadth)
     res = {"date": date_str, "data_month": cur, "market_bull": mkt_bull,
            "sectors_bull": sectors_bull, "sectors_bull_n": len(sectors_bull),
-           "sectors_total": len(ind_bull), "stocks_bull_n": len(stocks_bull),
-           "stocks_total": int(df["code"].nunique()),
+           "sectors_total": len(ind_bull),
+           "sectors_bull_l1": sectors_bull_l1, "sectors_bull_l1_n": len(sectors_bull_l1),
+           "sectors_total_l1": len(l1_bull),
+           "stocks_bull_n": len(stocks_bull), "stocks_total": total,
+           "breadth_pct": breadth, "breadth_level": blevel, "breadth_range": brange,
            "sector_entry": {k: (ind_enter[k][-1] if ind_enter.get(k) else "") for k in sectors_bull},
+           "sector_entry_l1": {k: (l1_enter[k][-1] if l1_enter.get(k) else "") for k in sectors_bull_l1},
            "stocks_bull": stocks_bull}
     json.dump(res, open(os.path.join(OUT, "入牛时点_latest.json"), "w"), ensure_ascii=False, indent=1)
 
     L = [f"# 板块-个股「入牛时点」扫描 · {date_str}", "",
          f"- 数据月: **{cur}**",
          f"- 大盘（全市场等权）5根月线全向上: **{'是' if mkt_bull else '否'}**",
-         f"- 入牛行业: **{len(sectors_bull)}/{len(ind_bull)}** → {'、'.join(sectors_bull) or '无'}",
-         f"- 入牛个股: **{len(stocks_bull)}/{res['stocks_total']}**",
-         f"- 口径: 月线 MA5/10/20/30 均向上 + 月线DIF向上（前复权）", ""]
+         f"- 入牛个股占比: **{breadth}%**（{blevel}，档位 {brange}）",
+         f"- 入牛个股: **{len(stocks_bull)}/{total}**",
+         f"- 入牛行业(细分): **{len(sectors_bull)}/{len(ind_bull)}**",
+         f"- 入牛行业(32大类): **{len(sectors_bull_l1)}/{len(l1_bull)}** → {'、'.join(sectors_bull_l1) or '无'}",
+         f"- 口径: 月线 MA5/10/20/30 均向上 + 月线DIF向上（前复权）",
+         f"- 广度阈值: ≥25% 牛市确认 / ≥15% 广度扩散 / <10% 退潮（1996-2026 回测）", ""]
+    if sectors_bull_l1:
+        L.append("## 入牛行业（32 大类·申万一级）")
+        L.append("")
+        L.append("| 行业 | 入牛月 |")
+        L.append("|---|---|")
+        for s in sectors_bull_l1:
+            L.append(f"| {s} | {res['sector_entry_l1'].get(s,'')} |")
+        L.append("")
     if sectors_bull:
-        L.append("## 入牛行业")
+        L.append("## 入牛行业（细分）")
         L.append("")
         L.append("| 行业 | 入牛月 | 成分(入牛) |")
         L.append("|---|---|---|")
@@ -252,25 +301,37 @@ def main():
     L.append("")
     L.append("> 回测口径：Q4(板块入牛>6月后个股才入牛)+大盘牛 最优；Q1(板块当月同步)最差；「个股领先板块」无超额。止盈=周线顶背离后破周线黄金线。")
     open(os.path.join(OUT, f"入牛时点扫描_{date_str}.md"), "w", encoding="utf-8").write("\n".join(L))
-    # ── 推送（PushPlus）：每日直接推送 + 大盘入牛预警 ──
+
+    # ── 推送（PushPlus）：每日直接推送 + 大盘入牛预警 + 广度档位 ──
     alert = bool(mkt_bull) and (prev_bull is not True)
-    title = (f"🚨 大盘入牛预警 | 入牛时点 {date_str}" if alert else f"入牛时点 {date_str}")
+    if alert:
+        title = f"🚨 大盘入牛预警 | 入牛时点 {date_str}"
+    elif blevel.startswith("🔴"):
+        title = f"🔴 牛市确认 | 入牛时点 {date_str}"
+    elif blevel.startswith("🟠"):
+        title = f"🟠 广度扩散 | 入牛时点 {date_str}"
+    elif blevel.startswith("🟢"):
+        title = f"🟢 退潮 | 入牛时点 {date_str}"
+    else:
+        title = f"入牛时点 {date_str}"
     P = [f"## 📊 入牛时点 · {date_str}", "",
          f"- 大盘（全市场等权）5线: {'✅ 牛市' if mkt_bull else '❌ 非牛'}",
-         f"- 入牛行业: **{len(sectors_bull)}/{len(ind_bull)}** → {'、'.join(sectors_bull) or '无'}",
-         f"- 入牛个股: **{len(stocks_bull)}/{res['stocks_total']}**",
+         f"- 入牛个股占比: **{breadth}%** → {blevel}（{brange}）",
+         f"- 入牛个股: **{len(stocks_bull)}/{total}**",
+         f"- 入牛行业(32大类): **{len(sectors_bull_l1)}/{len(l1_bull)}** → {'、'.join(sectors_bull_l1) or '无'}",
+         f"- 入牛行业(细分): **{len(sectors_bull)}/{len(ind_bull)}**",
          f"- 数据月: {cur}"]
     if alert:
         P.append("")
         P.append("> 🚨 **大盘入牛预警**：全市场等权月线 5 线转牛！")
-    if sectors_bull:
+    if sectors_bull_l1:
         P.append("")
-        P.append("### 入牛行业")
-        for s in sectors_bull:
-            P.append(f"- {s}（入牛 {res['sector_entry'].get(s, '')}）")
+        P.append("### 入牛行业（32 大类）")
+        for s in sectors_bull_l1:
+            P.append(f"- {s}（入牛 {res['sector_entry_l1'].get(s, '')}）")
     pushplus(os.environ.get("PUSH_TOKEN", ""), title, "\n".join(P))
 
-    print(f"[OK] 大盘牛={mkt_bull} 入牛行业={len(sectors_bull)} 入牛个股={len(stocks_bull)}", flush=True)
+    print(f"[OK] 大盘牛={mkt_bull} 个股占比={breadth}%({blevel}) 入牛行业32类={len(sectors_bull_l1)}/{len(l1_bull)} 细分={len(sectors_bull)} 个股={len(stocks_bull)}", flush=True)
 
 
 if __name__ == "__main__":
