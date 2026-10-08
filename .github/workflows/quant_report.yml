@@ -217,13 +217,15 @@ jobs:
       - name: 妖股发现与跟踪池（启动入池+出货预警推送）
         continue-on-error: true
         env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
-          python3 quant_scripts/yao_gu_pool.py
+          # --no-push：复盘路径由下方 push_report 推整份报告，避免与脚本内「每日摘要」双推
+          python3 quant_scripts/yao_gu_pool.py --no-push
           F=$(ls outputs/妖股池_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
           if [ -n "$F" ]; then
             python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "妖股池上传失败(非致命)"

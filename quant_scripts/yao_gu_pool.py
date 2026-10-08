@@ -324,6 +324,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--no-glm", action="store_true", dest="no_glm", help="跳过概念第一特征校验")
+    ap.add_argument("--no-push", action="store_true", dest="no_push", help="跳过每日摘要推送（复盘路径改用 push_report 推整份）")
     args = ap.parse_args()
     date_str = datetime.now(BJ).strftime("%Y-%m-%d")
 
@@ -475,7 +476,9 @@ def main():
     print(f"\n[OK] 报告: {md_path}\n[OK] 池: /sandbox/workspace/yao_pool.txt")
 
     # ── 每日摘要推送（B 方案：固定推一条，见 push_daily_summary）──
-    push_daily_summary(results, len(pool), len(cand), date_str, emotion_block)
+    #    复盘路径（quant_report 4.9 步）以 --no-push 运行 → 由 push_report 推整份，避免双推
+    if not args.no_push:
+        push_daily_summary(results, len(pool), len(cand), date_str, emotion_block)
 
 if __name__ == "__main__":
     main()
