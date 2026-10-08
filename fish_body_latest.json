@@ -1,6 +1,6 @@
 {
   "market_temp": {
-    "temp": 50,
+    "temp": 45,
     "level": "中性",
     "idx": "3811.90"
   },
@@ -127,7 +127,7 @@
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
-        "stock": "个股弱势",
+        "stock": "个股强势",
         "resonance": "共振向下",
         "score": 20
       },
@@ -160,13 +160,46 @@
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
-        "stock": "个股弱势",
+        "stock": "个股中性",
         "resonance": "共振向下",
         "score": 20
       },
       "month_trend": "纠缠",
       "month_gate": "WARN",
       "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sh600400",
+      "name": "红豆股份",
+      "pattern": "MACD空中加油",
+      "raw_score": 100,
+      "final_score": 75,
+      "multi_score": 59,
+      "resonance": "共振向下",
+      "price": 3.62,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.11)>=DEA(0.10)金叉",
+        "MACD柱0.030刚翻红加油成功",
+        "收盘3.62>MA53.39",
+        "MA20>MA60多头排列",
+        "KDJ_J=66未超买"
+      ],
+      "stop_loss": "3.22",
+      "target": "4.16",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": null,
       "rsg_strong": false
     },
@@ -224,7 +257,138 @@
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
-        "stock": "个股弱势",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002882",
+      "name": "金龙羽",
+      "pattern": "高阳强势",
+      "raw_score": 85,
+      "final_score": 68,
+      "multi_score": 82,
+      "resonance": "共振向下",
+      "price": 26.95,
+      "reasons": [
+        "MA20(23.36)>MA60(21.44)多头",
+        "近3日涨幅10.0%（高阳）",
+        "放量2.2倍",
+        "收盘26.95>MA524.09",
+        "MACD金叉0轴上"
+      ],
+      "stop_loss": "22.40",
+      "target": "30.99",
+      "mode": 4,
+      "tag": "高阳强势",
+      "trend_exit": "趋势跟踪止盈：MA20破位或MACD死叉（不等回落）",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002913",
+      "name": "奥士康",
+      "pattern": "MACD空中加油",
+      "raw_score": 85,
+      "final_score": 66,
+      "multi_score": 72,
+      "resonance": "共振向下",
+      "price": 90.77,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(8.01)>=DEA(7.48)金叉",
+        "MACD柱1.07>0但已走高",
+        "收盘90.77>MA588.75",
+        "MA20>MA60多头排列",
+        "KDJ_J=55未超买"
+      ],
+      "stop_loss": "84.31",
+      "target": "104.39",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002835",
+      "name": "同为股份",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 66,
+      "multi_score": 52,
+      "resonance": "共振向下",
+      "price": 13.02,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.16)>=DEA(0.15)金叉",
+        "MACD柱0.010刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=60未超买"
+      ],
+      "stop_loss": "12.46",
+      "target": "14.97",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002780",
+      "name": "三夫户外",
+      "pattern": "MACD空中加油",
+      "raw_score": 85,
+      "final_score": 66,
+      "multi_score": 74,
+      "resonance": "共振向下",
+      "price": 15.18,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.39)>=DEA(0.31)金叉",
+        "MACD柱0.16>0但已走高",
+        "收盘15.18>MA514.81",
+        "MA20>MA60多头排列",
+        "KDJ_J=83未超买"
+      ],
+      "stop_loss": "14.07",
+      "target": "17.46",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
         "resonance": "共振向下",
         "score": 20
       },
@@ -269,33 +433,148 @@
     {
       "code": "sh600400",
       "name": "红豆股份",
-      "pattern": "MACD空中加油",
-      "raw_score": 100,
+      "pattern": "高阳强势",
+      "raw_score": 85,
       "final_score": 64,
-      "multi_score": 0,
+      "multi_score": 59,
       "resonance": "共振向下",
       "price": 3.62,
       "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.11)>=DEA(0.10)金叉",
-        "MACD柱0.030刚翻红加油成功",
+        "MA20(3.25)>MA60(3.02)多头",
+        "近3日涨幅9.4%（高阳）",
+        "放量2.7倍",
         "收盘3.62>MA53.39",
-        "MA20>MA60多头排列",
-        "KDJ_J=66未超买"
+        "MACD金叉0轴上"
       ],
-      "stop_loss": "3.22",
+      "stop_loss": "3.15",
       "target": "4.16",
-      "mode": 1,
-      "tag": "",
+      "mode": 4,
+      "tag": "高阳强势",
+      "trend_exit": "趋势跟踪止盈：MA20破位或MACD死叉（不等回落）",
       "resonance_detail": {
         "index": "大盘向下",
-        "stock": "个股弱势",
+        "stock": "个股中性",
         "resonance": "共振向下",
         "score": 20
       },
       "month_trend": "多头",
       "month_gate": "PASS",
       "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002882",
+      "name": "金龙羽",
+      "pattern": "MACD空中加油",
+      "raw_score": 80,
+      "final_score": 64,
+      "multi_score": 82,
+      "resonance": "共振向下",
+      "price": 26.95,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.63)>=DEA(0.35)金叉",
+        "MACD柱0.56>0但已走高",
+        "收盘26.95>MA524.09",
+        "MA20>MA60多头排列"
+      ],
+      "stop_loss": "22.89",
+      "target": "30.99",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002882",
+      "name": "金龙羽",
+      "pattern": "箱体突破",
+      "raw_score": 80,
+      "final_score": 64,
+      "multi_score": 82,
+      "resonance": "共振向下",
+      "price": 26.95,
+      "reasons": [
+        "MA20(23.36)>MA60(21.44)",
+        "MACD金叉(DIF=0.63)",
+        "KDJ向上(J=100)",
+        "收盘26.95>MA524.09",
+        "突破验证通过：量2.3倍/回踩守住/位置16%"
+      ],
+      "stop_loss": "22.40",
+      "target": "30.99",
+      "mode": 3,
+      "tag": "有效突破",
+      "breakout": {
+        "valid": true,
+        "reason": "量2.3倍/回踩守住/位置16%",
+        "checks": {
+          "volume": true,
+          "pullback": true,
+          "position": true,
+          "pullback_state": "hold"
+        },
+        "box": {
+          "top": 24.4,
+          "bottom": 20.72,
+          "height": 17.8,
+          "break_date": "2026-09-30",
+          "vol_ratio": 2.25,
+          "pos_dev": 15.6
+        }
+      },
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002813",
+      "name": "路畅科技",
+      "pattern": "高阳强势",
+      "raw_score": 85,
+      "final_score": 64,
+      "multi_score": 62,
+      "resonance": "共振向下",
+      "price": 26.38,
+      "reasons": [
+        "MA20(22.43)>MA60(20.80)多头",
+        "近3日涨幅14.2%（高阳）",
+        "放量3.7倍",
+        "收盘26.38>MA524.53",
+        "MACD金叉0轴上"
+      ],
+      "stop_loss": "22.81",
+      "target": "30.34",
+      "mode": 4,
+      "tag": "高阳强势",
+      "trend_exit": "趋势跟踪止盈：MA20破位或MACD死叉（不等回落）",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
       "rsg_dev": null,
       "rsg_strong": false
     },
@@ -343,9 +622,172 @@
         "resonance": "共振向下",
         "score": 20
       },
-      "month_trend": "无数据",
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002780",
+      "name": "三夫户外",
+      "pattern": "箱体突破",
+      "raw_score": 80,
+      "final_score": 63,
+      "multi_score": 74,
+      "resonance": "共振向下",
+      "price": 15.18,
+      "reasons": [
+        "MA20(14.14)>MA60(13.36)",
+        "MACD金叉(DIF=0.39)",
+        "KDJ向上(J=83)",
+        "收盘15.18>MA514.81",
+        "突破验证通过：量1.6倍/回踩待确认/位置2%"
+      ],
+      "stop_loss": "13.77",
+      "target": "17.46",
+      "mode": 3,
+      "tag": "突破待回踩确认",
+      "breakout": {
+        "valid": true,
+        "reason": "量1.6倍/回踩待确认/位置2%",
+        "checks": {
+          "volume": true,
+          "pullback": true,
+          "position": true,
+          "pullback_state": "pending"
+        },
+        "box": {
+          "top": 14.92,
+          "bottom": 12.74,
+          "height": 17.1,
+          "break_date": "2026-10-08",
+          "vol_ratio": 1.58,
+          "pos_dev": 2.5
+        }
+      },
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002705",
+      "name": "新宝股份",
+      "pattern": "MACD空中加油",
+      "raw_score": 85,
+      "final_score": 63,
+      "multi_score": 52,
+      "resonance": "共振向下",
+      "price": 11.59,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.09)>=DEA(0.06)金叉",
+        "MACD柱0.070刚翻红加油成功",
+        "KDJ_J=15未超买"
+      ],
+      "stop_loss": "11.11",
+      "target": "13.33",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "空头",
       "month_gate": "BLOCK",
       "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002813",
+      "name": "路畅科技",
+      "pattern": "MACD空中加油",
+      "raw_score": 80,
+      "final_score": 61,
+      "multi_score": 62,
+      "resonance": "共振向下",
+      "price": 26.38,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(1.05)>=DEA(0.59)金叉",
+        "MACD柱0.93>0但已走高",
+        "收盘26.38>MA524.53",
+        "MA20>MA60多头排列"
+      ],
+      "stop_loss": "23.30",
+      "target": "30.34",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sh600400",
+      "name": "红豆股份",
+      "pattern": "箱体突破",
+      "raw_score": 80,
+      "final_score": 60,
+      "multi_score": 59,
+      "resonance": "共振向下",
+      "price": 3.62,
+      "reasons": [
+        "MA20(3.25)>MA60(3.02)",
+        "MACD金叉(DIF=0.11)",
+        "KDJ向上(J=66)",
+        "收盘3.62>MA53.39",
+        "突破验证通过：量1.8倍/回踩待确认/位置4%"
+      ],
+      "stop_loss": "3.15",
+      "target": "4.16",
+      "mode": 3,
+      "tag": "突破待回踩确认",
+      "breakout": {
+        "valid": true,
+        "reason": "量1.8倍/回踩待确认/位置4%",
+        "checks": {
+          "volume": true,
+          "pullback": true,
+          "position": true,
+          "pullback_state": "pending"
+        },
+        "box": {
+          "top": 3.6,
+          "bottom": 2.83,
+          "height": 27.2,
+          "break_date": "2026-10-08",
+          "vol_ratio": 1.84,
+          "pos_dev": 3.7
+        }
+      },
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": null,
       "rsg_strong": false
     },
@@ -414,6 +856,70 @@
       "rsg_strong": false
     },
     {
+      "code": "sz002780",
+      "name": "三夫户外",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 59,
+      "multi_score": 74,
+      "resonance": "共振向下",
+      "price": 15.18,
+      "reasons": [
+        "MA20(14.14)>MA60(13.36)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离3.9%)",
+        "收盘15.18>MA514.81",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "13.43",
+      "target": "17.00",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002913",
+      "name": "奥士康",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 58,
+      "multi_score": 72,
+      "resonance": "共振向下",
+      "price": 90.77,
+      "reasons": [
+        "MA20(78.88)>MA60(60.75)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离3.9%)",
+        "收盘90.77>MA588.75",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "74.94",
+      "target": "101.66",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
       "code": "sz002910",
       "name": "庄园牧场",
       "pattern": "均线回踩支撑",
@@ -435,7 +941,7 @@
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
-        "stock": "个股弱势",
+        "stock": "个股强势",
         "resonance": "共振向下",
         "score": 20
       },
@@ -467,7 +973,39 @@
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
-        "stock": "个股弱势",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002988",
+      "name": "豪美新材",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 57,
+      "multi_score": 60,
+      "resonance": "共振向下",
+      "price": 31.95,
+      "reasons": [
+        "MA20(30.34)>MA60(24.44)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离1.8%)",
+        "收盘31.95>MA531.12",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "28.82",
+      "target": "35.78",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
         "resonance": "共振向下",
         "score": 20
       },
@@ -505,38 +1043,6 @@
       },
       "month_trend": "空头",
       "month_gate": "BLOCK",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sz002835",
-      "name": "同为股份",
-      "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 57,
-      "multi_score": 0,
-      "resonance": "共振向下",
-      "price": 13.02,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.16)>=DEA(0.15)金叉",
-        "MACD柱0.010刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=60未超买"
-      ],
-      "stop_loss": "12.46",
-      "target": "14.97",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
       "month_reversal": null,
       "rsg_dev": null,
       "rsg_strong": false
@@ -595,7 +1101,7 @@
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
-        "stock": "个股弱势",
+        "stock": "个股强势",
         "resonance": "共振向下",
         "score": 20
       },
@@ -624,6 +1130,38 @@
       "stop_loss": "19.09",
       "target": "22.64",
       "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz003023",
+      "name": "彩虹集团",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 55,
+      "multi_score": 47,
+      "resonance": "共振向下",
+      "price": 25.87,
+      "reasons": [
+        "MA20(25.79)>MA60(23.82)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离0.9%)",
+        "收盘25.87>MA525.57",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "24.50",
+      "target": "28.97",
+      "mode": 2,
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
