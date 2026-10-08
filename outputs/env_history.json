@@ -1,0 +1,19 @@
+{
+ "2026-10-08": {
+  "temp": 40.9,
+  "level": "偏冷",
+  "position_cap": 30,
+  "subs": {
+   "index_trend": 10.5,
+   "emotion": 85.0,
+   "width": 68.1,
+   "breadth": 19.4,
+   "structure": 19.2
+  },
+  "divergence": {
+   "index_vs_emotion": -74.5,
+   "breadth_vs_width": -48.7
+  },
+  "degraded": false
+ }
+}
