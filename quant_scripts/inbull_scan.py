@@ -41,6 +41,22 @@ def run(args, timeout=180):
         return ""
 
 
+def pushplus(tok, title, md):
+    """PushPlus 推送（markdown）"""
+    if not tok:
+        print("[SKIP] 无 PUSH_TOKEN，跳过推送")
+        return
+    import urllib.request
+    body = json.dumps({"token": tok, "title": title, "content": md,
+                       "template": "markdown"}).encode("utf-8")
+    req = urllib.request.Request("https://www.pushplus.plus/send", data=body,
+                                 headers={"Content-Type": "application/json"}, method="POST")
+    try:
+        print("推送:", urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace"))
+    except Exception as e:
+        print("[WARN] 推送失败", e)
+
+
 def parse_batch_month(txt):
     """解析批量月线表(symbol|date|open|last|high|low|...) -> {code:[(ym,close)]}"""
     hdr, data = None, {}
@@ -141,6 +157,17 @@ def main():
     ind6 = load_industry()
     print(f"[入牛时点] 标的 {len(codes)} 只, date={date_str}", flush=True)
 
+    # 上次大盘牛市状态（用于「大盘入牛」预警）
+    prev_bull = None
+    for _p in [os.path.join(ROOT, "入牛时点_latest.json"),
+               os.path.join(OUT, "入牛时点_latest.json")]:
+        if os.path.exists(_p):
+            try:
+                prev_bull = json.load(open(_p, encoding="utf-8")).get("market_bull")
+                break
+            except Exception:
+                pass
+
     rows = fetch_all(codes)
     df = pd.DataFrame(rows, columns=["code", "ym", "close"]).dropna()
     df = df[df["close"] > 0]
@@ -225,6 +252,24 @@ def main():
     L.append("")
     L.append("> 回测口径：Q4(板块入牛>6月后个股才入牛)+大盘牛 最优；Q1(板块当月同步)最差；「个股领先板块」无超额。止盈=周线顶背离后破周线黄金线。")
     open(os.path.join(OUT, f"入牛时点扫描_{date_str}.md"), "w", encoding="utf-8").write("\n".join(L))
+    # ── 推送（PushPlus）：每日直接推送 + 大盘入牛预警 ──
+    alert = bool(mkt_bull) and (prev_bull is not True)
+    title = (f"🚨 大盘入牛预警 | 入牛时点 {date_str}" if alert else f"入牛时点 {date_str}")
+    P = [f"## 📊 入牛时点 · {date_str}", "",
+         f"- 大盘（全市场等权）5线: {'✅ 牛市' if mkt_bull else '❌ 非牛'}",
+         f"- 入牛行业: **{len(sectors_bull)}/{len(ind_bull)}** → {'、'.join(sectors_bull) or '无'}",
+         f"- 入牛个股: **{len(stocks_bull)}/{res['stocks_total']}**",
+         f"- 数据月: {cur}"]
+    if alert:
+        P.append("")
+        P.append("> 🚨 **大盘入牛预警**：全市场等权月线 5 线转牛！")
+    if sectors_bull:
+        P.append("")
+        P.append("### 入牛行业")
+        for s in sectors_bull:
+            P.append(f"- {s}（入牛 {res['sector_entry'].get(s, '')}）")
+    pushplus(os.environ.get("PUSH_TOKEN", ""), title, "\n".join(P))
+
     print(f"[OK] 大盘牛={mkt_bull} 入牛行业={len(sectors_bull)} 入牛个股={len(stocks_bull)}", flush=True)
 
 

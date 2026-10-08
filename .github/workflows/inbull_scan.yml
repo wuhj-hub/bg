@@ -1,0 +1,64 @@
+name: 入牛时点扫描
+
+on:
+  # 手动触发（随时可跑 / 首次验证）
+  workflow_dispatch: {}
+  # 外部定时（cron-job.org → repository_dispatch，按仓库惯例）
+  repository_dispatch:
+    types: [inbull-run]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: inbull-scan
+  cancel-in-progress: false
+
+jobs:
+  trade_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ok: ${{ steps.g.outputs.is_trade_day }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 判断是否交易日
+        id: g
+        continue-on-error: true
+        run: python3 quant_scripts/trade_day_check.py --github-output
+
+  scan:
+    needs: trade_gate
+    if: needs.trade_gate.outputs.ok == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 安装依赖（pandas + westock CLI 免npx）
+        run: |
+          pip install -q pandas
+          npm i -g westock-data-skillhub@1.0.3 || true
+      - name: 入牛时点扫描 + 上传知识库 + 推送 + 提交
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          python3 quant_scripts/inbull_scan.py --date "$(date +%Y-%m-%d)"
+          F=$(ls outputs/入牛时点扫描_$(date +%Y-%m-%d).md 2>/dev/null | head -1)
+          if [ -n "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename $F)" || echo "入牛时点上传失败"
+          fi
+          cp outputs/入牛时点_latest.json 入牛时点_latest.json 2>/dev/null || true
+          python3 git_api_commit.py --msg "chore: inbull scan ($(date +%Y-%m-%d))" \
+            入牛时点_latest.json "outputs/入牛时点扫描_$(date +%Y-%m-%d).md" || echo "入牛时点提交失败(非致命)"
