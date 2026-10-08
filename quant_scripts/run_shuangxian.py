@@ -403,6 +403,14 @@ def enrich_with_beast_signals(stocks: list[dict]) -> list[dict]:
             enriched.append(s)
             continue
 
+        # 价格回填：score_stock 阶段若取价失败会残留 price=0；此处 df 有效则补最新收盘价
+        # （2026-10-08 修复：避免"有信号、无价格"的低吸条目以 0 进入月池）
+        try:
+            if (not s.get("price")) or float(s.get("price", 0)) <= 0:
+                s["price"] = float(df["close"].iloc[-1])
+        except Exception:
+            pass
+
         tags = []
 
         # OVS检测
@@ -646,7 +654,7 @@ def run_daily(pool_path=None):
     dip_list = []
     for r in enriched:
         in_gate = any(g["code"] == r["code"] for g in gate_results)
-        if not in_gate and r["price"] <= 10:
+        if not in_gate and r["price"] <= 10 and r["price"] > 0:  # 2026-10-08修复：低吸同共振，要求价格>0
             # 三维低吸检测
             has_rsd = "RS_D背离" in r.get("beast_tags", [])
             has_ambush = r.get("ambush_score", 0) >= 3

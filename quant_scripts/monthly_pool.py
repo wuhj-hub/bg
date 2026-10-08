@@ -154,7 +154,7 @@ class MonthlyPool:
     def add_resonance_stock(self, code: str, name: str, price: float,
                             score: float, resonance_label: str,
                             sector: str = "", reason: str = ""):
-        if price > MAX_PRICE:
+        if price <= 0 or price > MAX_PRICE:  # 2026-10-08修复：拒绝无效价格(<=0)，避免0价入池
             return False
 
         existing = self._code_exists(code)
@@ -180,7 +180,7 @@ class MonthlyPool:
 
     def add_dip_stock(self, code: str, name: str, price: float,
                       score: float = 0, sector: str = "", reason: str = ""):
-        if price > MAX_PRICE:
+        if price <= 0 or price > MAX_PRICE:  # 2026-10-08修复：拒绝无效价格(<=0)，避免0价入池
             return False
 
         existing = self._code_exists(code)

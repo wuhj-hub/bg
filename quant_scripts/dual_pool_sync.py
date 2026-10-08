@@ -17,6 +17,15 @@ OUT_DIR = "outputs"
 SHUANGXIAN_KB_FOLDER = "folder_7484244066591607"
 
 
+def _fmt_price(e):
+    """价格格式化：<=0 或缺失显示为 —（2026-10-08修复：0价不以0展示）"""
+    try:
+        p = float(e.get("price") or 0)
+    except Exception:
+        p = 0
+    return f"{p:g}" if p > 0 else "\u2014"
+
+
 def load_quant(paths):
     for p in paths:
         if os.path.exists(p):
@@ -68,7 +77,7 @@ def main():
             continue
         reason = e.get("reason", "")
         reason_short = reason.replace("双弦门控通过 | 猛兽: ", "猛兽: ").replace("双弦门控通过", "门控通过") if reason else ""
-        L.append(f"| {e['code']} | {e['name']} | {e['price']} | {e.get('score','')} | {e.get('resonance_label','')} | {reason_short} |")
+        L.append(f"| {e['code']} | {e['name']} | {_fmt_price(e)} | {e.get('score','')} | {e.get('resonance_label','')} | {reason_short} |")
     L.append("")
     lx = [e for e in entries if e.get("signal_type") != "共振"]
     if lx:
@@ -76,7 +85,7 @@ def main():
         L.append("| 代码 | 名称 | 价格 | 评分 | 备注 |")
         L.append("|---|---|---|---|---|")
         for e in lx:
-            L.append(f"| {e['code']} | {e['name']} | {e['price']} | {e.get('score','')} | {e.get('reason','')} |")
+            L.append(f"| {e['code']} | {e['name']} | {_fmt_price(e)} | {e.get('score','')} | {e.get('reason','')} |")
         L.append("")
     L.append("## 🗑️ 剔除规则（不符合不入池）")
     L.append("- 价格 > 10元 → 剔除（月度池规则 MAX_PRICE=10）")
