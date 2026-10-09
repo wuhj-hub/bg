@@ -212,13 +212,64 @@ def main():
     json.dump({"tf": tf, "updated": today, "total": len(tracked), "items": tracked},
               open(pool_fp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
+    # ── 胜率记录：入池后 5/10/20 日表现 + 出池结算收益（data/reversal_perf_{tf}.csv）──
+    perf_fp = os.path.join(POOL_DIR, f"reversal_perf_{tf}.csv")
+    perf = {}
+    if os.path.exists(perf_fp):
+        for ln in open(perf_fp, encoding="utf-8"):
+            p = ln.rstrip("\n").split(",")
+            if len(p) >= 4 and p[0] != "code":
+                perf[(p[0], p[3])] = p
+
+    def _upd(code, name, first_date, rows, exit_reason=""):
+        if not rows or not first_date:
+            return
+        idx = next((i for i, r in enumerate(rows) if r[0] == first_date), None)
+        if idx is None:
+            return
+        if idx + 1 >= len(rows):      # 入池当日尚无次日K线 → 先占位，后续运行自动回填
+            perf.setdefault((code, first_date),
+                            [code, (name or "").replace(",", " "), tf, first_date, "", "", "", "", "", "", ""])
+            return
+        entry = rows[idx + 1][1]
+        if entry <= 0:
+            return
+        get = lambda h: (f"{rows[idx+1+h][2]/entry-1:.4f}" if idx + 1 + h < len(rows) else "")
+        exit_dt = rows[-1][0] if exit_reason else ""
+        ret_exit = f"{rows[-1][2]/entry-1:.4f}" if exit_reason else ""
+        old = perf.get((code, first_date), [])
+        # 已记录的出池信息不被后续覆盖丢失
+        perf[(code, first_date)] = [code, (name or (old[1] if len(old) > 1 else "")).replace(",", " "), tf, first_date,
+                                    f"{entry:.3f}", get(5), get(10), get(20),
+                                    exit_dt or (old[8] if len(old) > 8 else ""),
+                                    exit_reason or (old[9] if len(old) > 9 else ""),
+                                    ret_exit or (old[10] if len(old) > 10 else "")]
+    for it in added + kept:
+        _upd(it["code"], it["name"], it["first_date"], rows_map.get(it["code"]))
+    for it in removed:
+        _upd(it["code"], it["name"], it.get("first_date", ""), rows_map.get(it["code"]), it.get("reason", ""))
+    with open(perf_fp, "w", encoding="utf-8") as f:
+        f.write("code,name,tf,first_date,entry,r5,r10,r20,exit_date,exit_reason,ret_exit\n")
+        for k in sorted(perf, key=lambda x: x[1]):
+            f.write(",".join(str(v) for v in perf[k]) + "\n")
+
+    def _agg(col, only_exit=False):
+        vs = [float(p[col]) for p in perf.values() if len(p) > col and p[col] not in ("", None)
+              and (not only_exit or p[9])]
+        if not vs:
+            return "—", "—", 0
+        return f"{sum(1 for x in vs if x>0)/len(vs)*100:.1f}%", f"{sum(vs)/len(vs)*100:+.2f}%", len(vs)
+    perf_line = "｜".join(f"{lab} 胜率{_agg(c)[0]}（均值 {_agg(c)[1]}，n={_agg(c)[2]}）"
+                          for lab, c in (("5日", 5), ("10日", 6), ("20日", 7)))
+
     # ── 报告 ──
     lbl = "日线" if tf == "day" else "周线"
     L = [f"# 🔄 反转数值·{lbl}信号跟踪（{today}）", "",
          f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 新信号窗口 {win} 根{lbl} ｜ 现价 < {a.max_price:g}元",
          f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值（改①：不破线=0.618×金叉以来最高红柱）",
          f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出", "",
-         f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**", ""]
+         f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**",
+         f"> 📊 入池后历史胜率：{perf_line} ｜ 出池结算（跌破等）：{_agg(10, True)[0]} / 均值 {_agg(10, True)[1]}（n={_agg(10, True)[2]}）", ""]
 
     def tbl(rows, with_reason=False, with_first=False):
         if not rows:
@@ -264,7 +315,8 @@ def main():
             # —— 摘要推送（只推新增/移除，明细过长则截断）——
             P = [f"## 🔄 反转数值·{lbl}跟踪 · {today}", "",
                  f"- 本次：🆕新增 **{len(added)}** ｜ 📌在池 **{len(kept)}** ｜ 🗑️移除 **{len(removed)}**",
-                 f"- 池内合计：**{len(tracked)}** 只（现价<{a.max_price:g}元）"]
+                 f"- 池内合计：**{len(tracked)}** 只（现价<{a.max_price:g}元）",
+                 f"- 📊 入池后胜率：{perf_line}"]
             if added:
                 P += ["", f"### 🆕 新增（{len(added)}）"]
                 for s in sorted(added, key=lambda x: x["gap"])[:12]:
