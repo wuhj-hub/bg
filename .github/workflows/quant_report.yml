@@ -497,13 +497,14 @@ jobs:
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485234585035034
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           # 先运行反转数值周线扫描（≤10元），供复盘报告明日展望章节引用
           python3 quant_scripts/reversal_funnel_screener.py --weeks 2 --max-price 10 || echo "反转数值扫描失败, 复盘继续"
           # 反转数值·日线扫描（突破2倍反转数值 → 回调不破1倍反转数值，≤10元）
-          python3 quant_scripts/reversal_daily_screener.py --tf day --window 5 --max-price 10 --pool-file all_mainboard.csv || echo "反转数值日线跟踪失败, 复盘继续"
+          python3 quant_scripts/reversal_daily_screener.py --tf day --window 5 --max-price 10 --pool-file all_mainboard.csv --push || echo "反转数值日线跟踪失败, 复盘继续"
           # 反转数值·周线跟踪（同口径，周线周期）
-          python3 quant_scripts/reversal_daily_screener.py --tf week --window 2 --max-price 10 --pool-file all_mainboard.csv || echo "反转数值周线跟踪失败, 复盘继续"
+          python3 quant_scripts/reversal_daily_screener.py --tf week --window 2 --max-price 10 --pool-file all_mainboard.csv --push || echo "反转数值周线跟踪失败, 复盘继续"
           export ZHIPU_API_KEY="${{ secrets.ZHIPU_API_KEY }}"
           python3 quant_scripts/glm_brief.py --out "outputs/glm_brief_review_$(date +%Y-%m-%d).md" || echo "GLM 复盘研判跳过"
           # 西湖广度拐点过滤验证（先于复盘报告生成，供其引用）
