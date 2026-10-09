@@ -15,11 +15,14 @@
   python3 reversal_daily_screener.py --pool-file all_mainboard.csv   # 全市场
 输出: outputs/反转数值日线信号_{date}.md
 """
-import os, sys, re, json, subprocess, argparse
+import os, sys, re, json, subprocess, argparse, shutil
 from datetime import datetime
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-WESTOCK = "npx -y westock-data-skillhub@1.0.3"
+ROOT = os.path.dirname(BASE)
+_W = shutil.which("westock-data-skillhub")
+WESTOCK = _W if _W else "npx -y westock-data-skillhub@1.0.3"
+BATCH = 250          # 批量（westock 250 只/批零丢失，避免 npx 逐批开销）
 K = 0.618
 
 
@@ -41,10 +44,10 @@ def calc_dif_dea(closes):
 
 
 def fetch_batch(codes, period="day", limit=250):
-    """westock 批量 K 线（100只/批），返回 {code: rows[(date,open,last,high,low)]}"""
+    """westock 批量 K 线（BATCH 只/批），返回 {code: rows[(date,open,last,high,low)]}"""
     out = {}
-    for i in range(0, len(codes), 100):
-        batch = codes[i:i + 100]
+    for i in range(0, len(codes), BATCH):
+        batch = codes[i:i + BATCH]
         try:
             r = subprocess.run(f"{WESTOCK} kline {','.join(batch)} --period {period} --limit {limit}",
                                shell=True, capture_output=True, text=True, timeout=240)
@@ -58,7 +61,7 @@ def fetch_batch(codes, period="day", limit=250):
                 rows.sort(key=lambda x: x[0])
                 out[sym] = rows
         except Exception as e:
-            print(f"  [warn] 批{i//100+1}拉取失败: {e}")
+            print(f"  [warn] 批{i//BATCH+1}拉取失败: {e}")
     return out
 
 
@@ -120,17 +123,25 @@ def detect_daily(rows, days=5):
 def load_pool(pool_arg="", pool_file=""):
     if pool_arg:
         return [(c.strip(), "") for c in pool_arg.split(",") if c.strip()]
-    fp = pool_file or os.path.join(BASE, "hs300.csv")
-    if not os.path.isabs(fp):
-        fp = os.path.join(BASE, fp)
+    name = pool_file or "hs300.csv"
+    cands = [name] if os.path.isabs(name) else [
+        os.path.join(BASE, name), os.path.join(ROOT, name), os.path.join(os.getcwd(), name)]
+    fp = next((p for p in cands if os.path.exists(p)), None)
     rows = []
-    if os.path.exists(fp):
+    if fp:
         for ln in open(fp, encoding="utf-8-sig"):
             p = ln.strip().split(",")
-            if len(p) >= 2 and (p[0].startswith(("sh", "sz"))):
-                rows.append((p[0], p[1]))
-            elif len(p) >= 2 and re.match(r"^\d{6}$", p[0]):
-                rows.append((("sh" if p[0].startswith("6") else "sz") + p[0], p[1]))
+            if len(p) < 2:
+                continue
+            nm = p[1]
+            if "ST" in nm.upper().replace(" ", "") or "退" in nm:
+                continue
+            if p[0].startswith(("sh", "sz")):
+                rows.append((p[0], nm))
+            elif re.match(r"^\d{6}$", p[0]):
+                rows.append((("sh" if p[0].startswith("6") else "sz") + p[0], nm))
+    else:
+        print(f"  [warn] 未找到股票池文件: {name}")
     return rows
 
 
