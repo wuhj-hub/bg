@@ -261,8 +261,25 @@ def main():
         import urllib.request, urllib.parse
         token = os.environ.get("PUSH_TOKEN", "")
         if token:
+            # —— 摘要推送（只推新增/移除，明细过长则截断）——
+            P = [f"## 🔄 反转数值·{lbl}跟踪 · {today}", "",
+                 f"- 本次：🆕新增 **{len(added)}** ｜ 📌在池 **{len(kept)}** ｜ 🗑️移除 **{len(removed)}**",
+                 f"- 池内合计：**{len(tracked)}** 只（现价<{a.max_price:g}元）"]
+            if added:
+                P += ["", f"### 🆕 新增（{len(added)}）"]
+                for s in sorted(added, key=lambda x: x["gap"])[:12]:
+                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜突破{s['tp_date']}｜回调{s['pullback']}<{s['line']}")
+                if len(added) > 12:
+                    P.append(f"- …等共 {len(added)} 只（完整见知识库报告）")
+            if removed:
+                P += ["", f"### 🗑️ 移除（{len(removed)}）"]
+                for s in removed[:8]:
+                    P.append(f"- {s['code'][2:]} {s['name']}｜{s.get('reason','')}")
+                if len(removed) > 8:
+                    P.append(f"- …等共 {len(removed)} 只")
+            P += ["", "> 规则：跌破1倍反转数值即出池；完整报告见知识库"]
             body = urllib.parse.urlencode({"token": token, "title": f"🔄 反转数值{lbl}跟踪 {today}",
-                                           "content": "\n".join(L)[:3500], "template": "markdown"}).encode()
+                                           "content": "\n".join(P), "template": "markdown"}).encode()
             try:
                 r = urllib.request.urlopen(urllib.request.Request("https://pushplus.plus/send", data=body), timeout=30)
                 print(f"[pushplus] {r.read().decode()[:80]}")
