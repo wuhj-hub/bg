@@ -479,7 +479,8 @@ jobs:
             outputs/复盘报告_$(date +%Y-%m-%d).md \
             outputs/glm_brief_review_$(date +%Y-%m-%d).md \
             pools/pool_$(date +%Y-%m).json \
-            data/reversal_pool_day.json data/reversal_pool_week.json
+            data/reversal_pool_day.json data/reversal_pool_week.json \
+            data/reversal_perf_day.csv data/reversal_perf_week.csv
           RC=$?
           set -e
           if [ "$RC" != "0" ]; then
