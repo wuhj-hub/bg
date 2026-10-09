@@ -1,23 +1,22 @@
 {
- "date": "2026-10-08",
- "total": 25,
- "lianban_cnt": 7,
- "max_lb": 8,
- "shouban": 18,
+ "date": "2026-10-09",
+ "total": 29,
+ "lianban_cnt": 6,
+ "max_lb": 9,
+ "shouban": 23,
  "by_lb": {
-  "8": 1,
-  "4": 1,
-  "3": 3,
-  "2": 2,
-  "1": 18
+  "9": 1,
+  "5": 1,
+  "2": 4,
+  "1": 23
  },
  "score": {
-  "score": 85,
+  "score": 80,
   "level": "亢奋",
   "parts": {
    "涨停家数": 5,
    "连板高度": 45,
-   "连板占比": 35
+   "连板占比": 30
   }
  },
  "persistence": [],
@@ -28,8 +27,8 @@
    "name": "新华传媒",
    "price": "",
    "chg": "",
-   "lianban": 8,
-   "ji_ji_ban": "8天8板",
+   "lianban": 9,
+   "ji_ji_ban": "9天9板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -38,74 +37,40 @@
    "sectors": []
   },
   {
-   "code": "sz002242",
-   "name": "九阳股份",
+   "code": "sh600241",
+   "name": "时代万恒",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "家用电器"
-   ]
-  },
-  {
-   "code": "sz002058",
-   "name": "紫竹高科",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
+    "锂电池",
     "电池",
-    "电池化学品",
     "电力设备"
    ]
   },
   {
-   "code": "sh603200",
-   "name": "上海洗霸",
+   "code": "sz001336",
+   "name": "楚环科技",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
-   "sectors": [
-    "水务及水治理"
-   ]
+   "sectors": []
   },
   {
-   "code": "sh605303",
-   "name": "园林股份",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "建筑装饰"
-   ]
-  },
-  {
-   "code": "sh600663",
-   "name": "陆家嘴",
+   "code": "sz002733",
+   "name": "雄韬股份",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -116,14 +81,13 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "房地产",
-    "房地产开发",
-    "商业地产"
+    "电池",
+    "电力设备"
    ]
   },
   {
-   "code": "sh603906",
-   "name": "龙蟠科技",
+   "code": "sz002805",
+   "name": "丰元股份",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -138,6 +102,20 @@
     "电池化学品",
     "电力设备"
    ]
+  },
+  {
+   "code": "sh600408",
+   "name": "安泰集团",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
   }
  ],
  "leaders": {}
