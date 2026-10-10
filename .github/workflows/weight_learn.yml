@@ -15,8 +15,11 @@ name: 仲裁权重自学习（月度·L1 闭环：提议 + 回验）
 #
 # ── 触发 ──────────────────────────────────────────────────────────────
 on:
-  schedule:
-    - cron: '30 9 1 * *'          # 每月 1 日 北京 17:30（UTC 09:30）
+  # ⚠️ 2026-10-11：原生 schedule 已停用 —— 改由 cron-job.org 单点触发
+  #   （原生 cron 实测延迟数小时不可靠；外部每月 1 日北京 17:30 发 repository_dispatch[weight-learn-run]）。
+  #   如需回退到原生调度，删掉下面两行开头的 # 即可。
+#  schedule:
+#    - cron: '30 9 1 * *'          # 每月 1 日 北京 17:30（UTC 09:30）
   repository_dispatch:
     types: [weight-learn-run]
   workflow_dispatch: {}
