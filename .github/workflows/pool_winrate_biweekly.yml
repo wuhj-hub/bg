@@ -1,4 +1,4 @@
-name: 股池胜率双周报
+name: 股池胜率总览（双周 · 统一 OOS 口径）
 
 # 每两周一份「股池 OOS 胜率」汇总（entry_date 起算 5/10/20/60 交易日收益）。
 # 触发：每周一北京 09:00（UTC 01:00）+ 外部 dispatch；脚本内做 ISO 双周判断，
@@ -68,7 +68,7 @@ jobs:
           pip install -q pandas numpy || echo "pandas 安装跳过(非致命)"
           npm i -g westock-data-skillhub@1.0.3
 
-      - name: 生成股池胜率双周报
+      - name: 生成股池胜率总览
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -76,17 +76,17 @@ jobs:
           if [ "${{ inputs.force }}" = "true" ]; then EXTRA="--force"; fi
           python3 quant_scripts/pool_winrate_biweekly.py --push $EXTRA
 
-      - name: 提交双周报到仓库
+      - name: 提交总览到仓库
         if: always()
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
-          F="outputs/股池胜率双周报_$(date +%Y-%m-%d).md"
+          F="outputs/股池胜率总览_$(date +%Y-%m-%d).md"
           if [ -f "$F" ]; then
-            python3 git_api_commit.py --msg "chore: 股池胜率双周报 $(date +%Y-%m-%d)" "$F" \
-              || echo "::warning::双周报提交失败"
+            python3 git_api_commit.py --msg "chore: 股池胜率总览 $(date +%Y-%m-%d)" "$F" \
+              || echo "::warning::总览提交失败"
           else
             echo "本周为非报告周或未生成，跳过提交"
           fi
@@ -101,9 +101,9 @@ jobs:
           IMA_FOLDER_ID: folder_7485264708529742
           IMA_SKIP_DUP: "1"
         run: |
-          F="outputs/股池胜率双周报_$(date +%Y-%m-%d).md"
+          F="outputs/股池胜率总览_$(date +%Y-%m-%d).md"
           if [ -f "$F" ]; then
-            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "⚠️ 双周报上传失败(非致命)"
+            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "⚠️ 总览上传失败(非致命)"
           else
             echo "未找到 $F，跳过上传"
           fi
