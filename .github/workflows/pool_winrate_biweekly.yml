@@ -1,0 +1,109 @@
+name: 股池胜率双周报
+
+# 每两周一份「股池 OOS 胜率」汇总（entry_date 起算 5/10/20/60 交易日收益）。
+# 触发：每周一北京 09:00（UTC 01:00）+ 外部 dispatch；脚本内做 ISO 双周判断，
+#       奇数周自动跳过（workflow_dispatch 时脚本默认也判双周，如需立即出可临时改 --force）。
+# 说明：口径为「自入池日往后看」的样本外（非 pool_quality.py 的前视口径）。
+
+on:
+  schedule:
+    - cron: '0 1 * * 1'
+  repository_dispatch:
+    types: [pool-biweekly-run]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '强制生成（忽略双周判断，手动补跑用）'
+        type: boolean
+        default: false
+
+# github.token 默认只读，提交产物需显式 write，否则 PUT 403（step 仍 success = 静默丢失）
+permissions:
+  contents: write
+
+concurrency:
+  group: pool-biweekly
+  cancel-in-progress: false
+
+jobs:
+  # ─── 交易日守卫（休市/周末直接跳过）───
+  trade_gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      ok: ${{ steps.g.outputs.is_trade_day }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 判断是否交易日
+        id: g
+        continue-on-error: true
+        run: python3 quant_scripts/trade_day_check.py --github-output
+
+  biweekly:
+    needs: trade_gate
+    if: needs.trade_gate.outputs.ok == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      TZ: Asia/Shanghai   # 产物日期按北京时间
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js（westock npx 依赖）
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安装依赖 + 全局 westock（免 npx 加速）
+        run: |
+          pip install -q pandas numpy || echo "pandas 安装跳过(非致命)"
+          npm i -g westock-data-skillhub@1.0.3
+
+      - name: 生成股池胜率双周报
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          EXTRA=""
+          if [ "${{ inputs.force }}" = "true" ]; then EXTRA="--force"; fi
+          python3 quant_scripts/pool_winrate_biweekly.py --push $EXTRA
+
+      - name: 提交双周报到仓库
+        if: always()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          F="outputs/股池胜率双周报_$(date +%Y-%m-%d).md"
+          if [ -f "$F" ]; then
+            python3 git_api_commit.py --msg "chore: 股池胜率双周报 $(date +%Y-%m-%d)" "$F" \
+              || echo "::warning::双周报提交失败"
+          else
+            echo "本周为非报告周或未生成，跳过提交"
+          fi
+
+      - name: 上传知识库「报告 / 全盘量化」
+        if: always()
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          IMA_SKIP_DUP: "1"
+        run: |
+          F="outputs/股池胜率双周报_$(date +%Y-%m-%d).md"
+          if [ -f "$F" ]; then
+            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "⚠️ 双周报上传失败(非致命)"
+          else
+            echo "未找到 $F，跳过上传"
+          fi
