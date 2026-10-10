@@ -1,29 +1,35 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""pool_winrate_biweekly.py —— 股池胜率「双周报」（2026-10-10）
+"""pool_winrate_biweekly.py —— 股池胜率「总览」（双周 · 统一 OOS 口径）v2（2026-10-10）
 
-口径：读 outputs/pool_entries.csv（pool_snapshot.py 每日累积，entry_date=首次入池日），
-      对每个 (池, 标的) 计算**自入池日起**的 5/10/20/60 交易日收益 → 严格 OOS（非前视），
-      按池聚合出「胜率 / 均值 / 样本数」，并单列 2026-10-10 新增的跟踪池。
-      （注意：pool_quality.py 用的是「池当前标的回头算」，带选样偏差，不是业绩；
-        本脚本按 entry_date 往后看，才是可外推的样本外口径。）
+统一体系内所有「股池 / 信号源」的胜率跟踪到**一套 OOS 口径**：
+    entry = 信号/入池日（或其后的首个交易日）收盘价
+    收益  = 收盘(+N) / entry − 1，N ∈ {5,10,20,60} 交易日（严格样本外，非前视）
 
-触发：由 .github/workflows/pool_winrate_biweekly.yml 每两周调用（脚本内做 ISO 周双周判断）。
+数据源（均在仓库检出，无需外部）：
+  · 各池       outputs/pool_entries.csv        （pool_snapshot.py 每日累积，entry_date=首次入池日）
+  · 涨停王者   outputs/wangzhe_signals.csv     （用其自带 r5/r10/r20 回测列，避免重取）
+  · 量学       outputs/liangxue_signals_log.csv（date+code → 现算）
+  · 竞价       data/jingjia_signals.csv        （date+code → 现算，统一为收盘口径）
 
-用法：
-  python3 pool_winrate_biweekly.py [--force] [--push] [--out PATH]
-    --force  忽略双周判断，强制生成（手动补跑用）
-    --push   PushPlus 推送摘要（env PUSH_TOKEN）
+取代（2026-10-10 起，方案「乙」直接停用被替代的重复报告）：
+  · 《股池信号胜率跟踪报告》（win_rate_tracker.py 之报告部分）
+  · 《纸面组合跟踪报告》（paper_tracker.py 之报告部分；其数据仍由 pool_snapshot/paper_tracker 维护）
+  保留：四态胜率（资金行为维度，非股池）；三阶漏斗「股池标的跟踪报告」（体检，非胜率）。
+
+触发：.github/workflows/pool_winrate_biweekly.yml（每周一触发，脚本内做 ISO 双周判断）。
+用法：python3 pool_winrate_biweekly.py [--force] [--push] [--out PATH]
 """
 import os, re, csv, json, argparse, subprocess, shutil, urllib.parse, urllib.request
 from datetime import datetime, timezone, timedelta
 
 BJ = timezone(timedelta(hours=8))
 ENTRY = "outputs/pool_entries.csv"
+WANGZHE = "outputs/wangzhe_signals.csv"
+LIANGXUE = "outputs/liangxue_signals_log.csv"
+JINGJIA = "data/jingjia_signals.csv"
 HOLDS = [5, 10, 20, 60]
-# 2026-10-10 起新纳入跟踪的池（与 pool_snapshot.py / paper_tracker.py 的 EXTRA_POOLS 对应）
 NEW_POOLS = {"四维共振", "信号仲裁", "乖离低买", "RSV强度", "123ABC"}
-# ⭐免 npx：装了全局包直调（~0.7s/次），未装回退 npx（零风险）
 WESTOCK = ([shutil.which("westock-data-skillhub")] if shutil.which("westock-data-skillhub")
            else ["npx", "-y", "westock-data-skillhub@1.0.3"])
 
@@ -36,7 +42,6 @@ def run(args, timeout=300):
 
 
 def parse_batch(txt):
-    """批量K线 → {code: [(date, close)]} 升序"""
     out, hdr = {}, None
     for ln in txt.splitlines():
         s = ln.strip()
@@ -59,8 +64,26 @@ def parse_batch(txt):
     return out
 
 
+def norm(c):
+    c = (c or "").strip()
+    if re.match(r"^(sh|sz)\d{6}$", c):
+        return c
+    m = re.search(r"(\d{6})", c)
+    if not m:
+        return ""
+    d = m.group(1)
+    return ("sh" if d[0] in ("6", "9", "5") else "sz") + d
+
+
+def fetch_klines(codes):
+    kline = {}
+    codes = sorted({c for c in codes if c})
+    for i in range(0, len(codes), 250):
+        kline.update(parse_batch(run(["kline", ",".join(codes[i:i + 250]), "--period", "day", "--limit", "250"])))
+    return kline
+
+
 def trading_ret(bars, entry_date, h):
-    """自 entry_date（或之后首个交易日）起 h 个交易日收益%（不足则 None）"""
     if not bars:
         return None
     idx = next((i for i, x in enumerate(bars) if x[0] >= entry_date), None)
@@ -70,90 +93,135 @@ def trading_ret(bars, entry_date, h):
     return (c1 / c0 - 1) * 100 if c0 > 0 else None
 
 
-def agg_pool(vals):
-    """→ (胜率%, 均值%, n) 或 None"""
+def agg(vals):
     if not vals:
         return None
-    win = sum(1 for x in vals if x > 0) / len(vals) * 100
-    return round(win, 1), round(sum(vals) / len(vals), 2), len(vals)
+    return round(sum(1 for x in vals if x > 0) / len(vals) * 100, 1), round(sum(vals) / len(vals), 2), len(vals)
 
 
 def cell(res):
-    if not res:
-        return "—"
-    win, avg, n = res
-    return f"{win:.0f}% / {avg:+.2f}% (n={n})"
+    return "—" if not res else f"{res[0]:.0f}% / {res[1]:+.2f}% (n={res[2]})"
+
+
+def read_csv(p):
+    if not os.path.exists(p):
+        return []
+    for enc in ("utf-8-sig", "utf-8", "gbk"):
+        try:
+            with open(p, encoding=enc, newline="") as f:
+                return list(csv.DictReader(f))
+        except Exception:
+            continue
+    return []
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--force", action="store_true", help="忽略双周判断，强制生成")
-    ap.add_argument("--push", action="store_true", help="PushPlus 推送摘要")
+    ap.add_argument("--force", action="store_true")
+    ap.add_argument("--push", action="store_true")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
 
     now = datetime.now(BJ)
     wk = now.isocalendar()[1]
     if not a.force and wk % 2 != 0:
-        print(f"[SKIP] ISO 第 {wk} 周（奇数周），非双周报告周；加 --force 可强制生成")
+        print(f"[SKIP] ISO 第 {wk} 周（奇数周），非双周报告周；--force 可强制")
         return
 
+    # ── 收集所有需要 K 线的 (来源, 日期, 代码) ──
     if not os.path.exists(ENTRY):
-        print(f"[ERR] 缺 {ENTRY}（pool_snapshot.py 是否已跑？）")
+        print(f"[ERR] 缺 {ENTRY}")
         return
-    rows = [r for r in csv.DictReader(open(ENTRY, encoding="utf-8")) if r.get("code") and r.get("entry_date")]
-    if not rows:
-        print("[ERR] pool_entries.csv 为空")
-        return
-    codes = sorted({r["code"] for r in rows})
-    print(f"[INFO] {len(rows)} 条 / {len(codes)} 只，开始取日线", flush=True)
+    p_rows = [(r["pool"], r["code"], r["entry_date"]) for r in read_csv(ENTRY) if r.get("code") and r.get("entry_date")]
+    lx = [(r.get("date"), norm(r.get("code"))) for r in read_csv(LIANGXUE) if r.get("date") and r.get("code")]
+    jj = [(r.get("date"), norm(r.get("code")), r.get("strategy")) for r in read_csv(JINGJIA) if r.get("date") and r.get("code")]
 
-    kline = {}
-    for i in range(0, len(codes), 250):
-        kline.update(parse_batch(run(["kline", ",".join(codes[i:i + 250]), "--period", "day", "--limit", "250"])))
-    print(f"[INFO] 取到 K 线 {len(kline)}/{len(codes)} 只", flush=True)
+    codes = [c for _, c, _ in p_rows] + [c for _, c in lx] + [c for _, c, _ in jj]
+    kline = fetch_klines(codes)
+    print(f"[INFO] 标的 {len(set(c for c in codes if c))} 只，取到 K 线 {len(kline)} 只", flush=True)
 
-    # 基准：全池标的同时段等权（{h: (win,avg,n)}）
-    base = {}
-    for h in HOLDS:
-        base[h] = agg_pool([v for r in rows
-                            if (v := trading_ret(kline.get(r["code"]), r["entry_date"], h)) is not None])
-
-    # 按池聚合
-    agg = {}
-    for r in rows:
-        p, c, ed = r["pool"], r["code"], r["entry_date"]
+    # ── 一、各池 OOS ──
+    agg_pool = {}
+    for pool, c, ed in p_rows:
         for h in HOLDS:
             v = trading_ret(kline.get(c), ed, h)
             if v is not None:
-                agg.setdefault(p, {}).setdefault(h, []).append(v)
+                agg_pool.setdefault(pool, {}).setdefault(h, []).append(v)
+    base = {h: [v for _, c, ed in p_rows if (v := trading_ret(kline.get(c), ed, h)) is not None] for h in HOLDS}
 
+    # ── 二、信号源 OOS ──
+    src = {}
+    # 涨停王者：用自带 r5/r10/r20 列（不重取）
+    wz = read_csv(WANGZHE)
+    if wz:
+        for h, col in ((5, "r5"), (10, "r10"), (20, "r20")):
+            vals = []
+            for r in wz:
+                try:
+                    if r.get(col):
+                        vals.append(float(r[col]))
+                except ValueError:
+                    pass
+            if vals:
+                src.setdefault("涨停王者（自带回测列）", {})[h] = vals
+    # 量学：现算
+    lx_agg = {}
+    for d, c in lx:
+        for h in (5, 10, 20):
+            v = trading_ret(kline.get(c), d, h)
+            if v is not None:
+                lx_agg.setdefault(h, []).append(v)
+    if lx_agg:
+        src["量学（月线闸门 PASS）"] = lx_agg
+    # 竞价：按策略现算
+    for d, c, st in jj:
+        for h in (5, 10, 20):
+            v = trading_ret(kline.get(c), d, h)
+            if v is not None:
+                src.setdefault(f"竞价·{st}", {}).setdefault(h, []).append(v)
+
+    # ── 组装报告 ──
     date_str = now.strftime("%Y-%m-%d")
-    out_path = a.out or f"outputs/股池胜率双周报_{date_str}.md"
-    HDR = "| 池 | 5日 胜率/均值 | 10日 | 20日 | 60日 |"
+    out_path = a.out or f"outputs/股池胜率总览_{date_str}.md"
+    HDR = "| 池 / 来源 | 5日 胜率/均值 | 10日 | 20日 | 60日 |"
     SEP = "|---|---|---|---|---|"
 
-    L = [f"# 📊 股池胜率双周报 · {date_str}", "",
-         "> **口径**：自 **入池日（entry_date）起** 的 5/10/20/60 **交易日**收益（严格 OOS，非前视）",
-         f"> **样本**：`pool_entries.csv` {len(rows)} 条 / {len(codes)} 只 · 基准 = 全池标的同时段等权",
-         f"> **周期**：双周（ISO 第 {wk} 周）· 生成 {now.strftime('%Y-%m-%d %H:%M')} 北京", ""]
+    def row(name, d):
+        return f"| {name} | " + " | ".join(cell(agg(d.get(h, []))) for h in HOLDS) + " |"
 
-    L += ["## 一、全部跟踪池（按 20日样本量排序）", "", HDR, SEP]
-    order = sorted(agg, key=lambda p: -len(agg[p].get(20, next(iter(agg[p].values()), []))))
+    L = [f"# 📊 股池胜率总览 · {date_str}", "",
+         "> **统一口径（OOS）**：entry = 信号/入池日（或其后的首个交易日）收盘价，收益 = 收盘(+N)/entry−1，N∈{5,10,20,60} 交易日",
+         f"> 生成 {now.strftime('%Y-%m-%d %H:%M')} 北京 · 双周（ISO 第 {wk} 周）· 样本：pool_entries {len(p_rows)} 条",
+         "> 本报告已统一取代《股池信号胜率跟踪报告》《纸面组合跟踪报告》", ""]
+
+    L += ["## 一、各池 OOS 表现（按 20日样本量排序）", "", HDR, SEP]
+    order = sorted(agg_pool, key=lambda p: -len(agg_pool[p].get(20, agg_pool[p].get(5, []))))
     for p in order:
-        L.append(f"| {p} | " + " | ".join(cell(agg_pool(agg[p].get(h, []))) for h in HOLDS) + " |")
-    L += ["", "**基准（全池同时段等权）**", "", HDR, SEP,
-          "| 大盘代理 | " + " | ".join(cell(base[h]) for h in HOLDS) + " |", ""]
+        L.append(row(p, agg_pool[p]))
+    L += ["", HDR.replace("池 / 来源", "**基准（全池等权）**"), SEP, row("全池基准", base), ""]
 
     L += ["## 二、🆕 2026-10-10 新增跟踪池", "", HDR, SEP]
-    newp = sorted(p for p in agg if p in NEW_POOLS)
-    if newp:
-        for p in newp:
-            L.append(f"| {p} | " + " | ".join(cell(agg_pool(agg[p].get(h, []))) for h in HOLDS) + " |")
+    np_ = sorted(p for p in agg_pool if p in NEW_POOLS)
+    if np_:
+        for p in np_:
+            L.append(row(p, agg_pool[p]))
     else:
         L.append("| （样本积累中） | — | — | — | — |")
-    L += ["", "> 新池自 2026-10-10 盘后开始累积 entry_date；20/60 日列需样本持有满相应交易日才有值。", "",
-          f"> 与「前视口径」的区别：pool_quality.py 取池当前标的回头算（有选样偏差）仅供参考；本表按入池日往后看，可外推。", ""]
+    L += ["", "> 新池自 2026-10-10 盘后起累积 entry_date；20/60 日列需持有满相应交易日才有值。", ""]
+
+    L += ["## 三、体系信号源 OOS", "", HDR, SEP]
+    if src:
+        for s in sorted(src):
+            L.append(row(s, src[s]))
+    else:
+        L.append("| （无信号源数据） | — | — | — | — |")
+    L += ["", "> 王者=其自带 r5/r10/r20 回测列；量学/竞价=按上表统一口径现算（竞价原为开盘口径，此处统一为收盘口径）。", ""]
+
+    L += ["---", "",
+          "**口径与边界**：",
+          "- 严格样本外：自入池/信号日往后看；区别于 `pool_quality.py` 的「取当前标的回头算」（有选样偏差）。",
+          "- 保留的独立报告：四态胜率（资金行为维度）、三阶漏斗「股池标的跟踪报告」（体检，非胜率）。",
+          "- 休眠脚本 `win_rate_pool.py` / `win_rate_liangxue.py` 的能力已并入本总览。", ""]
 
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
     open(out_path, "w", encoding="utf-8").write("\n".join(L))
@@ -163,7 +231,7 @@ def main():
         tok = os.environ.get("PUSH_TOKEN")
         if tok:
             body = "\n".join(L[:50])
-            data = urllib.parse.urlencode({"token": tok, "title": f"📊 股池胜率双周报 {date_str}",
+            data = urllib.parse.urlencode({"token": tok, "title": f"📊 股池胜率总览 {date_str}",
                                            "content": body, "template": "markdown"}).encode()
             try:
                 urllib.request.urlopen("https://pushplus.plus/send", data=data, timeout=20)
