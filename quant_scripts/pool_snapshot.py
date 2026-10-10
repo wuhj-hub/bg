@@ -9,6 +9,17 @@
     ② outputs/pool_entries.csv     —— 累计入池表（首次出现日 = entry_date，可算入池后收益）
 
 用法：python3 pool_snapshot.py [--date YYYY-MM-DD]
+
+选池口径（2026-10-10 起，新增池一律遵循「只取高质量层」原则）：
+  · 一个池若输出分档（必然/高置信/弱共振/否决、★级/观察、buy/risk …），
+    只纳入最强的一档作为跟踪标的，剔除 否决/风险/观察/无共振 等噪声层。
+    理由：本体系是 OOS 前瞻验证，混入噪声层会稀释胜率、淹没高信号。
+  · 范例：四维共振=仅 ★★高置信及以上；信号仲裁=仅 ★ 级及以上；
+    123/2B=仅 ABC 结构确认（buy 层每日约 1560 只、占池 61%，过宽不纳入）。
+  · 新增池两条路径：
+    ① 产物是「单一标的清单」（txt/json 含 code 字段）→ 直接追加到 POOL_SOURCES；
+    ② 产物分档 / 文件名带日期 / 多候选路径 → 追加到 EXTRA_POOLS + 写精确提取器
+       （参考 _ex_quad / _ex_arbiter / _ex_guaili / _ex_rsv / _ex_123abc）。
 """
 import os, re, json, csv, argparse
 from datetime import datetime, timezone, timedelta
