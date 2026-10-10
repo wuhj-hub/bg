@@ -1,0 +1,20 @@
+{
+  "version": "2026-10-10",
+  "updated": "2026-10-10",
+  "note": "仲裁权重外置（P0，2026-10-10）。取值会被 bounds 夹取；缺失键回退 signal_arbiter.py 内置默认（DEFAULT_WEIGHTS）。闭环：learn_weights.py 提议 → 人工确认 → 改本文件 → weight_change_review.py 到期回验 → 保留/回滚。",
+  "weights": {
+    "四维高置信": 3,
+    "四维弱共振": 1,
+    "四维否决": -3,
+    "鱼身空中加油": 2,
+    "猛兽Setup60": 3,
+    "猛兽Setup50": 1,
+    "猛兽Setup40": 0,
+    "猛兽RS_D": 1,
+    "猛兽G点": 1,
+    "双弦共振": 1,
+    "乾坤A级": 2
+  },
+  "grade": { "s1": 3, "s2": 5, "s3": 7 },
+  "bounds": { "min": -3, "max": 3 }
+}
