@@ -18,6 +18,14 @@ v3 相对 v2 的改造（A+B+C 三轨）：
   python3 paper_tracker.py --add                 # 各股池新标的入池
   python3 paper_tracker.py --update              # 更新收益快照 + 三线状态
   python3 paper_tracker.py --report              # 按期收益曲线 + 三线退出对照
+
+选池口径（2026-10-10 起，与 pool_snapshot.py 一致，「只取高质量层」）：
+  · 一个池若输出分档（必然/高置信/弱共振/否决、★级/观察、buy/risk …），
+    只纳入最强的一档，剔除 否决/风险/观察/无共振 等噪声层（OOS 前瞻验证需保持信号纯度）。
+  · 范例：四维共振=仅 ★★高置信及以上；信号仲裁=仅 ★ 级及以上；
+    123/2B=仅 ABC 结构确认（buy 层每日约 1560 只、占池 61%，过宽不纳入）。
+  · 新增池：单一标的清单 → 追加 POOL_SOURCES；分档/带日期/多路径 → 追加 EXTRA_POOLS + 精确提取器。
+    注意两个文件的 EXTRA_POOLS 须同步维护（pool_snapshot.py 与 paper_tracker.py）。
 """
 import subprocess, sys, os, re, csv, json, argparse
 from datetime import datetime, timezone, timedelta
