@@ -37,6 +37,56 @@ from datetime import datetime
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 OUT_DIR = "outputs"
 
+# ═══════ 仲裁权重外置（P0 · 2026-10-10）═══════
+# 权重/分级阈值可外置到 config/arbiter_weights.json；缺失或异常 → 回退内置默认（行为与旧版完全一致）。
+# 闭环：learn_weights.py 提议 → 人工确认 → 改 JSON → weight_change_review.py 到期回验 → 保留/回滚。
+DEFAULT_WEIGHTS = {
+    "四维高置信": 3, "四维弱共振": 1, "四维否决": -3,
+    "鱼身空中加油": 2,
+    "猛兽Setup60": 3, "猛兽Setup50": 1, "猛兽Setup40": 0,
+    "猛兽RS_D": 1, "猛兽G点": 1,
+    "双弦共振": 1, "乾坤A级": 2,
+}
+DEFAULT_GRADE = {"s1": 3, "s2": 5, "s3": 7}
+DEFAULT_BOUNDS = {"min": -3, "max": 3}
+
+
+def load_arbiter_weights(path="config/arbiter_weights.json"):
+    """读外部权重配置；缺失/异常 → 回退内置默认。返回 (weights, grade, bounds)。"""
+    w = dict(DEFAULT_WEIGHTS)
+    g = dict(DEFAULT_GRADE)
+    b = dict(DEFAULT_BOUNDS)
+    cands = [path, os.path.join(os.path.dirname(os.path.abspath(__file__)), path)]
+    for p in cands:
+        if not os.path.exists(p):
+            continue
+        try:
+            cfg = json.load(open(p, encoding="utf-8"))
+        except Exception:
+            break
+        eb = cfg.get("bounds") or {}
+        for k in ("min", "max"):
+            try:
+                b[k] = int(eb[k])
+            except (KeyError, TypeError, ValueError):
+                pass
+        for k, v in (cfg.get("weights") or {}).items():
+            if k in w:
+                try:
+                    iv = int(v)
+                except (TypeError, ValueError):
+                    continue
+                if b["min"] <= iv <= b["max"]:
+                    w[k] = iv
+        for k in g:
+            if k in (cfg.get("grade") or {}):
+                try:
+                    g[k] = int(cfg["grade"][k])
+                except (TypeError, ValueError):
+                    pass
+        return w, g, b
+    return w, g, b
+
 
 def run(args, timeout=20):
     for i in range(3):
@@ -435,6 +485,8 @@ def main():
         if a == "--top" and i + 1 < len(argv):
             top_n = int(argv[i + 1])
 
+    W, G, _ = load_arbiter_weights()   # 权重外置（缺失回退内置默认）
+
     four = load_four_dim()
     fish = load_fish()
     beast = load_beast()
@@ -453,18 +505,18 @@ def main():
     for code, info in four.items():
         t = info["total"]
         if "否决" in info.get("level", ""):
-            scores.setdefault(code, {"pts": 0, "src": []})["pts"] -= 3
+            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += W["四维否决"]
             scores[code]["src"].append(f"四维否决{info.get('veto','')}")
         elif t >= 7:
-            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 3
+            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += W["四维高置信"]
             scores[code]["src"].append(f"四维{t}分")
         elif t >= 4:
-            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 1
+            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += W["四维弱共振"]
             scores[code]["src"].append(f"四维{t}分")
     for code, info in fish.items():
         # 2026-09-14 20年长样本：鱼身·均线回踩/箱体突破 在 6/6 环境显著为负(t≈-5~-10) → 降级为仅标注
         if "加油" in info["pattern"] and info["final"] >= 70:
-            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 2
+            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += W["鱼身空中加油"]
             scores[code]["src"].append(f"鱼身{info['pattern']}({info['final']})")
         else:
             scores.setdefault(code, {"pts": 0, "src": []})
@@ -472,7 +524,8 @@ def main():
     for code, info in beast.items():
         s = info["setup"]
         # 2026-09-14 20年长样本：Setup≥60 仅长期牛显著(+4.20/t2.8)；≥50 全环境显著负(t≈-4~-6)；≥40 无区分度
-        pts = 3 if s >= 60 else (1 if s >= 50 else 0)
+        pts = (W["猛兽Setup60"] if s >= 60 else
+               (W["猛兽Setup50"] if s >= 50 else W["猛兽Setup40"]))
         if pts:
             scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
             scores[code]["src"].append(f"猛兽Setup{s:.0f}")
@@ -481,19 +534,19 @@ def main():
             scores[code]["src"].append(f"⚠️猛兽Setup{s:.0f}·初选档验证为负不计分")
         # 伏击线 6/6 环境显著负 → 移除加分；RS_D（长期熊 +1.30/t3.2 显著）/ G点 保留
         if "RS_D" in info.get("rsd", "") or "RS_D" in info.get("fujie", ""):
-            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 1
+            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += W["猛兽RS_D"]
             scores[code]["src"].append("猛兽RS_D")
         elif "G点" in info.get("gpoint", ""):
-            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 1
+            scores.setdefault(code, {"pts": 0, "src": []})["pts"] += W["猛兽G点"]
             scores[code]["src"].append("猛兽G点")
         if "伏击" in info.get("fujie", ""):
             scores.setdefault(code, {"pts": 0, "src": []})
             scores[code]["src"].append("⚠️猛兽伏击线·验证为负不计分")
     for code, info in sx.items():
-        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 1
+        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += W["双弦共振"]
         scores[code]["src"].append(f"双弦共振({info.get('score', 0)})")
     for code, info in qk.items():
-        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += 2
+        scores.setdefault(code, {"pts": 0, "src": []})["pts"] += W["乾坤A级"]
         scores[code]["src"].append(f"乾坤{info.get('grade','A')}级")
     for code, pts in wuwei.items():  # 武威月线精选（2026-08-11接入）
         scores.setdefault(code, {"pts": 0, "src": []})["pts"] += pts
@@ -519,11 +572,11 @@ def main():
     ranked = []
     for code, v in scores.items():
         pts = v["pts"]
-        if pts >= 7:
+        if pts >= G["s3"]:
             lv = "★★★ 全信号共振"
-        elif pts >= 5:
+        elif pts >= G["s2"]:
             lv = "★★ 多信号共振"
-        elif pts >= 3:
+        elif pts >= G["s1"]:
             lv = "★ 双信号"
         else:
             lv = "观察"
