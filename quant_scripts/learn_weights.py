@@ -22,7 +22,9 @@ import csv, json, os, re, subprocess, sys, argparse
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+import shutil as _shutil
+_westock_bin = _shutil.which("westock-data-skillhub")
+WESTOCK = [_westock_bin] if _westock_bin else ["npx", "-y", "westock-data-skillhub@1.0.3"]
 LOG = "logs/arbiter_signals_log.csv"
 LOG_CANDIDATES = ["outputs/仲裁信号日志.csv", LOG]
 
