@@ -35,6 +35,60 @@ POOL_SOURCES = [
 FIELDS = ["entry_date", "pool", "code", "last_seen", "times_seen"]
 
 
+# ── 2026-10-10 新增：「在生成但此前无跟踪」的股池 ────────────────────
+# 这些池只产 latest（无日期历史文件），故用「精确提取器」只取强信号层，
+# 避免通用 walk() 把 否决/风险/观察 等噪声一并抓入。
+def _ex_quad(d):
+    """四维共振：仅 ★★高置信 及以上"""
+    return [r.get("code") for r in d.get("stocks", []) if str(r.get("level", "")).startswith("★★")]
+
+
+def _ex_arbiter(d):
+    """信号仲裁：仅 ★ 级及以上（排除「观察」）"""
+    return [r.get("code") for r in d.get("ranked", []) if "★" in str(r.get("level", ""))]
+
+
+def _ex_guaili(d):
+    """乖离低买：全部命中"""
+    return [r.get("code") for r in d.get("hits", [])]
+
+
+def _ex_rsv(d):
+    """RSV强度：仅「启动」信号"""
+    return [r.get("code") for r in d.get("launch", [])]
+
+
+def _ex_123abc(d):
+    """123/2B：仅 ABC 结构确认层（buy 层过宽，不纳入）"""
+    return [r.get("code") for r in d.get("abc", [])]
+
+
+EXTRA_POOLS = [
+    ("四维共振", ("outputs/四维共振_latest.json", "四维共振_latest.json"), _ex_quad),
+    ("信号仲裁", ("outputs/信号仲裁_latest.json", "信号仲裁_latest.json"), _ex_arbiter),
+    ("乖离低买", ("outputs/乖离低买_latest.json", "乖离低买_latest.json"), _ex_guaili),
+    ("RSV强度",  ("outputs/rsv_strength_latest.json", "rsv_strength_latest.json"), _ex_rsv),
+    ("123ABC",  ("outputs/123_2b_latest.json", "123_2b_latest.json"), _ex_123abc),
+]
+
+
+def _collect_extra(out):
+    """把 EXTRA_POOLS 的提取结果并入 out（{pool: set(code)}）"""
+    for pool, paths, fn in EXTRA_POOLS:
+        cand = (paths,) if isinstance(paths, str) else paths
+        path = next((p for p in cand if os.path.exists(p)), None)
+        if not path:
+            continue
+        try:
+            d = json.load(open(path, encoding="utf-8"))
+            codes = {c for c in (norm(c) for c in (fn(d) or [])) if c}
+            if codes:
+                out[pool] = codes
+        except Exception as e:
+            print(f"[WARN] {pool}({path}): {e}")
+    return out
+
+
 def norm(c):
     c = (c or "").strip()
     if re.match(r"^(sh|sz)\d{6}$", c):
@@ -76,6 +130,7 @@ def collect():
                 out[pool] = codes
         except Exception as e:
             print(f"[WARN] {path}: {e}")
+    _collect_extra(out)
     return out
 
 
