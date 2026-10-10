@@ -244,7 +244,7 @@ def main():
             groups.setdefault(tag, []).append(r["ret"])
 
     L = [f"# ⚖️ 仲裁权重学习报告 {datetime.now():%Y-%m-%d}", "",
-         f"> 数据: {LOG}（{len(rows)}条信号，有效{len(results)}条）| 信号后收益口径: 信号日收盘→当前",
+         f"> 数据: {log_path}（{len(rows)}条信号，有效{len(results)}条）| 信号后收益口径: 信号日收盘→当前",
          "> 用途: 按信号源实际胜率校准仲裁权重（月度运行）", "",
          "| 信号源 | 样本 | 胜率 | 平均收益 | 中位 | 盈亏比 | 当前权重 | 建议 |",
          "|:----|:---:|:----:|:----:|:----:|:----:|:----:|:----|"]
@@ -285,8 +285,9 @@ def main():
     else:
         L.append("- 当前样本不足或权重已合理，维持现状")
         L.append("- 建议继续累积 2-4 周后重跑本脚本")
-    L += ["", "## 当前仲裁权重基线（signal_arbiter.py）", ""]
-    for k, v in CUR_WEIGHTS.items():
+    base = _load_config_weights() or CUR_WEIGHTS
+    L += ["", "## 当前仲裁权重基线（config/arbiter_weights.json）", ""]
+    for k, v in base.items():
         L.append(f"- {k}: {v}")
     L += ["", "---", "⚠️ 本报告为统计学习输出，不构成投资建议。"]
 
