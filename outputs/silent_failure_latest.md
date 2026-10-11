@@ -1,12 +1,12 @@
-# 🔍 体系自检元审计 · 2026-10-09
+# 🔍 体系自检元审计 · 2026-10-12
 
-> 扫描 21 个 workflow ｜ 风险项 **136** ｜ 🔴高危 **1**
+> 扫描 23 个 workflow ｜ 风险项 **147** ｜ 🔴高危 **1**
 
 ## 🔴高危·静默失败（1）
 
 - quant_report.yml :: 入牛时点扫描（板块入牛/个股入牛·月线5线） (L363) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）；且包裹核心脚本 → 失败会被吞掉，workflow 仍绿
 
-## 🟡中危·吞错误（123）
+## 🟡中危·吞错误（133）
 
 - artifact_audit.yml :: 判断是否交易日 (L34) — 命中 continue-on-error: true
 - artifact_audit.yml :: 运行产物入库审计 (L62) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
@@ -43,6 +43,10 @@
 - jingjia_track.yml :: 上传竞价报告到知识库「报告/竞价」 (L86) — 命中 continue-on-error: true, || echo（吞错误）
 - market_regime.yml :: 判断是否交易日 (L36) — 命中 continue-on-error: true
 - market_regime.yml :: 提交判定结果到仓库 (L68) — 命中 continue-on-error: true, set +e, || true
+- pool_winrate_biweekly.yml :: 判断是否交易日 (L40) — 命中 continue-on-error: true
+- pool_winrate_biweekly.yml :: 安装依赖 + 全局 westock（免 npx 加速） (L66) — 命中 || echo（吞错误）
+- pool_winrate_biweekly.yml :: 提交总览到仓库 (L79) — 命中 continue-on-error: true, || echo（吞错误）
+- pool_winrate_biweekly.yml :: 上传知识库「报告 / 全盘量化」 (L94) — 命中 continue-on-error: true, || echo（吞错误）
 - premarket_report.yml :: 判断是否交易日 (L44) — 命中 continue-on-error: true
 - premarket_report.yml :: 生成盘前市场报告 (L70) — 命中 || echo（吞错误）
 - premarket_report.yml :: 提交盘前预判到仓库（供复盘报告真实验证） (L83) — 命中 continue-on-error: true, set +e, || true
@@ -76,13 +80,13 @@
 - quant_report.yml :: 股池守护（数据源故障则不覆盖历史股池） (L425) — 命中 continue-on-error: true
 - quant_report.yml :: 盘后数据健康审计（产物可信度） (L437) — 命中 continue-on-error: true, set +e, || true
 - quant_report.yml :: 提交报告产物到仓库（供盘前报告引用） (L451) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
-- quant_report.yml :: 自动生成复盘报告并上传 (L490) — 命中 continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: env 对照三系统温度（观察期） (L541) — 命中 continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 股池信号实盘胜率跟踪 (L555) — 命中 continue-on-error: true, || echo（吞错误）, || true
-- quant_report.yml :: 纸面组合跟踪（选股方法对比） (L580) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 反转数值周线信号上传推送 (L621) — 命中 continue-on-error: true, || true
-- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L659) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 推送自检报告到微信 (L677) — 命中 continue-on-error: true
+- quant_report.yml :: 自动生成复盘报告并上传 (L492) — 命中 continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: env 对照三系统温度（观察期） (L548) — 命中 continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 资金四态胜率（抢筹/进场/控盘/观望） (L562) — 命中 continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: 股池入池快照（OOS 数据维护） (L583) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 反转数值周线信号上传推送 (L620) — 命中 continue-on-error: true, || true
+- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L664) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 推送自检报告到微信 (L682) — 命中 continue-on-error: true
 - quant_scan.yml :: 判断是否交易日 (L35) — 命中 continue-on-error: true
 - quant_scan.yml :: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断） (L73) — 命中 continue-on-error: true, || echo（吞错误）
 - quant_scan.yml :: IMA 凭证早期预检（失效立即微信告警，不阻断扫描） (L81) — 命中 continue-on-error: true, || true
@@ -125,6 +129,12 @@
 - wangzhe_track.yml :: 涨停王者·合格标的漏斗 (L81) — 命中 continue-on-error: true
 - wangzhe_track.yml :: 合格标的上传知识库 + 推送 (L86) — 命中 continue-on-error: true, || echo（吞错误）
 - wangzhe_track.yml :: 才哥公众号文章跟踪 (L105) — 命中 continue-on-error: true
+- weight_learn.yml :: 预热 westock 数据包 (L57) — 命中 continue-on-error: true, || echo（吞错误）
+- weight_learn.yml :: 推送月度提案报告 (L65) — 命中 continue-on-error: true, || echo（吞错误）
+- weight_learn.yml :: 上传提案到知识库「报告/指标存档」 (L79) — 命中 continue-on-error: true, || echo（吞错误）
+- weight_learn.yml :: ② 权重改进回验（到期项） (L98) — 命中 continue-on-error: true
+- weight_learn.yml :: 推送回验报告 (L109) — 命中 continue-on-error: true, || echo（吞错误）
+- weight_learn.yml :: 提交提案 + 回验产物 + 台账 (L119) — 命中 set +e
 - yao_gu_pool.yml :: 判断是否交易日 (L30) — 命中 continue-on-error: true
 - yao_gu_pool.yml :: 安装依赖 (L63) — 命中 || true
 - yao_gu_pool.yml :: 预热 westock (L69) — 命中 || true
@@ -132,7 +142,7 @@
 - yao_gu_pool.yml :: 上传知识库（报告·全盘量化） (L89) — 命中 continue-on-error: true, || echo（吞错误）
 - yao_gu_pool.yml :: 提交产物 (L105) — 命中 set +e, || true
 
-## 🟡中危·依赖外部 cron（12）
+## 🟡中危·依赖外部 cron（13）
 
 - artifact_audit.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - beast_pool.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
@@ -145,6 +155,7 @@
 - premarket_report.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - selfcheck_daily.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - wangzhe_track.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
+- weight_learn.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - yao_gu_pool.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 
 ## 各 workflow 静默失败热点
@@ -164,6 +175,7 @@
 | intraday_monitor.yml | 3 | — |
 | jingjia_track.yml | 2 | — |
 | market_regime.yml | 3 | — |
+| pool_winrate_biweekly.yml | 4 | — |
 | premarket_report.yml | 4 | — |
 | probe_em.yml | 5 | — |
 | probe_kpl.yml | 0 | — |
@@ -171,4 +183,5 @@
 | quant_scan.yml | 30 | — |
 | selfcheck_daily.yml | 9 | — |
 | wangzhe_track.yml | 5 | — |
+| weight_learn.yml | 7 | — |
 | yao_gu_pool.yml | 7 | — |
