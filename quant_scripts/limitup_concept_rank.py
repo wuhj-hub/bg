@@ -33,6 +33,8 @@
   v4.4 (2026-10-11) ★备选热点概念新增「分时走势」列（westock minute，曾星智第⑤步）
                     ★新增「📅 事件前瞻（未来1-2周）」小节（westock calendar）+ 注入 GLM 提示（第⑥步）
                     ★新增 --no-minute / --no-calendar
+  v4.5 (2026-10-11) ★分时走势扩展至「龙头榜」全部龙头（minute_cache 共享，免重复取数）
+                    ★新增「📑 龙头财报披露日（事件风险预警）」小节（westock reserve，随 --no-calendar 关闭）
 
 数据源：all_mainboard.csv + westock 日线 + westock asfund 资金 + outputs/sector_component_em.json + 东财涨停池(push2ex)。
 口径提示：概念来自东财板块成分（一票多概念会放大家数）；市值接口在沙箱不可用，
@@ -530,6 +532,38 @@ def render_calendar(events, limit=8):
     return L
 
 
+def fetch_reserve(sym):
+    """取个股最近一期财报披露日（westock reserve，仅单只返回明细）→ (disclosureDate, desc)。失败返回 (None, "")。"""
+    txt = cli(["reserve", sym], timeout=60)
+    header = None
+    for ln in txt.splitlines():
+        s = ln.strip()
+        if not s.startswith("|"):
+            continue
+        p = [q.strip() for q in s.strip("|").split("|")]
+        if "disclosureDate" in p:
+            header = p
+            continue
+        if not header or "---" in p[0]:
+            continue
+        def g(k):
+            return p[header.index(k)] if k in header and header.index(k) < len(p) else ""
+        return g("disclosureDate"), g("disclosureDesc")
+    return None, ""
+
+
+def render_reserve(items, limit=10):
+    """龙头财报披露日小节（事件风险预警）"""
+    L = ["", "### 📑 龙头财报披露日（未来 · 事件风险预警）", ""]
+    if not items:
+        L.append("> （近期无可预知的财报披露日）")
+        return L
+    L += ["| 龙头 | 披露日 | 说明 |", "|---|---|---|"]
+    for code, name, ds, desc in items[:limit]:
+        L.append(f"| {name}({code}) | {ds} | {desc or '—'} |")
+    return L
+
+
 def glm_news_check(rank, ups, mood, today, code_sector=None, events=None):
     """曾星智《连板妖股的第一特征》落地：概念催化链 + 蹭概念校验。
 
@@ -813,10 +847,11 @@ def main():
                  f"{v['prev']} | {fmt_jj(v['jj'], v['prev'])} | {v['maxlb']} | {v['first']} | {names} |")
 
     # ── 模块二：龙头榜 · 七维（含首板/二板资金流向 + 长期力量）──
-    L += ["", "## 👑 龙头榜 · 七维（各热门板块龙头 · 含资金流向 + 长期力量）", "",
-          "| 板块 | 龙头 | 板数 | 首封 | 封单/流通 | 5日涨幅 | 主力净流入(万) | 带动(后涨) | 辨识 | 长期力量 | 龙头分 | 构成(启动/弹性/封单/带动/辨识/资金/长期) |",
-          "|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    L += ["", "## 👑 龙头榜 · 七维 + 分时（各热门板块龙头）", "",
+          "| 板块 | 龙头 | 板数 | 首封 | 封单/流通 | 5日涨幅 | 主力净流入(万) | 带动(后涨) | 辨识 | 长期力量 | 分时 | 龙头分 | 构成(启动/弹性/封单/带动/辨识/资金/长期) |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
     leaders_json = []
+    minute_cache = {}
     for s, v in rank:
         if v["n"] < 3:
             continue
@@ -827,8 +862,16 @@ def main():
         later = lead["s_danda"] // 12 * (len(allm) - 1) if len(allm) > 1 else 0
         con = (f"{lead['s_qidong']}/{lead['s_elastic']}/{lead['s_fengdan']}/"
                f"{lead['s_danda']}/{max(0,lead['s_bianshi'])}/{lead['s_fund']}/{lead['s_long']}")
+        # 分时走势（第⑤步判据之三）：龙头当日分时（minute_cache 与备选热点小节共享）
+        if not a.no_minute:
+            if lead["code"] not in minute_cache:
+                lab, det, _ = minute_strength(fetch_minute_bars(lead["code"]))
+                minute_cache[lead["code"]] = f"{lab}（{det}）" if lab else "—"
+            min_txt = minute_cache[lead["code"]]
+        else:
+            min_txt = "—"
         L.append(f"| {s} | **{lead['name']}**({lead['code']}) | {lead['lianban']} | {fmt_t(lead.get('fbt'))} | "
-                 f"{ratio} | {r5} | {fn} | {later} | {max(0,lead['s_bianshi'])} | {lead['s_long']} | **{lead['leader_score']}** | {con} |")
+                 f"{ratio} | {r5} | {fn} | {later} | {max(0,lead['s_bianshi'])} | {lead['s_long']} | {min_txt} | **{lead['leader_score']}** | {con} |")
         leaders_json.append({"concept": s, "leader": lead["name"], "code": lead["code"],
                              "lianban": lead["lianban"], "score": lead["leader_score"],
                              "fbt": fmt_t(lead.get("fbt")),
@@ -839,23 +882,25 @@ def main():
                              "s_long": lead["s_long"],
                              "ret5": round(lead["ret5"], 2) if lead.get("ret5") is not None else None})
     if not leaders_json:
-        L.append("| — | 无（当日无≥3家涨停的板块） | | | | | | | | | | |")
+        L.append("| — | 无（当日无≥3家涨停的板块） | | | | | | | | | | | |")
 
     # ── 模块一.5：今日备选热点概念（2-4 个 · 曾星智七步法第④步）──
     vmap = {s: v for s, v in rank}
     pick = [s for s, v in rank if v["n"] >= 3][:4]
     if pick:
         lj = {x["concept"]: x for x in leaders_json}
-        # 分时走势（第⑤步判据之一）：对每个备选概念的龙头取当日分时
+        # 分时走势（第⑤步判据之一）：复用龙头榜 minute_cache
         minm = {}
         if not a.no_minute:
             for s in pick:
                 lc = (lj.get(s) or {}).get("code")
                 if not lc:
                     continue
-                lab, det, _ = minute_strength(fetch_minute_bars(lc))
-                if lab:
-                    minm[s] = f"{lab}（{det}）"
+                if lc not in minute_cache:
+                    lab, det, _ = minute_strength(fetch_minute_bars(lc))
+                    minute_cache[lc] = f"{lab}（{det}）" if lab else "—"
+                if minute_cache.get(lc, "—") != "—":
+                    minm[s] = minute_cache[lc]
             print(f"[INFO] 分时走势取到 {len(minm)}/{len(pick)} 只", flush=True)
         L += ["", "## 🎯 今日备选热点概念（2-4 个）", "",
               "> 对应曾星智七步法第④步：结合热点行业/板块与涨停股，收敛出 2-4 个备选热点概念；次日再定买不买。", "",
@@ -869,6 +914,21 @@ def main():
 
     # ── 模块一.6：事件前瞻（未来 1-2 周 · 曾星智第⑥步）──
     L += render_calendar(cal)
+    # 龙头财报披露日（事件风险预警）
+    if not a.no_calendar and leaders_json:
+        resv, seen = [], set()
+        for x in leaders_json:
+            c = x["code"]
+            if c in seen or len(seen) >= 12:
+                continue
+            seen.add(c)
+            ds, desc = fetch_reserve(c)
+            if ds and ds >= today:
+                resv.append((c, x["leader"], ds, desc))
+        resv.sort(key=lambda t: t[2])
+        if resv:
+            print(f"[INFO] 龙头财报披露 {len(resv)} 条", flush=True)
+            L += render_reserve(resv)
 
     # ── 模块二.5：GLM 概念催化链 + 蹭概念校验（曾星智《连板妖股的第一特征》）──
     if not a.no_glm:
@@ -910,7 +970,7 @@ def main():
           "⚠️ 概念分类来自东财板块成分（一票可属多个概念，家数会放大）；晋级率=今日连板家数/昨日涨停家数（昨日涨停<3标 `!`）；",
           "龙头为板块内相对排名打分（七维：启动=首封最早 / 弹性=5日涨幅 / 封单=封单/流通 / 带动=首封后跟涨 / 辨识=最高板+未炸板 / **资金=当日主力净流入强度** / **长期力量=月线5力(MA5/10/20/30全向上+月线DIF向上)**）；",
           "资金流向来自 westock asfund（首板/二板当日主力净流入是关键，缺失则该维为0）；中军以成交额近似市值；",
-          "分时走势=备选热点龙头当日分时（westock minute；判据=运行最大回撤+均价线上方占比+尾盘方向）；事件前瞻=未来1-2周财经日历（westock calendar，权重≥3）；",
+          "分时走势=当日分时（westock minute，龙头榜全龙头 + 备选概念龙头共享缓存；判据=运行最大回撤+均价线上方占比+尾盘方向）；事件前瞻=未来1-2周财经日历（westock calendar，权重≥3）+ 龙头财报披露日（westock reserve）；",
           "概念催化链与蹭概念校验来自 GLM（glm-4-flash，输入=当日涨停明细+近期要闻+未来事件日历），仅作参考、可能有误，请结合实盘判断。"]
     md = "\n".join(L)
     mp = os.path.join(outdir, f"涨停概念排行_{today}.md")
