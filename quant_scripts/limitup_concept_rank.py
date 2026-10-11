@@ -15,7 +15,8 @@
        → GLM「概念催化链（催化事件→逻辑→持续性→验证点）+ 蹭概念真实性校验」落地。
   ⑥ 曾星智《养成每天判断"热点概念"和"龙头"的习惯》(2026-10-11)：短线能力=判断热点概念+龙头，
        7 步日常流程 → 新增「🎯 今日备选热点概念（2-4 个）」小节（第④步：收敛备选概念）
-       + 龙头评分并入「长期力量」维（第⑤步：龙头判据之一「底部长期力量」= 月线5力，与入牛体系同源）。
+       + 龙头评分并入「长期力量」维（第⑤步：龙头判据之一「底部长期力量」= 月线5力，与入牛体系同源）
+       + 备选龙头「分时走势」校验（第⑤步：分时走势）+「📅 事件前瞻」（第⑥步：结合时间节点）。
 
 版本演进：
   v1 (2026-09-25) 涨停家数 / 连板家数排行
@@ -29,6 +30,9 @@
   v4.2 (2026-10-11) ★新增「🎯 今日备选热点概念（2-4 个）」小节（曾星智《养成每天判断热点概念和龙头的习惯》第④步）
   v4.3 (2026-10-11) ★龙头评分六维→七维：新增「长期力量」维（月线5力·曾星智「底部长期力量」，15 分）
                     ★新增 --no-long；权重重分配 启动15/弹性12/封单17/带动12/辨识9/资金20/长期15
+  v4.4 (2026-10-11) ★备选热点概念新增「分时走势」列（westock minute，曾星智第⑤步）
+                    ★新增「📅 事件前瞻（未来1-2周）」小节（westock calendar）+ 注入 GLM 提示（第⑥步）
+                    ★新增 --no-minute / --no-calendar
 
 数据源：all_mainboard.csv + westock 日线 + westock asfund 资金 + outputs/sector_component_em.json + 东财涨停池(push2ex)。
 口径提示：概念来自东财板块成分（一票多概念会放大家数）；市值接口在沙箱不可用，
@@ -37,16 +41,17 @@
 用法：
   python3 quant_scripts/limitup_concept_rank.py [--days 20] [--top 20] [--date YYYY-MM-DD]
          [--main-zt 8] [--main-jj 35] [--sub-jj 20] [--max-stocks N] [--outdir DIR]
-         [--no-fund] [--no-glm] [--no-long]
+         [--no-fund] [--no-glm] [--no-long] [--no-minute] [--no-calendar]
 """
-import os, re, sys, csv, json, time, argparse, subprocess, urllib.request
+import os, re, sys, csv, json, time, shutil, argparse, subprocess, urllib.request
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
 BJ = timezone(timedelta(hours=8))
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 仓库根
-WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
+_BIN = shutil.which("westock-data-skillhub")
+WESTOCK = [_BIN] if _BIN else ["npx", "-y", "westock-data-skillhub@1.0.3"]  # 免 npx：命中全局 bin 则直调
 LIMIT_UP = 9.8          # 主板涨停阈值（含四舍五入误差）
 CHUNK = 40
 WORKERS = 4
@@ -418,7 +423,114 @@ def recent_news(n=8):
         return []
 
 
-def glm_news_check(rank, ups, mood, today, code_sector=None):
+def fetch_minute_bars(sym):
+    """取最新交易日分时（单只，westock minute 不支持批量）→ [(time, price, cumvol, cumamt)] 升序。失败返回 []。"""
+    txt = cli(["minute", sym], timeout=90)
+    rows = []
+    for ln in txt.splitlines():
+        s = ln.strip()
+        if not s.startswith("|"):
+            continue
+        p = [q.strip() for q in s.strip("|").split("|")]
+        if len(p) < 5 or not re.match(r"^\d{4}$", p[1]):
+            continue
+        try:
+            rows.append((p[1], float(p[2]), float(p[3]), float(p[4])))
+        except Exception:
+            pass
+    rows.sort()
+    return rows
+
+
+def minute_strength(rows):
+    """分时走势强弱（曾星智第⑤步「分时走势」判龙头）。
+    判据（针对已涨停个股）：运行最大回撤（低开高走不计为弱）+ 全天在均价线上方占比 + 尾盘30分钟方向。
+    返回 (label, detail, dip_pct)；数据不足返回 (None, "", None)。"""
+    if not rows or len(rows) < 30:
+        return None, "", None
+    prices = [r[1] for r in rows]
+    run_max, dd = prices[0], 0.0
+    for p in prices:
+        run_max = max(run_max, p)
+        dd = max(dd, run_max - p)
+    dip_pct = dd / run_max * 100 if run_max else 0.0
+    above = tot = 0
+    for _, p, v, a in rows:
+        if v > 0:
+            vwap = a / v
+            if vwap > p * 10:      # volume 以「手」计时，amount/volume ≈ price×100
+                vwap /= 100.0
+            tot += 1
+            if p >= vwap - 1e-9:
+                above += 1
+    above_ratio = 100.0 * above / tot if tot else 0
+    tail = prices[-30:]
+    tdir = "↑" if tail[-1] > tail[0] else ("↓" if tail[-1] < tail[0] else "→")
+    if dip_pct <= 0.6:
+        lab = "💪 一字/秒封"
+    elif dip_pct <= 1.5:
+        lab = "👍 强"
+    elif dip_pct <= 3.0:
+        lab = "⚖️ 中"
+    else:
+        lab = "⚠️ 弱"
+    return lab, f"回撤{dip_pct:.1f}%·均价上{above_ratio:.0f}%·尾盘{tdir}", dip_pct
+
+
+def fetch_calendar(today, days_ahead=12, min_weight=3):
+    """未来 days_ahead 个自然日（跳过周末）的财经日历 → [(date,time,weight,country,content,event)]（权重降序）。
+    数据源 westock `calendar <date>`；只保留权重≥min_weight。失败静默返回 []。
+    给「事件前瞻」小节与 GLM 提供未来催化锚点（曾星智第⑥步「结合时间节点」）。"""
+    try:
+        d0 = datetime.strptime(today, "%Y-%m-%d")
+    except Exception:
+        return []
+    out = []
+    for i in range(1, days_ahead + 1):
+        d = d0 + timedelta(days=i)
+        if d.weekday() >= 5:
+            continue
+        ds = d.strftime("%Y-%m-%d")
+        txt = cli(["calendar", ds], timeout=60)
+        header = None
+        for ln in txt.splitlines():
+            s = ln.strip()
+            if not s.startswith("|"):
+                continue
+            p = [q.strip() for q in s.strip("|").split("|")]
+            if "Content" in p and "Weightiness" in p:
+                header = p
+                continue
+            if not header or "---" in p[0]:
+                continue
+            def g(k):
+                return p[header.index(k)] if k in header and header.index(k) < len(p) else ""
+            try:
+                w = int(float(g("Weightiness") or 0))
+            except Exception:
+                w = 0
+            ev = (g("FinancialEvent") or g("Content")).strip()
+            if not ev or w < min_weight:
+                continue
+            out.append((ds, g("time"), w, g("CountryName"), g("Content"), ev.replace("|", "/")))
+    out.sort(key=lambda x: (-x[2], x[0], x[1]))
+    return out
+
+
+def render_calendar(events, limit=8):
+    """事件前瞻小节（未来 1-2 周高权重事件）"""
+    L = ["", "## 📅 事件前瞻（未来 1-2 周 · 曾星智第⑥步「结合时间节点」）", ""]
+    if not events:
+        L.append("> （事件日历不可用或近期无高权重事件）")
+        return L
+    L += ["| 日期 | 时间 | 权重 | 地区 | 事件 |", "|---|---|---|---|---|"]
+    for ds, tm, w, ctry, content, ev in events[:limit]:
+        L.append(f"| {ds} | {tm} | {'⭐' * min(w, 3)} | {ctry or '—'} | {ev} |")
+    L += ["", "> 权重≥3 为高影响事件；题材催化常发生在数据/会议节点前后，短线可据此判断「时间窗口」。"]
+    return L
+
+
+def glm_news_check(rank, ups, mood, today, code_sector=None, events=None):
     """曾星智《连板妖股的第一特征》落地：概念催化链 + 蹭概念校验。
 
     ① 热门概念的「催化事件 → 炒作逻辑 → 持续性 → 关键验证点」链条；
@@ -445,15 +557,23 @@ def glm_news_check(rank, ups, mood, today, code_sector=None):
     news = recent_news(8)
     news_block = ("\n\n【近24小时财经要闻（仅当某条与某概念直接相关时才引用，否则忽略）】\n"
                   + "\n".join("- " + x for x in news)) if news else ""
+    events = events or []
+    ev_block = ""
+    if events:
+        ev_lines = [f"- {ds} {ev}" + (f"（{ctry}）" if ctry else "")
+                    for ds, tm, w, ctry, content, ev in events[:12]]
+        ev_block = ("\n\n【未来1-2周事件日历（判断题材催化窗口用；仅当相关时引用，否则忽略）】\n"
+                    + "\n".join(ev_lines))
     prompt = (
         f"日期 {today}，A股当日涨停 {ups_total} 只，情绪档位「{mood}」。\n"
         "【热门概念（按涨停家数排序）】\n" + "\n".join(items)
         + "\n\n【当日涨停个股（连板优先，最多30只）】\n" + "\n".join(up_lines)
-        + news_block + "\n\n"
+        + news_block + ev_block + "\n\n"
         "请完成三部分（总长≤700字，语言精炼、结论明确）：\n"
         "①【概念催化链】对上面每个热门概念逐行输出：概念 → 「催化事件/政策/产业驱动」"
         " → 「炒作逻辑（为什么是现在）」 → 持续性判定（可持续/分歧/一日游）"
-        " → 「关键验证点（后续看什么来确认）」；催化事件必须与该概念直接相关——"
+        " → 「关键验证点（后续看什么来确认）」；若催化与「未来事件日历」直接相关，点明时间节点；"
+        "催化事件必须与该概念直接相关——"
         "若你确实不了解、或近期无直接相关事件，写“无明确催化/信息不足”，切勿用无关新闻强行归因，不要编造。\n"
         "②【蹭概念校验】结合「当日涨停个股」名单，指出哪些个股的题材归属很可能是“蹭概念”"
         "（挂着板块标签、但当日涨停的真实驱动可能不在此概念，或市场未实质炒作）；"
@@ -478,6 +598,8 @@ def main():
     ap.add_argument("--no-fund", action="store_true", dest="no_fund", help="跳过资金流向维度")
     ap.add_argument("--no-glm", action="store_true", dest="no_glm", help="跳过 GLM 新闻面校验")
     ap.add_argument("--no-long", action="store_true", dest="no_long", help="跳过长期力量维度（月线5力）")
+    ap.add_argument("--no-minute", action="store_true", dest="no_minute", help="跳过分时走势校验（备选热点龙头）")
+    ap.add_argument("--no-calendar", action="store_true", dest="no_calendar", help="跳过事件前瞻（财经日历）")
     a = ap.parse_args()
     outdir = a.outdir or os.path.join(BASE, "outputs")
     os.makedirs(outdir, exist_ok=True)
@@ -616,6 +738,12 @@ def main():
         mstr = fetch_month_strength([u["c6"] for u in ups])
         print(f"[INFO] 长期力量取到 {len(mstr)}/{len(ups)} 只（月线5力）", flush=True)
 
+    # ── 事件前瞻（未来 1-2 周财经日历；曾星智第⑥步「结合时间节点」）──
+    cal = []
+    if not a.no_calendar:
+        cal = fetch_calendar(today, days_ahead=12, min_weight=3)
+        print(f"[INFO] 事件前瞻 {len(cal)} 条（未来2周权重≥3）", flush=True)
+
     code_sector, code_name, sectors, sec_date = load_sector()
     print(f"[INFO] 题材映射 {len(code_sector)} 只（更新于 {sec_date}）", flush=True)
 
@@ -718,21 +846,35 @@ def main():
     pick = [s for s, v in rank if v["n"] >= 3][:4]
     if pick:
         lj = {x["concept"]: x for x in leaders_json}
+        # 分时走势（第⑤步判据之一）：对每个备选概念的龙头取当日分时
+        minm = {}
+        if not a.no_minute:
+            for s in pick:
+                lc = (lj.get(s) or {}).get("code")
+                if not lc:
+                    continue
+                lab, det, _ = minute_strength(fetch_minute_bars(lc))
+                if lab:
+                    minm[s] = f"{lab}（{det}）"
+            print(f"[INFO] 分时走势取到 {len(minm)}/{len(pick)} 只", flush=True)
         L += ["", "## 🎯 今日备选热点概念（2-4 个）", "",
               "> 对应曾星智七步法第④步：结合热点行业/板块与涨停股，收敛出 2-4 个备选热点概念；次日再定买不买。", "",
-              "| 概念 | 级别 | 涨停 | 最高板 | 代表龙头 | 龙头分 |", "|---|---|---|---|---|---|"]
+              "| 概念 | 级别 | 涨停 | 最高板 | 代表龙头 | 龙头分 | 分时走势 |", "|---|---|---|---|---|---|---|"]
         for s in pick:
             v = vmap[s]
             lead = lj.get(s)
             lname = f"{lead['leader']}({lead['code']})" if lead else "—"
             lsc = lead["score"] if lead else "—"
-            L.append(f"| **{s}** | {icon.get(v['grade'], '')}{v['grade']} | {v['n']} | {v['maxlb']} | {lname} | {lsc} |")
+            L.append(f"| **{s}** | {icon.get(v['grade'], '')}{v['grade']} | {v['n']} | {v['maxlb']} | {lname} | {lsc} | {minm.get(s, '—')} |")
+
+    # ── 模块一.6：事件前瞻（未来 1-2 周 · 曾星智第⑥步）──
+    L += render_calendar(cal)
 
     # ── 模块二.5：GLM 概念催化链 + 蹭概念校验（曾星智《连板妖股的第一特征》）──
     if not a.no_glm:
         L += ["", "## 🧠 概念催化链 · 蹭概念校验（GLM · 曾星智第一特征）", ""]
         try:
-            reply = glm_news_check(rank, ups, mood, today, code_sector)
+            reply = glm_news_check(rank, ups, mood, today, code_sector, events=cal)
             L.append(reply.strip())
         except Exception as e:
             L.append(f"> 跳过（GLM 不可用：{e}）")
@@ -768,7 +910,8 @@ def main():
           "⚠️ 概念分类来自东财板块成分（一票可属多个概念，家数会放大）；晋级率=今日连板家数/昨日涨停家数（昨日涨停<3标 `!`）；",
           "龙头为板块内相对排名打分（七维：启动=首封最早 / 弹性=5日涨幅 / 封单=封单/流通 / 带动=首封后跟涨 / 辨识=最高板+未炸板 / **资金=当日主力净流入强度** / **长期力量=月线5力(MA5/10/20/30全向上+月线DIF向上)**）；",
           "资金流向来自 westock asfund（首板/二板当日主力净流入是关键，缺失则该维为0）；中军以成交额近似市值；",
-          "概念催化链与蹭概念校验来自 GLM（glm-4-flash，输入=当日涨停明细+近期要闻），仅作参考、可能有误，请结合实盘判断。"]
+          "分时走势=备选热点龙头当日分时（westock minute；判据=运行最大回撤+均价线上方占比+尾盘方向）；事件前瞻=未来1-2周财经日历（westock calendar，权重≥3）；",
+          "概念催化链与蹭概念校验来自 GLM（glm-4-flash，输入=当日涨停明细+近期要闻+未来事件日历），仅作参考、可能有误，请结合实盘判断。"]
     md = "\n".join(L)
     mp = os.path.join(outdir, f"涨停概念排行_{today}.md")
     open(mp, "w", encoding="utf-8").write(md)
