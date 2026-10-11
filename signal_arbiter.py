@@ -776,14 +776,15 @@ def main():
         print(f"[WARN] 自选清单失败: {e}")
 
     # V3 仲裁信号日志（2026-08-11）：累积 date,code,pts,level,month,src 供胜率分层
+    # 2026-10-11：TOP20→TOP50、src[:4]→src[:8]，让猛兽/武威/反转/123-2B/RSV 等低权重源也能进日志（供 learn_weights 按配置键学习）
     try:
         log_path = os.path.join(OUT_DIR, "仲裁信号日志.csv")
         new = not os.path.exists(log_path)
         with open(log_path, "a", encoding="utf-8") as f:
             if new:
                 f.write("date,code,pts,level,month,src\n")
-            for r in ranked[:20]:
-                f.write(f"{today},{r['code']},{r['pts']},{r['level']},{r.get('month','?')},{'|'.join(r['src'][:4])}\n")
+            for r in ranked[:50]:
+                f.write(f"{today},{r['code']},{r['pts']},{r['level']},{r.get('month','?')},{'|'.join(r['src'][:8])}\n")
         print(f"[OK] 仲裁日志累积 → outputs/仲裁信号日志.csv")
     except Exception as e:
         print(f"[WARN] 仲裁日志失败: {e}")
