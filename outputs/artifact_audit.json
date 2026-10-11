@@ -1,5 +1,5 @@
 {
- "date": "2026-10-09",
+ "date": "2026-10-12",
  "writes": {
   "all_mainboard.csv": [
    ".github/workflows/duowei_fish.yml",
@@ -11,6 +11,7 @@
    "quant_scripts/fetch_mainboard_data.py",
    "quant_scripts/hot_emotion.py",
    "quant_scripts/inbull_scan.py",
+   "quant_scripts/inbull_threshold_monitor.py",
    "quant_scripts/jinji_emotion_backtest.py",
    "quant_scripts/limitup_concept_rank.py",
    "quant_scripts/market_regime.py",
@@ -156,6 +157,15 @@
    ".github/workflows/quant_scan.yml",
    "quant_scripts/scan_123_2b.py"
   ],
+  "权重提案_{var}.json": [
+   "quant_scripts/learn_weights.py"
+  ],
+  "入牛阈值漂移_latest.json": [
+   "quant_scripts/inbull_threshold_monitor.py"
+  ],
+  "入牛阈值漂移_{var}.md": [
+   "quant_scripts/inbull_threshold_monitor.py"
+  ],
   "rsv_strength_latest.json": [
    ".github/workflows/quant_scan.yml",
    "quant_scripts/rsv_strength.py"
@@ -269,6 +279,12 @@
   ],
   "xihu_turns_latest.json": [
    "quant_scripts/xihu_turns_check.py"
+  ],
+  "reversal_pool_{var}.json": [
+   "quant_scripts/reversal_daily_screener.py"
+  ],
+  "reversal_perf_{var}.csv": [
+   "quant_scripts/reversal_daily_screener.py"
   ],
   "xihu_breadth_history.json": [
    ".github/workflows/quant_scan.yml",
@@ -405,6 +421,18 @@
    "quant_report.yml",
    "quant_scan.yml"
   ],
+  "reversal_pool_day.json": [
+   "quant_report.yml"
+  ],
+  "reversal_pool_week.json": [
+   "quant_report.yml"
+  ],
+  "reversal_perf_day.csv": [
+   "quant_report.yml"
+  ],
+  "reversal_perf_week.csv": [
+   "quant_report.yml"
+  ],
   "xihu_turns_latest.json": [
    "quant_report.yml"
   ],
@@ -432,9 +460,6 @@
    "quant_report.yml"
   ],
   "pool_quality.json": [
-   "quant_report.yml"
-  ],
-  "纸面组合跟踪报告_{var}.md": [
    "quant_report.yml"
   ],
   "fish_body_latest.json": [
@@ -574,6 +599,9 @@
   ],
   "artifact_audit.json": [
    "artifact_audit.yml"
+  ],
+  "入牛阈值漂移_latest.json": [
+   "inbull_threshold_monitor.yml"
   ],
   "cross_source_latest.md": [
    "selfcheck_daily.yml"
@@ -715,7 +743,9 @@
  "high_risk": [],
  "missing": [
   "em_industry.json",
-  "sw_l1_industry.json"
+  "sw_l1_industry.json",
+  "入牛阈值漂移_{var}.md",
+  "权重提案_{var}.json"
  ],
  "ok": [
   "123_2b_latest.json",
@@ -752,6 +782,8 @@
   "quant_results_2.json",
   "quant_results_latest.json",
   "quant_results_{var}.json",
+  "reversal_perf_{var}.csv",
+  "reversal_pool_{var}.json",
   "rsv_strength_latest.json",
   "sector_component_em.json",
   "system_temp_history.json",
@@ -774,6 +806,7 @@
   "仲裁信号日志.csv",
   "信号仲裁_latest.json",
   "入牛时点_latest.json",
+  "入牛阈值漂移_latest.json",
   "双弦观察池_latest.json",
   "四维共振_chinext_kcb_latest.json",
   "四维共振_latest.json",
@@ -810,6 +843,10 @@
   "pipeline_audit_latest.json",
   "pool_entries.csv",
   "pool_quality.json",
+  "reversal_perf_day.csv",
+  "reversal_perf_week.csv",
+  "reversal_pool_day.json",
+  "reversal_pool_week.json",
   "silent_failure_audit.json",
   "silent_failure_latest.md",
   "一统天下建仓区股池_latest.json",
@@ -822,7 +859,6 @@
   "涨停型王者_成功率报告",
   "猛兽突破池_{var}.md",
   "盘前市场报告_{var}.md",
-  "纸面组合跟踪报告_{var}.md",
   "西湖rsv全市场_{var}.md",
   "资金快照_{var}.csv"
  ]
