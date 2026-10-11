@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""limitup_concept_rank.py —— 热板作战面板 v4（2026-09-29）
+"""limitup_concept_rank.py —— 热板作战面板 v4.3（2026-10-11）
 
 灵感来源：
   ① 曾星智《中秋快乐及短线核心方法》(2026-09-25)：汇总涨停 → 按概念归类 → 涨停家数最多者=热点。
@@ -14,7 +14,8 @@
   ⑤ 曾星智《连板妖股的第一特征》(2026-10-07)：第一特征=「属不属于最近的热点概念」
        → GLM「概念催化链（催化事件→逻辑→持续性→验证点）+ 蹭概念真实性校验」落地。
   ⑥ 曾星智《养成每天判断"热点概念"和"龙头"的习惯》(2026-10-11)：短线能力=判断热点概念+龙头，
-       7 步日常流程 → 新增「🎯 今日备选热点概念（2-4 个）」小节（对应第④步：收敛备选概念）。
+       7 步日常流程 → 新增「🎯 今日备选热点概念（2-4 个）」小节（第④步：收敛备选概念）
+       + 龙头评分并入「长期力量」维（第⑤步：龙头判据之一「底部长期力量」= 月线5力，与入牛体系同源）。
 
 版本演进：
   v1 (2026-09-25) 涨停家数 / 连板家数排行
@@ -26,6 +27,8 @@
   v4.1 (2026-10-08) ★GLM 章节升级为「概念催化链 + 蹭概念校验」（曾星智《连板妖股的第一特征》）
                     ★入参新增当日涨停明细 + 近期要闻（新浪7x24）作为事实锚，降低幻觉
   v4.2 (2026-10-11) ★新增「🎯 今日备选热点概念（2-4 个）」小节（曾星智《养成每天判断热点概念和龙头的习惯》第④步）
+  v4.3 (2026-10-11) ★龙头评分六维→七维：新增「长期力量」维（月线5力·曾星智「底部长期力量」，15 分）
+                    ★新增 --no-long；权重重分配 启动15/弹性12/封单17/带动12/辨识9/资金20/长期15
 
 数据源：all_mainboard.csv + westock 日线 + westock asfund 资金 + outputs/sector_component_em.json + 东财涨停池(push2ex)。
 口径提示：概念来自东财板块成分（一票多概念会放大家数）；市值接口在沙箱不可用，
@@ -34,7 +37,7 @@
 用法：
   python3 quant_scripts/limitup_concept_rank.py [--days 20] [--top 20] [--date YYYY-MM-DD]
          [--main-zt 8] [--main-jj 35] [--sub-jj 20] [--max-stocks N] [--outdir DIR]
-         [--no-fund] [--no-glm]
+         [--no-fund] [--no-glm] [--no-long]
 """
 import os, re, sys, csv, json, time, argparse, subprocess, urllib.request
 from datetime import datetime, timezone, timedelta
@@ -186,6 +189,33 @@ def fetch_fund(codes, date):
     return out
 
 
+def fetch_month_strength(codes):
+    """批量取月线 → {6位代码: 长期力量分(0-15)}（月线5力·曾星智「底部长期力量」）。
+    仅用月线收盘序列判断均线方向，与是否复权无关。失败/数据不足 → 该股无此项（记0）。"""
+    codes = [c for c in codes if re.match(r"^\d{6}$", c or "")]
+    if not codes:
+        return {}
+    syms = {("sh" if c[0] == "6" else "sz") + c: c for c in codes}
+    keys = list(syms)
+    bc = min(CHUNK, 60)
+    batches = [keys[i:i + bc] for i in range(0, len(keys), bc)]
+    km = {}
+    def one(b):
+        return parse_batch(cli(["kline", ",".join(b), "--period", "month", "--limit", "60"]))
+    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+        for d in ex.map(one, batches):
+            km.update(d)
+    out = {}
+    for sym, bars in km.items():
+        c6 = syms.get(sym)
+        if not c6:
+            continue
+        _, sc = month_strength([b[2] for b in bars])
+        if sc:
+            out[c6] = sc
+    return out
+
+
 def classify(zt, prev_zt, jj, a):
     if zt <= 2:
         return "一日游"
@@ -227,10 +257,36 @@ def rank_frac(values, asc):
     return out
 
 
-def leader_pick(members):
-    """龙头评分（六维，0-100）：启动(首封最早18) / 弹性(5日涨幅15) / 封单(封单/流通20)
-    / 带动(首封后跟涨15) / 辨识(最高板+未炸板12) / 资金(主力净流入强度20)。
-    资金维度=曾星智「首板/二板当日资金流向」；缺资金数据则该维为0（不惩罚其余维度）。"""
+def _ema(vals, n):
+    """指数移动平均（首值作种子），返回与 vals 等长序列"""
+    if not vals:
+        return []
+    k = 2.0 / (n + 1)
+    out = [vals[0]]
+    for v in vals[1:]:
+        out.append(out[-1] + k * (v - out[-1]))
+    return out
+
+
+def month_strength(closes):
+    """月线「长期力量」评分（曾星智月线力量 5 力）：MA5/MA10/MA20/MA30 月均线全部向上（4 项）
+    + 月线 MACD 的 DIF 向上（1 项）→ 每项 3 分，满分 15。
+    closes=月度收盘（升序，最新在末尾），不足 33 根返回 (None, 0)（数据不足不参与、不惩罚）。
+    返回 (命中项数 k, 分值 0-15)。与「入牛时点」同源口径。"""
+    if not closes or len(closes) < 33:
+        return None, 0
+    def _up(n):
+        return sum(closes[-n:]) / n > sum(closes[-n - 1:-1]) / n
+    e12, e26 = _ema(closes, 12), _ema(closes, 26)
+    hits = sum(1 for n in (5, 10, 20, 30) if _up(n)) + (1 if (e12[-1] - e26[-1]) > (e12[-2] - e26[-2]) else 0)
+    return hits, round(15 * hits / 5)
+
+
+def leader_pick(members, mstr=None):
+    """龙头评分（七维，0-100）：启动(首封最早15) / 弹性(5日涨幅12) / 封单(封单/流通17)
+    / 带动(首封后跟涨12) / 辨识(最高板+未炸板9) / 资金(主力净流入强度20) / 长期力量(月线5力15)。
+    资金维度=曾星智「首板/二板当日资金流向」；长期力量=曾星智「底部长期力量」（与入牛体系同源 5 力）。
+    mstr={6位代码: 长期力量分(0-15)}；某维缺数据则该维为0（不惩罚其余维度）。"""
     k = len(members)
     fbt = rank_frac([m.get("fbt") or None for m in members], asc=True)       # 启动最早
     ret = rank_frac([m.get("ret5") for m in members], asc=False)            # 涨幅最大
@@ -243,14 +299,15 @@ def leader_pick(members):
     for i, m in enumerate(members):
         f = m.get("fbt")
         later = sum(1 for y in members if f and y.get("fbt") and y["fbt"] > f)
-        m["s_qidong"] = round(18 * fbt[i])
-        m["s_danda"] = round(15 * (later / (k - 1))) if k > 1 else 15
-        m["s_fengdan"] = round(20 * fd[i])
-        m["s_elastic"] = round(15 * ret[i])
-        m["s_bianshi"] = round(12 * ((m.get("lianban") or 0) / maxlb) - (5 if m.get("zbc") else 0))
+        m["s_qidong"] = round(15 * fbt[i])
+        m["s_danda"] = round(12 * (later / (k - 1))) if k > 1 else 12
+        m["s_fengdan"] = round(17 * fd[i])
+        m["s_elastic"] = round(12 * ret[i])
+        m["s_bianshi"] = round(9 * ((m.get("lianban") or 0) / maxlb) - (5 if m.get("zbc") else 0))
         m["s_fund"] = round(20 * fund[i])
+        m["s_long"] = round(mstr.get(m.get("c6"), 0)) if mstr else 0
         s = m["s_qidong"] + m["s_danda"] + m["s_fengdan"] + m["s_elastic"] \
-            + max(0, m["s_bianshi"]) + m["s_fund"]
+            + max(0, m["s_bianshi"]) + m["s_fund"] + m["s_long"]
         m["leader_score"] = int(max(0, round(s)))
     leaders = sorted(members, key=lambda x: -x["leader_score"])
     return leaders[0], leaders
@@ -420,6 +477,7 @@ def main():
     ap.add_argument("--fast", action="store_true", help="轻量模式：仅用东财涨停池（秒级，不含中军/5日弹性）")
     ap.add_argument("--no-fund", action="store_true", dest="no_fund", help="跳过资金流向维度")
     ap.add_argument("--no-glm", action="store_true", dest="no_glm", help="跳过 GLM 新闻面校验")
+    ap.add_argument("--no-long", action="store_true", dest="no_long", help="跳过长期力量维度（月线5力）")
     a = ap.parse_args()
     outdir = a.outdir or os.path.join(BASE, "outputs")
     os.makedirs(outdir, exist_ok=True)
@@ -552,6 +610,12 @@ def main():
             u.setdefault("fund_rate", None)
             u.setdefault("fund_net5", None)
 
+    # ── 长期力量（月线5力：MA5/10/20/30 全向上 + 月线 DIF 向上；曾星智「底部长期力量」）──
+    mstr = {}
+    if ups and not a.no_long:
+        mstr = fetch_month_strength([u["c6"] for u in ups])
+        print(f"[INFO] 长期力量取到 {len(mstr)}/{len(ups)} 只（月线5力）", flush=True)
+
     code_sector, code_name, sectors, sec_date = load_sector()
     print(f"[INFO] 题材映射 {len(code_sector)} 只（更新于 {sec_date}）", flush=True)
 
@@ -620,23 +684,23 @@ def main():
         L.append(f"| {icon.get(v['grade'],'')} {v['grade']} | **{s}** | {v['n']} | {v['lb']} | "
                  f"{v['prev']} | {fmt_jj(v['jj'], v['prev'])} | {v['maxlb']} | {v['first']} | {names} |")
 
-    # ── 模块二：龙头榜 · 六维（含首板/二板资金流向）──
-    L += ["", "## 👑 龙头榜 · 六维（各热门板块龙头 · 含资金流向）", "",
-          "| 板块 | 龙头 | 板数 | 首封 | 封单/流通 | 5日涨幅 | 主力净流入(万) | 带动(后涨) | 辨识 | 龙头分 | 构成(启动/弹性/封单/带动/辨识/资金) |",
-          "|---|---|---|---|---|---|---|---|---|---|---|"]
+    # ── 模块二：龙头榜 · 七维（含首板/二板资金流向 + 长期力量）──
+    L += ["", "## 👑 龙头榜 · 七维（各热门板块龙头 · 含资金流向 + 长期力量）", "",
+          "| 板块 | 龙头 | 板数 | 首封 | 封单/流通 | 5日涨幅 | 主力净流入(万) | 带动(后涨) | 辨识 | 长期力量 | 龙头分 | 构成(启动/弹性/封单/带动/辨识/资金/长期) |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|"]
     leaders_json = []
     for s, v in rank:
         if v["n"] < 3:
             continue
-        lead, allm = leader_pick(v["stocks"])
+        lead, allm = leader_pick(v["stocks"], mstr)
         ratio = f"{(lead['fdratio']*100):.1f}%" if lead.get("fdratio") is not None else "—"
         r5 = f"{lead['ret5']:.1f}%" if lead.get("ret5") is not None else "—"
         fn = f"{lead['fund_net']/1e4:,.0f}" if lead.get("fund_net") is not None else "—"
-        later = lead["s_danda"] // 15 * (len(allm) - 1) if len(allm) > 1 else 0
+        later = lead["s_danda"] // 12 * (len(allm) - 1) if len(allm) > 1 else 0
         con = (f"{lead['s_qidong']}/{lead['s_elastic']}/{lead['s_fengdan']}/"
-               f"{lead['s_danda']}/{max(0,lead['s_bianshi'])}/{lead['s_fund']}")
+               f"{lead['s_danda']}/{max(0,lead['s_bianshi'])}/{lead['s_fund']}/{lead['s_long']}")
         L.append(f"| {s} | **{lead['name']}**({lead['code']}) | {lead['lianban']} | {fmt_t(lead.get('fbt'))} | "
-                 f"{ratio} | {r5} | {fn} | {later} | {max(0,lead['s_bianshi'])} | **{lead['leader_score']}** | {con} |")
+                 f"{ratio} | {r5} | {fn} | {later} | {max(0,lead['s_bianshi'])} | {lead['s_long']} | **{lead['leader_score']}** | {con} |")
         leaders_json.append({"concept": s, "leader": lead["name"], "code": lead["code"],
                              "lianban": lead["lianban"], "score": lead["leader_score"],
                              "fbt": fmt_t(lead.get("fbt")),
@@ -644,9 +708,10 @@ def main():
                              "fund_net": round(lead["fund_net"], 0) if lead.get("fund_net") is not None else None,
                              "fund_rate": round(lead["fund_rate"], 3) if lead.get("fund_rate") is not None else None,
                              "s_fund": lead["s_fund"],
+                             "s_long": lead["s_long"],
                              "ret5": round(lead["ret5"], 2) if lead.get("ret5") is not None else None})
     if not leaders_json:
-        L.append("| — | 无（当日无≥3家涨停的板块） | | | | | | | | | |")
+        L.append("| — | 无（当日无≥3家涨停的板块） | | | | | | | | | | |")
 
     # ── 模块一.5：今日备选热点概念（2-4 个 · 曾星智七步法第④步）──
     vmap = {s: v for s, v in rank}
@@ -701,7 +766,7 @@ def main():
                  f"{fd} | {fn} | {lz} | {'/'.join(secs[:4])} |")
     L += ["", "---",
           "⚠️ 概念分类来自东财板块成分（一票可属多个概念，家数会放大）；晋级率=今日连板家数/昨日涨停家数（昨日涨停<3标 `!`）；",
-          "龙头为板块内相对排名打分（六维：启动=首封最早 / 弹性=5日涨幅 / 封单=封单/流通 / 带动=首封后跟涨 / 辨识=最高板+未炸板 / **资金=当日主力净流入强度**）；",
+          "龙头为板块内相对排名打分（七维：启动=首封最早 / 弹性=5日涨幅 / 封单=封单/流通 / 带动=首封后跟涨 / 辨识=最高板+未炸板 / **资金=当日主力净流入强度** / **长期力量=月线5力(MA5/10/20/30全向上+月线DIF向上)**）；",
           "资金流向来自 westock asfund（首板/二板当日主力净流入是关键，缺失则该维为0）；中军以成交额近似市值；",
           "概念催化链与蹭概念校验来自 GLM（glm-4-flash，输入=当日涨停明细+近期要闻），仅作参考、可能有误，请结合实盘判断。"]
     md = "\n".join(L)
