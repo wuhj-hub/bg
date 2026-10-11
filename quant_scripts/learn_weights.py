@@ -13,6 +13,8 @@
   双弦共振、乾坤A级，另补 武威精选/反转数值/123-2B/RSV-*），并计算超额收益与 Wilson 置信区间。
   胜率≥60% 且平均超额>0 且样本≥10 → 权重 +1；胜率≤40% 且超额<0 → -1；样本<10 维持现状。
   Wilson 仅作置信标注（下限≥0.45 / 上限≤0.55 记「高」，否则记「小样本」）。
+  2026-10-11 P1：接入 config/source_priors.json 历史先验，对胜率做 Beta 收缩
+  （后验 = (wins + c×先验wr) / (n + c)，c = min(先验n, shrink_cap)），判定改用「后验胜率」。
 
 用法:
   python3 learn_weights.py                    # 全量学习
@@ -164,6 +166,22 @@ def _load_config_weights():
     return {}
 
 
+PRIOR_ALIAS = {"猛兽Setup60": "猛兽Setup", "猛兽Setup50": "猛兽Setup", "猛兽Setup40": "猛兽Setup"}
+
+
+def load_priors():
+    """读各信号源历史先验（config/source_priors.json）。缺失→({} , 20)。"""
+    for p in ("config/source_priors.json",
+              os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config", "source_priors.json")):
+        if os.path.exists(p):
+            try:
+                d = json.load(open(p, encoding="utf-8"))
+                return (d.get("priors") or {}), int(d.get("shrink_cap", 20))
+            except Exception:
+                pass
+    return {}, 20
+
+
 def _bench_return(bench_rows, d):
     entry = None
     for dd, cc in bench_rows:
@@ -199,13 +217,15 @@ def _emit_proposals(date_str, log_path, rows, results, groups, stats, a):
         wcur = cfg.get(key, st.get("cur"))
         wsug = wcur
         if st.get("action") == "+1" and isinstance(wcur, int):
-            wsug = wcur + 1
+            wsug = min(3, wcur + 1)
         elif st.get("action") == "-1" and isinstance(wcur, int):
-            wsug = wcur - 1
+            wsug = max(-3, wcur - 1)
         props.append({
             "signal_source": key,
             "n": st["n"],
             "winrate": (round(st["wr"], 3) if st["wr"] is not None else None),
+            "posterior_winrate": (round(st["post_wr"], 3) if st.get("post_wr") is not None else None),
+            "prior_winrate": (round(st["pr"]["wr"], 3) if st.get("pr") else None),
             "avg_ret": (round(st["avg"], 3) if st["avg"] is not None else None),
             "avg_excess": (round(avg_ex, 3) if avg_ex is not None else None),
             "weight_current": wcur,
@@ -262,6 +282,7 @@ def main():
 
     # 按「配置键」粒度分组统计（2026-10-11 P0）
     cfg0 = _load_config_weights()
+    priors, shrink_cap = load_priors()
     bench_rows = []
     for _ in range(3):
         bench_rows = parse_kline(run(["kline", a.bench, "--period", "day", "--limit", "120"]))
@@ -286,8 +307,8 @@ def main():
          f"> 数据: {log_path}（{len(rows)}条信号，有效{len(results)}条）| 收益口径: 信号日收盘→当前",
          "> 判据: 胜率≥60%且平均超额>0 → +1；≤40%且超额<0 → -1；样本<10 维持（Wilson 仅作置信标注）",
          "> 2026-10-11 P0：按配置键粒度 + 补 123/2B/RSV + 超额/Wilson", "",
-         "| 信号源(配置键) | 样本 | 胜率 | 平均收益 | 平均超额 | 中位 | 盈亏比 | Wilson[下,上] | 当前 | 建议 | 置信 |",
-         "|:----|:---:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----|:----|"]
+         "| 信号源(配置键) | 样本 | 胜率 | 后验 | 先验 | 平均超额 | Wilson[下,上] | 当前 | 建议 | 置信 |",
+         "|:----|:---:|:----:|:----:|:----:|:----:|:----:|:----:|:----|:----|"]
     advice = []
     stats = {}
     for key in KEYS:
@@ -296,7 +317,7 @@ def main():
         n = len(rets)
         if n < 3:
             _cur = cfg0.get(key, CUR_WEIGHTS.get(key, "—"))
-            L.append(f"| {key} | {n} | 样本不足 | — | — | — | — | — | {_cur} | 数据不足 | — |")
+            L.append(f"| {key} | {n} | 样本不足 | — | — | — | — | {_cur} | 数据不足 | — |")
             stats[key] = {"n": n, "wr": None, "avg": None, "exc": None, "med": None, "pl": None,
                           "wlb": None, "wub": None, "cur": (_cur if isinstance(_cur, int) else None),
                           "action": "hold", "conf": ""}
@@ -311,23 +332,32 @@ def main():
         pl = (sum(wins) / len(wins)) / abs(sum(loss) / len(loss)) if wins and loss else 99
         wlb, wub = wilson(len(wins), n)
         cur = cfg0.get(key, CUR_WEIGHTS.get(key, 1))
+        # 先验收缩（Beta 伪计数）：后验 = (wins + c*wr_prior) / (n + c)
+        pr = priors.get(PRIOR_ALIAS.get(key, key))
+        if pr and pr.get("wr") is not None:
+            c = min(int(pr.get("n", 0) or 0), shrink_cap)
+            post_wr = (len(wins) + c * pr["wr"]) / (n + c)
+            pr_txt = f"{pr['wr']*100:.0f}%/n{pr.get('n')}"
+        else:
+            pr, post_wr, pr_txt = None, wr, "—"
         act, conf = "hold", ""
-        if n >= 10 and exc is not None:
-            if wr >= 0.60 and exc > 0:
+        if n >= 10:
+            if post_wr >= 0.60 and (exc is None or exc > 0):
                 act = "+1"; conf = "高" if (wlb is not None and wlb >= 0.45) else "低"
-            elif wr <= 0.40 and exc < 0:
+            elif post_wr <= 0.40 and (exc is None or exc < 0):
                 act = "-1"; conf = "高" if (wub is not None and wub <= 0.55) else "低"
         tag_c = "高置信" if conf == "高" else "小样本"
+        ex_s = "—" if exc is None else f"{exc:+.2f}%"
         if act == "+1":
-            advice.append(f"{key}: 当前{cur} → 建议{min(3, cur+1)}（胜率{wr*100:.0f}%，超额{exc:+.2f}%，{tag_c}）")
+            advice.append(f"{key}: 当前{cur} → 建议{min(3, cur+1)}（胜率{wr*100:.0f}%→后验{post_wr*100:.0f}%，超额{ex_s}，{tag_c}）")
         elif act == "-1":
-            advice.append(f"{key}: 当前{cur} → 建议{max(-3, cur-1)}（胜率{wr*100:.0f}%，超额{exc:+.2f}%，{tag_c}）")
+            advice.append(f"{key}: 当前{cur} → 建议{max(-3, cur-1)}（胜率{wr*100:.0f}%→后验{post_wr*100:.0f}%，超额{ex_s}，{tag_c}）")
         sug = {"+1": "↑ +1", "-1": "↓ -1", "hold": "维持"}[act]
-        exc_s = f"{exc:+.2f}%" if exc is not None else "—"
-        L.append(f"| {key} | {n} | {wr*100:.0f}% | {avg:+.2f}% | {exc_s} | {med:+.2f}% | {pl:.2f} | "
+        L.append(f"| {key} | {n} | {wr*100:.0f}% | {post_wr*100:.0f}% | {pr_txt} | {ex_s} | "
                  f"[{wlb:.2f},{wub:.2f}] | {cur} | {sug} | {conf or '—'} |")
-        stats[key] = {"n": n, "wr": wr, "avg": avg, "exc": exc, "med": med, "pl": pl,
-                      "wlb": wlb, "wub": wub, "cur": cur, "action": act, "conf": conf}
+        stats[key] = {"n": n, "wr": wr, "pr": pr, "post_wr": post_wr, "avg": avg, "exc": exc,
+                      "med": med, "pl": pl, "wlb": wlb, "wub": wub, "cur": cur,
+                      "action": act, "conf": conf}
 
     L += ["", "## 📌 建议权重调整", ""]
     if advice:
