@@ -8,10 +8,11 @@
      按 src 中的信号源归属拆分统计各信号源胜率/平均收益/盈亏比，
      对比当前仲裁权重（signal_arbiter.py）给出建议调整。
 
-建议规则（保守）：
-  胜率≥60% 且样本≥10 → 权重 +1
-  胜率≤40% 且样本≥10 → 权重 -1
-  样本<10 → 维持现状（数据不足）
+建议规则（2026-10-11 P0 升级）：
+  按「配置键」粒度统计（四维高置信/弱共振/否决、鱼身空中加油、猛兽Setup60/50/40/RS_D/G点、
+  双弦共振、乾坤A级，另补 武威精选/反转数值/123-2B/RSV-*），并计算超额收益与 Wilson 置信区间。
+  胜率≥60% 且平均超额>0 且样本≥10 → 权重 +1；胜率≤40% 且超额<0 → -1；样本<10 维持现状。
+  Wilson 仅作置信标注（下限≥0.45 / 上限≤0.55 记「高」，否则记「小样本」）。
 
 用法:
   python3 learn_weights.py                    # 全量学习
@@ -95,38 +96,61 @@ def signal_return(code, signal_date):
     days = (datetime.strptime(rows[-1][0], "%Y-%m-%d") - datetime.strptime(signal_date, "%Y-%m-%d")).days
     return (cur / entry - 1) * 100, days
 
-def classify_src(src_str):
-    """把 src 明细归类到信号源维度（可多属）"""
-    tags = []
+def classify_keys(src_str):
+    """把 src 明细归类到「配置键」粒度（可多属）。2026-10-11：细粒度化，补 123/2B、RSV。"""
+    keys = []
     s = src_str or ""
     if "四维" in s:
-        tags.append("四维" + ("否决" if "否决" in s else "加分"))
+        if "否决" in s:
+            keys.append("四维否决")
+        else:
+            m = re.search(r"四维(\d+)分", s)
+            t = int(m.group(1)) if m else 0
+            keys.append("四维高置信" if t >= 7 else "四维弱共振")
     if "鱼身" in s:
-        tags.append("鱼身")
+        keys.append("鱼身空中加油")
     if "猛兽" in s:
-        tags.append("猛兽")
+        m = re.search(r"猛兽Setup(\d+)", s)
+        if m:
+            v = int(m.group(1))
+            keys.append("猛兽Setup60" if v >= 60 else ("猛兽Setup50" if v >= 50 else "猛兽Setup40"))
+        if "RS_D" in s:
+            keys.append("猛兽RS_D")
+        if "G点" in s:
+            keys.append("猛兽G点")
     if "双弦" in s:
-        tags.append("双弦")
+        keys.append("双弦共振")
     if "乾坤" in s:
-        tags.append("乾坤")
+        keys.append("乾坤A级")
     if "武威" in s:
-        tags.append("武威")
+        keys.append("武威精选")
     if "反转" in s:
-        tags.append("反转")
-    return tags
+        keys.append("反转数值")
+    if "123" in s or "2B" in s:
+        keys.append("123/2B")
+    m = re.search(r"RSV-([A-Za-z_]+)", s)
+    if m:
+        keys.append(f"RSV-{m.group(1)}")
+    out = []
+    for k in keys:
+        if k not in out:
+            out.append(k)
+    return out
 
 
-# 聚合标签 → 外置配置键（config/arbiter_weights.json）提示映射
-HINT = {
-    "四维加分": ["四维高置信", "四维弱共振"],
-    "四维否决": ["四维否决"],
-    "猛兽": ["猛兽Setup60", "猛兽Setup50", "猛兽Setup40", "猛兽RS_D", "猛兽G点"],
-    "鱼身": ["鱼身空中加油"],
-    "双弦": ["双弦共振"],
-    "乾坤": ["乾坤A级"],
-    "武威": [],
-    "反转": [],
-}
+def wilson(wins, n, z=1.96):
+    """Wilson 得分区间（95%）下限/上限。用于小样本胜率的置信判断。"""
+    if n <= 0:
+        return None, None
+    p = wins / n
+    d = 1 + z * z / n
+    c = p + z * z / (2 * n)
+    h = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5)
+    return (c - h) / d, (c + h) / d
+
+
+# 2026-10-11：已改为「配置键」粒度，键名即配置键；无配置键者 keys=[]。
+HINT = {}
 
 
 def _load_config_weights():
@@ -159,27 +183,27 @@ def _emit_proposals(date_str, log_path, rows, results, groups, stats, a):
         if bench_rows:
             break
     cfg = _load_config_weights()
-    tag_excess = {}
+    key_excess = {}
     for r in results:
         bidx = _bench_return(bench_rows, r["date"]) if bench_rows else None
         if bidx is None:
             continue
         ex = r["ret"] - bidx
-        for tag in classify_src(r.get("src", "")):
-            tag_excess.setdefault(tag, []).append(ex)
+        for k in classify_keys(r.get("src", "")):
+            key_excess.setdefault(k, []).append(ex)
     props = []
-    for tag, st in stats.items():
-        exs = tag_excess.get(tag, [])
+    for key, st in stats.items():
+        exs = key_excess.get(key, [])
         avg_ex = (sum(exs) / len(exs)) if exs else None
-        keys = HINT.get(tag, [])
-        wcur = cfg.get(keys[0]) if len(keys) == 1 and keys[0] in cfg else st.get("cur")
+        keys = [key] if key in cfg else []
+        wcur = cfg.get(key, st.get("cur"))
         wsug = wcur
         if st.get("action") == "+1" and isinstance(wcur, int):
             wsug = wcur + 1
         elif st.get("action") == "-1" and isinstance(wcur, int):
             wsug = wcur - 1
         props.append({
-            "signal_source": tag,
+            "signal_source": key,
             "n": st["n"],
             "winrate": (round(st["wr"], 3) if st["wr"] is not None else None),
             "avg_ret": (round(st["avg"], 3) if st["avg"] is not None else None),
@@ -188,8 +212,7 @@ def _emit_proposals(date_str, log_path, rows, results, groups, stats, a):
             "weight_suggested": wsug,
             "action": st.get("action", "hold"),
             "config_keys": keys,
-            "note": ("聚合标签·跨多个配置键，需人工拆分到具体键" if len(keys) > 1
-                     else ("该信号源暂无外置配置键" if not keys else "")),
+            "note": ("" if keys else "该信号源暂无外置配置键"),
         })
     doc = {
         "date": date_str,
@@ -237,44 +260,74 @@ def main():
                 results.append(r)
     print(f"有效样本（≥{a.min_days}日）: {len(results)}\n")
 
-    # 按信号源分组统计
+    # 按「配置键」粒度分组统计（2026-10-11 P0）
+    cfg0 = _load_config_weights()
+    bench_rows = []
+    for _ in range(3):
+        bench_rows = parse_kline(run(["kline", a.bench, "--period", "day", "--limit", "120"]))
+        if bench_rows:
+            break
+    for r in results:
+        b = _bench_return(bench_rows, r["date"]) if bench_rows else None
+        r["exc"] = (r["ret"] - b) if b is not None else None
+
     groups = {}
     for r in results:
-        for tag in classify_src(r.get("src", "")):
-            groups.setdefault(tag, []).append(r["ret"])
+        for k in classify_keys(r.get("src", "")):
+            groups.setdefault(k, []).append(r)
+
+    ORDER = ["四维高置信", "四维弱共振", "四维否决", "鱼身空中加油",
+             "猛兽Setup60", "猛兽Setup50", "猛兽Setup40", "猛兽RS_D", "猛兽G点",
+             "双弦共振", "乾坤A级", "武威精选", "反转数值", "123/2B",
+             "RSV-launch", "RSV-hold", "RSV-exit"]
+    KEYS = ORDER + sorted([k for k in groups if k not in ORDER])
 
     L = [f"# ⚖️ 仲裁权重学习报告 {datetime.now():%Y-%m-%d}", "",
-         f"> 数据: {log_path}（{len(rows)}条信号，有效{len(results)}条）| 信号后收益口径: 信号日收盘→当前",
-         "> 用途: 按信号源实际胜率校准仲裁权重（月度运行）", "",
-         "| 信号源 | 样本 | 胜率 | 平均收益 | 中位 | 盈亏比 | 当前权重 | 建议 |",
-         "|:----|:---:|:----:|:----:|:----:|:----:|:----:|:----|"]
+         f"> 数据: {log_path}（{len(rows)}条信号，有效{len(results)}条）| 收益口径: 信号日收盘→当前",
+         "> 判据: 胜率≥60%且平均超额>0 → +1；≤40%且超额<0 → -1；样本<10 维持（Wilson 仅作置信标注）",
+         "> 2026-10-11 P0：按配置键粒度 + 补 123/2B/RSV + 超额/Wilson", "",
+         "| 信号源(配置键) | 样本 | 胜率 | 平均收益 | 平均超额 | 中位 | 盈亏比 | Wilson[下,上] | 当前 | 建议 | 置信 |",
+         "|:----|:---:|:----:|:----:|:----:|:----:|:----:|:----:|:----:|:----|:----|"]
     advice = []
     stats = {}
-    for tag in ["四维加分", "四维否决", "猛兽", "鱼身", "双弦", "乾坤", "武威", "反转"]:
-        rets = groups.get(tag, [])
-        if len(rets) < 3:
-            L.append(f"| {tag} | {len(rets)} | 样本不足 | — | — | — | 见注 | 数据不足 |")
-            stats[tag] = {"n": len(rets), "wr": None, "avg": None, "med": None, "pl": None, "cur": None, "action": "hold"}
+    for key in KEYS:
+        rs = groups.get(key, [])
+        rets = [x["ret"] for x in rs]
+        n = len(rets)
+        if n < 3:
+            _cur = cfg0.get(key, CUR_WEIGHTS.get(key, "—"))
+            L.append(f"| {key} | {n} | 样本不足 | — | — | — | — | — | {_cur} | 数据不足 | — |")
+            stats[key] = {"n": n, "wr": None, "avg": None, "exc": None, "med": None, "pl": None,
+                          "wlb": None, "wub": None, "cur": (_cur if isinstance(_cur, int) else None),
+                          "action": "hold", "conf": ""}
             continue
         wins = [x for x in rets if x > 0]
-        wr = len(wins) / len(rets)
-        avg = sum(rets) / len(rets)
-        med = sorted(rets)[len(rets) // 2]
-        pl = (sum(wins) / len(wins)) / abs(sum(x for x in rets if x <= 0) / max(1, len(rets) - len(wins))) if wins and len(wins) < len(rets) else 99
-        cur = {"四维加分": 3, "四维否决": -3, "猛兽": 2, "鱼身": 1, "双弦": 1, "乾坤": 2, "武威": 2, "反转": 1}.get(tag, 1)
-        act = "hold"
-        if len(rets) >= 10 and wr >= 0.60:
-            sug = f"↑ 权重+1（胜率{wr*100:.0f}%）"
-            act = "+1"
-            advice.append(f"{tag}: 当前{cur} → 建议{cur+1}")
-        elif len(rets) >= 10 and wr <= 0.40:
-            sug = f"↓ 权重-1（胜率{wr*100:.0f}%）"
-            act = "-1"
-            advice.append(f"{tag}: 当前{cur} → 建议{max(0,cur-1)}")
-        else:
-            sug = "维持"
-        stats[tag] = {"n": len(rets), "wr": wr, "avg": avg, "med": med, "pl": pl, "cur": cur, "action": act}
-        L.append(f"| {tag} | {len(rets)} | {wr*100:.0f}% | {avg:+.2f}% | {med:+.2f}% | {pl:.2f} | {cur} | {sug} |")
+        wr = len(wins) / n
+        avg = sum(rets) / n
+        excs = [x["exc"] for x in rs if x.get("exc") is not None]
+        exc = (sum(excs) / len(excs)) if excs else None
+        med = sorted(rets)[n // 2]
+        loss = [x for x in rets if x <= 0]
+        pl = (sum(wins) / len(wins)) / abs(sum(loss) / len(loss)) if wins and loss else 99
+        wlb, wub = wilson(len(wins), n)
+        cur = cfg0.get(key, CUR_WEIGHTS.get(key, 1))
+        act, conf = "hold", ""
+        if n >= 10 and exc is not None:
+            if wr >= 0.60 and exc > 0:
+                act = "+1"; conf = "高" if (wlb is not None and wlb >= 0.45) else "低"
+            elif wr <= 0.40 and exc < 0:
+                act = "-1"; conf = "高" if (wub is not None and wub <= 0.55) else "低"
+        tag_c = "高置信" if conf == "高" else "小样本"
+        if act == "+1":
+            advice.append(f"{key}: 当前{cur} → 建议{min(3, cur+1)}（胜率{wr*100:.0f}%，超额{exc:+.2f}%，{tag_c}）")
+        elif act == "-1":
+            advice.append(f"{key}: 当前{cur} → 建议{max(-3, cur-1)}（胜率{wr*100:.0f}%，超额{exc:+.2f}%，{tag_c}）")
+        sug = {"+1": "↑ +1", "-1": "↓ -1", "hold": "维持"}[act]
+        exc_s = f"{exc:+.2f}%" if exc is not None else "—"
+        L.append(f"| {key} | {n} | {wr*100:.0f}% | {avg:+.2f}% | {exc_s} | {med:+.2f}% | {pl:.2f} | "
+                 f"[{wlb:.2f},{wub:.2f}] | {cur} | {sug} | {conf or '—'} |")
+        stats[key] = {"n": n, "wr": wr, "avg": avg, "exc": exc, "med": med, "pl": pl,
+                      "wlb": wlb, "wub": wub, "cur": cur, "action": act, "conf": conf}
 
     L += ["", "## 📌 建议权重调整", ""]
     if advice:
