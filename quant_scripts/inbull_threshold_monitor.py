@@ -4,6 +4,8 @@
 
 用途：每季度用最新全历史月线重算「入牛个股占比」与「大盘牛」的关系，
       与 2026-10-09 建立的基线对比，检测阈值是否漂移。
+      另按 5 年分段检测「年代漂移」（阈值下移 / 区分度收窄）——2026-10-11 新增，
+      因“全期最优 vs 近期基线”比对会掩盖长期年代漂移。
 
 口径（与基线一致）：
     大盘指数 = 全市场月度等权收益累乘；大盘牛 = 该指数 MA5/10/20/30 ↑ + DIF↑
@@ -36,6 +38,10 @@ BASELINE = {
     "best_lo": 19, "best_hi": 21, "best_f1": 0.85,
     "t25_precision": 0.88, "t15_precision": 0.68,
 }
+
+# ── 年代分段（2026-10-11 新增）：漂移判定用本期自算分段，避免跨源偏差 ──
+#   sep = 牛市月占比中位 − 非牛月占比中位（pp）；早期约 40pp、近年约 10pp
+ERA_SPAN = 5
 
 
 # ── 池 ──
@@ -216,6 +222,29 @@ def threshold_table(T):
     return out, best
 
 
+def segment_table(T, span=ERA_SPAN):
+    """按 span 年分段，各自算 牛市/非牛月中位 + 最优阈值 + 区分度(sep)。"""
+    if T.empty:
+        return []
+    yr = T.index.str[:4].astype(int)
+    start = (yr // span) * span
+    out = []
+    for lo in sorted(set(start)):
+        sub = T[start == lo]
+        b = sub[sub["mkt_bull"]]["ratio"].dropna()
+        n = sub[~sub["mkt_bull"]]["ratio"].dropna()
+        _, best = threshold_table(sub)
+        out.append({
+            "seg": f"{lo}-{lo + span - 1}", "lo": int(lo), "months": int(len(sub)),
+            "bull_n": int(len(b)),
+            "bull_med": round(float(b.median()), 1) if len(b) else None,
+            "nonbull_med": round(float(n.median()), 1) if len(n) else None,
+            "best": best[0] if best else None,
+            "sep": (round(float(b.median()) - float(n.median()), 1) if (len(b) and len(n)) else None),
+        })
+    return out
+
+
 def pushplus(tok, title, md):
     if not tok:
         print("[SKIP] 无 PUSH_TOKEN"); return
@@ -260,6 +289,7 @@ def main():
     tbl, best = threshold_table(T)
     t25 = next((r for r in tbl if r[0] == 25), None)
     t15 = next((r for r in tbl if r[0] == 15), None)
+    seg = segment_table(T)
 
     cur = {
         "bull_months": int(len(bull)), "nonbull_months": int(len(bear)),
@@ -279,12 +309,31 @@ def main():
     if cur["bull_median"] and abs(cur["bull_median"] - BASELINE["bull_median"]) > 5:
         drift.append(f"牛市月中位 {BASELINE['bull_median']}% → {cur['bull_median']}%（偏移>5pp）")
 
+    # ── 年代漂移（2026-10-11 新增）：分段阈值/区分度趋势，抓“全期口径”掩盖的长期漂移 ──
+    good = [s for s in seg if s["months"] >= 24 and s["bull_n"] >= 2
+            and s["best"] is not None and s["sep"] is not None]
+    era_msg = []
+    if len(good) >= 2:
+        early = [s for s in good if s["lo"] <= 2010]
+        late = good[-1]
+        if early:
+            ebest = sorted(s["best"] for s in early)[len(early) // 2]
+            if ebest - late["best"] >= 5:
+                era_msg.append(f"最优阈值下移：早期(≤2010)~{ebest}% → 近期 {late['seg']} {late['best']}%")
+        if late["sep"] < 20:
+            era_msg.append(f"判别力弱化：{late['seg']} 区分度 {late['sep']}pp（<20pp；早期约 40pp）")
+        if late["bull_med"] is not None and late["bull_med"] < 30:
+            era_msg.append(f"牛市月占比中位降至 {late['bull_med']}%（基线 {BASELINE['bull_median']}%）")
+    if era_msg:
+        drift.append("【年代漂移】" + "；".join(era_msg))
+
     now = datetime.now()
     q = (now.month - 1) // 3 + 1
     period = f"{now.year}Q{q}"
     res = {"period": period, "run_date": now.strftime("%Y-%m-%d"),
            "source": src, "window": f"{d0} ~ {d1}", "stocks": ncol,
            "baseline": BASELINE, "current": cur, "drift": drift,
+           "era_segments": seg,
            "threshold_table": [{"t": r[0], "n": r[1], "prec": r[2], "rec": r[3], "f1": r[4]} for r in tbl]}
     json.dump(res, open(os.path.join(OUT, "入牛阈值漂移_latest.json"), "w"), ensure_ascii=False, indent=1)
 
@@ -305,7 +354,13 @@ def main():
         L += ["→ **建议**：复核三档阈值（15/25/10）是否需调整，并更新技能与知识库口径文档。", ""]
     else:
         L += ["## ✅ 无漂移", "", "各项指标与基线一致（在容差内），三档阈值维持 15/25/10。", ""]
-    L += ["## 二、本期阈值校准表", "", "| 阈值% | 命中 | 精确率 | 召回率 | F1 |", "|---|---|---|---|---|"]
+    L += ["## 二、五年分段趋势（年代漂移检测）", "",
+          "| 分段 | 月数 | 牛月 | 牛市月中位 | 非牛月中位 | 区分度 | 最优阈值 |",
+          "|---|---|---|---|---|---|---|"]
+    for s in seg:
+        L.append(f"| {s['seg']} | {s['months']} | {s['bull_n']} | {s['bull_med']}% | {s['nonbull_med']}% | {s['sep']}pp | {s['best']}% |")
+    L += ["", "> 区分度 = 牛市月占比中位 − 非牛月占比中位；逐年下滑即「年代漂移」征兆。", ""]
+    L += ["## 三、本期阈值校准表", "", "| 阈值% | 命中 | 精确率 | 召回率 | F1 |", "|---|---|---|---|---|"]
     L += [f"| {r[0]} | {r[1]} | {r[2]} | {r[3]} | {r[4]} |" for r in tbl]
     L += ["", f"> 最优单阈值 = {best[0]}%（F1={best[4]}）"]
     open(os.path.join(OUT, f"入牛阈值漂移_{period}.md"), "w", encoding="utf-8").write("\n".join(L))
@@ -316,6 +371,9 @@ def main():
          f"- 牛市月 {cur['bull_months']} / 非牛月 {cur['nonbull_months']}",
          f"- 占比中位：牛 {cur['bull_median']}% / 非牛 {cur['nonbull_median']}%",
          f"- 最优单阈值 {cur['best_lo']}%；25%档精确率 {cur['t25_precision']}"]
+    if seg:
+        L_ = seg[-1]
+        P += [f"- 近段({L_['seg']})：牛中位 {L_['bull_med']}% / 区分度 {L_['sep']}pp / 最优 {L_['best']}%"]
     if drift:
         P += ["", "### ⚠️ 漂移告警"] + [f"- {d}" for d in drift]
     else:
