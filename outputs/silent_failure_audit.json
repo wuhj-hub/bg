@@ -1,7 +1,7 @@
 {
  "date": "2026-10-12",
  "workflows": 23,
- "high_risk": 1,
+ "high_risk": 0,
  "issues": {
   "🟡中危·吞错误": [
    "artifact_audit.yml :: 判断是否交易日 (L34) — 命中 continue-on-error: true",
@@ -72,6 +72,7 @@
    "quant_report.yml :: 实盘执行纪律报告（trade_journal） (L331) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true",
    "quant_report.yml :: 个股执行卡生成（持仓 + 当日信号仲裁候选） (L339) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）",
    "quant_report.yml :: 乖离低买扫描（一统天下·跌破MA5>7%） (L346) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true",
+   "quant_report.yml :: 入牛时点扫描（板块入牛/个股入牛·月线5线） (L363) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）",
    "quant_report.yml :: 市场状态判定（三级别力量·内联刷新） (L397) — 命中 continue-on-error: true, set +e, || true",
    "quant_report.yml :: 股池守护（数据源故障则不覆盖历史股池） (L425) — 命中 continue-on-error: true",
    "quant_report.yml :: 盘后数据健康审计（产物可信度） (L437) — 命中 continue-on-error: true, set +e, || true",
@@ -152,9 +153,6 @@
    "wangzhe_track.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆",
    "weight_learn.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆",
    "yao_gu_pool.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆"
-  ],
-  "🔴高危·静默失败": [
-   "quant_report.yml :: 入牛时点扫描（板块入牛/个股入牛·月线5线） (L363) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）；且包裹核心脚本 → 失败会被吞掉，workflow 仍绿"
   ]
  },
  "per_workflow": {
@@ -577,9 +575,9 @@
     "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true"
    },
    {
-    "level": "🔴高危·静默失败",
+    "level": "🟡中危·吞错误",
     "step": "入牛时点扫描（板块入牛/个股入牛·月线5线） (L363)",
-    "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）；且包裹核心脚本 → 失败会被吞掉，workflow 仍绿"
+    "detail": "命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）"
    },
    {
     "level": "🟡中危·吞错误",
