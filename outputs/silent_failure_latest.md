@@ -1,12 +1,8 @@
 # 🔍 体系自检元审计 · 2026-10-12
 
-> 扫描 23 个 workflow ｜ 风险项 **147** ｜ 🔴高危 **1**
+> 扫描 23 个 workflow ｜ 风险项 **147** ｜ 🔴高危 **0**
 
-## 🔴高危·静默失败（1）
-
-- quant_report.yml :: 入牛时点扫描（板块入牛/个股入牛·月线5线） (L363) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）；且包裹核心脚本 → 失败会被吞掉，workflow 仍绿
-
-## 🟡中危·吞错误（133）
+## 🟡中危·吞错误（134）
 
 - artifact_audit.yml :: 判断是否交易日 (L34) — 命中 continue-on-error: true
 - artifact_audit.yml :: 运行产物入库审计 (L62) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
@@ -76,6 +72,7 @@
 - quant_report.yml :: 实盘执行纪律报告（trade_journal） (L331) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
 - quant_report.yml :: 个股执行卡生成（持仓 + 当日信号仲裁候选） (L339) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
 - quant_report.yml :: 乖离低买扫描（一统天下·跌破MA5>7%） (L346) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）, || true
+- quant_report.yml :: 入牛时点扫描（板块入牛/个股入牛·月线5线） (L363) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || echo（吞错误）
 - quant_report.yml :: 市场状态判定（三级别力量·内联刷新） (L397) — 命中 continue-on-error: true, set +e, || true
 - quant_report.yml :: 股池守护（数据源故障则不覆盖历史股池） (L425) — 命中 continue-on-error: true
 - quant_report.yml :: 盘后数据健康审计（产物可信度） (L437) — 命中 continue-on-error: true, set +e, || true
@@ -162,7 +159,6 @@
 
 | workflow | 风险数 | 高危 |
 |---|---|---|
-| quant_report.yml | 33 | 1 |
 | artifact_audit.yml | 4 | — |
 | beast_pool.yml | 5 | — |
 | bt_cycle.yml | 3 | — |
@@ -180,6 +176,7 @@
 | probe_em.yml | 5 | — |
 | probe_kpl.yml | 0 | — |
 | probe_search.yml | 0 | — |
+| quant_report.yml | 33 | — |
 | quant_scan.yml | 30 | — |
 | selfcheck_daily.yml | 9 | — |
 | wangzhe_track.yml | 5 | — |
