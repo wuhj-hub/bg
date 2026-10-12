@@ -1,12 +1,16 @@
 {
- "date": "2026-10-09",
- "total_scored": 3,
+ "date": "2026-10-12",
+ "total_scored": 15,
  "all": {
-  "堆量模式": 2,
-  "": 1
+  "堆量模式": 12,
+  "": 3
  },
- "leaders": {},
- "pullbacks": {},
+ "leaders": {
+  "堆量模式": 9
+ },
+ "pullbacks": {
+  "堆量模式": 2
+ },
  "gpoints": {},
- "dominant": "无显著主导"
+ "dominant": "堆量模式"
 }
