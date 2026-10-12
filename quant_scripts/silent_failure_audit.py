@@ -49,6 +49,12 @@ MANUAL_TOOLS = {"probe_em.yml", "probe_kpl.yml", "probe_search.yml", "probe_em_p
 CORE_HINTS = ["data_guard", "self_check", "market_width", "run_shuangxian", "beast",
               "fish_body", "hot_emotion", "signal_arbiter", "market_regime", "gen_"]
 
+# 刻意吞错误、不算风险的步骤（2026-10-12）：
+# trade_gate 守卫「判断是否交易日」——continue-on-error 仅为把 is_trade_day
+# 写入 $GITHUB_OUTPUT 供后续 job 的 if 判断，失败即视为非交易日、不影响数据，非静默失败风险。
+SAFE_STEP_HINTS = ["判断是否交易日"]
+SAFE_BODY_HINTS = ["trade_day_check.py"]
+
 
 def parse_workflow(path):
     """轻量解析（不依赖 pyyaml）：返回 (text, steps[dict])"""
@@ -95,6 +101,9 @@ def audit_workflow(path):
     # ② 静默失败热点
     for st in steps:
         body = "\n".join(st["body"])
+        # 白名单：刻意吞错误的守卫步骤（trade_gate），跳过不计风险
+        if any(h in st["name"] for h in SAFE_STEP_HINTS) or any(h in body for h in SAFE_BODY_HINTS):
+            continue
         hits = [label for pat, label in SWALLOW_PATTERNS if re.search(pat, body)]
         if not hits:
             continue
