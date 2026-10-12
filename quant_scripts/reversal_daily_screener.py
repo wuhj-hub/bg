@@ -266,7 +266,7 @@ def main():
     lbl = "日线" if tf == "day" else "周线"
     L = [f"# 🔄 反转数值·{lbl}信号跟踪（{today}）", "",
          f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 新信号窗口 {win} 根{lbl} ｜ 现价 < {a.max_price:g}元",
-         f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值（改①：不破线=0.618×金叉以来最高红柱）",
+         f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值（即突破后死叉、不跌破水下反转数值线；改①：不破线=0.618×金叉以来最高红柱）",
          f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出", "",
          f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**",
          f"> 📊 入池后历史胜率：{perf_line} ｜ 出池结算（跌破等）：{_agg(10, True)[0]} / 均值 {_agg(10, True)[1]}（n={_agg(10, True)[2]}）", ""]
@@ -276,14 +276,21 @@ def main():
             L.append("> 无")
             L.append("")
             return
-        head = "| 代码 | 名称 | " + ("入池日 | " if with_first else "") + "信号日 | 最新价 | 突破日 | 突破2倍值 | 回调深 | 不破线(1倍) | 距突破 |" + (" 移除原因 |" if with_reason else "")
-        L.append(head)
-        L.append("|:--|:--|" + ("--:|" if with_first else "") + "--:|--:|:--|--:|--:|--:|--:|" + ("--:|" if with_reason else ""))
+        cols = ["代码", "名称"] + (["入池日"] if with_first else []) + \
+               ["最新日期", "最新价", "突破日", "突破2倍值", "回调深", "不破线(1倍)", "距突破"] + \
+               (["移除原因"] if with_reason else [])
+        L.append("| " + " | ".join(cols) + " |")
+        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "突破日", "移除原因") else "--:" for c in cols) + "|")
         for s in rows:
-            mid = f"| {s.get('first_date','')} " if with_first else ""
-            tail = f"  {s.get('reason','')} |" if with_reason else ""
-            L.append(f"| {s['code']} | {s['name']} |{mid}| {s.get('tp_date','')} | {s.get('last_close','')} | {s.get('tp_date','')} | "
-                     f"{float(s.get('tp_val',0)):+.2f} | {float(s.get('pullback',0)):.2f} | {float(s.get('line',0)):.2f} | {s.get('gap','')} |" + tail)
+            cells = [s["code"], s["name"]]
+            if with_first:
+                cells.append(s.get("first_date", ""))
+            cells += [s.get("last_date", ""), s.get("last_close", ""), s.get("tp_date", ""),
+                      f"{float(s.get('tp_val', 0)):+.2f}", f"{float(s.get('pullback', 0)):.2f}",
+                      f"{float(s.get('line', 0)):.2f}", s.get("gap", "")]
+            if with_reason:
+                cells.append(s.get("reason", ""))
+            L.append("| " + " | ".join(str(c) for c in cells) + " |")
         L.append("")
 
     L.append(f"## 🆕 本次新增（{len(added)}）")
