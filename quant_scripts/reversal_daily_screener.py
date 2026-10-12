@@ -48,6 +48,12 @@ def calc_dif_dea(closes):
     return dif, dea, macd
 
 
+def _line_signed(s):
+    """改1->+0.618×H（水上）；改2->−0.618×H（水下）"""
+    ln = float(s.get("line", 0))
+    return ln if s.get("angle") == "改1" else -ln
+
+
 def fetch_batch(codes, period="day", limit=250):
     out = {}
     for i in range(0, len(codes), BATCH):
@@ -103,11 +109,13 @@ def eval_state(rows, lookback_tp=120):
         return None
     seg = macd[tp_bar:i + 1]
     red_high = max(seg)
-    deep = abs(min(seg))
+    m_low = min(seg)                      # 自突破以来 MACD 最低值（可为负）
+    deep = abs(m_low)
     line = K * max(macd[max(0, i - int(JCB[i])):i + 1])
     return {"tp_date": rows[tp_bar][0], "tp_val": round(2 * K * bl, 2),
             "red_high": round(red_high, 2), "pullback": round(deep, 2),
-            "line": round(line, 2), "valid": deep < line,
+            "line": round(line, 2), "m_low": round(m_low, 2),
+            "angle": ("改1" if m_low > 0 else "改2"), "valid": m_low > -line,
             "gap": i - tp_bar, "last_date": rows[-1][0], "last_close": round(closes[-1], 2)}
 
 
@@ -199,7 +207,7 @@ def main():
                 removed.append({**cur, "code": code, "name": name, "reason": "超过跟踪期"})
                 tracked.pop(code, None)
             else:
-                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "gap", "last_close", "last_date")})
+                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "angle", "gap", "last_close", "last_date")})
                 cur["name"] = name
                 kept.append(cur)
         else:
@@ -266,7 +274,7 @@ def main():
     lbl = "日线" if tf == "day" else "周线"
     L = [f"# 🔄 反转数值·{lbl}信号跟踪（{today}）", "",
          f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 新信号窗口 {win} 根{lbl} ｜ 现价 < {a.max_price:g}元",
-         f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值（即突破后死叉、不跌破水下反转数值线；改①：不破线=0.618×金叉以来最高红柱）",
+         f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）",
          f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出", "",
          f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**",
          f"> 📊 入池后历史胜率：{perf_line} ｜ 出池结算（跌破等）：{_agg(10, True)[0]} / 均值 {_agg(10, True)[1]}（n={_agg(10, True)[2]}）", ""]
@@ -277,17 +285,17 @@ def main():
             L.append("")
             return
         cols = ["代码", "名称"] + (["入池日"] if with_first else []) + \
-               ["最新日期", "最新价", "突破日", "突破2倍值", "回调深", "不破线(1倍)", "距突破"] + \
+               ["最新日期", "最新价", "角度", "突破日", "突破2倍值", "回调深", "不破线", "距突破"] + \
                (["移除原因"] if with_reason else [])
         L.append("| " + " | ".join(cols) + " |")
-        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "突破日", "移除原因") else "--:" for c in cols) + "|")
+        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "移除原因") else "--:" for c in cols) + "|")
         for s in rows:
             cells = [s["code"], s["name"]]
             if with_first:
                 cells.append(s.get("first_date", ""))
-            cells += [s.get("last_date", ""), s.get("last_close", ""), s.get("tp_date", ""),
+            cells += [s.get("last_date", ""), s.get("last_close", ""), s.get("angle", ""), s.get("tp_date", ""),
                       f"{float(s.get('tp_val', 0)):+.2f}", f"{float(s.get('pullback', 0)):.2f}",
-                      f"{float(s.get('line', 0)):.2f}", s.get("gap", "")]
+                      f"{_line_signed(s):+.2f}", s.get("gap", "")]
             if with_reason:
                 cells.append(s.get("reason", ""))
             L.append("| " + " | ".join(str(c) for c in cells) + " |")
@@ -311,7 +319,7 @@ def main():
     open(fp, "w", encoding="utf-8").write("\n".join(L))
     print(f"✅ [{tf}] 新增{len(added)} 在池{len(kept)} 移除{len(removed)} 池内{len(tracked)} | 报告: {fp} | 池: {pool_fp}")
     for s in added[:12]:
-        print(f"   + {s['code']} {s['name']} 价{s['last_close']} 突破{s['tp_date']} 回调{s['pullback']}<{s['line']}")
+        print(f"   + [{s.get('angle','')}] {s['code']} {s['name']} 价{s['last_close']} 突破{s['tp_date']} 回调{s['pullback']}<{s['line']}")
     for s in removed[:8]:
         print(f"   - {s['code']} {s['name']} [{s['reason']}]")
 
@@ -327,7 +335,7 @@ def main():
             if added:
                 P += ["", f"### 🆕 新增（{len(added)}）"]
                 for s in sorted(added, key=lambda x: x["gap"])[:12]:
-                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜突破{s['tp_date']}｜回调{s['pullback']}<{s['line']}")
+                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{s.get('angle','')}｜突破{s['tp_date']}｜回调{s['pullback']}<{s['line']}")
                 if len(added) > 12:
                     P.append(f"- …等共 {len(added)} 只（完整见知识库报告）")
             if removed:
