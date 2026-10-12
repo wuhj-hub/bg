@@ -1,12 +1,12 @@
 {
- "date": "2026-10-09",
+ "date": "2026-10-12",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 49,
+ "pool_size": 52,
  "resonance_boards": [
   {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "zdf": 5.62,
+   "name": "出版",
+   "code": "pt01801769",
+   "zdf": 4.02,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -15,9 +15,9 @@
    ]
   },
   {
-   "name": "电池",
-   "code": "pt01801737",
-   "zdf": 2.1,
+   "name": "影视院线",
+   "code": "pt01801766",
+   "zdf": 3.89,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -26,12 +26,42 @@
    ]
   },
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "zdf": 2.73,
+   "name": "数字媒体",
+   "code": "pt01801767",
+   "zdf": 2.65,
    "strength": 7,
    "factors": [
     "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "zdf": 1.41,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "乘用车",
+   "code": "pt01801095",
+   "zdf": 0.56,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "保险Ⅱ",
+   "code": "pt01801194",
+   "zdf": 0.75,
+   "strength": 5,
+   "factors": [
     "进场",
     "吸筹"
    ]
@@ -39,64 +69,122 @@
  ],
  "grab_top": [
   {
-   "name": "贵金属",
-   "code": "pt01801053",
+   "name": "出版",
+   "code": "pt01801769",
    "value": 7
   },
   {
-   "name": "电池",
-   "code": "pt01801737",
+   "name": "影视院线",
+   "code": "pt01801766",
    "value": 7
   },
   {
-   "name": "工业金属",
-   "code": "pt01801055",
+   "name": "数字媒体",
+   "code": "pt01801767",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "电池",
-   "code": "pt01801737",
-   "value": 91.6
+   "name": "电力设备",
+   "code": "pt01801730",
+   "value": 21.2
   },
   {
-   "name": "工业金属",
-   "code": "pt01801055",
-   "value": 6.1
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 12.9
   },
   {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "value": 1.4
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "value": 7.7
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 4.1
+  },
+  {
+   "name": "医疗服务",
+   "code": "pt01801156",
+   "value": 3.1
+  },
+  {
+   "name": "数字媒体",
+   "code": "pt01801767",
+   "value": 2.6
+  },
+  {
+   "name": "保险Ⅱ",
+   "code": "pt01801194",
+   "value": 2.1
+  },
+  {
+   "name": "乘用车",
+   "code": "pt01801095",
+   "value": 0.9
   }
  ],
  "absorption_top": [
   {
-   "name": "贵金属",
-   "code": "pt01801053",
+   "name": "出版",
+   "code": "pt01801769",
    "value": 0
   },
   {
-   "name": "电池",
-   "code": "pt01801737",
+   "name": "影视院线",
+   "code": "pt01801766",
    "value": 0
   },
   {
-   "name": "工业金属",
-   "code": "pt01801055",
+   "name": "数字媒体",
+   "code": "pt01801767",
+   "value": 0
+  },
+  {
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "value": 0
+  },
+  {
+   "name": "乘用车",
+   "code": "pt01801095",
+   "value": 0
+  },
+  {
+   "name": "电力设备",
+   "code": "pt01801730",
+   "value": 0
+  },
+  {
+   "name": "保险Ⅱ",
+   "code": "pt01801194",
+   "value": 0
+  },
+  {
+   "name": "医疗服务",
+   "code": "pt01801156",
    "value": 0
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "贵金属",
-   "stock": "西部黄金",
-   "code": "sh601069",
+   "board": "数字媒体",
+   "stock": "掌阅科技",
+   "code": "sh603533",
    "zdf": "9.98",
-   "main1": 1.26,
-   "main5": -0.89
+   "main1": 2.56,
+   "main5": 2.45
+  },
+  {
+   "board": "影视院线",
+   "stock": "欢瑞世纪",
+   "code": "sz000892",
+   "zdf": "10.10",
+   "main1": 0.63,
+   "main5": 1.53
   }
  ]
 }
