@@ -67,7 +67,10 @@ def parse_workflow(path):
                 steps.append(cur)
                 cur = None
             else:
-                cur["body"].append(ln)
+                # 跳过注释行：注释不是执行代码；且「下一个 step 的标题注释」
+                # 常被错误归入上一步 body，污染 CORE_HINTS 关键词匹配（2026-10-12 修复误报）
+                if not ln.lstrip().startswith("#"):
+                    cur["body"].append(ln)
     if cur:
         steps.append(cur)
     return text, steps
