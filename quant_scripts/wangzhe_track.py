@@ -334,8 +334,8 @@ def fetch_bars_batch(codes, limit=65, chunk=20):
     return out
 
 
-def confirm_pending(rows, lookback_days=6):
-    """对 T-3 及更早（lookback 日内）的 live 候选，校验才哥正版「王者倍量柱」确认条件。
+def confirm_pending(rows, stale_days=180):
+    """对尚未确认的 live 候选，校验才哥正版「王者倍量柱」确认条件。
 
     正版定义（出处：知识库「王者倍量柱（正版选股指标）」通达信源码）：
       信号 = REF(A1,3) AND A2 AND A3 AND A4 AND A5   （在涨停后第 3 天确认，无未来函数）
@@ -345,26 +345,42 @@ def confirm_pending(rows, lookback_days=6):
         A4 后三天最高价较涨停价涨幅 <9% + MA60 向上
         A5 后三天平均量能 < 涨停日量能
     → 写入 confirmed 字段：Y=已确认（真·王者倍量柱）/ N=未确认 / 空=尚未满 3 日
+
+    ⚠️ 2026-10-13 修复：原实现按【自然日窗口 3~6 天】挑选候选
+       （`3 <= (today-signal_date).days <= 6`，不看交易日、窗口仅 4 天）。
+       遇周末/长假时，信号的自然日窗口与 T+3 数据可用期错开 → 信号永久停留「空」、
+       再也不会被确认（实测 2026-09-24 起 live 信号全部卡空）。
+       现改为【数据驱动】：凡 confirmed 为空且自然日≥3 的 live 信号一律纳入判定，
+       由 K 线数据自行决定——T+3 三根 bar 已到即判 Y/N，未到则保持「空」、下次运行继续。
+       超过 stale_days 仍未确认（数据缺失/退市/长期停牌）判 N，避免永久悬挂。
     """
     today = datetime.now(BJT).date()
     pend = []
+    stale = 0
     for r in rows:
         if r.get("source") != "live" or r.get("variant") != "day1":
+            continue
+        if r.get("confirmed"):                       # 已有 Y/N → 不重复判定
             continue
         sd = r.get("signal_date") or ""
         if not re.match(r"^\d{4}-\d{2}-\d{2}$", sd):
             continue
         try:
-            dd = (today - datetime.strptime(sd, "%Y-%m-%d").date()).days
+            nd = (today - datetime.strptime(sd, "%Y-%m-%d").date()).days
         except ValueError:
             continue
-        if 3 <= dd <= lookback_days:
-            pend.append((r, sd))
+        if nd < 3:                                   # 不足 3 自然日 → 必然未满 T+3
+            continue
+        if nd > stale_days:                          # 超期仍无法确认 → 判 N，避免永久悬挂
+            r["confirmed"] = "N"
+            stale += 1
+            continue
+        pend.append((r, sd))
     if not pend:
-        log("确认检查：无待确认候选（T-3~T-%d 无 live 信号）" % lookback_days)
+        log("确认检查：无未确认的 live 候选" + (f"（超期判N {stale} 条）" if stale else ""))
         return 0
-    log(f"确认检查：{len(pend)} 条候选（T-3~T-{lookback_days}）…")
-    bars_map = fetch_bars_batch(sorted({r["code"] for r, _ in pend}), limit=130)
+    log(f"确认检查：{len(pend)} 条未确认候选（数据驱动）…" + (f" | 超期判N {stale} 条" if stale else ""))
+    bars_map = fetch_bars_batch(sorted({r["code"] for r, _ in pend}), limit=200)
     done = 0
     fixed = 0
     for r, sd in pend:
@@ -399,9 +415,7 @@ def confirm_pending(rows, lookback_days=6):
         if t < 59:
             continue
         if t + 3 >= len(b):
-            # T+3 数据未到 → 保持「空」（未满3日）；若之前误判为 Y 则清掉，防残留
-            if r.get("confirmed") == "Y" and fixed:
-                r["confirmed"] = ""
+            # T+3 数据未到 → 保持「空」（未满3日），下次运行继续判定
             continue
         c_t = b[t][2]; v_t = b[t][5]
         c13 = [b[t + 1][2], b[t + 2][2], b[t + 3][2]]
