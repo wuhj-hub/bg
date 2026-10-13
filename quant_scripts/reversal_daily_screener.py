@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线信号跟踪轮动器（reversal_daily_screener.py · v2）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v3）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -11,13 +11,18 @@
 跟踪轮动（v2 新增）：
   · 每次运行把命中标的并入**跟踪池**（data/reversal_pool_{tf}.json），跨日/跨周保留
   · 后续若**跌破**（回调深 ≥ 1倍反转数值）→ 从池中**删除**
-  · 另两类移出：现价 ≥ 上限、距突破超过最大跟踪期（日线45根 / 周线15根）
+  · 另两类移出：现价 ≥ 上限、距突破超过最大跟踪期（日线45根 / 周线30根 / 月线18根）
   · 报告区分：本次新增 / 在池跟踪 / 本次移除
 
+口径差异（v3）：
+  · 日线：保留「改1+改2」；新信号须在窗口内（--window，默认5）
+  · 周线/月线：只保留「改2」，且取消新信号窗口（凡当前结构构成改2即纳入跟踪）
 用法:
-  python3 reversal_daily_screener.py --tf day  --window 5 --max-price 10 --pool-file all_mainboard.csv
-  python3 reversal_daily_screener.py --tf week --window 2 --max-price 10 --pool-file all_mainboard.csv
+  python3 reversal_daily_screener.py --tf day   --window 5 --max-price 10 --pool-file all_mainboard.csv
+  python3 reversal_daily_screener.py --tf week  --max-price 10 --pool-file all_mainboard.csv
+  python3 reversal_daily_screener.py --tf month --max-price 10 --pool-file all_mainboard.csv
 输出: outputs/反转数值日线信号_{date}.md（day）/ outputs/反转数值周线跟踪_{date}.md（week）
+      / outputs/反转数值月线跟踪_{date}.md（month）
 """
 import os, sys, re, json, subprocess, argparse, shutil
 from datetime import datetime
@@ -29,7 +34,7 @@ WESTOCK = _W if _W else "npx -y westock-data-skillhub@1.0.3"
 BATCH = 250
 K = 0.618
 POOL_DIR = os.path.join(ROOT, "data")
-MAXGAP = {"day": 45, "week": 15}          # 最大跟踪期（根）
+MAXGAP = {"day": 45, "week": 30, "month": 18}   # 最大跟踪期（根）
 
 
 def ema(series, n):
@@ -146,7 +151,7 @@ def load_pool(pool_arg="", pool_file=""):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tf", default="day", choices=["day", "week"])
+    ap.add_argument("--tf", default="day", choices=["day", "week", "month"])
     ap.add_argument("--pool", default="")
     ap.add_argument("--pool-file", default="")
     ap.add_argument("--window", type=int, default=0, help="新信号检测窗口(根)；默认 day=5 / week=2")
@@ -155,12 +160,14 @@ def main():
     a = ap.parse_args()
     tf = a.tf
     win = a.window or (5 if tf == "day" else 2)
-    period, limit = ("day", 250) if tf == "day" else ("week", 130)
+    only2 = tf in ("week", "month")   # 周线/月线：只保留「改2（死叉回调·不破水下反转数值线）」
+    nowin = tf in ("week", "month")   # 周线/月线：取消「新信号窗口」，凡当前结构构成改2即纳入
+    period, limit = {"day": ("day", 250), "week": ("week", 130), "month": ("month", 124)}[tf]
 
     pool = load_pool(a.pool, a.pool_file)
     if not pool:
         print("❌ 无股票池"); return
-    print(f"🔍 反转数值[{tf}] 跟踪扫描 | 标的{len(pool)}只 | 新信号窗口{win}根 | 现价<{a.max_price:g}元")
+    print(f"🔍 反转数值[{tf}] 跟踪扫描 | 标的{len(pool)}只 | " + ("只留改2·无窗口 | " if only2 else f"新信号窗口{win}根 | ") + f"现价<{a.max_price:g}元")
 
     rows_map = fetch_batch([c for c, n in pool], period, limit)
     print(f"  数据就绪: {len(rows_map)}/{len(pool)}只")
@@ -200,6 +207,9 @@ def main():
             elif not st["valid"]:
                 removed.append({**cur, "code": code, "name": name, "reason": "跌破1倍反转数值"})
                 tracked.pop(code, None)
+            elif only2 and st["angle"] != "改2":
+                removed.append({**cur, "code": code, "name": name, "reason": "已非改2"})
+                tracked.pop(code, None)
             elif st["last_close"] >= a.max_price:
                 removed.append({**cur, "code": code, "name": name, "reason": "现价≥上限"})
                 tracked.pop(code, None)
@@ -211,8 +221,13 @@ def main():
                 cur["name"] = name
                 kept.append(cur)
         else:
-            # 新信号：突破2倍后回调不破1倍，且窗口内
-            if st and st["valid"] and st["gap"] <= win and st["last_close"] < a.max_price:
+            # 新信号：突破2倍后回调不破1倍
+            #   日线：须在「新信号窗口」内（gap ≤ win）
+            #   周线/月线（only2+nowin）：取消窗口，凡当前结构构成「改2」即纳入跟踪
+            ok_new = (bool(st) and st["valid"] and st["last_close"] < a.max_price
+                      and (not only2 or st["angle"] == "改2")
+                      and (nowin or st["gap"] <= win))
+            if ok_new:
                 item = {"code": code, "name": name, "first_date": today, **st}
                 tracked[code] = item
                 added.append(item)
@@ -271,10 +286,12 @@ def main():
                           for lab, c in (("5日", 5), ("10日", 6), ("20日", 7)))
 
     # ── 报告 ──
-    lbl = "日线" if tf == "day" else "周线"
+    lbl = {"day": "日线", "week": "周线", "month": "月线"}[tf]
     L = [f"# 🔄 反转数值·{lbl}信号跟踪（{today}）", "",
-         f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 新信号窗口 {win} 根{lbl} ｜ 现价 < {a.max_price:g}元",
-         f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）",
+         (f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 现价 < {a.max_price:g}元" if only2
+          else f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 新信号窗口 {win} 根{lbl} ｜ 现价 < {a.max_price:g}元"),
+         (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
+          else f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）"),
          f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出", "",
          f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**",
          f"> 📊 入池后历史胜率：{perf_line} ｜ 出池结算（跌破等）：{_agg(10, True)[0]} / 均值 {_agg(10, True)[1]}（n={_agg(10, True)[2]}）", ""]
@@ -314,7 +331,7 @@ def main():
     L.append("> ⚠️ 量化规律统计，不构成投资建议。跌破1倍反转数值即出池。")
 
     os.makedirs("outputs", exist_ok=True)
-    fn = f"反转数值日线信号_{today}.md" if tf == "day" else f"反转数值周线跟踪_{today}.md"
+    fn = {"day": f"反转数值日线信号_{today}.md", "week": f"反转数值周线跟踪_{today}.md", "month": f"反转数值月线跟踪_{today}.md"}[tf]
     fp = os.path.join("outputs", fn)
     open(fp, "w", encoding="utf-8").write("\n".join(L))
     print(f"✅ [{tf}] 新增{len(added)} 在池{len(kept)} 移除{len(removed)} 池内{len(tracked)} | 报告: {fp} | 池: {pool_fp}")
