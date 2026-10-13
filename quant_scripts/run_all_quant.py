@@ -129,7 +129,7 @@ def run_fishbody():
 
     stock_pool = str(SCRIPTS_DIR / "stock_pool.txt")
     stdout, stderr = run_py(
-        f"quant_scripts/fish_body_enhanced.py --pool {stock_pool}",
+        f"quant_scripts/fish_body_enhanced.py --pool {stock_pool} --cold-report",
         cwd=str(REPO_DIR)
     )
 

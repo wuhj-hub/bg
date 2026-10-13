@@ -56,15 +56,50 @@ def api_commits(path, n=1):
 def check_runs(days=2):
     since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
     d = api(f"actions/runs?per_page=100&created=%3E{urllib.parse.quote(since)}")
-    bad, total = [], 0
-    if d:
-        for w in d.get("workflow_runs", []):
-            total += 1
-            c = w.get("conclusion")
-            if c in ("failure", "cancelled", "timed_out", "startup_failure"):
-                bad.append({"name": w["name"], "conclusion": c, "created": w["created_at"][:16],
-                            "id": w["id"], "event": w.get("event")})
-    return {"total": total, "bad": bad}
+    bad, noise = [], []
+    runs = (d or {}).get("workflow_runs", [])
+    total = len(runs)
+
+    # ── 并发/重复触发取消降噪（2026-10-14）────────────────────────
+    # 同一 workflow 被重复触发（cron-job.org 与原生 schedule 双跑、手动连点）时，
+    # concurrency: cancel-in-progress 会把多余 run 标记为 conclusion=cancelled，
+    # 属设计噪音而非故障。判据（二者取一即视为噪音）：
+    #   ① 同 workflow 在其前后 30 分钟内有其它 run（并发取消）；
+    #   ② 同 workflow 在同一天(UTC)内存在 success 的 run（重复触发、另有一次已成功）。
+    # 真·超时取消（孤立、当天无成功）仍保留在 bad 中，不削弱原设计。
+    ok_days = {(w.get("name"), (w.get("created_at") or "")[:10])
+               for w in runs if w.get("conclusion") == "success"}
+
+    def _near(w):
+        try:
+            t0 = datetime.fromisoformat((w.get("created_at") or "").replace("Z", "+00:00"))
+        except Exception:
+            return False
+        for o in runs:
+            if o is w or o.get("name") != w.get("name"):
+                continue
+            try:
+                t1 = datetime.fromisoformat((o.get("created_at") or "").replace("Z", "+00:00"))
+            except Exception:
+                continue
+            if abs((t1 - t0).total_seconds()) <= 1800:
+                return True
+        return False
+
+    for w in runs:
+        c = w.get("conclusion")
+        if c not in ("failure", "cancelled", "timed_out", "startup_failure"):
+            continue
+        item = {"name": w["name"], "conclusion": c, "created": (w.get("created_at") or "")[:16],
+                "id": w["id"], "event": w.get("event")}
+        if c == "cancelled":
+            day = (w.get("created_at") or "")[:10]
+            if (w.get("name"), day) in ok_days or _near(w):
+                item["reason"] = "并发/重复触发取消"
+                noise.append(item)
+                continue
+        bad.append(item)
+    return {"total": total, "bad": bad, "noise": noise}
 
 
 # ── B. 步骤耗时 ───────────────────────────────────────────────
@@ -200,6 +235,8 @@ def main():
     if runs["bad"]:
         issues.append(f"❌ run 异常 {len(runs['bad'])} 个（" +
                       "、".join(f"{b['name']}:{b['conclusion']}" for b in runs["bad"][:5]) + "）")
+    if runs.get("noise"):
+        issues.append(f"⏹️ 并发/重复触发取消 {len(runs['noise'])} 个（已忽略，不计入异常）")
     if heavy:
         issues.append("⚠️ 重步骤：" + "、".join(f"{h['workflow']}/{h['step']} {h['minutes']}min" for h in heavy[:5]))
     if stale:
@@ -216,9 +253,12 @@ def main():
     json.dump(rep, open(a.json, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
     print(f"=== 流水线自愈巡检 {rep['date']} → {rep['status']} ===")
-    print(f"近{a.days}天 runs: {runs['total']} 个 | 异常 {len(runs['bad'])}")
+    print(f"近{a.days}天 runs: {runs['total']} 个 | 异常 {len(runs['bad'])}"
+          + (f" | 并发取消(忽略) {len(runs['noise'])}" if runs.get("noise") else ""))
     for b in runs["bad"]:
         print(f"   ❌ {b['created']} {b['name']} → {b['conclusion']}")
+    for b in runs.get("noise", []):
+        print(f"   ⏹️ {b['created']} {b['name']} → cancelled（{b.get('reason','并发取消')}，已忽略）")
     print(f"重步骤(≥{a.step_min}min): {len(heavy)}")
     for h in heavy[:8]:
         print(f"   ⚠️ {h['workflow']} / {h['step']} = {h['minutes']}min")

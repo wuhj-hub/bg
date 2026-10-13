@@ -5,11 +5,13 @@ name: 多维度·鱼身报告更新
 # 内容：鱼身交易系统报告 · 动态股票池（近20日日均成交额排名前300，非固定池）
 # 目标：kb_id=RgPmCvOW2CgN3I-HVGEYfmBS_W0mkiYzHRuTGHP8_6o=  folder_id=folder_7478204537267754
 on:
-  # 外部精确触发（cron-job.org → repository_dispatch，规避 GitHub 原生 cron 延迟）
+  # 外部精确触发（cron-job.org → repository_dispatch）。
+  # ⚠️ 现状（2026-10-14 核实）：本事件此前从未实际触发过，唯一实际触发源是下方原生 schedule。
   repository_dispatch:
     types: [duowei-fish-run]
-  # 原生 cron 兜底：交易日盘后 16:00（北京）= UTC 08:00，周一至周五。
-  # ⚠️ 若另配 cron-job.org 外部触发（event_type=duowei-fish-run），请注释掉下方 schedule 避免双跑。
+  # 原生 cron：交易日盘后 16:00（北京）= UTC 08:00，周一至周五。
+  # ⚠️ 实测 GitHub 原生 cron 延迟严重（16:00 计划常在 22:00~次日 02:00 才跑）。
+  # ⚠️ 请勿注释本 schedule —— 外部触发(duowei-fish-run)尚未接入，禁用后该链路仅剩手动 dispatch。
   schedule:
     - cron: '0 8 * * 1-5'
   workflow_dispatch: {}
