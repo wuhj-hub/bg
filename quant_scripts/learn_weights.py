@@ -18,7 +18,7 @@
 
 用法:
   python3 learn_weights.py                    # 全量学习
-  python3 learn_weights.py --min-days 3       # 信号后≥3天计入
+  python3 learn_weights.py --min-days 3       # 信号后≥3个交易日计入
 输出: outputs/仲裁权重学习报告_{date}.md
 """
 import csv, json, os, re, subprocess, sys, argparse
@@ -76,7 +76,7 @@ def parse_kline(txt):
     return rows
 
 def signal_return(code, signal_date):
-    """信号日收盘 → 当前收益（%），以及自然日数"""
+    """信号日收盘 → 当前收益（%），以及持有交易日数"""
     if re.match(r"^\d{6}$", code):
         code = ("sh" if code.startswith("6") else "sz") + code
     rows = []
@@ -87,15 +87,16 @@ def signal_return(code, signal_date):
             break
     if not rows:
         return None, None
-    entry = None
-    for d, c in rows:
+    ei, entry = None, None
+    for i, (d, c) in enumerate(rows):
         if d >= signal_date:
-            entry = c
+            ei, entry = i, c
             break
     if entry is None:
         return None, None
     cur = rows[-1][1]
-    days = (datetime.strptime(rows[-1][0], "%Y-%m-%d") - datetime.strptime(signal_date, "%Y-%m-%d")).days
+    # ⚠️ 2026-10-13：持有期由【自然日】改为【交易日】= 入场 bar 到最新 bar 的根数
+    days = (len(rows) - 1) - ei
     return (cur / entry - 1) * 100, days
 
 def classify_keys(src_str):
@@ -252,7 +253,7 @@ def _emit_proposals(date_str, log_path, rows, results, groups, stats, a):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--min-days", type=int, default=3)
+    ap.add_argument("--min-days", type=int, default=3, help="信号后最少观察交易日数（默认3）")
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--log", default=None, help="信号日志路径（默认自动解析 outputs/仲裁信号日志.csv）")
     ap.add_argument("--emit-proposals", action="store_true", help="额外输出结构化提案 JSON（默认关闭，行为不变）")
@@ -278,7 +279,7 @@ def main():
                 r["ret"] = ret
                 r["days"] = days
                 results.append(r)
-    print(f"有效样本（≥{a.min_days}日）: {len(results)}\n")
+    print(f"有效样本（≥{a.min_days}交易日）: {len(results)}\n")
 
     # 按「配置键」粒度分组统计（2026-10-11 P0）
     cfg0 = _load_config_weights()
