@@ -326,21 +326,31 @@ def render_md(sig):
     md += "\n---\n\n*规则：五维触发≥3 = 顶部区域；2 = 警戒；<2 = 正常。维度2/3数据缺失时不计分。*\n"
     return md
 
-def merge_events(dates_with_detail):
-    """将连续多日触发的同一信号合并为事件（如信号持续3天只算1次）"""
+def merge_events(dates_with_detail, cal=None):
+    """将连续多日触发的同一信号合并为事件（如信号持续3天只算1次）
+
+    cal：交易日历 {date: index}（升序），用于精确判定「下一交易日」（跨越周末/长假仍算连续）。
+    """
     events = []
     for d, detail in dates_with_detail:
         if events and d == events[-1][1]:  # 同日跳过（理论上不出现）
             continue
-        if events and close_dates(events[-1][1], d):
+        if events and close_dates(events[-1][1], d, cal):
             events[-1] = (events[-1][0], d, events[-1][2])  # 延续
         else:
             events.append((d, d, detail))
     return events
 
-def close_dates(d1, d2):
-    """d2 是否为 d1 的下一交易日（日期间隔≤4天视为连续）"""
-    from datetime import timedelta
+def close_dates(d1, d2, cal=None):
+    """d2 是否为 d1 的下一交易日。
+
+    ⚠️ 2026-10-13：优先用交易日历 cal={date:index} 精确判定（跨越长假如国庆仍算连续）；
+       无日历时回退为自然日近似（间隔≤4天，兼容周末）。
+    """
+    if cal:
+        i, j = cal.get(d1), cal.get(d2)
+        if i is not None and j is not None:
+            return j - i == 1
     a = datetime.strptime(d1, "%Y-%m-%d")
     b = datetime.strptime(d2, "%Y-%m-%d")
     return 0 < (b - a).days <= 4
@@ -364,7 +374,8 @@ def backtest(rows):
             hits["4_恐慌抛售"].append((win[-1]["date"], d4[1]))
         if d5[0]:
             hits["5_情绪亢奋"].append((win[-1]["date"], d5[1]))
-    events = {k: merge_events(v) for k, v in hits.items()}
+    _cal = {r["date"]: i for i, r in enumerate(rows)}
+    events = {k: merge_events(v, _cal) for k, v in hits.items()}
     for k, evs in events.items():
         print(f"\n{k} 事件 {len(evs)} 个：")
         for s, e, detail in evs:
