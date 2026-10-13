@@ -25,12 +25,15 @@
   实时：东财涨停池 push2ex（沙箱可直连）
   信号库：outputs/wangzhe_signals.csv（唯一真源，只增不改，推 GitHub）
 """
-import csv, json, os, sys, re, argparse, subprocess, urllib.request
+import csv, json, os, sys, re, argparse, subprocess, urllib.request, shutil, time
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 import numpy as np
 
 BJT = timezone(timedelta(hours=8))
+# ⚠️ 2026-10-13：优先用全局安装的 westock bin（免 npx，~0.7s/次 vs npx ~3.5s/次）
+_WESTOCK = ([shutil.which("westock-data-skillhub")] if shutil.which("westock-data-skillhub")
+           else ["npx", "-y", "westock-data-skillhub@1.0.3"])
 BASE = os.path.dirname(os.path.abspath(__file__))
 # 输出目录：沙箱内脚本与 outputs/ 同级；仓库内脚本在 quant_scripts/，输出需落到仓库根 outputs/
 OUT = os.path.join(BASE, "outputs")
@@ -291,47 +294,77 @@ def fetch_vol_ratios(codes, chunk=40):
 
 
 
-def fetch_bars_batch(codes, limit=65, chunk=20):
+def _run_kline(batch, limit):
+    """单次调用 westock kline → 解析结果 {code: [bars]}（空/异常则返回 {}）"""
+    cmd = _WESTOCK + ["kline", ",".join(batch), "--period", "day", "--limit", str(limit)]
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        txt = r.stdout or ""
+    except Exception as e:
+        log(f"[WARN] 日线批量拉取异常: {e}")
+        return {}
+    out = {}
+    for line in txt.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        p = [x.strip() for x in line.strip().strip("|").split("|")]
+        if re.match(r"^(sh|sz)\d{6}$", p[0]):
+            if len(p) < 9:
+                continue
+            try:
+                out.setdefault(p[0], []).append(
+                    (p[1], float(p[2]), float(p[3]), float(p[4]), float(p[5]), float(p[6])))
+            except (ValueError, TypeError):
+                continue
+        elif len(batch) == 1 and re.match(r"^\d{4}-\d{2}-\d{2}$", p[0]):
+            # 单股输出无代码列（date|open|last|high|low|volume|amount|exchange）
+            try:
+                out.setdefault(batch[0], []).append(
+                    (p[0], float(p[1]), float(p[2]), float(p[3]), float(p[4]), float(p[5])))
+            except (ValueError, TypeError):
+                continue
+    for c in out:
+        out[c].sort(key=lambda x: x[0])
+    return out
+
+
+def fetch_bars_batch(codes, limit=65, chunk=20, retries=3, single_fallback=True, single_cap=60):
     """批量拉 N 日日线 → {code: [(date, open, close, high, low, volume), ...] 日期升序}
 
     列序（westock 批量）：symbol|date|open|last|high|low|volume|amount|exchange
     ⚠️ volume 在 index 6（index 5 是 low）。
+
+    ⚠️ 2026-10-13 健壮性加固：westock 批量 kline 会【瞬时返回「数据为空」】（实测同一调用
+       连测 3 次得 0/0/6 行），空返回会拖累整批 → 故对每批做「空返回重试（含退避）」，
+       并对仍缺失的代码做单只兜底重取（上限 single_cap，避免空耗）。
+       另：优先用全局已安装的 westock bin（免 npx，~0.7s/次 vs npx ~3.5s/次）。
     """
     out = {}
     if not codes:
         return out
+    misses = []
     for k in range(0, len(codes), chunk):
         batch = codes[k:k + chunk]
-        cmd = ["npx", "-y", "westock-data-skillhub@1.0.3", "kline",
-               ",".join(batch), "--period", "day", "--limit", str(limit)]
-        try:
-            r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-            txt = r.stdout or ""
-        except Exception as e:
-            log(f"[WARN] 日线批量拉取失败（第{k//chunk+1}批）: {e}")
-            continue
-        for line in txt.splitlines():
-            if not line.strip().startswith("|"):
-                continue
-            p = [x.strip() for x in line.strip().strip("|").split("|")]
-            if re.match(r"^(sh|sz)\d{6}$", p[0]):
-                if len(p) < 9:
-                    continue
-                try:
-                    out.setdefault(p[0], []).append(
-                        (p[1], float(p[2]), float(p[3]), float(p[4]), float(p[5]), float(p[6])))
-                except (ValueError, TypeError):
-                    continue
-            elif len(batch) == 1 and re.match(r"^\d{4}-\d{2}-\d{2}$", p[0]):
-                # 单股输出无代码列（date|open|last|high|low|volume|amount|exchange）
-                # ⚠️ 2026-09-23 修：兼容候选仅 1 只时的单股格式
-                try:
-                    out.setdefault(batch[0], []).append(
-                        (p[0], float(p[1]), float(p[2]), float(p[3]), float(p[4]), float(p[5])))
-                except (ValueError, TypeError):
-                    continue
-        for c in out:
-            out[c].sort(key=lambda x: x[0])
+        got = {}
+        for attempt in range(max(1, retries)):
+            got = _run_kline(batch, limit)
+            if got:
+                break
+            if attempt < retries - 1:
+                time.sleep(1.5 * (attempt + 1))
+        if got:
+            out.update(got)
+        misses += [c for c in batch if c not in out]
+    if single_fallback and misses:
+        for c in misses[:single_cap]:
+            for _ in range(2):
+                got = _run_kline([c], limit)
+                if got:
+                    out.update(got)
+                    break
+                time.sleep(1.0)
+    log(f"[INFO] fetch_bars_batch: 请求 {len(codes)} 只 → 命中 {len(out)} 只"
+        + (f"（单只兜底重取 {min(len(misses), single_cap)} 只）" if misses and single_fallback else ""))
     return out
 
 
