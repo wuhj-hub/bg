@@ -1,5 +1,5 @@
 {
- "date": "2026-10-13",
+ "date": "2026-10-14",
  "writes": {
   "all_mainboard.csv": [
    ".github/workflows/duowei_fish.yml",
@@ -427,10 +427,16 @@
   "reversal_pool_week.json": [
    "quant_report.yml"
   ],
+  "reversal_pool_month.json": [
+   "quant_report.yml"
+  ],
   "reversal_perf_day.csv": [
    "quant_report.yml"
   ],
   "reversal_perf_week.csv": [
+   "quant_report.yml"
+  ],
+  "reversal_perf_month.csv": [
    "quant_report.yml"
   ],
   "xihu_turns_latest.json": [
@@ -844,8 +850,10 @@
   "pool_entries.csv",
   "pool_quality.json",
   "reversal_perf_day.csv",
+  "reversal_perf_month.csv",
   "reversal_perf_week.csv",
   "reversal_pool_day.json",
+  "reversal_pool_month.json",
   "reversal_pool_week.json",
   "silent_failure_audit.json",
   "silent_failure_latest.md",
