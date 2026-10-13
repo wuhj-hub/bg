@@ -11,7 +11,7 @@ win_rate_tracker.py —— 股池信号实盘胜率跟踪报告 v1.0
 
 用法:
   python3 win_rate_tracker.py                  # 全量统计
-  python3 win_rate_tracker.py --min-days 5     # 仅统计信号后≥5日的样本
+  python3 win_rate_tracker.py --min-days 5     # 仅统计信号后≥5个交易日的样本
 """
 import subprocess, sys, os, re, csv, argparse, json, shutil
 from datetime import datetime, timedelta
@@ -52,7 +52,7 @@ def parse_kline(txt):
     return rows
 
 def signal_return(code, signal_date):
-    """信号日收盘 → 当前收益（%），以及自然日数"""
+    """信号日收盘 → 当前收益（%），以及持有交易日数"""
     # 兼容无前缀代码（快照CSV: 000009 → sz000009）
     if re.match(r"^\d{6}$", code):
         code = ("sh" if code.startswith("6") else "sz") + code
@@ -65,15 +65,17 @@ def signal_return(code, signal_date):
     if not rows:
         return None, None
     # 找信号日（或其后第一个交易日）的收盘
-    entry = None
-    for d, c in rows:
+    ei, entry = None, None
+    for i, (d, c) in enumerate(rows):
         if d >= signal_date:
-            entry = c
+            ei, entry = i, c
             break
     if entry is None:
         return None, None
     cur = rows[-1][1]
-    days = (datetime.strptime(rows[-1][0], "%Y-%m-%d") - datetime.strptime(signal_date, "%Y-%m-%d")).days
+    # ⚠️ 2026-10-13：持有期由【自然日】改为【交易日】= 入场 bar 到最新 bar 的根数
+    #    （原按自然日，遇周末/长假与实际交易日不符 → 口径不一致）
+    days = (len(rows) - 1) - ei
     return (cur / entry - 1) * 100, days
 
 def parse_batch_kline(txt):
@@ -195,7 +197,7 @@ def by_phase(min_days=3, workers=8, top=50, max_snaps=10, cohort_step=1):
     # ── 基线（全市场等权，2026-10-01 新增）──
     base, bdesc = market_baseline(snaps)
     print(f"📏 基线：{bdesc}（超额 = 信号组平均 − 同日基线）\n" if base else "📏 基线不可用，超额列留空\n")
-    print(f"有效样本（≥{min_days}日）按资金行为四态:\n")
+    print(f"有效样本（≥{min_days}交易日）按资金行为四态:\n")
     print(f"{'资金行为':<8}{'样本':>7}{'胜率':>8}{'平均':>8}{'中位':>8}{'盈亏比':>7}{'最差':>8}{'超额':>9}")
     print("-" * 70)
     order = ["抢筹", "吸筹", "进场", "控盘", "观望"]
@@ -221,7 +223,7 @@ def by_phase(min_days=3, workers=8, top=50, max_snaps=10, cohort_step=1):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--log", default="outputs/pool_signals_log.csv")
-    ap.add_argument("--min-days", type=int, default=3, help="信号后最少观察天数")
+    ap.add_argument("--min-days", type=int, default=3, help="信号后最少观察交易日数")
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--by-phase", action="store_true", help="按资金行为四态分组统计(读资金快照)")
     ap.add_argument("--top", type=int, default=50, help="--by-phase 时每态取沉淀率前 N 只")
@@ -257,7 +259,7 @@ def main():
                 s["ret"] = ret
                 s["days"] = days
                 results.append(s)
-    print(f"有效样本（≥{a.min_days}日）: {len(results)}\n")
+    print(f"有效样本（≥{a.min_days}交易日）: {len(results)}\n")
 
     # 分层统计
     def show(title, ss):
@@ -270,13 +272,13 @@ def main():
         pl = (sum(wins)/len(wins)) / abs(sum(losses)/len(losses)) if wins and losses else float("inf")
         days_avg = sum(s["days"] for s in ss) / len(ss)
         print(f"| {title:<20} | {len(ss):>4} | {len(wins)/len(ss)*100:>5.1f}% | {sum(rets)/len(rets):>+7.2f}% "
-              f"| {sorted(rets)[len(rets)//2]:>+7.2f}% | {pl:>5.2f} | {days_avg:.0f}日 |")
+              f"| {sorted(rets)[len(rets)//2]:>+7.2f}% | {pl:>5.2f} | {days_avg:.0f}交易日 |")
 
     L = []
     A = L.append
     A("# 📊 股池信号实盘胜率跟踪报告\n")
     A(f"> 生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')} | 数据：pool_signals_log.csv（{len(signals)}条唯一信号）")
-    A(f"> 收益口径：信号日收盘 → 当前（日线），持有 {a.min_days} 天以上计入\n")
+    A(f"> 收益口径：信号日收盘 → 当前（日线），持有 ≥{a.min_days} 个交易日才计入\n")
     A("## 一、总体胜率（按决策分层）\n")
     A("| 决策分层 | 样本 | 胜率 | 平均 | 中位 | 盈亏比 | 平均持有 |")
     A("|:--------|:---:|:----:|:----:|:----:|:----:|:----:|")
@@ -321,7 +323,7 @@ def main():
 
     # 当前持仓信号清单
     A("## 四、当前有效信号清单\n")
-    A("| 代码 | 名称 | 信号日 | 决策 | 信号后收益 | 持有天数 |")
+    A("| 代码 | 名称 | 信号日 | 决策 | 信号后收益 | 持有交易日 |")
     A("|:----|:----|:----|:----|:----:|:----:|")
     for s in sorted(results, key=lambda x: -x["ret"]):
         dec = s.get("decision", "")
