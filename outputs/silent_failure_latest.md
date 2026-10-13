@@ -1,8 +1,8 @@
-# 🔍 体系自检元审计 · 2026-10-13
+# 🔍 体系自检元审计 · 2026-10-14
 
-> 扫描 23 个 workflow ｜ 风险项 **132** ｜ 🔴高危 **0**
+> 扫描 23 个 workflow ｜ 风险项 **133** ｜ 🔴高危 **0**
 
-## 🟡中危·吞错误（119）
+## 🟡中危·吞错误（120）
 
 - artifact_audit.yml :: 运行产物入库审计 (L62) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
 - artifact_audit.yml :: 提交审计报告 (L82) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || true
@@ -14,7 +14,7 @@
 - duowei_fish.yml :: 生成沪深主板清单（失败回退仓库缓存） (L71) — 命中 continue-on-error: true, || echo（吞错误）
 - duowei_fish.yml :: 预热westock数据包 (L79) — 命中 continue-on-error: true, || true
 - duowei_fish.yml :: 上传鱼身报告到「多维量化→多维度」文件夹 (L99) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || true
-- duowei_fish.yml :: 提交产物到仓库 (L125) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
+- duowei_fish.yml :: 提交产物到仓库 (L125) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
 - emotion_backtest_monthly.yml :: 预热 westock 数据包 (L39) — 命中 || true
 - emotion_backtest_monthly.yml :: 运行回测（120 交易日） (L48) — 命中 || true
 - emotion_backtest_monthly.yml :: 提交报告 (L51) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || true
@@ -67,12 +67,12 @@
 - quant_report.yml :: 盘后数据健康审计（产物可信度） (L437) — 命中 continue-on-error: true, set +e, || true
 - quant_report.yml :: 提交报告产物到仓库（供盘前报告引用） (L451) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
 - quant_report.yml :: 自动生成复盘报告并上传 (L492) — 命中 continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: env 对照三系统温度（观察期） (L548) — 命中 continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 资金四态胜率（抢筹/进场/控盘/观望） (L562) — 命中 continue-on-error: true, || echo（吞错误）, || true
-- quant_report.yml :: 股池入池快照（OOS 数据维护） (L583) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 反转数值周线信号上传推送 (L620) — 命中 continue-on-error: true, || true
-- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L664) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 推送自检报告到微信 (L682) — 命中 continue-on-error: true
+- quant_report.yml :: env 对照三系统温度（观察期） (L550) — 命中 continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 资金四态胜率（抢筹/进场/控盘/观望） (L564) — 命中 continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: 股池入池快照（OOS 数据维护） (L585) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 反转数值周线信号上传推送 (L622) — 命中 continue-on-error: true, || true
+- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L669) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 推送自检报告到微信 (L687) — 命中 continue-on-error: true
 - quant_scan.yml :: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断） (L73) — 命中 continue-on-error: true, || echo（吞错误）
 - quant_scan.yml :: IMA 凭证早期预检（失效立即微信告警，不阻断扫描） (L81) — 命中 continue-on-error: true, || true
 - quant_scan.yml :: 预热westock数据包 (L91) — 命中 set +e, || true
@@ -109,9 +109,10 @@
 - selfcheck_daily.yml :: 提交自检产物到仓库 (L105) — 命中 2>/dev/null（屏蔽 stderr）, set +e
 - selfcheck_daily.yml :: 异常告警到微信 (L124) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）
 - selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L142) — 命中 continue-on-error: true, || echo（吞错误）
-- wangzhe_track.yml :: 涨停王者·合格标的漏斗 (L81) — 命中 continue-on-error: true
-- wangzhe_track.yml :: 合格标的上传知识库 + 推送 (L86) — 命中 continue-on-error: true, || echo（吞错误）
-- wangzhe_track.yml :: 才哥公众号文章跟踪 (L105) — 命中 continue-on-error: true
+- wangzhe_track.yml :: 安装 westock 取数 CLI（免 npx） (L63) — 命中 continue-on-error: true
+- wangzhe_track.yml :: 涨停王者·合格标的漏斗 (L87) — 命中 continue-on-error: true
+- wangzhe_track.yml :: 合格标的上传知识库 + 推送 (L92) — 命中 continue-on-error: true, || echo（吞错误）
+- wangzhe_track.yml :: 才哥公众号文章跟踪 (L111) — 命中 continue-on-error: true
 - weight_learn.yml :: 预热 westock 数据包 (L57) — 命中 continue-on-error: true, || echo（吞错误）
 - weight_learn.yml :: 推送月度提案报告 (L65) — 命中 continue-on-error: true, || echo（吞错误）
 - weight_learn.yml :: 上传提案到知识库「报告/指标存档」 (L79) — 命中 continue-on-error: true, || echo（吞错误）
@@ -164,6 +165,6 @@
 | quant_report.yml | 32 | — |
 | quant_scan.yml | 29 | — |
 | selfcheck_daily.yml | 8 | — |
-| wangzhe_track.yml | 4 | — |
+| wangzhe_track.yml | 5 | — |
 | weight_learn.yml | 7 | — |
 | yao_gu_pool.yml | 6 | — |
