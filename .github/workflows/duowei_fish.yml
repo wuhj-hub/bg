@@ -93,7 +93,7 @@ jobs:
 
       # ─── 第三步：运行鱼身扫描（生成 JSON + Markdown 报告）───
       - name: 鱼身交易系统扫描（动态股票池）
-        run: python3 quant_scripts/fish_body_enhanced.py --pool quant_scripts/stock_pool.txt
+        run: python3 quant_scripts/fish_body_enhanced.py --pool quant_scripts/stock_pool.txt --cold-report
 
       # ─── 第四步：上传鱼身报告到「多维量化 → 多维度」文件夹 ───
       - name: 上传鱼身报告到「多维量化→多维度」文件夹
@@ -107,9 +107,9 @@ jobs:
           set +e
           MD=$(ls -t outputs/鱼身报告_*.md 2>/dev/null | head -1)
           if [ -z "$MD" ]; then
-            echo "::error::未生成鱼身报告，无法上传"
-            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️多维度鱼身报告缺失&content=duowei_fish 未生成 outputs/鱼身报告_*.md（可能大盘温度低于阈值提前退出，或扫描异常）&template=txt" > /dev/null || true
-            exit 1
+            echo "::warning::未生成鱼身报告（低温且未启用轻报告，或扫描异常），跳过上传，不阻断流水线"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=ℹ️多维度鱼身报告缺失&content=duowei_fish 未生成 outputs/鱼身报告_*.md（低温且未启用轻报告，或扫描异常），已跳过上传&template=txt" > /dev/null || true
+            exit 0
           fi
           echo "待上传报告: $MD"
           python3 upload_ima.py --file "$MD" --name "鱼身报告_$(date +%Y-%m-%d)"
@@ -128,7 +128,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          cp outputs/鱼身报告_*.md 鱼身报告_latest.md 2>/dev/null || true
-          cp outputs/fish_body_enhanced_*.json fish_body_latest.json 2>/dev/null || true
+          RPT=$(ls -t outputs/鱼身报告_*.md 2>/dev/null | head -1)
+          if [ -z "$RPT" ]; then
+            echo "⏭️ 无新报告，跳过产物提交（避免用旧/异源文件覆盖 latest）"
+            exit 0
+          fi
+          cp "$RPT" 鱼身报告_latest.md
+          JSN=$(ls -t outputs/fish_body_enhanced_*.json 2>/dev/null | head -1)
+          [ -n "$JSN" ] && cp "$JSN" fish_body_latest.json
           python3 git_api_commit.py --msg "chore: 多维度鱼身报告 ($(date +%Y-%m-%d))" \
             鱼身报告_latest.md fish_body_latest.json || echo "⚠️ 产物提交失败（不阻断）"

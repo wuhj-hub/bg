@@ -489,12 +489,50 @@ def safe_process_batch(batch):
         return [], [], []
 
 
+def write_cold_report(temp, min_temp):
+    """大盘温度低于阈值时生成低温轻报告，保持每日订阅连续（--cold-report 启用）。"""
+    import os
+    try:
+        os.makedirs('./outputs', exist_ok=True)
+        now = datetime.now()
+        t = temp.get('temp', '?')
+        lv = temp.get('level', '?')
+        lines = [
+            "# 🐟 鱼身交易扫描报告",
+            "",
+            "**扫描时间**: " + now.strftime('%Y-%m-%d %H:%M'),
+            "",
+            "**大盘温度**: %s/100 %s" % (t, lv),
+            "",
+            "**状态**: ⚠️ 大盘环境不达标（温度 %s < 阈值 %s），今日不建议开仓" % (t, min_temp),
+            "",
+            "**扫描标的**: 未扫描（大盘过滤未通过）",
+            "",
+            "**信号数量**: 0 个",
+            "",
+            "---",
+            "",
+            "> 大盘温度低于策略阈值，系统按纪律空仓观望，今日不产出买入信号。",
+            "> 待大盘温度回升至阈值以上，将自动恢复正常扫描。",
+            "",
+            "---",
+            "> 📊 鱼身交易系统 v2.0 · 多维度融合版（低温轻报告）",
+        ]
+        fn = "./outputs/鱼身报告_" + now.strftime('%Y%m%d_%H%M') + ".md"
+        with open(fn, 'w', encoding='utf-8') as fh:
+            fh.write(chr(10).join(lines) + chr(10))
+        print("  Markdown报告(低温轻报告): " + fn)
+    except Exception as e:
+        print("  ⚠️ 低温轻报告生成失败: " + str(e))
+
+
 def main():
     import argparse
     p=argparse.ArgumentParser()
     p.add_argument('--pool',default='core')
     p.add_argument('--mode',default='all')
     p.add_argument('--min-temp',type=int,default=40)
+    p.add_argument('--cold-report',action='store_true',help='大盘温度低于阈值时仍生成轻报告（保持订阅连续）')
     args=p.parse_args()
     
     core=[c for c in ['sh603669','sh600400','sz002520'] if c not in EXCLUDE_CODES]
@@ -536,6 +574,8 @@ def main():
     print(f"  上证指数: {temp['idx']}  温度: {c(str(temp['temp'])+'/100',tc)}  状态: {c(temp['level'],tc)}")
     if temp['temp']<args.min_temp:
         print(f"\n  {c('大盘温度低于阈值，不建议开仓',C.R)}")
+        if args.cold_report:
+            write_cold_report(temp, args.min_temp)
         return
     print(f"  {c('大盘环境通过',C.G)}")
     
