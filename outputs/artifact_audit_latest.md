@@ -1,7 +1,7 @@
-# 🔍 产物入库审计 · 2026-10-13
+# 🔍 产物入库审计 · 2026-10-14
 
-> 扫描 76 个产出路径 / 99 个提交路径 / 30 个消费读取路径
-> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **4** ｜ ✅ 已提交 **72** ｜ ❔ 提交但未见生成 39
+> 扫描 76 个产出路径 / 101 个提交路径 / 30 个消费读取路径
+> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **4** ｜ ✅ 已提交 **72** ｜ ❔ 提交但未见生成 41
 
 ## 🟡 写而未提交（其余，多为研究/一次性产物）
 
@@ -42,8 +42,10 @@
 | `pool_entries.csv` | quant_report.yml |
 | `pool_quality.json` | quant_report.yml |
 | `reversal_perf_day.csv` | quant_report.yml |
+| `reversal_perf_month.csv` | quant_report.yml |
 | `reversal_perf_week.csv` | quant_report.yml |
 | `reversal_pool_day.json` | quant_report.yml |
+| `reversal_pool_month.json` | quant_report.yml |
 | `reversal_pool_week.json` | quant_report.yml |
 | `silent_failure_audit.json` | selfcheck_daily.yml |
 | `silent_failure_latest.md` | selfcheck_daily.yml |
