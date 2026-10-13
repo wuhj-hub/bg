@@ -61,6 +61,7 @@ jobs:
       # ⚠️ 2026-10-13：预装 westock CLI → 脚本 shutil.which 命中后免 npx
       #    （npx 每次约 20s，直调约 0.7s；confirm_pending 的单只兜底重取依赖此加速）
       - name: 安装 westock 取数 CLI（免 npx）
+        continue-on-error: true
         run: npm i -g westock-data-skillhub@1.0.3
 
       - name: 设置 Python
