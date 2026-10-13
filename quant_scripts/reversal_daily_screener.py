@@ -115,7 +115,7 @@ def eval_state(rows, lookback_tp=120):
     return {"tp_date": rows[tp_bar][0], "tp_val": round(2 * K * bl, 2),
             "red_high": round(red_high, 2), "pullback": round(deep, 2),
             "line": round(line, 2), "m_low": round(m_low, 2),
-            "angle": ("改1" if m_low > 0 else "改2"), "valid": m_low > -line,
+            "angle": ("改1" if m_low > 0 else "改2"), "valid": deep < line,   # 窄口径：仅保留「回踩幅度 < 0.618×金叉以来最高红柱」(回踩确认)
             "gap": i - tp_bar, "last_date": rows[-1][0], "last_close": round(closes[-1], 2)}
 
 
