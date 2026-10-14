@@ -5,6 +5,27 @@
 
 ---
 
+## v2.28 (2026-10-15)
+
+### 阶段 4 · 批次 4.5：同花顺（v6 line，差分解码）
+
+**fetch.py** 新增：
+- `ext_ths_kline(code, period="day", fq="hfq")` + `parse_ths` + `aggregate_monthly`
+- 同花顺 v6 `d.10jqka.com.cn/v6/line/hs_{code}/{seg}/all.js` 差分解码：每根 bar 4 值 = [low, open−low, high−low, close−low] ÷ priceFactor；年份由 `sortYear` 推得
+- **seg 语义实测**：`01`=日线前复权、`02`=日线**后复权**（约 2001 起全历史）、`11`=周线、`21`=月线
+- 校验响应含 `quotebridge`（防反爬占位），带重试；多只由调用方并发（实测 12 workers 稳）
+
+**消费方迁移**：
+| 脚本 | 变更 | 对拍 |
+|---|---|---|
+| `inbull_threshold_monitor.py` | `fetch_ths` 走层内（日线02后复权 + aggregate_monthly） | **3 只月线全等**（302/425/306 根，逐字段 0 差异） |
+
+一次收口了「同花顺差分解码」这一整块自研逻辑。
+
+### 阶段 4 收尾情况
+- 已覆盖外部源：腾讯（gtimg 行情 / fqkline 长历史 / gu）｜新浪（sinajs 行情 / 7×24 / ）｜东财（涨停池 / 个股）｜同花顺（v6 全历史）。
+- 未迁移（均未接 CI / 体量或端点特殊）：sector_components(money.finance.sina)、beast_pool_screener+runner_fetch_em_sectors(push2delay clist 行业)、zj_filter、fetch_hist_index/fetch_history/fetch_mainboard_data。
+
 ## v2.27 (2026-10-15)
 
 ### 阶段 4 · 批次 4.4：东财（涨停池 + 个股快照）
