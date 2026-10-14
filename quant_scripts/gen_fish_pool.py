@@ -43,7 +43,7 @@ def get_json(url, retries=3):
 
 
 def _calc_amount(node):
-    """从K线节点计算近RECENT日日均成交额(元)，无数据返回 0.0"""
+    """从K线节点计算近RECENT日日均成交额(元)，无数据返回 0.0（本地回退实现）"""
     kl = node.get("qfqday") or node.get("day") or []
     tot, n = 0.0, 0
     for k in kl:
@@ -56,8 +56,30 @@ def _calc_amount(node):
     return tot / n if n else 0.0
 
 
-def est_daily_amount(code):
-    """返回 近RECENT日 日均估算成交额(元)。无数据返回 0.0。"""
+def _calc_amount_bars(bars):
+    """统一取数层 bar 列表 → 日均成交额(元)（口径同 _calc_amount）"""
+    tot, n = 0.0, 0
+    for b in bars or []:
+        v = b.get("volume")
+        if v is None:
+            continue
+        avg = (b["open"] + b["high"] + b["low"] + b["close"]) / 4.0
+        tot += v * 100 * avg
+        n += 1
+    return tot / n if n else 0.0
+
+
+def _fetch_layer(codes):
+    """2026-10-15：统一取数层 fetch.ext_fqkline（逐只 + 受控并发 + host 轮转 + 重试）。"""
+    import sys as _sys
+    _d = os.path.dirname(os.path.abspath(__file__))      # quant_scripts
+    if _d not in _sys.path:
+        _sys.path.insert(0, _d)
+    from fetch import ext_fqkline as _f
+    return _f(codes, count=RECENT)
+
+
+def _est_daily_amount_local(code):
     url = f"{KLINE}?param={code},day,,,{RECENT},qfq"
     try:
         d = get_json(url)
@@ -66,19 +88,26 @@ def est_daily_amount(code):
         return 0.0
 
 
-def est_batch(codes):
-    """批量估算（2026-08-28提速：腾讯fqkline支持分号多股，50只/批）。
-    返回 {code: amt}；批量失败返回 None（调用方降级单股）"""
-    url = f"{KLINE}?param=" + ";".join(f"{c},day,,,{RECENT},qfq" for c in codes)
+def est_daily_amount(code):
+    """返回 近RECENT日 日均估算成交额(元)。无数据返回 0.0。"""
     try:
-        d = get_json(url)
-        data = d.get("data", {}) or {}
-        out = {}
-        for c in codes:
-            out[c] = _calc_amount(data.get(c, {}))
-        return out
+        got = _fetch_layer([code])
+        if got.get(code):
+            return _calc_amount_bars(got[code])
     except Exception:
-        return None
+        pass
+    return _est_daily_amount_local(code)
+
+
+def est_batch(codes):
+    """批量估算。优先统一取数层（逐只+受控并发），失败返回 None（调用方降级单股）。"""
+    try:
+        got = _fetch_layer(codes)
+        if got:
+            return {c: _calc_amount_bars(got.get(c, [])) for c in codes}
+    except Exception:
+        pass
+    return None
 
 
 def main():
