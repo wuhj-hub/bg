@@ -129,7 +129,7 @@ def main():
                 codes.append(("sh" if c[0] == "6" else "sz") + c)
     print(f"      主板 {len(codes)} 只")
 
-    print(f"[2/3] 估算近{RECENT}日日均成交额（批量50只/批 × 8并发，2026-08-28提速）...")
+    print(f"[2/3] 估算近{RECENT}日日均成交额（统一取数层 fetch.ext_fqkline：逐只+受控并发8）...")
     from concurrent.futures import ThreadPoolExecutor
     scored = {}
     batches = [codes[i:i + 50] for i in range(0, len(codes), 50)]
