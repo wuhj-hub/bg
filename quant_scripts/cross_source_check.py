@@ -85,7 +85,20 @@ def westock_close(code):
 def sina_quote(codes):
     """批量 → {code: {name, close, pct}}。
     2026-09-30 由东财 push2delay 迁移至此：东财 push2/push2delay 主机自 09-29 起不可用；
-    新浪为完全独立的行情体系，实测上证 3830.4513 / 茅台 1235.58 与 westock 一致。"""
+    新浪为完全独立的行情体系，实测上证 3830.4513 / 茅台 1235.58 与 westock 一致。
+    2026-10-15：优先统一取数层 fetch.ext_sina_quote（同源+重试），失败回退本地实现。"""
+    try:
+        _d = os.path.dirname(os.path.abspath(__file__))       # quant_scripts
+        if _d not in sys.path:
+            sys.path.insert(0, _d)
+        from fetch import ext_sina_quote as _sq
+        got = _sq(codes)
+        if got:
+            return {c: {"name": r["name"],
+                        "close": round(r["price"], 3) if r.get("price") is not None else None,
+                        "pct": r.get("pct")} for c, r in got.items()}
+    except Exception:
+        pass
     out = {}
     try:
         req = urllib.request.Request(SINA_API.format(codes=",".join(codes)),
