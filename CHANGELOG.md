@@ -5,6 +5,30 @@
 
 ---
 
+## v2.22 (2026-10-15)
+
+### ⚠️ 修复一次自致回归 ＋ 阶段 3 asfund 消费方迁移（8 文件）
+
+**回归原因（重要教训）**：迁移过程使用了**静态源码镜像 `bg_src`** 作为编辑基线；当同一文件**第二次**被编辑时（如先做 kline 迁移、再做 board/asfund 迁移），基线仍是**旧镜像**，导致后一次提交**覆盖回**前一次迁移。
+**受影响并已恢复的 5 个文件**：
+- `gen_premarket_report.py`（丢失 fetch_kline_table 8 处 + calc_zengxingzhi 修复）
+- `gen_review_report.py`（丢失 fetch_kline_table 3 处）
+- `market_style.py`（丢失 fetch_kline_map）
+- `beast_screener.py`（丢失 parse_kline_df 迁移）
+- `full_market_dualdim.py`（丢失 batch_fetch_kline 迁移）
+> 已全部按「当前仓库版本 + 丢失改动」重建，并做 27 文件标记全量核对 = **all-ok**。
+> 规范（此后执行）：**任何回写前先从仓库取当前内容为基线**，绝不使用静态镜像。
+
+**本批 asfund 消费方迁移**（均以当前版本为基线）：
+
+| 文件 | 迁移点 | 影子对拍 |
+|---|---|---|
+| `quant_scripts/limitup_concept_rank.py` | `fetch_fund()` | 5 只 / **0 差异** |
+| `quad_resonance.py` | `batch_asfund()`（保留本模块 tag 映射） | 5 只 / **0 差异** |
+| `quant_scripts/fish_body_enhanced.py` | asfund → `fetch_asfund_rows()` | 修复「裸尾码恒空」（0→1 行） |
+
+- `fish_body_enhanced` 实证：旧代码用**裸 6 位码**调 asfund → 恒返空（fund 维度失效）；新层自动 `norm()` 加前缀 → 恢复。测试例：`asfund 600519`=0 行、`asfund sh600519`=1 行。
+
 ## v2.21 (2026-10-15)
 
 ### ⚙️ 阶段 3 推进：缓存铺开 3 条流水线 ＋ 板块/资金消费方迁移（6 文件）
