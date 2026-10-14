@@ -5,6 +5,22 @@
 
 ---
 
+## v2.24 (2026-10-15)
+
+### 阶段 4 启动 · 外部独立源适配器（批次 4.1：腾讯行情）
+
+**背景**：31 个脚本直连 9 类外部源（腾讯/新浪/东财/同花顺/开盘啦…），各自「拼 URL + 手写解析 + 各自重试」，是取数标准化最后一层。
+
+**本批（腾讯行情）**：
+- `fetch.py` 新增 `parse_gtimg(raw)` + **`ext_gtimg(codes, batch=50, retries=3)`**（qt.gtimg.cn，GBK，带重试）。
+  字段位实测：1名称 3现价 4昨收 5今开 6量(手) 32涨跌幅% 33最高 34最低 37额(万) 44流通市值(亿) 45总市值(亿) 47涨停 48跌停。
+- `quote()` 改为委托 `ext_gtimg`（向后兼容，返回 name/price/prev_close/open）。
+- 消费方迁移（影子对拍，包裹式「优先 fetch 层、失败回退本地」）：
+  - `quant_scripts/st_guard.py` `fetch_names` → ext_gtimg（8 只逐一对比 **0 差异**）。
+  - `gen_mainboard.py` `fetch_names_batch`（新）→ ext_gtimg（含 ST 批次 **0 差异**，36 只 + 含 ST/PT 批次全等）。
+
+**待办（阶段 4 剩余批次）**：4.2 腾讯长历史 fqkline（gen_fish_pool/fetch_hist_index/fetch_history）｜4.3 新浪（hq.sinajs→行情、zhibo→7x24 资讯、money.finance→行业成分）｜4.4 东财 push2ex 涨停池（limitup_concept_rank/wangzhe_track/beast_pool_screener）｜4.5 同花顺月线（inbull_threshold_monitor）。
+
 ## v2.23 (2026-10-15)
 
 ### 修复「根目录脚本无法导入 fetch」+ sector_flow 收口（阶段 3 收尾）
