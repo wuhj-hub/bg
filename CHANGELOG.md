@@ -5,6 +5,18 @@
 
 ---
 
+## v2.15 (2026-10-14)
+
+### 🚀 第 2 层·阶段 2 第四批迁移（2 个）＋ 发现 1 处解析缺陷（待决策）
+
+| 脚本 | 迁移点 | 影子对拍 |
+|---|---|---|
+| `quant_scripts/xihu_turns_check.py` | `fetch_index()`（上证指数 limit 900） | dates/closes **全等**（900 根） |
+| `quant_scripts/month_frame.py` | `fetch_month_rows()`（月线，不复权） | 9 只 / **0 差异** |
+
+- **累计已迁移 13 个 kline 调用点**。
+- ⚠️ **发现缺陷（未改，留待决策）**：`quant_scripts/monthly_macd_monitor.py` 的 `parse_monthly()` 取 `parts[3]` 当 close（实测 2026-10-14 得 3864.12 = **high**，真收盘 3767.23）——单股月线列序为 `date|open|last|high|low|...`，作者疑似误用批量列序（`symbol|date|open|last|high|low`）。即该脚本的 MACD 实际跑在**最高价**序列上。属数据口径 bug（非模型先验），改动会改变其输出，故**本轮不迁移、先上报**。
+
 ## v2.14 (2026-10-14)
 
 ### 🚀 第 2 层·阶段 2 第三批迁移（5 个重脚本 → `fetch.kline`）
