@@ -5,6 +5,24 @@
 
 ---
 
+## v2.14 (2026-10-14)
+
+### 🚀 第 2 层·阶段 2 第三批迁移（5 个重脚本 → `fetch.kline`）
+
+本批覆盖「全市场宽度 / 猛兽核心 / RSV强度 / 涨停概念 / 涨停王者漏斗」五个盘后主力：
+
+| 脚本 | 迁移点 | 影子对拍 |
+|---|---|---|
+| `market_width.py` | 批量+缺口+逐只+上证指数（200日成本线，limit 250） | 批量 37 只 + 指数 250 根 / **0 差异** |
+| `quant_scripts/beast_screener.py` | `parse_kline_df()`（单股，保留旧 cli 回退） | 6 只 ×(60/250) / **值级 0 差异** |
+| `quant_scripts/xihu_rsv.py` | `fetch()`（批量，qfq） | 19 只 / **值级 0 差异** |
+| `quant_scripts/limitup_concept_rank.py` | `fetch_all()`（日 qfq）+ `fetch_month_strength()`（月，不复权） | 日 37 / 月 37，**值级 0 差异** |
+| `quant_scripts/wangzhe_funnel.py` | `fetch_klines()`（不复权） | 37 只 / **值级 0 差异** |
+
+- **累计已迁移 11 个 kline 调用点**（+wangzhe_track/top_signal/xihu_breadth/scan_123_2b/rsv_strength/yitong_screener）。
+- 附带修复：`xihu_rsv.fetch()` 旧「逐只兜底」因单股输出无 symbol 列而恒空（`parse_batch_kline` 要求 `symbol` 列）→ 现已由 fetch.kline 统一处理；`beast_screener` 旧路径硬编码 npx，现直调。
+- 复权口径严格对齐：日线多为 `fq=qfq`，`wangzhe_funnel`/月线为**不复权**（保持原样），逐脚本核对，绝不臆改。
+
 ## v2.13 (2026-10-14)
 
 ### 🚀 第 2 层·阶段 2 第二批迁移（4 个批量取数主力 → `fetch.kline`）
