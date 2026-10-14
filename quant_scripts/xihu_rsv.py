@@ -101,25 +101,20 @@ def _kline_args(codes, period, limit):
 
 
 def fetch(codes, period, limit, chunk=40, workers=8, retries=2):
-    """并发批量拉K线 + 缺失补齐（防 westock 静默丢股票）"""
+    """2026-10-14：取数委托统一取数层 fetch.kline（qfq；批量/重试/免npx/缺口兜底统一收口）。
+    → {full_code: [ {date,open,close,high,low,volume,amount}, ... 升序]}（与 parse_batch_kline 同结构）。
+    chunk/workers/retries 保留仅为兼容旧调用签名。"""
     codes = [norm(c) for c in codes]
-    batches = [codes[i:i + chunk] for i in range(0, len(codes), chunk)]
-
-    def _one(sub):
-        for _ in range(retries):
-            d = parse_batch_kline(cli(_kline_args(sub, period, limit)))
-            if d:
-                return d
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(codes, period=period, limit=limit, fq="qfq")
+        return {c: [{"date": b["date"], "open": b["open"], "close": b["close"],
+                     "high": b["high"], "low": b["low"],
+                     "volume": b.get("volume"), "amount": b.get("amount")} for b in bars]
+                for c, bars in raw.items()}
+    except Exception:
         return {}
-
-    data = {}
-    with ThreadPoolExecutor(max_workers=workers) as ex:
-        for d in ex.map(_one, batches):
-            data.update(d)
-    missing = [c for c in codes if c not in data]
-    for c in missing:                      # 逐只补齐
-        data.update(parse_batch_kline(cli(_kline_args([c], period, limit))))
-    return data
 
 
 # ============================================================
