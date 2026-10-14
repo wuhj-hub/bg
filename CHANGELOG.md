@@ -5,6 +5,17 @@
 
 ---
 
+## v2.12 (2026-10-14)
+
+### 🚀 第 2 层·阶段 2 首批迁移（取数 → `fetch.kline`）
+
+- `quant_scripts/wangzhe_track.py`：`fetch_bars_batch` 委托 `fetch.kline`（保留原签名与元组返回）；**影子对拍：40 只样本命中 36 只、逐 bar 0 差异**。
+- `quant_scripts/top_signal.py`：`fetch_idx_kline` 委托 `fetch.kline`（保留 date/open/last/high/low/amount 行结构）；**对拍：60 行 0 差异**。
+- `quant_scripts/fetch.py` 修 bug：kline 单只（无 symbol 列）解析键回填为代码。
+- 迁移原则：逐个脚本**影子双跑对拍一致后**才切换，不改任何模型逻辑。
+
+---
+
 ## v2.11 (2026-10-14)
 
 ### 🚀 第 2 层「取数层标准化」启动
