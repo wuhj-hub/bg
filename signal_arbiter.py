@@ -382,6 +382,7 @@ def load_market_width():
 def fetch_month_closes(code, limit=12):
     """2026-10-15：委托统一取数层 fetch.kline（月线不复权）。→ 收盘价列表 **降序**（closes[0]=最新）。"""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts"))
     try:
         from fetch import kline as _fk
         bars = _fk([code], period="month", limit=limit).get(code, [])
