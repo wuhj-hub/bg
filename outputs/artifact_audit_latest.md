@@ -1,13 +1,14 @@
-# 🔍 产物入库审计 · 2026-10-14
+# 🔍 产物入库审计 · 2026-10-15
 
-> 扫描 76 个产出路径 / 101 个提交路径 / 30 个消费读取路径
-> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **4** ｜ ✅ 已提交 **72** ｜ ❔ 提交但未见生成 41 ｜ 🧬 陈旧副本 **0**
+> 扫描 77 个产出路径 / 101 个提交路径 / 30 个消费读取路径
+> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **5** ｜ ✅ 已提交 **72** ｜ ❔ 提交但未见生成 41 ｜ 🧬 陈旧副本 **0**
 
 ## 🟡 写而未提交（其余，多为研究/一次性产物）
 
 | 产物 | 写出位置 |
 |---|---|
 | `em_industry.json` | quant_scripts/inbull_scan.py |
+| `kline_{var}_{var}_{var}.json` | quant_scripts/fetch.py |
 | `sw_l1_industry.json` | quant_scripts/inbull_scan.py |
 | `入牛阈值漂移_{var}.md` | quant_scripts/inbull_threshold_monitor.py |
 | `权重提案_{var}.json` | quant_scripts/learn_weights.py |
@@ -66,9 +67,9 @@
 
 | 产物 | 根日期 | outputs日期 | 判定 |
 |---|---|---|---|
-| `env_latest.json` | 2026-10-13 | 2026-10-13 | 同步 |
-| `market_width_latest.json` | 2026-10-13 | 2026-10-13 | 同步 |
-| `qiankun_a_latest.json` | 2026-10-13 | 2026-10-13 | 同步 |
-| `sector_component_em.json` | 2026-10-13 | 2026-10-13 | 同步 |
+| `env_latest.json` | 2026-10-14 | 2026-10-14 | 同步 |
+| `market_width_latest.json` | 2026-10-14 | 2026-10-14 | 同步 |
+| `qiankun_a_latest.json` | 2026-10-14 | 2026-10-14 | 同步 |
+| `sector_component_em.json` | 2026-10-14 | 2026-10-14 | 同步 |
 | `xihu_breadth_history.json` | 2024-06-11 | 2024-06-11 | 同步 |
-| `四维共振_latest.json` | 2026-10-13 | 2026-10-13 | 同步 |
+| `四维共振_latest.json` | 2026-10-14 | 2026-10-14 | 同步 |
