@@ -127,42 +127,19 @@ def fetch_ths(codes, workers=12):
 
 
 def fetch_westock(codes, batch=250):
-    """回退：westock 月线（仅约 61 个月）"""
-    import shutil
-    w = shutil.which("westock-data-skillhub")
-    W = [w] if w else ["npx", "-y", "westock-data-skillhub@1.0.3"]
+    """回退：westock 月线（约 61 个月）。2026-10-15：委托统一取数层 fetch.kline。→ [(sym, ym, close)]"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     rows = []
-    for i in range(0, len(codes), batch):
-        chunk = codes[i:i + batch]
-        try:
-            r = subprocess.run(W + ["kline", ",".join(chunk), "--period", "month", "--limit", "61"],
-                               capture_output=True, text=True, timeout=240)
-            txt = r.stdout or ""
-        except Exception:
-            txt = ""
-        hdr, data = None, {}
-        for ln in txt.splitlines():
-            s = ln.strip()
-            if not s.startswith("|"):
-                continue
-            parts = [x.strip() for x in s.strip("|").split("|")]
-            if "date" in parts and "symbol" in parts:
-                hdr = parts; continue
-            if not hdr or not parts or set(parts[0]) <= set("-"):
-                continue
-            try:
-                sym, dt = parts[0], parts[1]
-                ci = hdr.index("last")
-                if re.match(r"^(sh|sz)\d{6}$", sym) and re.match(r"^\d{4}-\d{2}-\d{2}$", dt):
-                    c = float(parts[ci])
-                    if c > 0:
-                        data.setdefault(sym, []).append((dt[:7], c))
-            except (ValueError, IndexError):
-                pass
-        for c, lst in data.items():
-            for ym, cl in lst:
-                rows.append((c, ym, cl))
-        print(f"  westock batch {i//batch+1}/{(len(codes)+batch-1)//batch} rows={len(rows)}", flush=True)
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period="month", limit=61)
+    except Exception:
+        return rows
+    for c, bars in raw.items():
+        for b in bars:
+            if b.get("close", 0) > 0:
+                rows.append((c, b["date"][:7], b["close"]))
+    print(f"  westock rows={len(rows)}", flush=True)
     return rows
 
 
