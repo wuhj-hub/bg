@@ -5,6 +5,19 @@
 
 ---
 
+## v2.16 (2026-10-14)
+
+### 🚀 第 2 层·阶段 2 第五批迁移（2 个）
+
+| 脚本 | 迁移点 | 影子对拍 |
+|---|---|---|
+| `quant_scripts/fish_body_enhanced.py` | 3 处 kline（大盘温度指数 / 个股评分 / 黄金起爆线） | 7 只 + 大盘 temp **一致** |
+| `quant_scripts/dragon_leader.py` | `get_stock_hist()` 主源（kline qfq；东财/新浪回退保留） | 6 只 / **0 差异** |
+
+- **累计已迁移 15 个 kline 调用点**。
+- `fish_body_enhanced.py` 为「鱼身/多维」两条链路共享脚本，改动仅限取数入口；统一层负责 retry/免npx/缺口，脚本内原「首调冷启动重试」保留为回退。
+- `dragon_leader.get_stock_hist()` 原 westock 分支输出的降序需 `recs.reverse()` 校正，fetch.kline 直接升序，已对齐；akshare 两路回退原样保留。
+
 ## v2.15 (2026-10-14)
 
 ### 🚀 第 2 层·阶段 2 第四批迁移（2 个）＋ 发现 1 处解析缺陷（待决策）
