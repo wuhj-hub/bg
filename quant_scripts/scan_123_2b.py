@@ -120,6 +120,25 @@ def parse_kline_batch(txt, limit=KLINE_LIMIT):
     return by
 
 
+def fetch_kline_batch(codes, limit=KLINE_LIMIT):
+    """2026-10-14：委托统一取数层 fetch.kline（qfq 前复权；批量/重试/免npx/缺口兜底统一收口）。
+    → {wcode: [ {date,open,high,low,close}, ... 升序]}，与 parse_kline_batch 同结构。"""
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period="day", limit=limit, fq="qfq")
+        return {c: [{"date": b["date"], "open": b["open"], "high": b["high"],
+                     "low": b["low"], "close": b["close"]} for b in bars]
+                for c, bars in raw.items()}
+    except Exception:
+        return {}
+
+
+def fetch_kline_one(code, limit=KLINE_LIMIT):
+    """单只（逐只兜底用）。"""
+    return fetch_kline_batch([code], limit).get(code, [])
+
 def trendline_slope(rows, window=5):
     """最近window根收盘的线性趋势（简化：用首尾差/根数）"""
     if len(rows) < window + 1:
@@ -224,7 +243,7 @@ def to_result(code, name, rows):
 
 def analyze(code, name=""):
     """单只检测（逐只兜底用）"""
-    rows = parse_kline(cli(["kline", code, "--period", "day", "--limit", str(KLINE_LIMIT), "--fq", "qfq"]))
+    rows = fetch_kline_one(code)
     return to_result(code, name, rows)
 
 
@@ -286,9 +305,7 @@ def main():
     for i in range(0, n, BATCH):
         chunk = pool[i:i + BATCH]
         syms = [c for c, _ in chunk]
-        txt = cli(["kline", ",".join(syms), "--period", "day", "--limit", str(KLINE_LIMIT), "--fq", "qfq"],
-                  timeout=180)
-        d = parse_kline_batch(txt, limit=KLINE_LIMIT)
+        d = fetch_kline_batch(syms, limit=KLINE_LIMIT)
         got = 0
         for c, name in chunk:
             rows = d.get(c) or d.get("")
@@ -306,9 +323,7 @@ def main():
         still = []
         for j in range(0, len(misses), 250):
             sub = misses[j:j + 250]
-            txt = cli(["kline", ",".join(c for c, _ in sub), "--period", "day",
-                       "--limit", str(KLINE_LIMIT), "--fq", "qfq"], timeout=180)
-            d = parse_kline_batch(txt, limit=KLINE_LIMIT)
+            d = fetch_kline_batch([c for c, _ in sub], limit=KLINE_LIMIT)
             for c, name in sub:
                 rows = d.get(c) or d.get("")
                 if rows:
@@ -316,7 +331,7 @@ def main():
                 else:
                     still.append((c, name))
         for c, name in still[:GAP_PERSTOCK_CAP]:
-            rows = parse_kline(cli(["kline", c, "--period", "day", "--limit", str(KLINE_LIMIT), "--fq", "qfq"]))
+            rows = fetch_kline_one(c)
             if rows:
                 rows_by[c] = (name, rows)
         if len(still) > GAP_PERSTOCK_CAP:
