@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""fetch.py —— 统一取数层（第 2 层 · 取数标准化）v0.1
+"""fetch.py —— 统一取数层（第 2 层 · 取数标准化）v0.2
 
-第 1 批：`kline`（日/周/月/分钟）+ `quote`（腾讯行情）。
-统一收口历史上被反复重写的 5 件事：**批量 / 重试退避 / 免 npx / 缺口兜底 / 解析**。
+v0.1：`kline`（日/周/月/分钟）+ `quote`（腾讯行情）。
+v0.2（2026-10-15，阶段 3）新增：
+- `asfund(codes, date=None)`  资金（westock asfund）
+- `board()` / `hotboard(limit)`  板块（westock board / hot board）
+- `minute(code, days=None)`  分时（westock **minute** 子命令；单只）
+- **磁盘缓存**（opt-in）：`FETCH_CACHE=1`（或显式 cache_dir）开启；
+  防倒灌规则：只信任「最后一根 bar 日期 < 今天(北京)」的缓存（=历史已完结），
+  同交易日数据一律重取；另可用 `FETCH_CACHE_TTL`（秒）显式允许同日短期复用。
+
+统一收口历史上被反复重写的 6 件事：**批量 / 重试退避 / 免 npx / 缺口兜底 / 解析 / 缓存**。
 
 设计约束（沿用体系既有教训）：
 - kline 批量 250/批、**串行**（并发会限流丢数）；缺口小批复取 + 逐只有限兜底（≤10 只）。
@@ -12,23 +20,36 @@
 - 解析表头驱动（兼容 batch 含 symbol / 单只无 symbol，列序变化不炸）。
 
 用法：
-    from fetch import kline, quote
-    kl = kline(["sh600519","sz000001"], period="day", limit=250)
-    q  = quote(["sh600519"])
+    from fetch import kline, quote, asfund, board, hotboard, minute
+    kl = kline(["sh600519", "sz000001"], period="day", limit=250)
+    kl = kline(codes, period="day", limit=250, use_cache=True)
+    f  = asfund(["600519"], date="2026-10-14")
+    raw = board(); raw2 = hotboard(8)
 详见知识库《第2层·取数层对账与设计草案_2026-10-14》。
 """
 import os
 import re
+import json
 import time
 import shutil
+import hashlib
+import tempfile
+import datetime
 import subprocess
 import urllib.request
 
-_PERIOD_OK = {"day", "week", "month", "m1", "m5", "m15", "m30", "m60"}
+_PERIOD_OK = {"day", "week", "month", "season", "year"}   # 2026-10-15 实测：本版仅支持这 5 个周期（m1 等已移除）
 KLINE_BATCH = 250        # 批量大小（250/批零丢失）
 GAP_BATCH = 40           # 缺口小批复取
 GAP_PERSTOCK_CAP = 10    # 缺口逐只兜底上限（防退市票空耗）
 TIMEOUT = 120
+
+# ── 缓存配置 ──
+# 默认放在系统临时目录（不落仓库 → 不进提交清单/不触发产物审计）；同一次 CI job 内跨 step 共享。
+CACHE_DIR = (os.environ.get("FETCH_CACHE_DIR")
+             or os.path.join(tempfile.gettempdir(), "bg_fetch_cache"))
+_CACHE_ON = os.environ.get("FETCH_CACHE", "0").strip().lower() not in ("0", "", "false", "no")
+CACHE_TTL = int(os.environ.get("FETCH_CACHE_TTL", "0") or "0")   # >0 才允许「同交易日」短期复用
 
 WESTOCK = ([shutil.which("westock-data-skillhub")]
            if shutil.which("westock-data-skillhub")
@@ -54,6 +75,83 @@ def chunks(seq, n):
         yield seq[i:i + n]
 
 
+def norm(code):
+    """纯数字/带前缀 code → sh/sz/bj 前缀（asfund/minute 等子命令要求带前缀）。"""
+    code = str(code).strip()
+    if code.startswith(("sh", "sz", "bj", "pt")):
+        return code
+    if code.startswith(("6", "9", "5")):
+        return "sh" + code
+    if code.startswith(("4", "8")):
+        return "bj" + code
+    return "sz" + code
+
+
+# ══════════════════════════════════════════════════════════
+#  缓存层（opt-in）
+# ══════════════════════════════════════════════════════════
+def _today_bj():
+    return (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%Y-%m-%d")
+
+
+def _cache_enabled(use_cache):
+    return _CACHE_ON if use_cache is None else bool(use_cache)
+
+
+def _kline_cache_path(code, period, fq):
+    tag = hashlib.md5(("%s|%s|%s" % (code, period, fq or "nfq")).encode("utf-8")).hexdigest()[:16]
+    return os.path.join(CACHE_DIR, "kline_%s_%s_%s.json" % (period, fq or "nfq", tag))
+
+
+def _read_cache(path):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def _write_cache(path, rec):
+    """写缓存；防倒灌：若已有缓存最后一根 bar 日期更晚，则不覆盖。"""
+    try:
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        old = _read_cache(path)
+        if old:
+            old_last = (old.get("bars") or [{}])[-1].get("date", "")
+            new_last = (rec.get("bars") or [{}])[-1].get("date", "")
+            if old_last and new_last and old_last > new_last:
+                return
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(rec, f, ensure_ascii=False)
+    except Exception:
+        pass
+
+
+def _cache_usable(rec, period, limit, fq):
+    """可用性判定：只信任历史已完结的缓存（最后 bar < 今天）；TTL>0 时允许同日短期复用。"""
+    if not rec or rec.get("period") != period or rec.get("fq") != fq:
+        return False
+    bars = rec.get("bars") or []
+    if not bars:
+        return False
+    if rec.get("limit", 0) < limit:
+        return False
+    last = bars[-1].get("date", "")
+    today = _today_bj()
+    if last < today:
+        return True
+    if CACHE_TTL > 0:
+        try:
+            age = time.time() - float(rec.get("fetched_at") or 0)
+            return 0 <= age <= CACHE_TTL
+        except Exception:
+            return False
+    return False
+
+
+# ══════════════════════════════════════════════════════════
+#  K线
+# ══════════════════════════════════════════════════════════
 def parse_kline_txt(txt, limit=None):
     """westock kline 表格 → {code: [{date,open,high,low,close,volume,amount}, ... 升序]}。
     表头驱动（兼容 batch 含 symbol 列 / 单只无 symbol）。"""
@@ -96,10 +194,34 @@ def parse_kline_txt(txt, limit=None):
     return by
 
 
-def kline(codes, period="day", limit=250, fq=None):
-    """批量 K线 → {code: [bar, ...]}；缺口的逐只有限兜底。"""
-    assert period in _PERIOD_OK, "unsupported period: %s" % period
+def parse_kv_table(txt):
+    """westock 长表（含 symbol/code 列）→ {symbol: {列名: 值(str)}}（表头驱动）。"""
+    out, header = {}, None
+    for ln in txt.splitlines():
+        s = ln.strip()
+        if not s.startswith("|"):
+            continue
+        parts = [p.strip() for p in s.strip("|").split("|")]
+        if header is None:
+            if ("symbol" in parts) or ("code" in parts):
+                header = parts
+            continue
+        if "---" in parts[0]:
+            continue
+        if len(parts) < 2:
+            continue
+        try:
+            sym = parts[header.index("symbol")] if "symbol" in header else parts[0]
+            if not re.match(r"^[A-Za-z0-9]+$", sym or ""):
+                continue
+            out[sym] = {header[i]: parts[i] for i in range(min(len(header), len(parts)))}
+        except (ValueError, IndexError):
+            continue
+    return out
 
+
+def _fetch_kline_raw(codes, period, limit, fq):
+    """底层：批量 + 缺口兜底，返回 {code: [bar,...]}（表头驱动解析）。"""
     def _args(batch):
         a = ["kline", ",".join(batch), "--period", period, "--limit", str(limit)]
         if fq:
@@ -108,7 +230,6 @@ def kline(codes, period="day", limit=250, fq=None):
 
     def _fetch(batch):
         got = parse_kline_txt(_run(_args(batch)), limit=limit)
-        # 单只输出无 symbol 列 → 解析键为 ""，回填为该代码
         if len(batch) == 1 and batch[0] not in got and "" in got:
             got[batch[0]] = got.pop("")
         return got
@@ -125,6 +246,37 @@ def kline(codes, period="day", limit=250, fq=None):
     return result
 
 
+def kline(codes, period="day", limit=250, fq=None, use_cache=None):
+    """批量 K线 → {code: [bar, ...]}；缺口逐只有限兜底；可选磁盘缓存。
+
+    use_cache: None=跟随 env FETCH_CACHE；True/False 强制。
+    缓存命中条件见 `_cache_usable`（默认只复用历史已完结数据，防倒灌）。
+    """
+    assert period in _PERIOD_OK, "unsupported period: %s" % period
+    codes = list(codes)
+    cache_on = _cache_enabled(use_cache)
+    out, need = {}, list(codes)
+    if cache_on:
+        need = []
+        for c in codes:
+            rec = _read_cache(_kline_cache_path(c, period, fq))
+            if rec and _cache_usable(rec, period, limit, fq):
+                out[c] = rec["bars"][-limit:] if limit else rec["bars"]
+            else:
+                need.append(c)
+    fetched = _fetch_kline_raw(need, period, limit, fq) if need else {}
+    if cache_on and fetched:
+        for c, bars in fetched.items():
+            _write_cache(_kline_cache_path(c, period, fq),
+                         {"period": period, "fq": fq, "limit": limit,
+                          "bars": bars, "fetched_at": time.time(), "fetched_day": _today_bj()})
+    out.update(fetched)
+    return out
+
+
+# ══════════════════════════════════════════════════════════
+#  行情快照 / 资金 / 板块 / 分时
+# ══════════════════════════════════════════════════════════
 def quote(codes):
     """腾讯行情批量快照 → {code: {name, price, prev_close, open}}（batch 50，GBK）。"""
     out = {}
@@ -152,6 +304,64 @@ def quote(codes):
     return out
 
 
+def asfund(codes, date=None):
+    """westock asfund 资金流向 → {code: {列名: 值(str)}}（表头驱动）。
+    ⚠️ 必须带前缀代码（内部自动 norm）；date: 'YYYY-MM-DD'（YYYYMMDD 会返空）；缺省取最新。"""
+    out = {}
+    codes = [norm(c) for c in codes]
+    for batch in chunks(codes, 60):
+        args = ["asfund", ",".join(batch)]
+        if date:
+            args += ["--date", date]
+        out.update(parse_kv_table(_run(args, timeout=240)))
+    return out
+
+
+def board():
+    """westock 板块（行业+概念+资金，原始 markdown 文本）。"""
+    return _run(["board"])
+
+
+def hotboard(limit=8):
+    """westock 热门板块（原始 markdown 文本）。"""
+    return _run(["hot", "board", "--limit", str(limit)])
+
+
+def minute(code, days=None):
+    """westock **minute** 子命令分时 → list[dict]（单只，升序）。
+    列：time, price, volume, amount（days>1 时另含 date）。
+    ⚠️ 仅支持单只（批量会报 code param error）。"""
+    args = ["minute", norm(code)]
+    if days:
+        args += ["--days", str(days)]
+    txt = _run(args, timeout=180)
+    rows, header = [], None
+    for ln in txt.splitlines():
+        s = ln.strip()
+        if not s.startswith("|"):
+            continue
+        parts = [p.strip() for p in s.strip("|").split("|")]
+        if "time" in parts:
+            header = parts
+            continue
+        if not header or "---" in parts[0]:
+            continue
+        try:
+            row = {"time": parts[header.index("time")]}
+            if "date" in header:
+                row["date"] = parts[header.index("date")]
+            if "price" in header:
+                row["price"] = float(parts[header.index("price")])
+            if "volume" in header:
+                row["volume"] = float(parts[header.index("volume")])
+            if "amount" in header:
+                row["amount"] = float(parts[header.index("amount")])
+            rows.append(row)
+        except (ValueError, IndexError):
+            continue
+    return rows
+
+
 if __name__ == "__main__":
     import sys
     codes = sys.argv[1:] or ["sh600519"]
@@ -161,3 +371,7 @@ if __name__ == "__main__":
         if v:
             print("  latest:", k, v[-1])
     print("quote:", quote(codes))
+    print("asfund:", list(asfund(codes))[:3])
+    print("minute:", minute(codes[0])[:3])
+    print("board head:", (board() or "")[:80].replace("\n", " / "))
+    print("hotboard head:", (hotboard(3) or "")[:80].replace("\n", " / "))
