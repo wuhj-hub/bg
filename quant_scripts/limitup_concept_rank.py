@@ -397,7 +397,18 @@ def fast_prepare(a):
 
 
 def recent_news(n=8):
-    """近期要闻（新浪 7x24），失败静默返回 []。给 GLM 提供「催化事件」事实锚点。"""
+    """近期要闻（新浪 7x24），失败静默返回 []。给 GLM 提供「催化事件」事实锚点。
+    2026-10-15：优先统一取数层 fetch.ext_sina_news，失败回退本地。"""
+    try:
+        _d = os.path.dirname(os.path.abspath(__file__))       # quant_scripts
+        if _d not in sys.path:
+            sys.path.insert(0, _d)
+        from fetch import ext_sina_news as _sn
+        r = _sn(n)
+        if r:
+            return r
+    except Exception:
+        pass
     try:
         u = f"https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size={n}&zhibo_id=152"
         req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"})
