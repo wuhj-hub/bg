@@ -20,6 +20,9 @@ import json, os, re, subprocess, sys, time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts"))
+
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 OUT_DIR = "outputs"
 
