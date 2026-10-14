@@ -73,7 +73,19 @@ def load_holdings(fpath):
     return out
 
 def fetch_kline(code, limit=120):
-    """腾讯proxy近N日K线（快）"""
+    """腾讯proxy近N日K线（快）。
+    2026-10-15：优先统一取数层 fetch.ext_fqkline（host轮转/重试），失败回退本地实现。"""
+    try:
+        import sys as _sys
+        _d = os.path.dirname(os.path.abspath(__file__))     # quant_scripts
+        if _d not in _sys.path:
+            _sys.path.insert(0, _d)
+        from fetch import ext_fqkline as _f
+        bars = _f([code], count=limit).get(code) or []
+        if bars:
+            return [{"date": b["date"], "last": b["close"]} for b in bars]
+    except Exception:
+        pass
     url = f"https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get?param={code},day,,,{limit},qfq"
     try:
         import urllib.request
