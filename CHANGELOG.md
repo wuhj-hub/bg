@@ -5,6 +5,26 @@
 
 ---
 
+## v2.9 (2026-10-14)
+
+### 🐛 修复：报告产物「多副本陈旧劫持」
+
+- **症状**：盘前报告 ③.3「资金维度板块主线」自 ≈2026-09-04 上线起逐字不变（恒为 08 月的半导体/元件/电子…）。
+- **根因**：reader（`read_heshi_resonance` / `gen_review_report.read_sector_resonance`）把 `outputs/板块共振_latest.json` 排在候选路径首位，而该副本自 **2026-08-13** 起未再提交（`quant_scan` 只 `cp` 到仓库根并**只提交根副本**）→ 跨作业消费者（盘前/复盘作业自身不产该文件、仅 checkout）永远读到僵尸数据。
+- **判别规则**：产物若在「消费作业之外的另一个作业」生成，其 `outputs/` 副本一旦掉出提交清单就会冻结；同一作业内生成的（信号仲裁/市场风格，由 quant_report 产并被同作业复盘消费）因运行时刚写过而安全。
+- **修复**：
+  - `gen_premarket_report.read_heshi_resonance` / `gen_review_report.read_sector_resonance` 改用新助手 `_pick_newest_json()`（按 `data_date>bar_date>trade_date>date` 取最新；首个无日期则保持）。
+  - 删除 6 个陈旧 `outputs/` 副本：`板块共振_latest`(08-13)、`信号仲裁_latest`(08-11)、`market_style_latest`(08-11)、`xihu_breadth_latest`(09-27)、`黑石板块共振_latest`(08-07)、`liangxue_latest`(08-30)（均不在提交清单，不会复活）。
+- **验证**：`workflow_dispatch` 重生成 10-14 盘前报告 → ③.3 已刷新为 10-13 数据；②「🗺️空 共振板块」由 9 → 8。
+
+### ✨ 自检增强：多副本新鲜度
+
+- `quant_scripts/artifact_audit.py` 新增 `check_dup_freshness()`：比对「仓库根 vs `outputs/`」同名产物日期，输出 `dup_freshness`/`dup_stale` 字段与「🧬 多副本新鲜度」节；`dup_stale>0` 即 `--strict` 退出 1。
+- `.github/workflows/artifact_audit.yml` 告警接入 `dup_stale`。
+- 验证：artifact_audit CI run31 `dup_stale=[]`。
+
+---
+
 ## v2.8 (2026-09-30)
 
 ### 🔧 数据源自检加固（selfcheck ①）
