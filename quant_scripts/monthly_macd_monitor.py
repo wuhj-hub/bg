@@ -29,19 +29,44 @@ def cli(args, timeout=60):
 
 
 def parse_monthly(txt, limit=60):
-    """解析月线K线（升序），返回 [{date, close}]"""
+    """解析月线K线（升序），返回 [{date, close}]。
+    2026-10-15 修复：改为**表头驱动**取收盘列（date 后的 last/close），
+    此前硬编码 parts[3]，在单股列序 date|open|last|high|low 下取到的是 **high**（列错位 bug）。"""
     rows = []
+    header = None
     for ln in txt.splitlines():
         s = ln.strip()
-        if s.startswith("|") and re.match(r"^\|\s*20\d{2}-\d{2}", s):
-            parts = [p.strip() for p in s.strip("|").split("|")]
-            if len(parts) >= 6 and re.match(r"^\d{4}-\d{2}", parts[0]):
-                try:
-                    rows.append({"date": parts[0], "close": float(parts[3])})
-                except ValueError:
-                    pass
+        if not s.startswith("|"):
+            continue
+        parts = [p.strip() for p in s.strip("|").split("|")]
+        if "date" in parts:
+            header = parts
+            continue
+        if not header or "---" in parts[0]:
+            continue
+        try:
+            di = header.index("date")
+            ci = header.index("last") if "last" in header else header.index("close")
+            if re.match(r"^\d{4}-\d{2}", parts[di]):
+                rows.append({"date": parts[di], "close": float(parts[ci])})
+        except (ValueError, IndexError):
+            continue
     rows.sort(key=lambda r: r["date"])
     return rows[-limit:]
+
+
+def fetch_month_rows(limit=60):
+    """2026-10-15：委托统一取数层 fetch.kline（月线，不复权）。→ [{date,close}] 升序。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        bars = _fk(["sh000001"], period="month", limit=limit).get("sh000001", [])
+        if bars:
+            bars = sorted(bars, key=lambda b: b["date"])
+            return [{"date": b["date"], "close": b["close"]} for b in bars][-limit:]
+    except Exception:
+        pass
+    return parse_monthly(cli(["kline", "sh000001", "--period", "month", "--limit", str(limit)]), limit=limit)
 
 
 def ema_series(vals, n):
@@ -74,8 +99,7 @@ def calc_macd(closes):
 
 
 def main():
-    txt = cli(["kline", "sh000001", "--period", "month", "--limit", "60"])
-    rows = parse_monthly(txt)
+    rows = fetch_month_rows(60)
     if len(rows) < 30:
         print("[ERR] 月线数据不足", file=sys.stderr)
         sys.exit(1)
