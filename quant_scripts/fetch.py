@@ -106,16 +106,22 @@ def kline(codes, period="day", limit=250, fq=None):
             a += ["--fq", fq]
         return a
 
+    def _fetch(batch):
+        got = parse_kline_txt(_run(_args(batch)), limit=limit)
+        # 单只输出无 symbol 列 → 解析键为 ""，回填为该代码
+        if len(batch) == 1 and batch[0] not in got and "" in got:
+            got[batch[0]] = got.pop("")
+        return got
+
     result = {}
     for batch in chunks(codes, KLINE_BATCH):
-        result.update(parse_kline_txt(_run(_args(batch)), limit=limit))
+        result.update(_fetch(batch))
         missing = [c for c in batch if c not in result]
         if missing:
             for sub in chunks(missing, GAP_BATCH):
-                result.update(parse_kline_txt(_run(_args(sub)), limit=limit))
+                result.update(_fetch(sub))
             for c in [c for c in missing if c not in result][:GAP_PERSTOCK_CAP]:
-                result.update(parse_kline_txt(_run(["kline", c, "--period", period, "--limit", str(limit)]),
-                                              limit=limit))
+                result.update(_fetch([c]))
     return result
 
 
