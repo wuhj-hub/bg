@@ -320,6 +320,7 @@ def batch_fetch_kline(wcodes, limit=130, chunk=40):
     """2026-10-15：委托统一取数层 fetch.kline（qfq）。
     → {symbol: [ {date, amount, last}, ...] 升序}（与 parse_batch_kline 同结构）。"""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts"))
     try:
         from fetch import kline as _fk
         raw = _fk(list(wcodes), period="day", limit=limit, fq="qfq")
@@ -355,6 +356,7 @@ def parse_batch_asfund(txt):
 def batch_fetch_asfund(wcodes, chunk=40):
     """2026-10-15：委托统一取数层 fetch.asfund。→ {symbol: {列名: 值(str)}}（与 parse_batch_asfund 同结构）。"""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts"))
     try:
         from fetch import asfund as _af
         return _af(list(wcodes))
