@@ -25,16 +25,43 @@ import json, os, subprocess, sys
 from datetime import datetime
 
 
+def _asfund_raw_text() -> str:
+    """2026-10-15：板块级 `asfund --market all` 原始文本。
+
+    优先统一取数层 fetch.raw（复用 免npx/重试退避/超时），失败回退本地 npx 命令。
+    """
+    try:
+        _root = os.path.dirname(os.path.abspath(__file__))
+        for _p in (os.path.join(_root, "..", "quant_scripts"),
+                   os.path.join(_root, "quant_scripts"), _root):
+            _p = os.path.normpath(_p)
+            if _p not in sys.path:
+                sys.path.insert(0, _p)
+        from fetch import raw as _raw
+        t = _raw("asfund --market all", timeout=60)
+        if t and t.strip():
+            return t
+    except Exception:
+        pass
+    try:
+        r = subprocess.run("npx westock-data-skillhub@1.0.3 asfund --market all 2>/dev/null",
+                           shell=True, capture_output=True, text=True, timeout=60)
+        if r.returncode == 0:
+            return r.stdout
+    except Exception as e:
+        print(f"[sector_flow] asfund error: {e}", file=sys.stderr)
+    return ""
+
+
 def run_asfund() -> list | None:
     """调用 westock asfund 获取板块资金流向数据"""
     # v2 改进：分别取今日和近5日数据，判断资金持续性
-    cmd = "npx westock-data-skillhub@1.0.3 asfund --market all 2>/dev/null"
     try:
-        r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=60)
-        if r.returncode != 0 or not r.stdout.strip():
+        txt = _asfund_raw_text()
+        if not txt or not txt.strip():
             return None
-        
-        lines = r.stdout.strip().split("\n")
+
+        lines = txt.strip().split("\n")
         if len(lines) < 2:
             return None
         
