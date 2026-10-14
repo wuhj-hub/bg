@@ -5,6 +5,26 @@
 
 ---
 
+## v2.26 (2026-10-15)
+
+### 阶段 4 · 批次 4.3：新浪系（行情 + 7×24 快讯）
+
+**fetch.py** 新增：
+- `ext_sina_quote(codes, batch=60, retries=3)` + `parse_sina_hq` —— 新浪 hq.sinajs（GBK，须带 `Referer: finance.sina.com.cn`）；字段 [0]名称 [1]今开 [2]昨收 [3]现价 [8]量 [9]额；自动算 pct。**与腾讯完全独立的行情体系**（cross_source_check 的必需源 B）。
+- `ext_sina_news(n, with_time=False)` —— 新浪财经 7×24（zhibo_id=152）；返回 [text] 或 [{time,text}]。
+
+**消费方迁移（影子对拍）**：
+| 脚本 | 函数 | 对拍 |
+|---|---|---|
+| `cross_source_check.py` | `sina_quote` | 9 只标的（指数+个股）name/close/pct **完全一致** |
+| `limitup_concept_rank.py` | `recent_news` | 输出一致 |
+| `glm_brief.py` | `_news` | 输出一致 |
+| `gen_premarket_report.py` | `get_news_7x24` | 与旧 curl 实现 **{time,text} 完全一致** |
+
+一次性收口了「同一 7×24 源在 3 个脚本里被写 3 遍（其中 1 遍走 curl）」的重复。
+
+**未迁移（未接 CI，离线工具）**：`sector_components.py`（money.finance.sina 板块清单+成分，双端点，体量较大）。
+
 ## v2.25 (2026-10-15)
 
 ### 阶段 4 · 批次 4.2：腾讯长历史 fqkline 适配器
