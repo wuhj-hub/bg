@@ -101,7 +101,31 @@ def load_rsg_map() -> dict:
 
 
 def parse_kline_df(code: str, limit: int = 60) -> pd.DataFrame:
-    """获取K线并解析为DataFrame (时间正序)"""
+    """获取K线并解析为DataFrame (时间正序)。
+    2026-10-14：优先委托统一取数层 fetch.kline（免npx/重试/缺口兜底），失败回退旧 cli 解析。"""
+    bars = None
+    try:
+        import sys as _sys
+        _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from fetch import kline as _fk
+        bars = _fk([code], period="day", limit=limit).get(code, [])
+    except Exception:
+        bars = None
+    if bars is not None:
+        if len(bars) < 10:
+            return pd.DataFrame()
+        df = pd.DataFrame([{
+            "date": b["date"], "open": b["open"], "close": b["close"],
+            "high": b["high"], "low": b["low"],
+            "volume": b.get("volume"), "amount": b.get("amount"),
+        } for b in bars])
+        if df.empty:
+            return df
+        df = df.sort_values("date").reset_index(drop=True)
+        for col in ['open','close','high','low','volume','amount']:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+        return df
+    # ── 回退：旧 cli 路径 ──
     raw = cli(f"kline {code} --period day --limit {limit}")
     rows = parse_table(raw)
     if len(rows) < 10:
