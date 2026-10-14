@@ -139,15 +139,26 @@ def load_sector():
 
 
 def fetch_ztpool(d8):
-    """东财涨停池 → (实际数据日 qdate, {6位代码: {...}})；失败返回 (None, {})（优雅降级）"""
+    """东财涨停池 → (实际数据日 qdate, {6位代码: {...}})；失败返回 (None, {})（优雅降级）
+    2026-10-15：优先统一取数层 fetch.ext_em_ztpool，失败回退本地。"""
+    data = None
     try:
-        raw = urllib.request.urlopen(
-            urllib.request.Request(ZT_URL.format(d=d8), headers=UA), timeout=25).read().decode()
-        data = json.loads(raw).get("data") or {}
-        pool, qdate = data.get("pool") or [], data.get("qdate")
-    except Exception as e:
-        print(f"[WARN] 涨停池获取失败（{e}），龙头榜将降级", flush=True)
-        return None, {}
+        _d = os.path.dirname(os.path.abspath(__file__))       # quant_scripts
+        if _d not in sys.path:
+            sys.path.insert(0, _d)
+        from fetch import ext_em_ztpool as _ez
+        data = _ez(d8, pagesize=500)
+    except Exception:
+        data = None
+    if data is None:
+        try:
+            raw = urllib.request.urlopen(
+                urllib.request.Request(ZT_URL.format(d=d8), headers=UA), timeout=25).read().decode()
+            data = json.loads(raw).get("data") or {}
+        except Exception as e:
+            print(f"[WARN] 涨停池获取失败（{e}），龙头榜将降级", flush=True)
+            return None, {}
+    pool, qdate = data.get("pool") or [], data.get("qdate")
     d = {}
     for p in pool:
         c = p.get("c") or ""
