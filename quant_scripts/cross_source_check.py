@@ -156,6 +156,16 @@ def _em_secid(code):
 
 
 def _em_one(code):
+    try:                                              # 2026-10-15：优先统一取数层 fetch.ext_em_stock
+        _d = os.path.dirname(os.path.abspath(__file__))   # quant_scripts
+        if _d not in sys.path:
+            sys.path.insert(0, _d)
+        from fetch import ext_em_stock as _es
+        q = _es(code)
+        if q:
+            return q
+    except Exception:
+        pass
     sid = _em_secid(code)
     if not sid:
         return None
