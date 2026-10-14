@@ -105,22 +105,28 @@ def parse_batch_kline(txt):
     return out
 
 
+def fetch_rows(codes, period, limit, fq=True):
+    """2026-10-14：委托统一取数层 fetch.kline（批量/重试/免npx/缺口兜底统一收口）。
+    → {full_code: [ {date,high,low,close}, ... 升序]}，与 parse_batch_kline 同结构。"""
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk([norm(c) for c in codes], period=period, limit=limit,
+                  fq=("qfq" if fq else None))
+        return {c: [{"date": b["date"], "high": b["high"], "low": b["low"], "close": b["close"]}
+                    for b in bars] for c, bars in raw.items()}
+    except Exception:
+        return {}
+
+
 def fetch_batch(codes, period, limit, fq=True, retries=3):
-    """批量拉K线，{full_code: rows升序}。失败批次重试。"""
+    """2026-10-14：取数委托统一取数层 fetch.kline；保留「返回≥80%才接受」的批次守卫。"""
     codes = [norm(c) for c in codes]
-    joined = ",".join(codes)
-    args = ["kline", joined, "--period", period, "--limit", str(limit)]
-    if fq:
-        args += ["--fq", "qfq"]
     for i in range(retries):
-        txt = cli(args)
-        if txt:
-            data = parse_batch_kline(txt)
-            # 校验：返回的代码数≥请求的80%才接受，否则重试
-            got = set(data.keys())
-            want = set(codes)
-            if len(got) >= max(1, int(len(want) * 0.8)):
-                return data
+        data = fetch_rows(codes, period, limit, fq=fq)
+        if len(data) >= max(1, int(len(codes) * 0.8)):
+            return data
         time.sleep(2 * (i + 1))
     return {}
 
@@ -346,13 +352,13 @@ def main():
             bench_name = BENCH
     if not bench_ok:
         for _i in range(3):
-            bench_rows = parse_kline(cli(["kline", BENCH, "--period", "day", "--limit", "160"]))
+            bench_rows = fetch_rows([BENCH], "day", 160).get(BENCH, [])
             if len(bench_rows) >= 100:
                 break
             time.sleep(2)
         bench_week_rows = []
         for _i in range(3):
-            bench_week_rows = parse_kline(cli(["kline", BENCH, "--period", "week", "--limit", "100"]))
+            bench_week_rows = fetch_rows([BENCH], "week", 100).get(BENCH, [])
             if len(bench_week_rows) >= 80:
                 break
             time.sleep(2)
