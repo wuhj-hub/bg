@@ -45,35 +45,18 @@ def cli(cmd, timeout=180):
     return ""
 
 def fetch_kline(symbols, period, limit):
-    """兼容批量(含symbol列)与单股(无symbol列)两种输出格式"""
-    md = cli(f"kline {','.join(symbols)} --period {period} --limit {limit} --fq qfq")
-    groups = {}
-    has_symbol = "| symbol |" in md
-    for ln in md.splitlines():
-        s = ln.strip()
-        if not s.startswith("|"):
-            continue
-        parts = [p.strip() for p in s.strip("|").split("|")]
-        if len(parts) < 7:
-            continue
-        try:
-            if has_symbol:
-                # 批量: | symbol | date | open | last | high | low | volume | amount | exchange |
-                if parts[0] == "symbol" or parts[0] == "---":
-                    continue
-                sym, d, o, c, h, l = parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]
-            else:
-                # 单股: | date | open | last | high | low | volume | amount | exchange |
-                if not re.match(r"\d{4}-\d{2}-\d{2}", parts[0]):
-                    continue
-                sym, d, o, c, h, l = symbols[0], parts[0], parts[1], parts[2], parts[3], parts[4]
-            groups.setdefault(sym, []).append(
-                {"date": d, "open": float(o), "close": float(c), "high": float(h), "low": float(l)})
-        except (ValueError, IndexError):
-            continue
-    for sym in groups:
-        groups[sym].sort(key=lambda x: x["date"])
-    return groups
+    """2026-10-14：委托统一取数层 fetch.kline（qfq 前复权；批量/重试/免npx/解析统一收口）。
+    → {sym: [ {date,open,close,high,low}, ... 升序]}（与旧实现同结构）。"""
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(symbols), period=period, limit=limit, fq="qfq")
+        return {c: [{"date": b["date"], "open": b["open"], "close": b["close"],
+                     "high": b["high"], "low": b["low"]} for b in bars]
+                for c, bars in raw.items()}
+    except Exception:
+        return {}
 
 def fetch_kline_gap(symbols, period, limit):
     """缺口兜底：对未取到的 symbols 小批(40)复取。不做逐只——全市场约7.6%为退市票（本就无数据），
