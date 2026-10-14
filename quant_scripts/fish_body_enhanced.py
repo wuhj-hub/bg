@@ -36,6 +36,19 @@ def parse_table(md):
         if len(v)==len(hdrs): res.append(dict(zip(hdrs,v)))
     return res
 
+def fetch_asfund_rows(code):
+    """2026-10-15：委托统一取数层 fetch.asfund（内部 norm 加前缀）。→ list[dict]（与 parse_table 同结构；单只）。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import asfund as _af
+        d = _af([code])
+        for _k, v in d.items():
+            return [v]
+    except Exception:
+        pass
+    return []
+
+
 def fetch_kline_rows(code, limit=60):
     """2026-10-14：委托统一取数层 fetch.kline（单股日线，免npx/重试）。
     → list[dict]，**日期降序**（最新在前），键 date/open/last/high/low/volume/amount（与旧 parse_table 一致）。"""
@@ -103,7 +116,7 @@ def get_market_temp():
 # === 模块B: 多维度个股评分 ===
 def score_stock_multi(code):
     tech=parse_table(run(f"{WESTOCK_CMD} technical {code} --group macd,rsi,kdj,boll,ma 2>/dev/null"))
-    fund=parse_table(run(f"{WESTOCK_CMD} asfund {code} 2>/dev/null"))
+    fund=fetch_asfund_rows(code) or parse_table(run(f"{WESTOCK_CMD} asfund {code} 2>/dev/null"))
     kline=fetch_kline_rows(code, 60) or parse_table(run(f"{WESTOCK_CMD} kline {code} --period day --limit 60 2>/dev/null"))
     tech=tech[0] if tech else {}
     fund=fund[0] if fund else {}
