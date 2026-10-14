@@ -518,6 +518,68 @@ def ext_sina_news(n=8, with_time=False, timeout=18):
     return out[:n]
 
 
+# ── 东方财富：涨停池（push2ex）+ 个股快照（push2delay）──
+EM_ZT_URL = ("https://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989"
+             "&dpt=wz.ztzt&Pageindex=0&pagesize={ps}&sort=fbt%3Aasc&date={d}")
+EM_STOCK_URL = ("https://push2delay.eastmoney.com/api/qt/stock/get?secid={sid}"
+                "&fields=f43,f57,f58,f59,f60,f170")
+EM_HEADERS = {"User-Agent": "Mozilla/5.0"}
+
+
+def ext_em_ztpool(date=None, pagesize=500, timeout=25, retries=3):
+    """东财涨停池（push2ex getTopicZTPool）→ data dict `{pool:[...], qdate, tc}`；失败 {}。
+
+    date: 'YYYYMMDD' 或 'YYYY-MM-DD'；None=今天(北京)。非交易日返回 {}；未来日期会返回最近可用日(qdate)。
+    pool 元素字段：c代码 n名称 p价格(×1000) zdp涨跌幅 amount额 ltsz流通市值 hs换手
+    lbc连板数 fbt首封时间 lbt最后封板 fund封单 zbc炸板 hybk行业 zttj涨停统计。
+    """
+    d = (date or _today_bj()).replace("-", "")[:8]
+    url = EM_ZT_URL.format(ps=pagesize, d=d)
+    for i in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=EM_HEADERS)
+            j = json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "ignore"))
+            data = j.get("data")
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            time.sleep(1.5 * (i + 1))
+    return {}
+
+
+def em_secid(code):
+    """代码 → 东财 secid（sh→1.xxxxxx，sz→0.xxxxxx）。"""
+    code = str(code).strip()
+    if code.startswith("sh"):
+        return "1." + code[2:]
+    if code.startswith("sz"):
+        return "0." + code[2:]
+    return None
+
+
+def ext_em_stock(code_or_secid, timeout=8):
+    """东财个股快照（push2delay /api/qt/stock/get）→ {name, close, pct}；失败/无数据 None。
+
+    ⚠️ 东财 push2/push2delay 自 2026-09-29 起对 CI 抖动 → 使用方应作为**机会源**（离线静默跳过）。
+    """
+    sid = code_or_secid if "." in str(code_or_secid) else em_secid(code_or_secid)
+    if not sid:
+        return None
+    try:
+        j = json.loads(urllib.request.urlopen(
+            urllib.request.Request(EM_STOCK_URL.format(sid=sid), headers=EM_HEADERS),
+            timeout=timeout).read().decode("utf-8", "ignore"))
+        d = (j or {}).get("data") or {}
+        if not d or d.get("f43") in (None, "-", 0):
+            return None
+        dec = int(d.get("f59") or 2)
+        close = float(d["f43"]) / (10 ** dec)
+        pct = float(d["f170"]) / 100 if d.get("f170") not in (None, "-") else None
+        return {"name": d.get("f58"), "close": round(close, 3),
+                "pct": round(pct, 2) if pct is not None else None}
+    except Exception:
+        return None
+
+
 def raw(args, timeout=TIMEOUT):
     """通用透传：直接执行 westock 子命令并返回 **原始 stdout**（不解析）。
 
