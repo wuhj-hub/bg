@@ -54,6 +54,7 @@ def fetch_kline(codes, limit=10):
     → {code: [(date, close, high), ... **日期降序**（最新在前）]}，与 parse_batch 同结构。"""
     import sys as _sys
     _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts"))
     try:
         from fetch import kline as _fk
         raw = _fk(list(codes), period="day", limit=limit)
