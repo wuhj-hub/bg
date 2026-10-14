@@ -120,22 +120,20 @@ def load_sw_l1():
 
 
 def fetch_all(codes):
-    rows, n = [], len(codes)
-    for i in range(0, n, BATCH):
-        chunk = codes[i:i + BATCH]
-        d = parse_batch_month(run(["kline", ",".join(chunk), "--period", "month",
-                                   "--limit", str(MONTHS)]))
-        miss = [c for c in chunk if c not in d]
-        if len(miss) == len(chunk):          # 整批失败 → 重试一次
-            time.sleep(2)
-            d2 = parse_batch_month(run(["kline", ",".join(chunk), "--period", "month",
-                                        "--limit", str(MONTHS)]))
-            for k, v in d2.items():
-                d.setdefault(k, []).extend(v)
-        for c, lst in d.items():
-            for ym, cl in lst:
-                rows.append((c, ym, cl))
-        print(f"  batch {i//BATCH+1}/{(n+BATCH-1)//BATCH} rows={len(rows)}", flush=True)
+    """2026-10-15：取数委托统一取数层 fetch.kline（月线，不复权；批量/重试/缺口兜底统一收口）。
+    → [(sym, ym, close), ...]"""
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    rows = []
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period="month", limit=MONTHS)
+        for c, bars in raw.items():
+            for b in bars:
+                if b.get("close", 0) > 0:
+                    rows.append((c, b["date"][:7], b["close"]))
+    except Exception:
+        return rows
     return rows
 
 
