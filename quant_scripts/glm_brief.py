@@ -56,7 +56,17 @@ def _commodity():
 
 
 def _news(n=8):
-    """隔夜要闻（新浪 7x24，与报告同源）"""
+    """隔夜要闻（新浪 7x24，与报告同源）。2026-10-15：优先取数层 fetch.ext_sina_news，失败回退本地。"""
+    try:
+        _d = os.path.dirname(os.path.abspath(__file__))       # quant_scripts
+        if _d not in sys.path:
+            sys.path.insert(0, _d)
+        from fetch import ext_sina_news as _sn
+        r = _sn(n)
+        if r:
+            return r
+    except Exception:
+        pass
     try:
         u = f'https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size={n}&zhibo_id=152'
         d = json.loads(urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=18).read().decode())
