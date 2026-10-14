@@ -18,6 +18,18 @@ UA = {'User-Agent': 'Mozilla/5.0'}
 
 
 def _ifzq(code, fq='qfqkline'):
+    """2026-10-15：优先统一取数层 fetch.ext_fqkline（host轮转/重试），失败回退本地。"""
+    try:
+        _d = os.path.dirname(os.path.abspath(__file__))     # quant_scripts
+        if _d not in sys.path:
+            sys.path.insert(0, _d)
+        from fetch import ext_fqkline as _f
+        bars = _f([code], count=2).get(code) or []
+        if bars:
+            c = [b["close"] for b in bars]
+            return c[-1], (c[-1] / c[-2] - 1) * 100 if len(c) > 1 else 0
+    except Exception:
+        pass
     u = f'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={code},day,,,2,qfq'
     d = json.loads(urllib.request.urlopen(u, timeout=15).read().decode())
     node = d['data'][code]
