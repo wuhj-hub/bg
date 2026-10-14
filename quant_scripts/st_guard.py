@@ -29,7 +29,21 @@ def norm(code):
 
 
 def fetch_names(codes, batch=50):
-    """批量查询实时名称，返回 {纯数字code: 名称}。失败项跳过。"""
+    """批量查询实时名称，返回 {纯数字code: 名称}。失败项跳过。
+    2026-10-15：优先统一取数层 fetch.ext_gtimg（同源 qt.gtimg.cn，带重试），失败回退本地。"""
+    try:
+        import sys as _sys
+        _root = os.path.dirname(os.path.abspath(__file__))     # quant_scripts
+        if _root not in _sys.path:
+            _sys.path.insert(0, _root)
+        from fetch import ext_gtimg as _eg
+        got = _eg(codes, batch=batch)
+        out = {w[2:]: (r.get("name") or "").strip() for w, r in got.items() if r.get("name")}
+        if out:
+            return out
+    except Exception:
+        pass
+    # 回退：本地实现
     out = {}
     codes = [norm(c) for c in codes if str(c).strip()]
     for i in range(0, len(codes), batch):
