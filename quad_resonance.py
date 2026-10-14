@@ -78,6 +78,7 @@ def batch_asfund(codes, chunk=250):
     返回 {full_code: {m1..m20, tag}}；解析失败返回 {}（由调用方逐只兜底）。
     """
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts"))
     out = {}
     try:
         from fetch import asfund as _af
