@@ -25,27 +25,15 @@ WEST = ['npx', '-y', 'westock-data-skillhub@1.0.3']
 
 
 def kline(codes, period, limit):
-    r = subprocess.run(WEST + ['kline', ','.join(codes), '--period', period, '--limit', str(limit)],
-                       capture_output=True, text=True, timeout=300)
-    out = {}; header = None
-    for ln in r.stdout.splitlines():
-        s = ln.strip()
-        if not s.startswith('|'):
-            continue
-        p = [x.strip() for x in s.strip('|').split('|')]
-        if 'date' in p:
-            header = p; continue
-        if not header or '---' in p[0]:
-            continue
-        try:
-            si = header.index('symbol'); di = header.index('date'); ci = header.index('last')
-        except ValueError:
-            continue
-        if re.match(r'^[a-z]{2}\d{6}$', p[si]) and re.match(r'^\d{4}-\d{2}-\d{2}$', p[di]):
-            out.setdefault(p[si], []).append((p[di], float(p[ci])))
-    for c in out:
-        out[c].sort(key=lambda x: x[0])
-    return out
+    """2026-10-15：委托统一取数层 fetch.kline（不复权）。→ {code: [(date, close)] 升序}"""
+    import os as _os
+    sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period=period, limit=limit)
+        return {c: [(b["date"], b["close"]) for b in bars] for c, bars in raw.items()}
+    except Exception:
+        return {}
 
 
 def force(code, mon, day):
