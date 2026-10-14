@@ -342,29 +342,19 @@ def fetch_bars_batch(codes, limit=65, chunk=20, retries=3, single_fallback=True,
     out = {}
     if not codes:
         return out
-    misses = []
-    for k in range(0, len(codes), chunk):
-        batch = codes[k:k + chunk]
-        got = {}
-        for attempt in range(max(1, retries)):
-            got = _run_kline(batch, limit)
-            if got:
-                break
-            if attempt < retries - 1:
-                time.sleep(1.5 * (attempt + 1))
-        if got:
-            out.update(got)
-        misses += [c for c in batch if c not in out]
-    if single_fallback and misses:
-        for c in misses[:single_cap]:
-            for _ in range(2):
-                got = _run_kline([c], limit)
-                if got:
-                    out.update(got)
-                    break
-                time.sleep(1.0)
-    log(f"[INFO] fetch_bars_batch: 请求 {len(codes)} 只 → 命中 {len(out)} 只"
-        + (f"（单只兜底重取 {min(len(misses), single_cap)} 只）" if misses and single_fallback else ""))
+    # 2026-10-14：委托统一取数层 fetch.kline（批量/重试/免 npx/缺口兜底 统一收口）
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        res = _fk(codes, period="day", limit=limit)
+    except Exception as e:
+        log(f"[WARN] fetch.kline 调用失败: {e}")
+        res = {}
+    for c, bars in res.items():
+        out[c] = [(b["date"], b.get("open"), b.get("close"), b.get("high"), b.get("low"), b.get("volume"))
+                  for b in bars]
+    log(f"[INFO] fetch_bars_batch: 请求 {len(codes)} 只 → 命中 {len(out)} 只")
     return out
 
 
