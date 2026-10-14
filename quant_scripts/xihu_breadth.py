@@ -93,6 +93,19 @@ def parse_kline(raw):
     return out
 
 
+def fetch_kline(codes, limit):
+    """2026-10-14：委托统一取数层 fetch.kline（批量/重试/免npx/缺口兜底统一收口）。
+    返回 {wcode: [(date, open, close, high, low), ...] 升序}，与 parse_kline 同结构。"""
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period="day", limit=limit)
+        return {c: [(b["date"], b["open"], b["close"], b["high"], b["low"]) for b in bars]
+                for c, bars in raw.items()}
+    except Exception:
+        return {}
+
 def _ma(seq, i, n):
     """以 i 结尾、长度 n 的均值；数据不足返回 None。"""
     if i + 1 < n:
@@ -205,8 +218,7 @@ def scan(stocks, p, cache=None):
     for i in range(0, n, batch):
         chunk = stocks[i:i + batch]
         codes = [norm_code(c) for c, _ in chunk]
-        raw = run(["kline", ",".join(codes), "--period", "day", "--limit", str(p["limit"])])
-        data = parse_kline(raw)
+        data = fetch_kline(codes, p["limit"])
         _keep(data)
         got = _apply(chunk, codes, data, result, p)
         missing = [c for c, w in zip(chunk, codes) if not data.get(w)]
@@ -221,8 +233,7 @@ def scan(stocks, p, cache=None):
         for j in range(0, len(miss_stocks), 250):
             sub = miss_stocks[j:j + 250]
             codes = [norm_code(c[0]) for c in sub]
-            raw = run(["kline", ",".join(codes), "--period", "day", "--limit", str(p["limit"])])
-            data = parse_kline(raw)
+            data = fetch_kline(codes, p["limit"])
             _keep(data)
             _apply(sub, codes, data, result, p)
         still = [c for c in miss_stocks if result.get(c[0], {}).get("strong") is None]
@@ -230,8 +241,7 @@ def scan(stocks, p, cache=None):
             print(f"[补齐] 仍缺 {len(still)} 只（多为退市票），仅逐只补前 {GAP_PERSTOCK_CAP} 只，余者跳过", flush=True)
         for (code, name) in still[:GAP_PERSTOCK_CAP]:
             wcode = norm_code(code)
-            raw = run(["kline", wcode, "--period", "day", "--limit", str(p["limit"])])
-            data = parse_kline(raw)
+            data = fetch_kline([wcode], p["limit"])
             _keep(data)
             _apply([(code, name)], [wcode], data, result, p)
         fixed = sum(1 for c in miss_stocks if result.get(c[0], {}).get("strong") is not None)
