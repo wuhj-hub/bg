@@ -66,6 +66,26 @@ def parse_kline_table(txt):
     rows.sort(key=lambda r: r.get("date", ""))
     return rows
 
+def fetch_kline_table(codes, period="day", limit=25):
+    """2026-10-15：委托统一取数层 fetch.kline。→ list[dict]（date 升序，键同 westock 表头，值为字符串）。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period=period, limit=limit)
+    except Exception:
+        return []
+    def _s(v):
+        return "" if v is None else str(v)
+    rows = []
+    for c, bars in raw.items():
+        for b in bars:
+            rows.append({"symbol": c, "date": b["date"], "open": _s(b.get("open")),
+                         "last": _s(b.get("close")), "high": _s(b.get("high")),
+                         "low": _s(b.get("low")), "volume": _s(b.get("volume")),
+                         "amount": _s(b.get("amount")), "exchange": ""})
+    rows.sort(key=lambda r: r.get("date", ""))
+    return rows
+
 def parse_board_table(txt):
     """解析westock hot board输出（数据行第一列为数字index，板块名在name列、涨跌幅在zdf列）"""
     rows, header = [], None
@@ -325,8 +345,7 @@ def render_ljsk(now=""):
     else:
         L.append("- 📈 价：⚠️成本线缺失")
     try:
-        mtxt = run(["kline", "sh000001", "--period", "month", "--limit", "13"])
-        mrows = parse_kline_table(mtxt)
+        mrows = fetch_kline_table(["sh000001"], "month", 13)
         closes = [float(r["last"]) for r in mrows if "last" in r]
         if len(closes) >= 12:
             c = closes[-1]; ma6 = sum(closes[-6:]) / 6; ma12 = sum(closes[-12:]) / 12
@@ -842,8 +861,7 @@ def gen_report(today_str):
     # 一、大盘全景
     # ════════════════════════════════════════
     lines.append("## 一、大盘全景\n")
-    idx = run(["kline", "sh000001,sz399001,sz399006,sh000688", "--period", "day", "--limit", "3"])
-    idx_rows = parse_kline_table(idx)
+    idx_rows = fetch_kline_table(["sh000001", "sz399001", "sz399006", "sh000688"], "day", 3)
     if idx_rows:
         lines.append("| 指数 | 昨收 | 今收 | 涨跌幅 |")
         lines.append("|---|---|---|---|")
@@ -860,8 +878,7 @@ def gen_report(today_str):
         if rendered == 0:
             # batch查询失败，尝试逐只查询
             for code, name in symbols.items():
-                one = run(["kline", code, "--period", "day", "--limit", "3"])
-                one_rows = parse_kline_table(one)
+                one_rows = fetch_kline_table([code], "day", 3)
                 if len(one_rows) >= 2:
                     r_today, r_yest = one_rows[-1], one_rows[-2]
                     chg = (float(r_today["last"]) - float(r_yest["last"])) / float(r_yest["last"]) * 100
