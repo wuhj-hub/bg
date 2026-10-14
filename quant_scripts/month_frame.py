@@ -65,7 +65,18 @@ def parse_month_kline(txt):
     return rows
 
 def fetch_month_rows(code):
-    """获取月线数据：优先单股，偶发空时重试+batch fallback（westock单股查询不稳定）"""
+    """获取月线数据：2026-10-14 优先委托统一取数层 fetch.kline（月线不复权），失败回退旧路径。"""
+    import os as _os
+    sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        bars = _fk([code], period="month", limit=15).get(code, [])
+        if bars:
+            bars = sorted(bars, key=lambda b: b["date"])
+            return [{"date": b["date"], "close": b["close"], "high": b["high"], "low": b["low"]}
+                    for b in bars]
+    except Exception:
+        pass
     import time
     for attempt in range(3):
         txt = run(["kline", code, "--period", "month", "--limit", "15"])
