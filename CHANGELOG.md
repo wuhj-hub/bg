@@ -5,6 +5,23 @@
 
 ---
 
+## v2.18 (2026-10-15)
+
+### 🐛 又修复一例「按批量列序解析单股输出」缺陷 ＋ 阶段 2 第七批迁移（4 个）
+
+**修复**：`gen_premarket_report.py` 的 `calc_zengxingzhi()`（曾星智+双弦双体系市场定性）内联解析按**批量列序**读 `parts[1]/[3]/[4]/[5]`，但 kline 是**单股调用（无 symbol 列）** → 恒不匹配 → `data` 恒空 → **盘前报告该定性表长期为空**。改为表头驱动（`fetch_kline_table`）。
+- 实证：修复前 `lines_len=0 / 判定「🟡震荡结构」bear=0 bull=0` → 修复后 8 大指数定性表齐全、`🐻 熊市结构` bear=8 bull=0。
+
+| 迁移脚本 | 迁移点 | 影子对拍 |
+|---|---|---|
+| `gen_premarket_report.py` | 8 处 kline（含美股三大指数 batch） | 6 组对拍 **0 差异** |
+| `gen_review_report.py` | 3 处 kline | 3 组 **0 差异** |
+| `quant_scripts/beast_pool_screener.py` | `westock_kline()` | 37 只 **0 差异** |
+| `quant_scripts/inbull_threshold_monitor.py` | `fetch_westock()` 月线 | new ⊇ old，值级 **0 差异** |
+
+- **累计已迁移 21 个 kline 调用点**。
+- 新增 `fetch_kline_table()` 通用小适配（返回 date 升序、键同 westock 表头、值为字符串），盘前/复盘共用同一语义。
+
 ## v2.17 (2026-10-15)
 
 ### 🐛 修复 monthly_macd_monitor 月线解析列错位 ＋ 阶段 2 第六批迁移（2 个）
