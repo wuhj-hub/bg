@@ -1,5 +1,5 @@
 {
- "date": "2026-10-14",
+ "date": "2026-10-15",
  "writes": {
   "all_mainboard.csv": [
    ".github/workflows/duowei_fish.yml",
@@ -173,6 +173,9 @@
   "liangxue_month_join_latest.json": [
    ".github/workflows/quant_scan.yml",
    "quant_scripts/liangxue_month_join.py"
+  ],
+  "kline_{var}_{var}_{var}.json": [
+   "quant_scripts/fetch.py"
   ],
   "乖离低买_latest.json": [
    ".github/workflows/quant_report.yml",
@@ -749,6 +752,7 @@
  "high_risk": [],
  "missing": [
   "em_industry.json",
+  "kline_{var}_{var}_{var}.json",
   "sw_l1_industry.json",
   "入牛阈值漂移_{var}.md",
   "权重提案_{var}.json"
@@ -873,26 +877,26 @@
  "dup_freshness": [
   {
    "name": "env_latest.json",
-   "root": "2026-10-13",
-   "outputs": "2026-10-13",
+   "root": "2026-10-14",
+   "outputs": "2026-10-14",
    "status": "同步"
   },
   {
    "name": "market_width_latest.json",
-   "root": "2026-10-13",
-   "outputs": "2026-10-13",
+   "root": "2026-10-14",
+   "outputs": "2026-10-14",
    "status": "同步"
   },
   {
    "name": "qiankun_a_latest.json",
-   "root": "2026-10-13",
-   "outputs": "2026-10-13",
+   "root": "2026-10-14",
+   "outputs": "2026-10-14",
    "status": "同步"
   },
   {
    "name": "sector_component_em.json",
-   "root": "2026-10-13",
-   "outputs": "2026-10-13",
+   "root": "2026-10-14",
+   "outputs": "2026-10-14",
    "status": "同步"
   },
   {
@@ -903,8 +907,8 @@
   },
   {
    "name": "四维共振_latest.json",
-   "root": "2026-10-13",
-   "outputs": "2026-10-13",
+   "root": "2026-10-14",
+   "outputs": "2026-10-14",
    "status": "同步"
   }
  ],
