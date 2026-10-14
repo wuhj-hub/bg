@@ -300,7 +300,18 @@ def get_news():
         return ""
 
 def get_news_7x24(maxn=10):
-    """新浪财经7x24快讯（沙箱/runner均可达）。返回 [{time, text}]，失败返回[]"""
+    """新浪财经7x24快讯（沙箱/runner均可达）。返回 [{time, text}]，失败返回[]
+    2026-10-15：优先统一取数层 fetch.ext_sina_news(..., with_time=True)，失败回退本地 curl。"""
+    try:
+        _d = os.path.dirname(os.path.abspath(__file__))       # quant_scripts
+        if _d not in sys.path:
+            sys.path.insert(0, _d)
+        from fetch import ext_sina_news as _sn
+        r = _sn(maxn, with_time=True)
+        if r:
+            return r
+    except Exception:
+        pass
     try:
         r = subprocess.run(["curl", "-s", "--max-time", "12",
                             "https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size=%d&zhibo_id=152" % maxn,
