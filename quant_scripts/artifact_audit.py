@@ -213,6 +213,57 @@ def extract_commits(root):
     return committed
 
 
+
+# ── ③ 多副本新鲜度检查（防「同名产物 根 vs outputs/ 两份、其中一份冻结」被劫持）──
+def _fresh_sig(path):
+    """返回 (日期签名|None, md5)。日期优先取 JSON 的 data_date/bar_date/trade_date/date，
+    否则取正文中首个 YYYY-MM-DD。"""
+    import hashlib
+    try:
+        with open(path, "r", encoding="utf-8", errors="ignore") as f:
+            txt = f.read()
+    except Exception:
+        return None, None
+    md5 = hashlib.md5(txt.encode("utf-8", "ignore")).hexdigest()
+    d = None
+    try:
+        j = json.loads(txt)
+        if isinstance(j, dict):
+            for k in ("data_date", "bar_date", "trade_date", "date"):
+                if j.get(k):
+                    d = str(j[k]); break
+    except Exception:
+        pass
+    if not d:
+        m = re.search(r"(20\d{2}[-/]\d{2}[-/]\d{2})", txt)
+        if m:
+            d = m.group(1)
+    return d, md5
+
+
+def check_dup_freshness(root, outdir):
+    """比对仓库根与 outputs/ 下的同名产物：内容不同且日期可辨 → 判陈旧副本。"""
+    if not outdir or not os.path.isdir(outdir):
+        return []
+    rfiles = {f for f in os.listdir(root) if os.path.isfile(os.path.join(root, f))}
+    ofiles = {f for f in os.listdir(outdir) if os.path.isfile(os.path.join(outdir, f))}
+    res = []
+    for name in sorted(rfiles & ofiles):
+        if not is_art(name) or in_whitelist(name):
+            continue
+        rd, rm = _fresh_sig(os.path.join(root, name))
+        od, om = _fresh_sig(os.path.join(outdir, name))
+        if rm == om:
+            status = "同步"
+        elif rd and od and rd != od:
+            status = "❗陈旧副本(outputs旧)" if od < rd else "⚠️根副本较旧"
+        else:
+            status = "⚠️副本内容不同"
+        res.append((name, rd or "-", od or "-", status))
+    return res
+
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--repo", default=os.path.dirname(os.path.abspath(__file__)))
@@ -227,6 +278,8 @@ def main():
     writes = extract_writes(root)
     committed = extract_commits(root)
     reads = extract_reads(root)
+    dup = check_dup_freshness(root, outdir)
+    dup_stale = [d for d in dup if d[3].startswith("❗")]
 
     def covered(n, pool):
         """n 是否被 pool 中任一路径模糊覆盖"""
@@ -251,7 +304,7 @@ def main():
     today = __import__("datetime").datetime.now().strftime("%Y-%m-%d")
     L = [f"# 🔍 产物入库审计 · {today}", "",
          f"> 扫描 {len(writes)} 个产出路径 / {len(committed)} 个提交路径 / {len(reads)} 个消费读取路径",
-         f"> 🔴 高危（被读取且未提交）**{len(high_risk)}** ｜ 🟡 未提交 **{len(missing)}** ｜ ✅ 已提交 **{len(ok_list)}** ｜ ❔ 提交但未见生成 {len(orphan)}", ""]
+         f"> 🔴 高危（被读取且未提交）**{len(high_risk)}** ｜ 🟡 未提交 **{len(missing)}** ｜ ✅ 已提交 **{len(ok_list)}** ｜ ❔ 提交但未见生成 {len(orphan)} ｜ 🧬 陈旧副本 **{len(dup_stale)}**", ""]
 
     if high_risk:
         L += ["## 🔴 高危：被消费方读取、但从未提交（静默断链）", "",
@@ -272,6 +325,13 @@ def main():
             L.append(f"| `{n}` | {', '.join(srcs[:3])} |")
         L.append("")
 
+    if dup:
+        L += ["## 🧬 多副本新鲜度（同名产物：仓库根 vs outputs/）", "",
+              "| 产物 | 根日期 | outputs日期 | 判定 |", "|---|---|---|---|"]
+        for n, rd, od, st in dup:
+            L.append(f"| `{n}` | {rd} | {od} | {st} |")
+        L.append("")
+
     text = "\n".join(L)
     print(text)
     os.makedirs(outdir, exist_ok=True)
@@ -281,11 +341,13 @@ def main():
                "committed": {k: sorted(v) for k, v in committed.items()},
                "reads": {k: sorted(v) for k, v in reads.items()},
                "high_risk": [h[0] for h in high_risk],
-               "missing": [m[0] for m in missing], "ok": ok_list, "orphan": [o[0] for o in orphan]},
+               "missing": [m[0] for m in missing], "ok": ok_list, "orphan": [o[0] for o in orphan],
+               "dup_freshness": [{"name": n, "root": rd, "outputs": od, "status": st} for n, rd, od, st in dup],
+               "dup_stale": [d[0] for d in dup_stale]},
               open(os.path.join(outdir, "artifact_audit.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
-    print(f"\n[OK] {p_md}（高危 {len(high_risk)} / 未提交 {len(missing)}）")
-    if a.strict and high_risk:
+    print(f"\n[OK] {p_md}（高危 {len(high_risk)} / 未提交 {len(missing)} / 陈旧副本 {len(dup_stale)}）")
+    if a.strict and (high_risk or dup_stale):
         raise SystemExit(1)
 
 
