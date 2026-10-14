@@ -70,13 +70,17 @@ def parse_kline(txt):
     return rows
 
 def fetch_idx_kline(limit=1200):
-    for _ in range(4):
-        txt = run(["kline", "sh000001", "--period", "day", "--limit", str(limit)])
-        rows = parse_kline(txt)
-        if rows:
-            return rows
-        time.sleep(1.5)
-    return []
+    """上证指数日线（升序 rows: date/open/last/high/low/amount）。
+    2026-10-14：委托统一取数层 fetch.kline（批量/重试/免 npx 统一收口）。"""
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        bars = _fk(["sh000001"], period="day", limit=limit).get("sh000001", [])
+        return [{"date": b["date"], "open": b["open"], "last": b["close"],
+                 "high": b["high"], "low": b["low"], "amount": b.get("amount")} for b in bars]
+    except Exception:
+        return []
 
 def drop_intraday(rows):
     """剔除最后一根为今日盘中未收盘数据（防止量能失真）"""
