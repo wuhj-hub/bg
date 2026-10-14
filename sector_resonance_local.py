@@ -36,6 +36,30 @@ def run(args, timeout=90):
     return ""
 
 
+def _board_text():
+    """2026-10-15：优先统一取数层 fetch.board（免npx/重试），失败回退本地 run。"""
+    try:
+        from fetch import board as _b
+        t = _b()
+        if t:
+            return t
+    except Exception:
+        pass
+    return run(["board"])
+
+
+def _hot_board_text(limit):
+    """2026-10-15：优先统一取数层 fetch.hotboard，失败回退本地 run。"""
+    try:
+        from fetch import hotboard as _h
+        t = _h(limit)
+        if t:
+            return t
+    except Exception:
+        pass
+    return run(["hot", "board", "--limit", str(limit)])
+
+
 def parse_hot_board(txt):
     """hot board：返回 {板块名: (pt代码, 涨幅%)}，列序 index|level|symbol|rank|rankdelta|date|stock_type|name|zdf|zxj"""
     out = {}
@@ -193,8 +217,8 @@ def main():
             top_n = int(argv[i + 1])
 
     # 1. 板块池：board 三段（行业+概念+资金流，含资金/5日/20日/领涨）+ hot board（代码+涨幅）合并
-    board_map = parse_board_full(run(["board"]))
-    hot_map = parse_hot_board(run(["hot", "board", "--limit", str(top_n)]))
+    board_map = parse_board_full(_board_text())
+    hot_map = parse_hot_board(_hot_board_text(top_n))
     pool = {}
     for nm, info in board_map.items():
         pool.setdefault(nm, {}).update(info)
