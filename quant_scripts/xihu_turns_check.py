@@ -20,7 +20,16 @@ import xihu_breadth as xb  # noqa
 
 
 def fetch_index(limit=900):
-    """拉上证指数日线；单只K线列序为 date|open|last|high|low（无 symbol 列）。"""
+    """拉上证指数日线，返回 (dates, closes) 升序。
+    2026-10-14：优先委托统一取数层 fetch.kline（免npx/重试），失败回退旧 npx 路径。"""
+    try:
+        from fetch import kline as _fk
+        bars = _fk(["sh000001"], period="day", limit=limit).get("sh000001", [])
+        bars = sorted(bars, key=lambda b: b["date"])
+        if bars:
+            return [b["date"] for b in bars], [b["close"] for b in bars]
+    except Exception:
+        pass
     try:
         raw = subprocess.run(["npx", "-y", "westock-data-skillhub@1.0.3", "kline",
                               "sh000001", "--period", "day", "--limit", str(limit)],
