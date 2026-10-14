@@ -70,18 +70,18 @@ def cross_count(dif, dea):
 
 
 def fetch_preclose(wcode):
-    """拉前一日收盘价（涨停检测用）"""
-    txt = run(["kline", wcode, "--period", "day", "--limit", "2"])
-    closes = []
-    for ln in txt.splitlines():
-        s = ln.strip()
-        if not s.startswith("|"):
-            continue
-        parts = [p.strip() for p in s.strip("|").split("|")]
-        if len(parts) >= 4 and re.match(r"^\d{4}-\d{2}-\d{2}$", parts[0]):
-            closes.append(float(parts[2]))
-    # kline输出降序：closes[0]=最新, closes[1]=前收
-    return closes[1] if len(closes) >= 2 else (closes[0] if closes else 0)
+    """拉前一日收盘价（涨停检测用）。
+    2026-10-15：委托统一取数层 fetch.kline（单股日线 limit 2）。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        bars = _fk([wcode], period="day", limit=2).get(wcode, [])
+        if bars:
+            closes = [b["close"] for b in reversed(bars)]   # 降序：closes[0]=最新
+            return closes[1] if len(closes) >= 2 else (closes[0] if closes else 0)
+    except Exception:
+        pass
+    return 0
 
 
 def analyze(wcode, name, pre_close):
