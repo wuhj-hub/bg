@@ -163,42 +163,30 @@ def fetch_ztpool(d8):
 def fetch_fund(codes, date):
     """westock asfund → {6位代码: {net: 当日主力净流入, rate: 主力净流入/流通(%), net5: 5日主力净流入}}
     date: YYYY-MM-DD（asfund 需带横线；带日期无数据时回退取最新）。失败/无数据 → 该股无资金分（不阻断）。"""
-    out = {}
     codes = [c for c in codes if re.match(r"^\d{6}$", c or "")]
-    batches = [codes[i:i + CHUNK] for i in range(0, len(codes), CHUNK)]
-    def one(b):
-        syms = ",".join(("sh" if c[0] == "6" else "sz") + c for c in b)
-        txt = cli(["asfund", syms, "--date", date], timeout=240)
-        if "数据为空" in txt or "MainNetFlow" not in txt:
-            txt = cli(["asfund", syms], timeout=240)   # 回退：不带日期（取最新）
-        r = {}
-        header = None
-        for ln in txt.splitlines():
-            s = ln.strip()
-            if not s.startswith("|"):
-                continue
-            p = [q.strip() for q in s.strip("|").split("|")]
-            if "MainNetFlow" in p:
-                header = p
-                continue
-            if not header or "---" in p[0]:
-                continue
-            m = re.search(r"\d{6}", p[0])
-            if not m:
-                continue
-            def g(k):
-                if k in header:
-                    try:
-                        return float(p[header.index(k)])
-                    except Exception:
-                        return None
+    if not codes:
+        return {}
+    syms = [("sh" if c[0] == "6" else "sz") + c for c in codes]
+    sys.path.insert(0, BASE)
+    try:
+        from fetch import asfund as _af
+        raw = _af(syms, date) or {}
+        if not raw:                       # 回退：不带日期（取最新）
+            raw = _af(syms)
+    except Exception:
+        return {}
+    out = {}
+    for key, row in raw.items():
+        m = re.search(r"\d{6}", key or "")
+        if not m:
+            continue
+        def g(k):
+            try:
+                return float(row.get(k))
+            except (TypeError, ValueError):
                 return None
-            r[m.group(0)] = {"net": g("MainNetFlow"), "rate": g("MainInflowCircRate"),
-                             "net5": g("MainNetFlow5D")}
-        return r
-    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
-        for d in ex.map(one, batches):
-            out.update(d)
+        out[m.group(0)] = {"net": g("MainNetFlow"), "rate": g("MainInflowCircRate"),
+                           "net5": g("MainNetFlow5D")}
     return out
 
 
