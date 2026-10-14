@@ -357,6 +357,92 @@ def quote(codes):
             for c, r in full.items()}
 
 
+# ── 腾讯 fqkline：长历史（单次 ≤ ~800 根；多股 `;` 批量端点已失效）──
+FQKLINE_HOSTS = [
+    "https://ifzq.gtimg.cn/appstock/app/fqkline/get",
+    "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/fqkline/get",
+    "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+]
+FQKLINE_HEADERS = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com"}
+_FQK_KEYS = ("qfqday", "hfqday", "day", "qfqweek", "week", "qfqmonth", "hfqmonth", "month")
+
+
+def parse_fqkline(d, sym, limit=None):
+    """腾讯 fqkline JSON → [bar,...] 升序；bar={date,open,close,high,low[,volume,amount(元)]}。"""
+    data = d.get("data") if isinstance(d, dict) else None
+    node = data.get(sym) if isinstance(data, dict) else None
+    node = node if isinstance(node, dict) else {}
+    kl = None
+    for k in _FQK_KEYS:
+        if node.get(k):
+            kl = node[k]
+            break
+    bars = []
+    for k in (kl or []):
+        try:
+            b = {"date": k[0], "open": float(k[1]), "close": float(k[2]),
+                 "high": float(k[3]), "low": float(k[4])}
+        except (ValueError, IndexError, TypeError):
+            continue
+        if len(k) > 5:
+            try:
+                b["volume"] = float(k[5])
+            except (ValueError, TypeError):
+                pass
+        if len(k) > 8:
+            try:
+                b["amount"] = float(k[8]) * 10000      # 万 → 元
+            except (ValueError, TypeError):
+                pass
+        bars.append(b)
+    bars.sort(key=lambda r: r["date"])
+    return bars[-limit:] if limit else bars
+
+
+def _fqkline_one(sym, period, start, end, count, fq, retries=4, timeout=25):
+    """单只拉取（host 轮转；收到权威响应即返回，避免对退市/空数据空耗重试）。"""
+    param = "%s,%s,%s,%s,%s,%s" % (sym, period, start, end, count, fq)
+    for host in FQKLINE_HOSTS:
+        for attempt in range(retries):
+            try:
+                req = urllib.request.Request(host + "?param=" + param, headers=FQKLINE_HEADERS)
+                d = json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8"))
+            except Exception:
+                time.sleep(1.2 * (attempt + 1))
+                continue
+            if isinstance(d, dict) and d.get("msg") == "param error":
+                break                                   # 该 host 不认此格式 → 换 host
+            return parse_fqkline(d, sym)                # 权威响应（空=退市/无数据）
+    return []
+
+
+def ext_fqkline(codes, period="day", start="", end="", count=800, fq="qfq", workers=1, limit=None):
+    """腾讯 fqkline 长历史（前/后复权）→ {sym: [bar,...] 升序}。
+
+    - 单次 ≤ ~800 根；更长历史用 start/end 分段多次调用。
+    - ⚠️ 多股 `;` 批量端点已失效（param error）→ 本层改为「逐只 + 受控并发(≤6) + host 轮转 + 重试」，
+      消费方无需再自建并发/重试。
+    """
+    if isinstance(codes, str):
+        codes = [codes]
+    codes = [c if str(c).startswith(("sh", "sz", "bj", "us", "hk", "pt")) else norm(c) for c in codes]
+    out = {}
+
+    def _one(s):
+        b = _fqkline_one(s, period, start, end, count, fq)
+        if b:
+            out[s] = b[-limit:] if limit else b
+
+    if workers and workers > 1:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=min(int(workers), 6)) as ex:
+            list(ex.map(_one, codes))
+    else:
+        for s in codes:
+            _one(s)
+    return out
+
+
 def raw(args, timeout=TIMEOUT):
     """通用透传：直接执行 westock 子命令并返回 **原始 stdout**（不解析）。
 
