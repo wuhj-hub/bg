@@ -107,16 +107,22 @@ def parse_batch(txt):
     return out
 
 
+def fetch_kline_tuples(codes, period, limit, fq="qfq"):
+    """2026-10-14：委托统一取数层 fetch.kline（批量/重试/免npx/缺口兜底统一收口）。
+    → {sym: [(date,open,close,high,low,volume,amount), ...] 升序}（与 parse_batch 同结构）。"""
+    sys.path.insert(0, BASE)
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period=period, limit=limit, fq=fq)
+        return {c: [(b["date"], b["open"], b["close"], b["high"], b["low"],
+                     b.get("volume"), b.get("amount")) for b in bars]
+                for c, bars in raw.items()}
+    except Exception:
+        return {}
+
 def fetch_all(codes, days):
-    res = {}
-    batches = [codes[i:i + CHUNK] for i in range(0, len(codes), CHUNK)]
-    def one(b):
-        return parse_batch(cli(["kline", ",".join(b), "--period", "day",
-                                "--limit", str(days), "--fq", "qfq"]))
-    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
-        for d in ex.map(one, batches):
-            res.update(d)
-    return res
+    """2026-10-14：取数委托统一取数层 fetch.kline（qfq）。"""
+    return fetch_kline_tuples(codes, "day", days, fq="qfq")
 
 
 def load_sector():
@@ -204,14 +210,8 @@ def fetch_month_strength(codes):
         return {}
     syms = {("sh" if c[0] == "6" else "sz") + c: c for c in codes}
     keys = list(syms)
-    bc = min(CHUNK, 60)
-    batches = [keys[i:i + bc] for i in range(0, len(keys), bc)]
-    km = {}
-    def one(b):
-        return parse_batch(cli(["kline", ",".join(b), "--period", "month", "--limit", "60"]))
-    with ThreadPoolExecutor(max_workers=WORKERS) as ex:
-        for d in ex.map(one, batches):
-            km.update(d)
+    # 2026-10-14：取数委托统一取数层 fetch.kline（月线，与旧口径一致不复权 → fq=None）
+    km = fetch_kline_tuples(keys, "month", 60, fq=None)
     out = {}
     for sym, bars in km.items():
         c6 = syms.get(sym)
