@@ -1,7 +1,7 @@
 {
  "date": "2026-10-14",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 48,
+ "pool_size": 47,
  "resonance_boards": [
   {
    "name": "出版",
@@ -40,17 +40,6 @@
    "name": "煤炭",
    "code": "pt01801950",
    "zdf": 1.4,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "影视传媒",
-   "code": "pt02031356",
-   "zdf": 1.14,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -107,36 +96,6 @@
     "进场",
     "吸筹"
    ]
-  },
-  {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "zdf": 0.42,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "焦炭Ⅱ",
-   "code": "pt01801952",
-   "zdf": 1.33,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "zdf": 1.05,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
   }
  ],
  "grab_top": [
@@ -159,11 +118,6 @@
    "name": "煤炭",
    "code": "pt01801950",
    "value": 7
-  },
-  {
-   "name": "影视传媒",
-   "code": "pt02031356",
-   "value": 7
   }
  ],
  "entry_top": [
@@ -171,11 +125,6 @@
    "name": "传媒",
    "code": "pt01801760",
    "value": 29.3
-  },
-  {
-   "name": "影视传媒",
-   "code": "pt02031356",
-   "value": 25.7
   },
   {
    "name": "文化传媒概念",
@@ -203,71 +152,66 @@
    "value": 9.0
   },
   {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "value": 6.6
-  },
-  {
    "name": "游戏Ⅱ",
    "code": "pt01801764",
    "value": 5.5
   },
   {
-   "name": "焦炭Ⅱ",
-   "code": "pt01801952",
-   "value": 3.4
-  }
- ],
- "absorption_top": [
-  {
-   "name": "出版",
-   "code": "pt01801769",
-   "value": 0
-  },
-  {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 0
-  },
-  {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "value": 0
-  },
-  {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
-   "value": 0
-  },
-  {
-   "name": "炼化及贸易",
-   "code": "pt01801963",
-   "value": 0
-  },
-  {
-   "name": "传媒",
-   "code": "pt01801760",
-   "value": 0
-  },
-  {
-   "name": "文化传媒概念",
-   "code": "pt02002486",
-   "value": 0
-  },
-  {
    "name": "煤炭",
    "code": "pt01801950",
-   "value": 0
+   "value": 3.2
   },
   {
    "name": "中药Ⅱ",
    "code": "pt01801155",
-   "value": 0
+   "value": 0.0
+  }
+ ],
+ "absorption_top": [
+  {
+   "name": "数字媒体",
+   "code": "pt01801767",
+   "value": 2.19
   },
   {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "value": 0
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 1.82
+  },
+  {
+   "name": "炼化及贸易",
+   "code": "pt01801963",
+   "value": 1.66
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 1.36
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 0.91
+  },
+  {
+   "name": "传媒",
+   "code": "pt01801760",
+   "value": 0.87
+  },
+  {
+   "name": "文化传媒概念",
+   "code": "pt02002486",
+   "value": 0.44
+  },
+  {
+   "name": "煤炭",
+   "code": "pt01801950",
+   "value": 0.41
+  },
+  {
+   "name": "中药Ⅱ",
+   "code": "pt01801155",
+   "value": 0.01
   }
  ],
  "control_top": [],
