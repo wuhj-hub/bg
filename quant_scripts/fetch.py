@@ -277,31 +277,84 @@ def kline(codes, period="day", limit=250, fq=None, use_cache=None):
 # ══════════════════════════════════════════════════════════
 #  行情快照 / 资金 / 板块 / 分时
 # ══════════════════════════════════════════════════════════
-def quote(codes):
-    """腾讯行情批量快照 → {code: {name, price, prev_close, open}}（batch 50，GBK）。"""
+# ══════════════════════════════════════════════════════════
+#  外部独立源适配器（阶段 4）
+#  —— 把散落各脚本的「直连 URL + 手写解析 + 各自重试」收进本层。
+# ══════════════════════════════════════════════════════════
+GTIMG_URL = "https://qt.gtimg.cn/q="
+GTIMG_HEADERS = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com"}
+
+
+def parse_gtimg(raw):
+    """腾讯行情响应 → {wcode: {...}}（wcode 带 sh/sz 前缀，表头=字段位）。
+
+    字段位（实测）：1名称 3现价 4昨收 5今开 6成交量(手) 32涨跌幅% 33最高 34最低
+    37成交额(万) 44流通市值(亿) 45总市值(亿) 47涨停价 48跌停价。
+    """
     out = {}
-    for batch in chunks(codes, 50):
-        url = "https://qt.gtimg.cn/q=" + ",".join(batch)
+    for seg in (raw or "").split(";"):
+        seg = seg.strip()
+        if not seg.startswith("v_") or "=" not in seg:
+            continue
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            raw = urllib.request.urlopen(req, timeout=20).read().decode("gbk", "ignore")
+            wcode = seg.split("=")[0][2:].strip()
+            val = seg.split('="', 1)[1].rstrip('"')
         except Exception:
             continue
-        for seg in raw.split(";"):
-            seg = seg.strip()
-            if "=" not in seg:
-                continue
-            code = seg.split("=")[0].replace("v_", "").strip()
-            val = seg.split('="')[-1].rstrip('"')
-            f = val.split("~")
-            if len(f) < 6:
-                continue
+        f = val.split("~")
+        if len(f) < 6:
+            continue
+
+        def _f(i, d=None):
             try:
-                out[code] = {"name": f[1], "price": float(f[3]),
-                             "prev_close": float(f[4]), "open": float(f[5])}
-            except ValueError:
-                continue
+                return float(f[i])
+            except Exception:
+                return d
+        rec = {"name": f[1], "code": f[2], "price": _f(3), "prev_close": _f(4), "open": _f(5)}
+        for key, i in (("volume", 6), ("change_pct", 32), ("high", 33), ("low", 34),
+                       ("amount", 37), ("mktcap_circ", 44), ("mktcap_total", 45),
+                       ("limit_up", 47), ("limit_down", 48)):
+            if i < len(f):
+                v = _f(i)
+                if v is not None:
+                    rec[key] = v
+        out[wcode] = rec
     return out
+
+
+def ext_gtimg(codes, batch=50, timeout=20, retries=3, pause=0.0):
+    """腾讯行情快照（qt.gtimg.cn，GBK，带重试）→ {wcode: {...}}。
+
+    源：腾讯 gtimg（云 IP，不受东财反爬影响，沙箱/CI 均可用）。
+    不存在的代码不返回 → 响应缺键即视为无效代码（gen_mainboard 依赖此特性）。
+    """
+    codes = [str(c).strip() for c in codes if str(c).strip()]
+    codes = [c if c.startswith(("sh", "sz", "bj")) else norm(c) for c in codes]
+    out = {}
+    for batch_codes in chunks(codes, batch):
+        raw = ""
+        for attempt in range(retries):
+            try:
+                req = urllib.request.Request(GTIMG_URL + ",".join(batch_codes), headers=GTIMG_HEADERS)
+                raw = urllib.request.urlopen(req, timeout=timeout).read().decode("gbk", "replace")
+                if raw.strip():
+                    break
+            except Exception:
+                pass
+            time.sleep(1.5 * (attempt + 1))
+        out.update(parse_gtimg(raw))
+        if pause:
+            time.sleep(pause)
+    return out
+
+
+def quote(codes):
+    """腾讯行情批量快照 → {code: {name, price, prev_close, open}}（兼容旧接口）。
+    新代码请优先用 `ext_gtimg`（字段更全）。"""
+    full = ext_gtimg(codes)
+    return {c: {"name": r["name"], "price": r.get("price"),
+                "prev_close": r.get("prev_close"), "open": r.get("open")}
+            for c, r in full.items()}
 
 
 def raw(args, timeout=TIMEOUT):
