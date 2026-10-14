@@ -122,6 +122,16 @@ def _westock(args, timeout=90):
     return ""
 
 
+def _fetch_kline_bars(code, days):
+    """2026-10-14：委托统一取数层 fetch.kline（qfq）。→ list[dict] 升序（date/open/high/low/close/volume/amount）。"""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    try:
+        from fetch import kline as _fk
+        return _fk([code], period="day", limit=days, fq="qfq").get(code, [])
+    except Exception:
+        return []
+
+
 def _md_tables(txt):
     """把 westock 的 markdown 文本解析为 [{表头:值}, ...]（按空行分块）"""
     import re
@@ -216,19 +226,11 @@ class DataFetcher:
             _df = pd.DataFrame()
             try:
                 pre = 'sh' if code.startswith('6') else 'sz'
-                tabs = _md_tables(_westock(["kline", pre + code, "--period", "day",
-                                            "--limit", str(days), "--fq", "qfq"], timeout=120))
-                if tabs:
-                    recs = []
-                    for r in tabs[0]:
-                        d = r.get("date")
-                        cl = _f(r.get("last"))
-                        if not d or cl is None:
-                            continue
-                        recs.append({"日期": d, "开盘": _f(r.get("open")), "收盘": cl,
-                                     "最高": _f(r.get("high")), "最低": _f(r.get("low")),
-                                     "成交量": _f(r.get("volume"))})
-                    recs.reverse()                      # westock 批量输出为降序 → 转升序
+                bars = _fetch_kline_bars(pre + code, days)   # fetch.kline 已升序
+                if bars:
+                    recs = [{"日期": b["date"], "开盘": b["open"], "收盘": b["close"],
+                             "最高": b["high"], "最低": b["low"], "成交量": b.get("volume")}
+                            for b in bars]
                     if len(recs) >= 10:
                         _df = pd.DataFrame(recs)
             except Exception:
