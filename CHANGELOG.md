@@ -5,6 +5,23 @@
 
 ---
 
+## v2.13 (2026-10-14)
+
+### 🚀 第 2 层·阶段 2 第二批迁移（4 个批量取数主力 → `fetch.kline`）
+
+本批均为「全市场/大池」批量取数脚本，改动集中在取数入口，模型逻辑零改动：
+
+| 脚本 | 迁移点 | 影子对拍 |
+|---|---|---|
+| `quant_scripts/xihu_breadth.py` | `scan()` 批量+缺口+逐只兜底 → `fetch_kline()`（委托 fetch.kline，转 `(date,open,close,high,low)` 元组） | 37 只 / **0 差异** |
+| `quant_scripts/scan_123_2b.py` | `fetch_kline_batch/one()`（qfq 前复权） | 37 只 / **0 差异** |
+| `quant_scripts/rsv_strength.py` | `fetch_batch()` + 基准指数取数（day/week/month） | 值级 **0 差异**（旧 npx 路径偶发丢的 2 只被新层重试补回） |
+| `quant_scripts/yitong_screener.py` | `fetch_kline()`（qfq） | day/week 各 22 只 / **0 差异** |
+
+- 统一收益：**批量/重试退避/免 npx/缺口兜底/解析** 五件事收口到 `fetch.kline`；脚本本地只保留「结构转换」，去掉重复的 run/parse。
+- 保留降级：每个新入口 `try/except` 兜底返回空，不崩关键路径；保留原有 `--fq qfq` 口径。
+- 累计已迁移 **6 个** kline 调用点（wangzhe_track / top_signal / xihu_breadth / scan_123_2b / rsv_strength / yitong_screener）。
+
 ## v2.12 (2026-10-14)
 
 ### 🚀 第 2 层·阶段 2 首批迁移（取数 → `fetch.kline`）
