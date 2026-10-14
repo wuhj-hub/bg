@@ -16,6 +16,35 @@ KB_ID = os.environ.get("IMA_KB_ID", "")
 CLIENT_ID = os.environ.get("IMA_OPENAPI_CLIENTID", "")
 API_KEY = os.environ.get("IMA_OPENAPI_APIKEY", "")
 
+
+def _json_data_date(j):
+    """从 JSON 提取数据日期（优先级 data_date > bar_date > trade_date > date）。"""
+    if isinstance(j, dict):
+        for k in ("data_date", "bar_date", "trade_date", "date"):
+            v = j.get(k)
+            if v:
+                return str(v)
+    return None
+
+
+def _pick_newest_json(paths):
+    """在候选路径中读取「数据日期最新」的一份 JSON（防陈旧副本劫持）。
+    行为：取第一个可读的；若后续候选的数据日期严格更新则替换；无日期则不替换。"""
+    best, best_key = None, None
+    for p in paths:
+        try:
+            with open(p, "r", encoding="utf-8") as f:
+                j = json.load(f)
+        except Exception:
+            continue
+        if best is None:
+            best, best_key = j, _json_data_date(j)
+            continue
+        k = _json_data_date(j)
+        if best_key is not None and k and k > best_key:
+            best, best_key = j, k
+    return best
+
 def run(args, timeout=60):
     try:
         r = subprocess.run(WESTOCK + args, capture_output=True, text=True, timeout=timeout)
@@ -416,13 +445,10 @@ def read_rsv_strength():
 
 
 def read_sector_resonance():
-    """读板块共振JSON（本地复算优先），失败返回None"""
-    for p in ("outputs/板块共振_latest.json", "板块共振_latest.json", "../outputs/板块共振_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    """读板块共振JSON（本地复算优先），失败返回None。
+    多副本时取数据日期最新的一份——防止 outputs/ 陈旧副本劫持（2026-10-14 修复）。"""
+    return _pick_newest_json(("outputs/板块共振_latest.json", "板块共振_latest.json",
+                              "../outputs/板块共振_latest.json"))
 
 
 def read_market_style():
