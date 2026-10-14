@@ -5,6 +5,23 @@
 
 ---
 
+## v2.27 (2026-10-15)
+
+### 阶段 4 · 批次 4.4：东财（涨停池 + 个股快照）
+
+**fetch.py** 新增：
+- `ext_em_ztpool(date=None, pagesize=500)` —— 东财涨停池（push2ex getTopicZTPool）→ `{pool,qdate,tc}`；pool 字段 c/n/p(×1000)/zdp/amount/ltsz/hs/lbc/fbt/lbt/fund/zbc/hybk/zttj。非交易日 `{}`；未来日返回最近可用日。
+- `ext_em_stock(code_or_secid)` + `em_secid(code)` —— 东财个股快照（push2delay stock/get，f43/f58/f59/f170→name/close/pct）。**机会源**（离线返回 None，静默跳过）。
+
+**消费方迁移（影子对拍）**：
+| 脚本 | 函数 | 对拍 |
+|---|---|---|
+| `limitup_concept_rank.py` | `fetch_ztpool` | 36 只涨停池逐字段**全等** + qdate 一致 |
+| `wangzhe_track.py` | `scan`（涨停池段） | 36 只**完全一致** |
+| `cross_source_check.py` | `_em_one` | 机会源，走层内；**沙箱 push2delay 离线无法对拍**（主机 RemoteDisconnected，与 09-29 起事实一致） |
+
+**未迁移（未接 CI，离线工具）**：`zj_filter.py`（一次性研究脚本，硬编码日期）；`beast_pool_screener.py` / `runner_fetch_em_sectors.py`（push2delay clist 全市场行业映射，另一端点，体量较大）→ 留待 4.4b。
+
 ## v2.26 (2026-10-15)
 
 ### 阶段 4 · 批次 4.3：新浪系（行情 + 7×24 快讯）
