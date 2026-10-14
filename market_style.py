@@ -73,6 +73,18 @@ def find_file(names):
     return None
 
 
+def fetch_kline_map(codes, limit=25):
+    """2026-10-15：委托统一取数层 fetch.kline。→ {code: [(date, close, amount), ...] **日期降序**}"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period="day", limit=limit)
+        return {c: [(b["date"], b["close"], b.get("amount") or 0.0) for b in reversed(bars)]
+                for c, bars in raw.items()}
+    except Exception:
+        return {}
+
+
 def _hot_board_text(limit):
     """2026-10-15：优先统一取数层 fetch.hotboard，失败回退本地 run。"""
     try:
@@ -359,8 +371,7 @@ def main():
 
     # 拉指数K线（批量）
     codes = list(ALL_IDX.keys())
-    txt = run(["kline", ",".join(codes), "--period", "day", "--limit", "25"])
-    kl = parse_kline(txt)
+    kl = fetch_kline_map(codes, 25)
     big_df = kl.get("sh000300", [])
     small_df = kl.get("sh000852", [])
     mid_df = kl.get("sh000905", [])
