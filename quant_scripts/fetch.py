@@ -304,6 +304,20 @@ def quote(codes):
     return out
 
 
+def raw(args, timeout=TIMEOUT):
+    """通用透传：直接执行 westock 子命令并返回 **原始 stdout**（不解析）。
+
+    用途：尚未标准化为结构化函数的子命令（如板块级 `asfund --market all`、
+    `board --market all` 等），先统一走本层以复用「免 npx / 重试退避 / 超时」，
+    解析逻辑仍由调用方保留（包裹式适配：优先本层，失败回退本地 run）。
+
+    args: 字符串或列表，例如 "asfund --market all" / ["asfund","--market","all"]。
+    """
+    if isinstance(args, str):
+        args = args.split()
+    return _run(list(args), timeout=timeout)
+
+
 def asfund(codes, date=None):
     """westock asfund 资金流向 → {code: {列名: 值(str)}}（表头驱动）。
     ⚠️ 必须带前缀代码（内部自动 norm）；date: 'YYYY-MM-DD'（YYYYMMDD 会返空）；缺省取最新。"""
