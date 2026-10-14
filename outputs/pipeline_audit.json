@@ -1,7 +1,7 @@
 {
- "date": "2026-10-14 07:01",
+ "date": "2026-10-15 07:01",
  "runs": {
-  "total": 78,
+  "total": 82,
   "bad": [
    {
     "name": "多维度·鱼身报告更新",
@@ -9,41 +9,40 @@
     "created": "2026-10-13T15:49",
     "id": 38425372499,
     "event": "schedule"
-   },
+   }
+  ],
+  "noise": [
    {
     "name": "涨停型王者跟踪",
     "conclusion": "cancelled",
     "created": "2026-10-13T09:18",
     "id": 38375360774,
-    "event": "workflow_dispatch"
+    "event": "workflow_dispatch",
+    "reason": "并发/重复触发取消"
    },
    {
     "name": "涨停型王者跟踪",
     "conclusion": "cancelled",
     "created": "2026-10-13T09:18",
     "id": 38375351503,
-    "event": "workflow_dispatch"
+    "event": "workflow_dispatch",
+    "reason": "并发/重复触发取消"
    },
    {
     "name": "涨停型王者跟踪",
     "conclusion": "cancelled",
     "created": "2026-10-13T09:18",
     "id": 38375340520,
-    "event": "workflow_dispatch"
+    "event": "workflow_dispatch",
+    "reason": "并发/重复触发取消"
    },
    {
     "name": "竞价统计·逐日跟踪",
     "conclusion": "cancelled",
     "created": "2026-10-13T08:21",
     "id": 38368652140,
-    "event": "schedule"
-   },
-   {
-    "name": "多维度·鱼身报告更新",
-    "conclusion": "failure",
-    "created": "2026-10-12T17:41",
-    "id": 38285886640,
-    "event": "schedule"
+    "event": "schedule",
+    "reason": "并发/重复触发取消"
    }
   ]
  },
@@ -51,35 +50,21 @@
   {
    "workflow": "盘后报告生成",
    "step": "一统天下建仓区股池扫描+跟踪（多周期共振）",
-   "minutes": 37.4
+   "minutes": 32.4
   },
   {
    "workflow": "竞价统计·逐日跟踪",
    "step": "采集竞价 + 逐日跟踪 + 报告",
-   "minutes": 60.0
-  },
-  {
-   "workflow": "全盘量化扫描",
-   "step": "全量量化扫描（盘后量化）",
-   "minutes": 28.6
-  },
-  {
-   "workflow": "全盘量化扫描",
-   "step": "市场宽度扫描（全主板涨跌家数分布）",
-   "minutes": 45.2
-  },
-  {
-   "workflow": "全盘量化扫描",
-   "step": "一统天下多周期扫描（建仓区+月线反转+RSV50三线强度）",
-   "minutes": 28.1
+   "minutes": 59.3
   }
  ],
  "stale_products": [],
  "freshness_skipped": false,
  "script_errors": [],
  "issues": [
-  "❌ run 异常 6 个（多维度·鱼身报告更新:failure、涨停型王者跟踪:cancelled、涨停型王者跟踪:cancelled、涨停型王者跟踪:cancelled、竞价统计·逐日跟踪:cancelled）",
-  "⚠️ 重步骤：盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 37.4min、竞价统计·逐日跟踪/采集竞价 + 逐日跟踪 + 报告 60.0min、全盘量化扫描/全量量化扫描（盘后量化） 28.6min、全盘量化扫描/市场宽度扫描（全主板涨跌家数分布） 45.2min、全盘量化扫描/一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） 28.1min"
+  "❌ run 异常 1 个（多维度·鱼身报告更新:failure）",
+  "⏹️ 并发/重复触发取消 4 个（已忽略，不计入异常）",
+  "⚠️ 重步骤：盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 32.4min、竞价统计·逐日跟踪/采集竞价 + 逐日跟踪 + 报告 59.3min"
  ],
  "status": "FAIL"
 }
