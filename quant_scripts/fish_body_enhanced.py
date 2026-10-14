@@ -36,6 +36,20 @@ def parse_table(md):
         if len(v)==len(hdrs): res.append(dict(zip(hdrs,v)))
     return res
 
+def fetch_kline_rows(code, limit=60):
+    """2026-10-14：委托统一取数层 fetch.kline（单股日线，免npx/重试）。
+    → list[dict]，**日期降序**（最新在前），键 date/open/last/high/low/volume/amount（与旧 parse_table 一致）。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        bars = _fk([code], period="day", limit=limit).get(code, [])
+        return [{"date": b["date"], "open": b["open"], "last": b["close"], "high": b["high"],
+                 "low": b["low"], "volume": b.get("volume"), "amount": b.get("amount")}
+                for b in reversed(bars)]
+    except Exception:
+        return []
+
+
 def sf(v):
     if v is None or v=='-' or v=='': return None
     try: return float(v)
@@ -46,13 +60,15 @@ def get_market_temp():
     # ⚠️ 2026-09-15 修复：这是鱼身**第 1 个** westock 调用，runner 上首调易冷启动失败
     #    （当日 09:32 出现 temp=0/数据缺失 → 阶段1 直接退出 → 「未生成鱼身结果文件」）。
     #    加重试 + 报错重试间隔，避免单次抖动就让整个鱼身系统失效。
-    raw=""
-    for _try in range(3):
-        raw=run(f"{WESTOCK_CMD} kline sh000001 --period day --limit 60", timeout=90)
-        if raw and parse_table(raw):
-            break
-        time.sleep(3)
-    rows=parse_table(raw)
+    rows=fetch_kline_rows("sh000001", 60)
+    if not rows:                      # 回退旧路径（带重试）
+        raw=""
+        for _try in range(3):
+            raw=run(f"{WESTOCK_CMD} kline sh000001 --period day --limit 60", timeout=90)
+            if raw and parse_table(raw):
+                break
+            time.sleep(3)
+        rows=parse_table(raw)
     if not rows:
         # ⚠️ 2026-09-15 加固：原 50（中性）会掩盖数据源故障 → 改为 0（保守）
         return {"temp":0,"level":"⚠️数据缺失","idx":"--"}
@@ -88,7 +104,7 @@ def get_market_temp():
 def score_stock_multi(code):
     tech=parse_table(run(f"{WESTOCK_CMD} technical {code} --group macd,rsi,kdj,boll,ma 2>/dev/null"))
     fund=parse_table(run(f"{WESTOCK_CMD} asfund {code} 2>/dev/null"))
-    kline=parse_table(run(f"{WESTOCK_CMD} kline {code} --period day --limit 60 2>/dev/null"))
+    kline=fetch_kline_rows(code, 60) or parse_table(run(f"{WESTOCK_CMD} kline {code} --period day --limit 60 2>/dev/null"))
     tech=tech[0] if tech else {}
     fund=fund[0] if fund else {}
     if not kline: return {"score":0,"detail":{},"kline":[]}
@@ -181,8 +197,7 @@ def verify_resonance(code):
 def detect_golden_breakout(code):
     """黄金起爆线检测：涨停→缩量→不破涨停均价线
     返回 True/False"""
-    raw = run(f"{WESTOCK_CMD} kline {code} --period day --limit 60 2>/dev/null")
-    rows = parse_table(raw)
+    rows = fetch_kline_rows(code, 60) or parse_table(run(f"{WESTOCK_CMD} kline {code} --period day --limit 60 2>/dev/null"))
     if not rows or len(rows) < 6:
         return False
     # 最近10天内找涨停日
