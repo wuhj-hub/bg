@@ -9,38 +9,21 @@ gen_premarket_report.py —— 盘前市场报告生成器
 
 import subprocess, json, time, os, sys, re, urllib.request
 from datetime import datetime, timedelta
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    from report_io import load_latest as _ri_load
+except Exception:  # 兜底：报告关键路径不应因公共模块导入失败而中断
+    def _ri_load(paths):
+        for _p in paths:
+            try:
+                with open(_p, "r", encoding="utf-8") as _f:
+                    return json.load(_f)
+            except Exception:
+                continue
+        return None
 
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 TIMEOUT = 60
-
-
-def _json_data_date(j):
-    """从 JSON 提取数据日期（优先级 data_date > bar_date > trade_date > date）。"""
-    if isinstance(j, dict):
-        for k in ("data_date", "bar_date", "trade_date", "date"):
-            v = j.get(k)
-            if v:
-                return str(v)
-    return None
-
-
-def _pick_newest_json(paths):
-    """在候选路径中读取「数据日期最新」的一份 JSON（防陈旧副本劫持）。
-    行为：取第一个可读的；若后续候选的数据日期严格更新则替换；无日期则不替换。"""
-    best, best_key = None, None
-    for p in paths:
-        try:
-            with open(p, "r", encoding="utf-8") as f:
-                j = json.load(f)
-        except Exception:
-            continue
-        if best is None:
-            best, best_key = j, _json_data_date(j)
-            continue
-        k = _json_data_date(j)
-        if best_key is not None and k and k > best_key:
-            best, best_key = j, k
-    return best
 
 def run(args, timeout=TIMEOUT):
     try:
@@ -57,15 +40,8 @@ def run_curl(url):
         return ""
 
 def load_quant_latest():
-    """读取昨日盘后量化汇总（三系统信号），返回dict或None"""
-    for name in ("quant_results_latest.json", "outputs/quant_results_latest.json"):
-        if os.path.exists(name):
-            try:
-                with open(name, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                return None
-    return None
+    """读取昨日盘后量化汇总（三系统信号），返回dict或None（多副本按日期取最新）"""
+    return _ri_load(("quant_results_latest.json", "outputs/quant_results_latest.json"))
 
 
 def check_quant_fresh(quant, yesterday):
@@ -403,15 +379,10 @@ def calc_zengxingzhi():
 
 def read_limitup_panel():
     """读热板作战面板（涨停概念排行_latest.json），失败返回None"""
-    for p in ("涨停概念排行_latest.json", "outputs/涨停概念排行_latest.json",
+    return _ri_load(("涨停概念排行_latest.json", "outputs/涨停概念排行_latest.json",
               "../outputs/涨停概念排行_latest.json",
               "/sandbox/workspace/bg/outputs/涨停概念排行_latest.json",
-              "/sandbox/workspace/github_bg/outputs/涨停概念排行_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/github_bg/outputs/涨停概念排行_latest.json"))
 
 
 def render_limitup_panel():
@@ -846,7 +817,7 @@ def calc_factor_analysis():
 def read_heshi_resonance():
     """读板块共振JSON（本地复算优先，黑石外部版降级），失败返回None。
     多副本时取数据日期最新的一份——防止 outputs/ 陈旧副本劫持（2026-10-14 修复）。"""
-    return _pick_newest_json(("outputs/板块共振_latest.json", "板块共振_latest.json",
+    return _ri_load(("outputs/板块共振_latest.json", "板块共振_latest.json",
                               "../outputs/板块共振_latest.json",
                               "outputs/黑石板块共振_latest.json", "../outputs/黑石板块共振_latest.json",
                               "/sandbox/workspace/github_bg/outputs/板块共振_latest.json"))
@@ -854,96 +825,56 @@ def read_heshi_resonance():
 
 def read_market_width():
     """读市场宽度指标（market_width_latest.json），失败返回None"""
-    for p in ("market_width_latest.json", "outputs/market_width_latest.json", "../outputs/market_width_latest.json",
-              "/sandbox/workspace/github_bg/outputs/market_width_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("market_width_latest.json", "outputs/market_width_latest.json", "../outputs/market_width_latest.json",
+              "/sandbox/workspace/github_bg/outputs/market_width_latest.json"))
 
 
 def read_ai_chokepoint_watch():
     """读宁静AI卡位观察清单（ai_chokepoint_watch_latest.json，盘后流水线产出），失败返回None"""
-    for p in ("ai_chokepoint_watch_latest.json", "outputs/ai_chokepoint_watch_latest.json",
+    return _ri_load(("ai_chokepoint_watch_latest.json", "outputs/ai_chokepoint_watch_latest.json",
               "../outputs/ai_chokepoint_watch_latest.json",
               "/sandbox/workspace/github_bg/ai_chokepoint_watch_latest.json",
-              "/sandbox/workspace/github_bg/outputs/ai_chokepoint_watch_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/github_bg/outputs/ai_chokepoint_watch_latest.json"))
 
 
 def read_yearline_breadth():
     """读年线广度指标（yearline_breadth_latest.json，V纪元方法论），失败返回None"""
-    for p in ("yearline_breadth_latest.json", "outputs/yearline_breadth_latest.json", "../outputs/yearline_breadth_latest.json",
+    return _ri_load(("yearline_breadth_latest.json", "outputs/yearline_breadth_latest.json", "../outputs/yearline_breadth_latest.json",
               "/sandbox/workspace/github_bg/outputs/yearline_breadth_latest.json",
-              "/sandbox/workspace/yearline/outputs/yearline_breadth_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/yearline/outputs/yearline_breadth_latest.json"))
 
 
 def read_xihu_breadth():
     """读西湖广度温度计（xihu_breadth_latest.json，西湖区的孩纸·下雨图+大盘量化），失败返回None"""
-    for p in ("xihu_breadth_latest.json", "outputs/xihu_breadth_latest.json", "../outputs/xihu_breadth_latest.json",
+    return _ri_load(("xihu_breadth_latest.json", "outputs/xihu_breadth_latest.json", "../outputs/xihu_breadth_latest.json",
               "/sandbox/workspace/github_bg/xihu_breadth_latest.json",
-              "/sandbox/workspace/github_bg/outputs/xihu_breadth_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/github_bg/outputs/xihu_breadth_latest.json"))
 
 
 def read_rsv_strength():
     """读RSV均相对强度（rsv_strength_latest.json，腰缠万贯144日），失败返回None"""
-    for p in ("rsv_strength_latest.json", "outputs/rsv_strength_latest.json", "../outputs/rsv_strength_latest.json",
-              "/sandbox/workspace/github_bg/outputs/rsv_strength_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("rsv_strength_latest.json", "outputs/rsv_strength_latest.json", "../outputs/rsv_strength_latest.json",
+              "/sandbox/workspace/github_bg/outputs/rsv_strength_latest.json"))
 
 
 def read_monthly_macd():
     """读上证月线MACD监控（monthly_macd_latest.json，Seaborg方法论），失败返回None"""
-    for p in ("monthly_macd_latest.json", "outputs/monthly_macd_latest.json", "../outputs/monthly_macd_latest.json",
-              "/sandbox/workspace/github_bg/outputs/monthly_macd_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("monthly_macd_latest.json", "outputs/monthly_macd_latest.json", "../outputs/monthly_macd_latest.json",
+              "/sandbox/workspace/github_bg/outputs/monthly_macd_latest.json"))
 
 
 def read_hot_emotion():
     """读热点情绪温度（hot_emotion_latest.json，连板梯队+情绪温度+退潮预警），失败返回None"""
-    for p in ("hot_emotion_latest.json", "outputs/hot_emotion_latest.json", "../outputs/hot_emotion_latest.json",
+    return _ri_load(("hot_emotion_latest.json", "outputs/hot_emotion_latest.json", "../outputs/hot_emotion_latest.json",
               "/sandbox/workspace/github_bg/outputs/hot_emotion_latest.json",
-              "/sandbox/workspace/skills/盘前市场报告/scripts/outputs/hot_emotion_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/skills/盘前市场报告/scripts/outputs/hot_emotion_latest.json"))
 
 
 def read_env():
     """读环境唯一化引擎（env_latest.json，第1层：5子分→温度→仓位总闸），失败返回None"""
-    for p in ("env_latest.json", "outputs/env_latest.json", "../outputs/env_latest.json",
+    return _ri_load(("env_latest.json", "outputs/env_latest.json", "../outputs/env_latest.json",
               "/sandbox/workspace/github_bg/env_latest.json",
-              "/sandbox/workspace/github_bg/outputs/env_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/github_bg/outputs/env_latest.json"))
 
 
 def render_ai_chokepoint():
@@ -995,10 +926,7 @@ def read_yitong_pool():
                    + glob.glob("/sandbox/workspace/outputs/一统天下建仓区股池_*.json"))
     if not cands:
         return None
-    try:
-        return json.load(open(cands[-1], encoding="utf-8"))
-    except Exception:
-        return None
+    return _ri_load(tuple(cands))
 
 
 def render_yitong_rsv50():
@@ -1028,14 +956,9 @@ def render_yitong_rsv50():
 
 def read_xihu_rsv():
     """读西湖-RSV多周期相对强度（xihu_rsv_latest.json，全市场扫描），失败返回None"""
-    for p in ("xihu_rsv_latest.json", "outputs/xihu_rsv_latest.json",
+    return _ri_load(("xihu_rsv_latest.json", "outputs/xihu_rsv_latest.json",
               "../outputs/xihu_rsv_latest.json",
-              "/sandbox/workspace/outputs/xihu_rsv_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/outputs/xihu_rsv_latest.json"))
 
 
 def render_xihu_rsv():
@@ -1120,13 +1043,8 @@ def render_ljsk(now=""):
 
 def read_market_style():
     """读市场风格轴（market_style_latest.json），失败返回None"""
-    for p in ("market_style_latest.json", "outputs/market_style_latest.json", "../outputs/market_style_latest.json",
-              "/sandbox/workspace/github_bg/outputs/market_style_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("market_style_latest.json", "outputs/market_style_latest.json", "../outputs/market_style_latest.json",
+              "/sandbox/workspace/github_bg/outputs/market_style_latest.json"))
 
 
 def read_fund_phase():
@@ -1202,15 +1120,10 @@ def main():
 
 def read_execution_cards():
     """读个股执行卡（execution_cards_latest.json，盘后 execution_card.py 产出），失败返回None"""
-    for p in ("execution_cards_latest.json", "outputs/execution_cards_latest.json",
+    return _ri_load(("execution_cards_latest.json", "outputs/execution_cards_latest.json",
               "../outputs/execution_cards_latest.json",
               "/sandbox/workspace/github_bg/outputs/execution_cards_latest.json",
-              "/sandbox/workspace/outputs/execution_cards_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/outputs/execution_cards_latest.json"))
 
 
 # ══════════ ②.7 环境切换决策表（用哪套·关哪套）══════════
@@ -1243,14 +1156,9 @@ ENV_BUCKET = {"强势向上": "牛市", "向上": "牛市", "纠缠": "震荡市
 
 def read_market_regime():
     """读 market_regime.py 产出（三级别力量判定），失败返回 None"""
-    for p in ("market_regime_latest.json", "outputs/market_regime_latest.json",
+    return _ri_load(("market_regime_latest.json", "outputs/market_regime_latest.json",
               "/sandbox/workspace/github_bg/market_regime_latest.json",
-              "/sandbox/workspace/github_bg/outputs/market_regime_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/github_bg/outputs/market_regime_latest.json"))
 
 
 def render_env_switch():
@@ -1407,14 +1315,9 @@ def render_env_cross_check():
 
 def read_hot_concepts():
     """读盘后《涨停概念排行》产出（涨停归类→热点概念→龙头）"""
-    for pth in ("涨停概念排行_latest.json", "outputs/涨停概念排行_latest.json",
+    return _ri_load(("涨停概念排行_latest.json", "outputs/涨停概念排行_latest.json",
                 "/sandbox/workspace/github_bg/涨停概念排行_latest.json",
-                "/sandbox/workspace/github_bg/outputs/涨停概念排行_latest.json"):
-        try:
-            return json.load(open(pth, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+                "/sandbox/workspace/github_bg/outputs/涨停概念排行_latest.json"))
 
 
 def render_hot_concepts():
@@ -1453,14 +1356,9 @@ def render_hot_concepts():
 
 def read_guaili():
     """读一统天下·乖离低买扫描产物（盘后产出）"""
-    for pth in ("乖离低买_latest.json", "outputs/乖离低买_latest.json",
+    return _ri_load(("乖离低买_latest.json", "outputs/乖离低买_latest.json",
                 "/sandbox/workspace/github_bg/乖离低买_latest.json",
-                "/sandbox/workspace/github_bg/outputs/乖离低买_latest.json"):
-        try:
-            return json.load(open(pth, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+                "/sandbox/workspace/github_bg/outputs/乖离低买_latest.json"))
 
 
 def render_guaili():
