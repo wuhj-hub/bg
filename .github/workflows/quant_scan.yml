@@ -41,6 +41,11 @@ jobs:
     if: needs.trade_gate.outputs.ok == '1'
     runs-on: ubuntu-latest
     timeout-minutes: 300  # 5h，余量充足（优化后实际约2.5-3.5h）
+    env:
+      # 2026-10-15 阶段3：打开统一取数层磁盘缓存（同一次运行内跨 step 复用；落 /tmp 不落仓库、跨运行不持久）
+      # TTL=18000s(5h)：盘后运行时允许同日复用；跨运行 fresh checkout 天然隔离，无跨日倒灌风险
+      FETCH_CACHE: "1"
+      FETCH_CACHE_TTL: "18000"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
