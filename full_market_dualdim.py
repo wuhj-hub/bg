@@ -317,17 +317,16 @@ def parse_batch_kline(txt):
 
 
 def batch_fetch_kline(wcodes, limit=130, chunk=40):
-    """⭐2026-09-25 批量预取 kline（40只/次），替代逐只调用。
-    npx 子进程启动开销 2-4s，全市场 3000 只逐只调用约 6000 次 → 现约 150 次。"""
-    out = {}
-    for i in range(0, len(wcodes), chunk):
-        part = wcodes[i:i + chunk]
-        txt = run(["kline", ",".join(part), "--period", "day", "--limit", str(limit),
-                   "--fq", "qfq"], timeout=300)
-        if not txt or txt.startswith("ERR:"):
-            continue
-        out.update(parse_batch_kline(txt))
-    return out
+    """2026-10-15：委托统一取数层 fetch.kline（qfq）。
+    → {symbol: [ {date, amount, last}, ...] 升序}（与 parse_batch_kline 同结构）。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(wcodes), period="day", limit=limit, fq="qfq")
+        return {c: [{"date": b["date"], "amount": b.get("amount"), "last": b["close"]}
+                    for b in bars] for c, bars in raw.items()}
+    except Exception:
+        return {}
 
 
 def parse_batch_asfund(txt):
