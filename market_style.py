@@ -58,6 +58,19 @@ def parse_kline(txt):
     return out  # 每只股票内部降序：kl[0]=最新
 
 
+def fetch_kline_map(codes, limit=25):
+    """2026-10-15：委托统一取数层 fetch.kline。→ {code: [(date, close, amount), ...] **日期降序**}
+    （与 parse_kline 同结构；kl[0]=最新）。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period="day", limit=limit)
+        return {c: [(b["date"], b["close"], b.get("amount") or 0.0) for b in reversed(bars)]
+                for c, bars in raw.items()}
+    except Exception:
+        return {}
+
+
 def pct_n(closes, n):
     """最近n个交易日的涨跌幅(%)，closes降序(最新在前)"""
     if len(closes) > n:
@@ -347,8 +360,7 @@ def main():
 
     # 拉指数K线（批量）
     codes = list(ALL_IDX.keys())
-    txt = run(["kline", ",".join(codes), "--period", "day", "--limit", "25"])
-    kl = parse_kline(txt)
+    kl = fetch_kline_map(codes, 25)
     big_df = kl.get("sh000300", [])
     small_df = kl.get("sh000852", [])
     mid_df = kl.get("sh000905", [])
