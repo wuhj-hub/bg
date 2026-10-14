@@ -5,6 +5,20 @@
 
 ---
 
+## v2.23 (2026-10-15)
+
+### 修复「根目录脚本无法导入 fetch」+ sector_flow 收口（阶段 3 收尾）
+
+**🐞 关键静默 bug**：`fetch.py` 位于 `quant_scripts/`，而 **7 个根目录脚本**（`market_width / market_style / minute_strength / full_market_dualdim / signal_arbiter / quad_resonance / sector_resonance_local`）在 CI 中以 `python3 xxx.py`（cwd=仓库根）运行 → `sys.path[0]=仓库根` → `from fetch import ...` **必然 ImportError**（被 try/except 吞掉）→ 取数层形同虚设。
+- 实测复现：隔离目录（脚本在根、fetch 在 quant_scripts）下 `market_style.fetch_kline_map` 返回 `{}`。
+- 修复：所有根目录脚本在 `sys.path` 中**追加 `<root>/quant_scripts`**；修复后隔离目录实测各函数全部返回真实数据（kline_map 5×2、batch_asfund 2 条、fetch_month_closes 5 点、_board_text 1140B）。
+- `quant_scripts/*` 下脚本不受影响（其 `sys.path[0]` 已是 quant_scripts）。
+
+**fetch.py**：新增 `raw(args)` 通用透传 —— 供尚未标准化的子命令（如板块级 `asfund --market all`）复用「免 npx / 重试退避 / 超时」。
+
+**`premarket_scripts/sector_flow.py`**：板块级 asfund 改为 `fetch.raw`（包裹式，失败回退 npx）。
+> ⚠️ **实测发现**：本版 westock **已不支持 `asfund --market all`**（返回用法提示/空）→ 该模块的资金榜**功能已失效**，且**未被任何 workflow 引用**（23 个 workflow 全无）。板块级资金建议改用已标准化的 `fetch.board()`（含行业/概念 + 资金）。
+
 ## v2.22 (2026-10-15)
 
 ### ⚠️ 修复一次自致回归 ＋ 阶段 3 asfund 消费方迁移（8 文件）
