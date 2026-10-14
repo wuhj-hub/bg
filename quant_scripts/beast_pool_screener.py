@@ -75,38 +75,17 @@ def fetch_industry_map():
 
 
 def westock_kline(codes, limit=200, chunk=40, period="day"):
-    """批量拉日线 → {code: [(date,o,h,l,c,v), ...] 日期升序}"""
-    res = {}
-    for k in range(0, len(codes), chunk):
-        batch = codes[k:k + chunk]
-        cmd = ["npx", "-y", "westock-data-skillhub@1.0.3", "kline",
-               ",".join(batch), "--period", period, "--limit", str(limit)]
-        txt = ""
-        for attempt in range(2):
-            try:
-                r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-                txt = r.stdout or ""
-                if txt:
-                    break
-            except Exception:
-                time.sleep(2)
-        for line in txt.splitlines():
-            s = line.strip()
-            if not s.startswith("|"):
-                continue
-            p = [x.strip() for x in s.strip("|").split("|")]
-            if len(p) < 9 or not re.match(r"^(sh|sz)\d{6}$", p[0]):
-                continue
-            try:
-                res.setdefault(p[0], []).append(
-                    (p[1], float(p[2]), float(p[4]), float(p[5]), float(p[3]), float(p[6])))
-                # 列序 symbol|date|open|last|high|low|volume|amount|exchange
-                # 存成 (date, open, high, low, close, volume)
-            except (ValueError, TypeError):
-                continue
-    for c in res:
-        res[c].sort(key=lambda x: x[0])
-    return res
+    """2026-10-15：委托统一取数层 fetch.kline。
+    → {code: [(date, open, high, low, close, volume), ...] 日期升序}（与旧结构一致）。
+    chunk 保留仅为兼容旧签名。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period=period, limit=limit)
+        return {c: [(b["date"], b["open"], b["high"], b["low"], b["close"], b.get("volume"))
+                    for b in bars] for c, bars in raw.items()}
+    except Exception:
+        return {}
 
 
 def calc_rsv(close, high, low, mkt_close):
