@@ -58,6 +58,18 @@ def parse_kline(txt):
     return out
 
 
+def fetch_kline_list(codes, limit):
+    """2026-10-14：委托统一取数层 fetch.kline（与旧口径一致不复权）。
+    → {sym: [[date,open,close,high,low,volume], ...] 升序}（与 parse_kline 同结构）。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period="day", limit=limit)
+        return {c: [[b["date"], b["open"], b["close"], b["high"], b["low"], b.get("volume")]
+                    for b in bars] for c, bars in raw.items()}
+    except Exception:
+        return {}
+
 def _fb(batch, limit):
     for _ in range(2):
         try:
@@ -72,12 +84,8 @@ def _fb(batch, limit):
 
 
 def fetch_klines(codes, limit=130):
-    out = {}
-    batches = [codes[i:i + 30] for i in range(0, len(codes), 30)]
-    with ThreadPoolExecutor(max_workers=4) as ex:
-        for d in ex.map(lambda b: _fb(b, limit), batches):
-            out.update(d)
-    return out
+    """2026-10-14：取数委托统一取数层 fetch.kline。"""
+    return fetch_kline_list(codes, limit)
 
 
 def fetch_names(codes):
