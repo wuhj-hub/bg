@@ -463,15 +463,25 @@ def confirm_pending(rows, stale_days=180):
 def scan(live=True):
     """抓当日实时涨停池 → 涨停型王者（换手口径）"""
     date = datetime.now(BJT).strftime("%Y%m%d")
-    url = ("https://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989"
-           f"&dpt=wz.ztzt&Pageindex=0&pagesize=300&sort=fbt%3Aasc&date={date}")
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        pool = (json.loads(urllib.request.urlopen(req, timeout=20).read().decode())
-                .get("data") or {}).get("pool") or []
-    except Exception as e:
-        log(f"[WARN] 涨停池获取失败: {e}")
-        return []
+    pool = []
+    try:                                              # 2026-10-15：优先统一取数层 fetch.ext_em_ztpool
+        _d = os.path.dirname(os.path.abspath(__file__))   # quant_scripts
+        if _d not in sys.path:
+            sys.path.insert(0, _d)
+        from fetch import ext_em_ztpool as _ez
+        pool = _ez(date, pagesize=300).get("pool") or []
+    except Exception:
+        pool = []
+    if not pool:                                      # 回退本地实现
+        url = ("https://push2ex.eastmoney.com/getTopicZTPool?ut=7eea3edcaed734bea9cbfc24409ed989"
+               f"&dpt=wz.ztzt&Pageindex=0&pagesize=300&sort=fbt%3Aasc&date={date}")
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            pool = (json.loads(urllib.request.urlopen(req, timeout=20).read().decode())
+                    .get("data") or {}).get("pool") or []
+        except Exception as e:
+            log(f"[WARN] 涨停池获取失败: {e}")
+            return []
     ds = datetime.now(BJT).strftime("%Y-%m-%d")
     rows = []
     cand = []
