@@ -5,6 +5,22 @@
 
 ---
 
+## v2.17 (2026-10-15)
+
+### 🐛 修复 monthly_macd_monitor 月线解析列错位 ＋ 阶段 2 第六批迁移（2 个）
+
+**修复**：`quant_scripts/monthly_macd_monitor.py` 的 `parse_monthly()` 原硬编码 `parts[3]` 当 close，而单股月线列序为 `date|open|last|high|low` → 实际取到 **high**（列错位）。改为**表头驱动**取 `last/close`，并把取数委托 `fetch.kline`。
+- 实证修正：2026-10 该行 close 由 3864.12(high) → **3767.23(真收盘)**；DIF 162.9→153.4、DEA 195.0→188.6、柱 -64.2→-70.3；近12月柱体路径改变（新序列更早转负）。
+- 影响面：该脚本由 `quant_scan.yml` 第二步.1.8 运行 → `monthly_macd_latest.json` → **盘前报告「📉 月线MACD」行**（Seaborg 方法论）。故盘前报告该行数值/临界判定随之校正。
+- 当前状态值两版同为「已死叉」，无方向性翻转；但历史临界时点会变。
+
+| 迁移脚本 | 迁移点 | 影子对拍 |
+|---|---|---|
+| `market_style.py` | 指数批量 kline → `fetch_kline_map()` | 6 指数 / **0 差异** |
+| `quant_scripts/inbull_scan.py` | `fetch_all()` 月线批量 | new ⊇ old，值级 **0 差异** |
+
+- **累计已迁移 17 个 kline 调用点**。
+
 ## v2.16 (2026-10-14)
 
 ### 🚀 第 2 层·阶段 2 第五批迁移（2 个）
