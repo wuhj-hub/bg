@@ -908,5 +908,6 @@
    "status": "同步"
   }
  ],
- "dup_stale": []
+ "dup_stale": [],
+ "reader_bypass": []
 }
