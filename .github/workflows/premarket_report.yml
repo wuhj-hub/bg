@@ -50,7 +50,11 @@ jobs:
     if: needs.trade_gate.outputs.ok == '1'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      # 2026-10-15 阶段3：打开统一取数层缓存（盘前数据全为历史已完结 → TTL=0 即安全复用）
+      FETCH_CACHE: "1"
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
