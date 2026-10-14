@@ -443,6 +443,81 @@ def ext_fqkline(codes, period="day", start="", end="", count=800, fq="qfq", work
     return out
 
 
+# ── 新浪：hq.sinajs 行情 + 财经 7x24 快讯 ──
+SINA_HQ_URL = "https://hq.sinajs.cn/list="
+SINA_HQ_HEADERS = {"User-Agent": "Mozilla/5.0", "Referer": "https://finance.sina.com.cn"}
+SINA_NEWS_URL = "https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size={n}&zhibo_id=152"
+
+
+def parse_sina_hq(raw):
+    """新浪 hq.sinajs 响应 → {code: {name,open,prev_close,price,high,low,volume,amount,pct}}。
+
+    字段位：[0]名称 [1]今开 [2]昨收 [3]现价 [4]最高 [5]最低 [8]成交量(股) [9]成交额(元)。
+    """
+    out = {}
+    for ln in (raw or "").splitlines():
+        m = re.match(r'var hq_str_(\w+)="([^"]*)"', ln.strip())
+        if not m:
+            continue
+        code, f = m.group(1), m.group(2).split(",")
+        if len(f) < 4 or not f[0]:
+            continue
+
+        def _f(i):
+            try:
+                return float(f[i])
+            except Exception:
+                return None
+        prev, close = _f(2), _f(3)
+        rec = {"name": f[0], "open": _f(1), "prev_close": prev, "price": close,
+               "high": _f(4), "low": _f(5), "volume": _f(8), "amount": _f(9)}
+        rec["pct"] = round((close - prev) / prev * 100, 2) if (close is not None and prev) else None
+        out[code] = rec
+    return out
+
+
+def ext_sina_quote(codes, batch=60, timeout=20, retries=3):
+    """新浪行情（hq.sinajs.cn，GBK，带重试）→ {code: {...}}（独立于腾讯的行情体系）。
+
+    ⚠️ 必须带 `Referer: https://finance.sina.com.cn`。
+    """
+    codes = [c if str(c).startswith(("sh", "sz", "bj")) else norm(c) for c in codes]
+    out = {}
+    for b in chunks(codes, batch):
+        raw = ""
+        for i in range(retries):
+            try:
+                req = urllib.request.Request(SINA_HQ_URL + ",".join(b), headers=SINA_HQ_HEADERS)
+                raw = urllib.request.urlopen(req, timeout=timeout).read().decode("gbk", "ignore")
+                if raw.strip():
+                    break
+            except Exception:
+                pass
+            time.sleep(1.2 * (i + 1))
+        out.update(parse_sina_hq(raw))
+    return out
+
+
+def ext_sina_news(n=8, with_time=False, timeout=18):
+    """新浪财经 7x24 快讯（zhibo_id=152）→ [text] 或 [{time, text}]（with_time=True）。失败返回 []。"""
+    try:
+        req = urllib.request.Request(SINA_NEWS_URL.format(n=n), headers={"User-Agent": "Mozilla/5.0"})
+        d = json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "ignore"))
+        lst = d.get("result", {}).get("data", {}).get("feed", {}).get("list", []) or []
+    except Exception:
+        return []
+    out = []
+    for it in lst:
+        t = re.sub(r"<[^>]+>", "", it.get("rich_text", "")).strip()
+        if not t:
+            continue
+        if with_time:
+            out.append({"time": (it.get("create_time") or "")[11:16], "text": t[:80]})
+        else:
+            out.append(t[:80])
+    return out[:n]
+
+
 def raw(args, timeout=TIMEOUT):
     """通用透传：直接执行 westock 子命令并返回 **原始 stdout**（不解析）。
 
