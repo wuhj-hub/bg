@@ -66,5 +66,22 @@
    "breadth_vs_width": -67.4
   },
   "degraded": false
+ },
+ "2026-10-14": {
+  "temp": 30.9,
+  "level": "偏冷",
+  "position_cap": 30,
+  "subs": {
+   "index_trend": 15.5,
+   "emotion": 55.0,
+   "width": 46.9,
+   "breadth": 17.8,
+   "structure": 16.0
+  },
+  "divergence": {
+   "index_vs_emotion": -39.5,
+   "breadth_vs_width": -29.1
+  },
+  "degraded": false
  }
 }
