@@ -379,19 +379,22 @@ def load_market_width():
 
 
 
+def fetch_month_closes(code, limit=12):
+    """2026-10-15：委托统一取数层 fetch.kline（月线不复权）。→ 收盘价列表 **降序**（closes[0]=最新）。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        bars = _fk([code], period="month", limit=limit).get(code, [])
+        return [b["close"] for b in reversed(bars)]
+    except Exception:
+        return []
+
+
 def month_gate(code):
     """月线闸门：PASS(收盘>MA6>MA12) / WARN(收盘>MA6但MA6<MA12) / BLOCK(收盘<MA6)"""
-    txt = run(["kline", code, "--period", "month", "--limit", "12"])
-    closes = []
-    for ln in txt.splitlines():
-        s = ln.strip()
-        if s.startswith("|") and re.match(r"^\|\s*20\d{2}", s):  # 2026-08-13修复：原仅匹配2026开头，2025年月K被过滤致closes不足返回"?"
-            parts = [p.strip() for p in s.strip("|").split("|")]
-            if len(parts) >= 4 and parts[3]:
-                try:
-                    closes.append(float(parts[3]))
-                except ValueError:
-                    continue
+    # 2026-10-15：取数委托 fetch.kline，并按表头取**收盘价**（原硬编码 parts[3]，
+    # 在单股列序 date|open|last|high|low 下实为 **high** —— 与 monthly_macd 同族的列错位 bug）。
+    closes = fetch_month_closes(code, 12)
     if len(closes) < 6:
         return "?"
     cur = closes[0]
