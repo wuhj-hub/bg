@@ -49,6 +49,19 @@ def parse_batch(txt):
     return out
 
 
+def fetch_kline(codes, limit=10):
+    """2026-10-14：委托统一取数层 fetch.kline（批量/重试/免npx/缺口兜底统一收口）。
+    → {code: [(date, close, high), ... **日期降序**（最新在前）]}，与 parse_batch 同结构。"""
+    import sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period="day", limit=limit)
+        return {c: [(b["date"], b["close"], b["high"]) for b in bars[::-1]]
+                for c, bars in raw.items()}
+    except Exception:
+        return {}
+
 def width_score(up_pct, strong_cnt, limitup_cnt, total):
     """市场宽度分0-100：上涨占比(广度分) + 强势/涨停(赚钱效应加成)。
     返回 (总分, 广度分, 赚钱效应加成) —— 拆分展示，避免把加成误读为普涨。"""
@@ -112,8 +125,7 @@ def main():
     for i in range(0, total, batch):
         chunk = rows[i:i + batch]
         codes = [("sh" if c["code"].startswith("60") else "sz") + c["code"] for c in chunk]
-        txt = run(["kline", ",".join(codes), "--period", "day", "--limit", "10"])
-        data = parse_batch(txt)
+        data = fetch_kline(codes, 10)
         for c, r_ in zip(chunk, codes):
             kl = data.get(r_, [])
             if len(kl) >= 2:
@@ -163,8 +175,7 @@ def main():
             return ("sh" if c["code"].startswith("60") else "sz") + c["code"]
         for k in range(0, len(all_missing), 10):
             sub = all_missing[k:k + 10]
-            txt2 = run(["kline", ",".join(_code(c) for c in sub), "--period", "day", "--limit", "10"])
-            d2 = parse_batch(txt2)
+            d2 = fetch_kline([_code(c) for c in sub], 10)
             for c in sub:
                 kl = d2.get(_code(c), [])
                 if len(kl) >= 2:
@@ -177,8 +188,7 @@ def main():
         if still:
             print(f"[补齐] 剩余 {len(still)} 只逐只重试…", flush=True)
             for c in still:
-                txt3 = run(["kline", _code(c), "--period", "day", "--limit", "10"], timeout=60)
-                d3 = parse_batch(txt3)
+                d3 = fetch_kline([_code(c)], 10)
                 kl = d3.get(_code(c), [])
                 if len(kl) >= 2:
                     fixed += 1
@@ -276,18 +286,9 @@ def main():
     # 200日成本线（猛兽派日报启发·2026-08-11）：上证近200日收盘均价 ≈ 市场成本
     cost = {}
     try:
-        ctxt = run(["kline", "sh000001", "--period", "day", "--limit", "250"])
-        closes = []
-        for ln in ctxt.splitlines():
-            s = ln.strip()
-            if s.startswith("|") and re.match(r"^\|\s*2026", s):
-                parts = [p.strip() for p in s.strip("|").split("|")]
-                # 单只K线列序: date|open|last|high|low (last=parts[2]，与批量symbol|date|open|last不同!)
-                if len(parts) >= 4 and parts[2]:
-                    try:
-                        closes.append(float(parts[2]))
-                    except ValueError:
-                        pass
+        # 委托统一取数层 fetch.kline：返回 (date, close, high) 降序，b[1]=close
+        _iraw = fetch_kline(["sh000001"], 250).get("sh000001", [])
+        closes = [b[1] for b in _iraw]
         if len(closes) >= 120:  # westock单只K线约146条上限，用实际可用数据近似成本线
             closes = closes[:min(len(closes), 200)]
             cost200 = sum(closes) / len(closes)
