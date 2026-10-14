@@ -10,40 +10,23 @@ gen_review_report.py —— 复盘报告生成器 v2.0
 """
 import subprocess, json, os, sys, time, re, csv, io, urllib.request, urllib.parse
 from datetime import datetime, timedelta
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    from report_io import load_latest as _ri_load
+except Exception:  # 兜底：报告关键路径不应因公共模块导入失败而中断
+    def _ri_load(paths):
+        for _p in paths:
+            try:
+                with open(_p, "r", encoding="utf-8") as _f:
+                    return json.load(_f)
+            except Exception:
+                continue
+        return None
 
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 KB_ID = os.environ.get("IMA_KB_ID", "")
 CLIENT_ID = os.environ.get("IMA_OPENAPI_CLIENTID", "")
 API_KEY = os.environ.get("IMA_OPENAPI_APIKEY", "")
-
-
-def _json_data_date(j):
-    """从 JSON 提取数据日期（优先级 data_date > bar_date > trade_date > date）。"""
-    if isinstance(j, dict):
-        for k in ("data_date", "bar_date", "trade_date", "date"):
-            v = j.get(k)
-            if v:
-                return str(v)
-    return None
-
-
-def _pick_newest_json(paths):
-    """在候选路径中读取「数据日期最新」的一份 JSON（防陈旧副本劫持）。
-    行为：取第一个可读的；若后续候选的数据日期严格更新则替换；无日期则不替换。"""
-    best, best_key = None, None
-    for p in paths:
-        try:
-            with open(p, "r", encoding="utf-8") as f:
-                j = json.load(f)
-        except Exception:
-            continue
-        if best is None:
-            best, best_key = j, _json_data_date(j)
-            continue
-        k = _json_data_date(j)
-        if best_key is not None and k and k > best_key:
-            best, best_key = j, k
-    return best
 
 def run(args, timeout=60):
     try:
@@ -378,101 +361,61 @@ def render_ljsk(now=""):
 def read_market_width():
     """读市场宽度指标（market_width_latest.json），失败返回None"""
     import json as _json
-    for p in ("market_width_latest.json", "outputs/market_width_latest.json", "../outputs/market_width_latest.json",
-              "/sandbox/workspace/github_bg/outputs/market_width_latest.json"):
-        try:
-            return _json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("market_width_latest.json", "outputs/market_width_latest.json", "../outputs/market_width_latest.json",
+              "/sandbox/workspace/github_bg/outputs/market_width_latest.json"))
 
 
 def read_yearline_breadth():
     """读年线广度指标（yearline_breadth_latest.json，V纪元方法论），失败返回None"""
-    for p in ("yearline_breadth_latest.json", "outputs/yearline_breadth_latest.json", "../outputs/yearline_breadth_latest.json",
+    return _ri_load(("yearline_breadth_latest.json", "outputs/yearline_breadth_latest.json", "../outputs/yearline_breadth_latest.json",
               "/sandbox/workspace/github_bg/outputs/yearline_breadth_latest.json",
-              "/sandbox/workspace/yearline/outputs/yearline_breadth_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/yearline/outputs/yearline_breadth_latest.json"))
 
 
 def read_xihu_breadth():
     """读西湖广度温度计（xihu_breadth_latest.json，西湖区的孩纸·下雨图+大盘量化），失败返回None"""
-    for p in ("xihu_breadth_latest.json", "outputs/xihu_breadth_latest.json", "../outputs/xihu_breadth_latest.json",
+    return _ri_load(("xihu_breadth_latest.json", "outputs/xihu_breadth_latest.json", "../outputs/xihu_breadth_latest.json",
               "/sandbox/workspace/github_bg/xihu_breadth_latest.json",
-              "/sandbox/workspace/github_bg/outputs/xihu_breadth_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/github_bg/outputs/xihu_breadth_latest.json"))
 
 
 def read_xihu_breadth_history():
     """读西湖广度历史序列（xihu_breadth_history.json），失败返回None"""
-    for p in ("outputs/xihu_breadth_history.json", "../outputs/xihu_breadth_history.json",
-              "/sandbox/workspace/github_bg/outputs/xihu_breadth_history.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("outputs/xihu_breadth_history.json", "../outputs/xihu_breadth_history.json",
+              "/sandbox/workspace/github_bg/outputs/xihu_breadth_history.json"))
 
 
 def read_xihu_turns():
     """读西湖广度拐点过滤验证（xihu_turns_latest.json，xihu_turns_check.py 产出），失败返回None"""
-    for p in ("outputs/xihu_turns_latest.json", "../outputs/xihu_turns_latest.json",
-              "/sandbox/workspace/github_bg/outputs/xihu_turns_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("outputs/xihu_turns_latest.json", "../outputs/xihu_turns_latest.json",
+              "/sandbox/workspace/github_bg/outputs/xihu_turns_latest.json"))
 
 
 def read_rsv_strength():
     """读RSV均相对强度（rsv_strength_latest.json，腰缠万贯144日），失败返回None"""
-    for p in ("rsv_strength_latest.json", "outputs/rsv_strength_latest.json", "../outputs/rsv_strength_latest.json",
-              "/sandbox/workspace/github_bg/outputs/rsv_strength_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("rsv_strength_latest.json", "outputs/rsv_strength_latest.json", "../outputs/rsv_strength_latest.json",
+              "/sandbox/workspace/github_bg/outputs/rsv_strength_latest.json"))
 
 
 def read_sector_resonance():
     """读板块共振JSON（本地复算优先），失败返回None。
     多副本时取数据日期最新的一份——防止 outputs/ 陈旧副本劫持（2026-10-14 修复）。"""
-    return _pick_newest_json(("outputs/板块共振_latest.json", "板块共振_latest.json",
+    return _ri_load(("outputs/板块共振_latest.json", "板块共振_latest.json",
                               "../outputs/板块共振_latest.json"))
 
 
 def read_market_style():
     """读市场风格轴（market_style_latest.json），失败返回None"""
     import json as _json
-    for p in ("market_style_latest.json", "outputs/market_style_latest.json", "../outputs/market_style_latest.json",
-              "/sandbox/workspace/github_bg/outputs/market_style_latest.json"):
-        try:
-            return _json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("market_style_latest.json", "outputs/market_style_latest.json", "../outputs/market_style_latest.json",
+              "/sandbox/workspace/github_bg/outputs/market_style_latest.json"))
 
 
 def read_qiankun_a():
     """读乾坤A级金股JSON（qiankun_a_latest.json，full_market_dualdim输出），失败返回None"""
     import json as _json
-    for p in ("outputs/qiankun_a_latest.json", "qiankun_a_latest.json", "../outputs/qiankun_a_latest.json",
-              "/sandbox/workspace/github_bg/outputs/qiankun_a_latest.json"):
-        try:
-            return _json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+    return _ri_load(("outputs/qiankun_a_latest.json", "qiankun_a_latest.json", "../outputs/qiankun_a_latest.json",
+              "/sandbox/workspace/github_bg/outputs/qiankun_a_latest.json"))
 
 
 def read_lianghua_csv():
@@ -703,16 +646,9 @@ def pool_overview_section(today):
 
 def quad_resonance_section(today):
     """③.7 四维共振速览：政策/资金/筹码/关联方 四维评分（quad_resonance.py 产出）"""
-    j = None
-    for p in (f"outputs/四维共振_{today}.json", "outputs/四维共振_latest.json",
+    j = _ri_load((f"outputs/四维共振_{today}.json", "outputs/四维共振_latest.json",
               "四维共振_latest.json", "../outputs/四维共振_latest.json",
-              "/sandbox/workspace/github_bg/outputs/四维共振_latest.json"):
-        if os.path.exists(p):
-            try:
-                j = json.load(open(p, encoding="utf-8"))
-                break
-            except Exception:
-                continue
+              "/sandbox/workspace/github_bg/outputs/四维共振_latest.json"))
     if not j:
         return "\n### ③.7 四维共振评分\n\n> ⏳ 当日四维共振评分缺失（quad_resonance.py 未产出）。可运行 `python3 quad_resonance.py --pool panhou_lianghua.csv` 补生成后重新生成复盘。\n"
     L = []
@@ -746,15 +682,8 @@ def quad_resonance_section(today):
 
 def signal_arbiter_section(today):
     """③.8 六套信号仲裁速览：四维/猛兽/鱼身/双弦/乾坤统一打分排序（signal_arbiter.py 产出）"""
-    j = None
-    for p in (f"outputs/信号仲裁_{today}.json", "outputs/信号仲裁_latest.json",
-              "信号仲裁_latest.json", "../outputs/信号仲裁_latest.json"):
-        if os.path.exists(p):
-            try:
-                j = json.load(open(p, encoding="utf-8"))
-                break
-            except Exception:
-                continue
+    j = _ri_load((f"outputs/信号仲裁_{today}.json", "outputs/信号仲裁_latest.json",
+              "信号仲裁_latest.json", "../outputs/信号仲裁_latest.json"))
     if not j:
         return "\n### ③.8 六套信号仲裁\n\n> ⏳ 当日信号仲裁缺失（signal_arbiter.py 未产出）。可运行 `python3 signal_arbiter.py` 补生成后重新生成复盘。\n"
     L = []
@@ -780,26 +709,17 @@ def signal_arbiter_section(today):
 
 def read_ai_chokepoint_watch():
     """读宁静AI卡位观察清单（ai_chokepoint_watch_latest.json），失败返回None"""
-    for p in ("ai_chokepoint_watch_latest.json", "outputs/ai_chokepoint_watch_latest.json",
+    return _ri_load(("ai_chokepoint_watch_latest.json", "outputs/ai_chokepoint_watch_latest.json",
               "../outputs/ai_chokepoint_watch_latest.json",
               "/sandbox/workspace/github_bg/ai_chokepoint_watch_latest.json",
-              "/sandbox/workspace/github_bg/outputs/ai_chokepoint_watch_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/github_bg/outputs/ai_chokepoint_watch_latest.json"))
 
 
 def read_signal_arbiter_cp():
     """读当日信号仲裁JSON的cp_logs（宁静守护层裁决日志），失败返回[]"""
-    for p in ("outputs/信号仲裁_latest.json", "信号仲裁_latest.json",
-              "../outputs/信号仲裁_latest.json", "/sandbox/workspace/github_bg/信号仲裁_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8")).get("cp_logs", [])
-        except Exception:
-            continue
-    return []
+    _j = _ri_load(("outputs/信号仲裁_latest.json", "信号仲裁_latest.json",
+              "../outputs/信号仲裁_latest.json", "/sandbox/workspace/github_bg/信号仲裁_latest.json"))
+    return _j.get("cp_logs", []) if _j else []
 
 
 def ai_chokepoint_section(today):
@@ -1284,15 +1204,10 @@ def gen_report(today_str):
 
 def read_limitup_panel():
     """读热板作战面板（涨停概念排行_latest.json），失败返回None"""
-    for p in ("涨停概念排行_latest.json", "outputs/涨停概念排行_latest.json",
+    return _ri_load(("涨停概念排行_latest.json", "outputs/涨停概念排行_latest.json",
               "../outputs/涨停概念排行_latest.json",
               "/sandbox/workspace/bg/outputs/涨停概念排行_latest.json",
-              "/sandbox/workspace/github_bg/outputs/涨停概念排行_latest.json"):
-        try:
-            return json.load(open(p, encoding="utf-8"))
-        except Exception:
-            continue
-    return None
+              "/sandbox/workspace/github_bg/outputs/涨停概念排行_latest.json"))
 
 
 def limitup_panel_section(today=""):
