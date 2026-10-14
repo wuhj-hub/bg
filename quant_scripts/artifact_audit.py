@@ -264,6 +264,44 @@ def check_dup_freshness(root, outdir):
 
 
 
+
+def check_reader_bypass(root, outdir):
+    """列出「多副本产物」被消费方直接 open() 读取、却未走 report_io.load_latest 的读取点。
+    多副本 = 同名文件同时存在于仓库根与 outputs/。属编写期预警（不参与退出码）。"""
+    if not outdir or not os.path.isdir(outdir):
+        return []
+    rn = {f.lower() for f in os.listdir(root) if os.path.isfile(os.path.join(root, f))}
+    on = {f.lower() for f in os.listdir(outdir) if os.path.isfile(os.path.join(outdir, f))}
+    dup = {n for n in (rn & on) if n.endswith((".json", ".csv", ".md", ".txt"))}
+    if not dup:
+        return []
+    hits = []
+    for name in CONSUMERS:
+        for fp in (os.path.join(root, "quant_scripts", name), os.path.join(root, name)):
+            if not os.path.exists(fp):
+                continue
+            try:
+                txt = open(fp, encoding="utf-8", errors="ignore").read()
+            except Exception:
+                continue
+            for b in re.split(r"(?m)^(?=def )", txt):
+                if "load_latest" in b or "report_io" in b:
+                    continue
+                mm = re.match(r"def (\w+)", b)
+                fname = mm.group(1) if mm else "<module>"
+                for m2 in re.finditer(r'open\(\s*f?["\']([^"\']{3,120})["\']', b):
+                    base = os.path.basename(m2.group(1)).lower()
+                    if base in dup:
+                        hits.append((name, fname, base))
+                        break
+    seen, out = set(), []
+    for h in hits:
+        if h not in seen:
+            seen.add(h)
+            out.append(h)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--repo", default=os.path.dirname(os.path.abspath(__file__)))
@@ -280,6 +318,7 @@ def main():
     reads = extract_reads(root)
     dup = check_dup_freshness(root, outdir)
     dup_stale = [d for d in dup if d[3].startswith("❗")]
+    bypass = check_reader_bypass(root, outdir)
 
     def covered(n, pool):
         """n 是否被 pool 中任一路径模糊覆盖"""
@@ -332,6 +371,13 @@ def main():
             L.append(f"| `{n}` | {rd} | {od} | {st} |")
         L.append("")
 
+    if bypass:
+        L += ["## 🧷 多副本读取旁路（消费方直接 open，未走 report_io.load_latest）", "",
+              "| 消费脚本 | 函数 | 产物 |", "|---|---|---|"]
+        for n, fn, base in bypass:
+            L.append(f"| `{n}` | `{fn}` | `{base}` |")
+        L.append("")
+
     text = "\n".join(L)
     print(text)
     os.makedirs(outdir, exist_ok=True)
@@ -343,7 +389,8 @@ def main():
                "high_risk": [h[0] for h in high_risk],
                "missing": [m[0] for m in missing], "ok": ok_list, "orphan": [o[0] for o in orphan],
                "dup_freshness": [{"name": n, "root": rd, "outputs": od, "status": st} for n, rd, od, st in dup],
-               "dup_stale": [d[0] for d in dup_stale]},
+               "dup_stale": [d[0] for d in dup_stale],
+               "reader_bypass": [{"consumer": n, "function": fn, "artifact": base} for n, fn, base in bypass]},
               open(os.path.join(outdir, "artifact_audit.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
     print(f"\n[OK] {p_md}（高危 {len(high_risk)} / 未提交 {len(missing)} / 陈旧副本 {len(dup_stale)}）")
