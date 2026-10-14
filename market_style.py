@@ -76,6 +76,7 @@ def find_file(names):
 def fetch_kline_map(codes, limit=25):
     """2026-10-15：委托统一取数层 fetch.kline。→ {code: [(date, close, amount), ...] **日期降序**}"""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts"))
     try:
         from fetch import kline as _fk
         raw = _fk(list(codes), period="day", limit=limit)
