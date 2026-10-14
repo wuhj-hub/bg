@@ -58,19 +58,6 @@ def parse_kline(txt):
     return out  # 每只股票内部降序：kl[0]=最新
 
 
-def fetch_kline_map(codes, limit=25):
-    """2026-10-15：委托统一取数层 fetch.kline。→ {code: [(date, close, amount), ...] **日期降序**}
-    （与 parse_kline 同结构；kl[0]=最新）。"""
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    try:
-        from fetch import kline as _fk
-        raw = _fk(list(codes), period="day", limit=limit)
-        return {c: [(b["date"], b["close"], b.get("amount") or 0.0) for b in reversed(bars)]
-                for c, bars in raw.items()}
-    except Exception:
-        return {}
-
-
 def pct_n(closes, n):
     """最近n个交易日的涨跌幅(%)，closes降序(最新在前)"""
     if len(closes) > n:
@@ -84,6 +71,18 @@ def find_file(names):
         if os.path.exists(p):
             return p
     return None
+
+
+def _hot_board_text(limit):
+    """2026-10-15：优先统一取数层 fetch.hotboard，失败回退本地 run。"""
+    try:
+        from fetch import hotboard as _h
+        t = _h(limit)
+        if t:
+            return t
+    except Exception:
+        pass
+    return run(["hot", "board", "--limit", str(limit)])
 
 
 def load_width(width_path):
@@ -284,7 +283,7 @@ def score_volume_structure(big_df, small_df):
 # ============================================================
 def score_sector_fund(top_n=5):
     """涨幅TOP板块的 asfund 主力/散户结构：主力净流入+散户净流出=机构型(-)，反之为游资型(+)"""
-    txt = run(["hot", "board", "--limit", str(top_n)])
+    txt = _hot_board_text(top_n)
     sectors = []
     for ln in txt.splitlines():
         s = ln.strip()
@@ -360,7 +359,8 @@ def main():
 
     # 拉指数K线（批量）
     codes = list(ALL_IDX.keys())
-    kl = fetch_kline_map(codes, 25)
+    txt = run(["kline", ",".join(codes), "--period", "day", "--limit", "25"])
+    kl = parse_kline(txt)
     big_df = kl.get("sh000300", [])
     small_df = kl.get("sh000852", [])
     mid_df = kl.get("sh000905", [])
