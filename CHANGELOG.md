@@ -5,6 +5,27 @@
 
 ---
 
+## v2.25 (2026-10-15)
+
+### 阶段 4 · 批次 4.2：腾讯长历史 fqkline 适配器
+
+**🐞 又一处静默回归（发现即修）**：腾讯 fqkline 的 **多股 `;` 批量端点已失效**（`{"msg":"param error"}`）。
+`gen_fish_pool.est_batch`（2026-08-28 的「50只/批」提速）因此**一直返回 None → 静默退化为逐只**（~3000 次请求），文档里的提速说明早已失真。
+
+**fetch.py**：新增 `ext_fqkline(codes, period, start, end, count, fq, workers, limit)` + `parse_fqkline`
+- host 轮转 `ifzq.gtimg.cn → proxy.finance.qq.com → web.ifzq.gtimg.cn`（web.ifzq 长跑会被 WAF 501）
+- 「收到权威响应即返回」避免对退市/空数据空耗重试；支持 `workers≤6` 受控并发
+- 兼容 qfqday/hfqday/day/qfqmonth/hfqmonth/month 各键；amount=第9列(万)×10000
+
+**消费方迁移（影子对拍，全部 0 差异）**：
+| 脚本 | 函数 | 对拍 |
+|---|---|---|
+| `gen_fish_pool.py` | `est_batch` / `est_daily_amount` | 6 只日均成交额**逐位相同** |
+| `portfolio_risk.py` | `fetch_kline` | 5 日收盘序列**完全一致** |
+| `glm_brief.py` | `_ifzq` | 7 个指数(美股/恒生/上证/创业板/科创)收盘+涨跌幅**一致** |
+
+均「优先 fetch 层、失败回退本地」。同步更正 `gen_fish_pool` 内失效注释。
+
 ## v2.24 (2026-10-15)
 
 ### 阶段 4 启动 · 外部独立源适配器（批次 4.1：腾讯行情）
