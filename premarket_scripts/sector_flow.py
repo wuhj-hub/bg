@@ -53,13 +53,57 @@ def _asfund_raw_text() -> str:
     return ""
 
 
+def _rows_from_board() -> list | None:
+    """降级数据源（2026-10-15）：解析统一取数层 fetch.board() 的「行业资金流入」表。
+
+    背景：本版 westock 已不支持 `asfund --market all`；board() 自带行业/概念+资金，
+    故用作同语义的行业资金榜来源（mainNetInflow 单位为万元 → 转亿）。
+    """
+    try:
+        _root = os.path.dirname(os.path.abspath(__file__))
+        for _p in (os.path.join(_root, "..", "quant_scripts"),
+                   os.path.join(_root, "quant_scripts"), _root):
+            _p = os.path.normpath(_p)
+            if _p not in sys.path:
+                sys.path.insert(0, _p)
+        from fetch import board as _b
+        txt = _b() or ""
+    except Exception:
+        return None
+    rows, header, in_flow = [], None, False
+    for ln in txt.splitlines():
+        s = ln.strip()
+        if s.startswith("**") and "行业资金" in s:
+            in_flow = True
+            header = None
+            continue
+        if s.startswith("**") and in_flow:
+            in_flow = False
+        if not in_flow or not s.startswith("|"):
+            continue
+        parts = [p.strip() for p in s.strip("|").split("|")]
+        if "name" in parts:
+            header = parts
+            continue
+        if not header or "---" in parts[0] or len(parts) < 3:
+            continue
+        try:
+            name = parts[header.index("name")]
+            raw_v = float(parts[header.index("mainNetInflow")]) / 10000.0   # 万元 → 亿
+            ch = parts[header.index("changePct")] if "changePct" in header else ""
+            rows.append({"name": name, "净流入": f"{raw_v:.2f}亿", "涨幅": ch})
+        except (ValueError, IndexError):
+            continue
+    return rows or None
+
+
 def run_asfund() -> list | None:
     """调用 westock asfund 获取板块资金流向数据"""
     # v2 改进：分别取今日和近5日数据，判断资金持续性
     try:
         txt = _asfund_raw_text()
         if not txt or not txt.strip():
-            return None
+            return _rows_from_board()
 
         lines = txt.strip().split("\n")
         if len(lines) < 2:
@@ -77,9 +121,9 @@ def run_asfund() -> list | None:
                 row = dict(zip(headers, vals))
                 rows.append(row)
         
-        return rows
+        return rows or _rows_from_board()
     except subprocess.TimeoutExpired:
-        return None
+        return _rows_from_board()
     except Exception as e:
         print(f"[sector_flow] asfund error: {e}", file=sys.stderr)
         return None
