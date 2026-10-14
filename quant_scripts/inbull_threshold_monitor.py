@@ -110,6 +110,19 @@ def fetch_ths(codes, workers=12):
     t0 = time.time()
 
     def one(sym):
+        # 2026-10-15：优先统一取数层 fetch.ext_ths_kline（差分解码）+ aggregate_monthly
+        try:
+            _d = os.path.dirname(os.path.abspath(__file__))
+            for _p in (_d, os.path.join(_d, "quant_scripts")):
+                if _p not in sys.path:
+                    sys.path.insert(0, _p)
+            from fetch import ext_ths_kline as _tk, aggregate_monthly as _am
+            mb = _am(_tk(sym, period="day", fq="hfq"))
+            if mb:
+                return sym, [(b["date"], b["open"], b["high"], b["low"], b["close"]) for b in mb]
+        except Exception:
+            pass
+        # 回退：本地 curl + parse_monthly
         return sym, parse_monthly(curl(f"http://d.10jqka.com.cn/v6/line/hs_{sym[2:]}/02/all.js"))
 
     with ThreadPoolExecutor(max_workers=workers) as ex:
