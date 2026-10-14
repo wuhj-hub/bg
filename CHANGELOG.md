@@ -5,6 +5,29 @@
 
 ---
 
+## v2.21 (2026-10-15)
+
+### ⚙️ 阶段 3 推进：缓存铺开 3 条流水线 ＋ 板块/资金消费方迁移（6 文件）
+
+**① 缓存铺开**（job 级 env，同一次运行内跨 step 复用取数）：
+- `quant_report.yml`（盘后）`FETCH_CACHE=1 / TTL=18000`
+- `duowei_fish.yml`（盘后）`FETCH_CACHE=1 / TTL=18000`
+- `premarket_report.yml`（盘前，数据全为历史已完结）`FETCH_CACHE=1`（TTL=0 即安全复用）
+
+**② 消费方迁移**（board / hotboard / asfund → 统一取数层；均保留本地回退）：
+
+| 文件 | 迁移点 | 影子对拍 |
+|---|---|---|
+| `sector_resonance_local.py` | `board()` + `hotboard()` | 文本**全等**(1140/585) |
+| `market_style.py` | `hotboard()` | 文本**全等**(585) |
+| `quant_scripts/beast_screener.py` | `board()`（2 处） | 文本**全等**(1140) |
+| `quant_scripts/gen_premarket_report.py` | `hotboard()`（limit 10/5） | 文本**全等**(1033) |
+| `quant_scripts/gen_review_report.py` | `hotboard()`（limit 10/5/8） | 文本**全等**(853) |
+| `full_market_dualdim.py` | `batch_fetch_asfund()` | 37 只 / **0 差异** |
+
+统一采用「优先 fetch 层、失败回退本地 run/cli」的包裹式适配，无需改调用点的解析逻辑。
+**待迁**：`quad_resonance.batch_asfund`（自带 tag 映射）、`limitup_concept_rank.fetch_fund`（6 位码映射）、`fish_body_enhanced` 的 asfund、`premarket_scripts/sector_flow.py`。
+
 ## v2.20 (2026-10-15)
 
 ### ⚙️ 第 2 层·阶段 3 启动：取数层扩展 + 打开缓存（fetch v0.2）
