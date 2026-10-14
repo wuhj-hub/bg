@@ -5,6 +5,25 @@
 
 ---
 
+## v2.20 (2026-10-15)
+
+### ⚙️ 第 2 层·阶段 3 启动：取数层扩展 + 打开缓存（fetch v0.2）
+
+**`quant_scripts/fetch.py` v0.2**（统一取数层）新增收口 + 缓存：
+
+| 新增 | 说明 |
+|---|---|
+| `asfund(codes, date=None)` | 资金（westock asfund；内部自动 `norm()` 加前缀——实测**裸代码返空**，须 `sh600519`） |
+| `board()` / `hotboard(limit)` | 板块原始文本（westock board / hot board） |
+| `minute(code, days=None)` | 分时（westock **minute** 子命令；单只——批量报 `code param error`） |
+| **磁盘缓存** | opt-in：`FETCH_CACHE=1`（+ `FETCH_CACHE_TTL` 秒）；默认目录 `/tmp/bg_fetch_cache`（**不落仓库**，跨 step 共享、跨运行隔离） |
+
+- 实测修正：本版 westock **已不支持 `kline --period m1`**（仅 day/week/month/season/year），分钟数据改走 `minute` 子命令 → `_PERIOD_OK` 同步收窄。
+- 缓存**防倒灌规则**：只信任「最后一根 bar 日期 < 今天(北京)」的缓存（=历史已完结）一律复用；同交易日数据默认重取，仅当显式 `FETCH_CACHE_TTL>0` 才允许同日短期复用；写入时旧数据更晚则不覆盖。
+- 冒烟：kline 1.32s→**0.11s**、月线 1.06s→**0.04s**；`asfund`/`minute`/`board`/`hotboard` 均实测取到数据；默认（未开）不产生任何缓存目录 = 零行为变化。
+
+**`.github/workflows/quant_scan.yml`**：`scan` job 级 env 打开 `FETCH_CACHE=1`、`FETCH_CACHE_TTL=18000`(5h)——同一次盘后运行内，21 个已迁移脚本对同一批全市场 K 线**首个取、其余复用**。
+
 ## v2.19 (2026-10-15)
 
 ### 🐛 第三例「列错位」修复（signal_arbiter 月线闸门） ＋ 阶段 2 第八批迁移（4 个）
