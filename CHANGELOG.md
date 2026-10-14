@@ -5,6 +5,23 @@
 
 ---
 
+## v2.19 (2026-10-15)
+
+### 🐛 第三例「列错位」修复（signal_arbiter 月线闸门） ＋ 阶段 2 第八批迁移（4 个）
+
+**修复**：`signal_arbiter.py` 的 `month_gate()`（月线闸门 PASS/WARN/BLOCK）原硬编码 `parts[3]` 当 close，单股月线列序下实为 **high** → 与 `monthly_macd_monitor`、`gen_premarket_report.calc_zengxingzhi` **同族缺陷**。改为表头取 close + 取数委托。
+- 实证差异：sh600519 旧 BLOCK→新 **WARN**；sz300750 旧 `?`→新 **BLOCK**；其余（sz000001/sz300750/sh601318/sh000001）亦有别。即此前**月线闸门对部分个股判定错误**，现已校正。
+
+| 迁移脚本 | 迁移点 | 影子对拍 |
+|---|---|---|
+| `quant_scripts/xzz_force.py` | `kline()`（指数批量 月/日） | 9 指数 **0 差异** |
+| `minute_strength.py` | `fetch_preclose()` | 4 只 **0 差异** |
+| `full_market_dualdim.py` | `batch_fetch_kline()`（qfq） | 37 只 **0 差异** |
+| `signal_arbiter.py` | `month_gate()` | 修复型（见上） |
+
+- **累计已迁移 25 个 kline 调用点**。
+- ⏸️ **未迁移（保留观察）**：`sector_resonance_local.py` 的板块 kline（pt 代码）——本环境 `board` 输出已无 `pt` 列、`kline ptXXXXXX` 返回空，**无法影子对拍**，故不动（待环境支持或换验证方式）。
+
 ## v2.18 (2026-10-15)
 
 ### 🐛 又修复一例「按批量列序解析单股输出」缺陷 ＋ 阶段 2 第七批迁移（4 个）
