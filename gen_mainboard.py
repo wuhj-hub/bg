@@ -56,7 +56,7 @@ def fetch_batch(batch):
 
 
 def parse(raw):
-    """解析 qt.gtimg.cn 批量响应，返回 [(wcode, name), ...]。"""
+    """解析 qt.gtimg.cn 批量响应，返回 [(wcode, name), ...]。（本地回退实现）"""
     found = []
     for line in raw.split(";"):
         line = line.strip()
@@ -80,6 +80,27 @@ def parse(raw):
     return found
 
 
+def fetch_names_batch(batch):
+    """2026-10-15：优先统一取数层 fetch.ext_gtimg（同源 qt.gtimg.cn，带重试），失败回退本地。
+    返回 [(wcode, name), ...]（已剔除 ST/*ST/退市）。"""
+    try:
+        import sys as _sys
+        _root = os.path.dirname(os.path.abspath(__file__))
+        for _p in (_root, os.path.join(_root, "quant_scripts")):
+            if _p not in _sys.path:
+                _sys.path.insert(0, _p)
+        from fetch import ext_gtimg as _eg
+        out = []
+        for w, r in _eg(batch, batch=BATCH).items():
+            nm = (r.get("name") or "").strip()
+            if not nm or "ST" in nm.upper() or "退" in nm:
+                continue
+            out.append((w, nm))
+        return out
+    except Exception:
+        return parse(fetch_batch(batch))
+
+
 def main():
     codes = gen_candidates()
     cap = os.environ.get("GM_MAX")
@@ -91,7 +112,7 @@ def main():
     for i in range(0, n, BATCH):
         batch = codes[i:i + BATCH]
         try:
-            for wcode, name in parse(fetch_batch(batch)):
+            for wcode, name in fetch_names_batch(batch):
                 out[wcode[2:]] = name         # 存纯数字 code
         except Exception as e:
             print(f"[WARN] batch {i} failed: {e}", file=sys.stderr)
