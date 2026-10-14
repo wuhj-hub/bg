@@ -66,25 +66,17 @@ def parse_kline_table(txt):
     rows.sort(key=lambda r: r.get("date", ""))
     return rows
 
-def fetch_kline_table(codes, period="day", limit=25):
-    """2026-10-15：委托统一取数层 fetch.kline。→ list[dict]（date 升序，键同 westock 表头，值为字符串）。"""
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+def _hot_board_text(limit):
+    """2026-10-15：优先统一取数层 fetch.hotboard，失败回退本地 run。"""
     try:
-        from fetch import kline as _fk
-        raw = _fk(list(codes), period=period, limit=limit)
+        from fetch import hotboard as _h
+        t = _h(limit)
+        if t:
+            return t
     except Exception:
-        return []
-    def _s(v):
-        return "" if v is None else str(v)
-    rows = []
-    for c, bars in raw.items():
-        for b in bars:
-            rows.append({"symbol": c, "date": b["date"], "open": _s(b.get("open")),
-                         "last": _s(b.get("close")), "high": _s(b.get("high")),
-                         "low": _s(b.get("low")), "volume": _s(b.get("volume")),
-                         "amount": _s(b.get("amount")), "exchange": ""})
-    rows.sort(key=lambda r: r.get("date", ""))
-    return rows
+        pass
+    return run(["hot", "board", "--limit", str(limit)])
+
 
 def parse_board_table(txt):
     """解析westock hot board输出（数据行第一列为数字index，板块名在name列、涨跌幅在zdf列）"""
@@ -237,7 +229,7 @@ def estimate_premarket_judgment(idx_rows, today=""):
             judgments.append({"item": "操作基调", "pre": pre_ops, "actual": actual_desc, "result": res_ops})
         # 板块方向验证（对比预判板块 vs 实际领涨）
         try:
-            hot = run(["hot", "board", "--limit", "10"])
+            hot = _hot_board_text(10)
             hot_rows = parse_board_table(hot) if hot else []
             top_sectors = [r.get("name", "") for r in hot_rows[:3] if r.get("name")]
         except:
@@ -274,7 +266,7 @@ def estimate_premarket_judgment(idx_rows, today=""):
     
     # 板块方向验证
     try:
-        hot = run(["hot", "board", "--limit", "5"])
+        hot = _hot_board_text(5)
         hot_rows = parse_board_table(hot) if hot else []
         top_sectors = [r.get("name", "") for r in hot_rows[:3] if r.get("name")]
     except:
@@ -345,7 +337,8 @@ def render_ljsk(now=""):
     else:
         L.append("- 📈 价：⚠️成本线缺失")
     try:
-        mrows = fetch_kline_table(["sh000001"], "month", 13)
+        mtxt = run(["kline", "sh000001", "--period", "month", "--limit", "13"])
+        mrows = parse_kline_table(mtxt)
         closes = [float(r["last"]) for r in mrows if "last" in r]
         if len(closes) >= 12:
             c = closes[-1]; ma6 = sum(closes[-6:]) / 6; ma12 = sum(closes[-12:]) / 12
@@ -861,7 +854,8 @@ def gen_report(today_str):
     # 一、大盘全景
     # ════════════════════════════════════════
     lines.append("## 一、大盘全景\n")
-    idx_rows = fetch_kline_table(["sh000001", "sz399001", "sz399006", "sh000688"], "day", 3)
+    idx = run(["kline", "sh000001,sz399001,sz399006,sh000688", "--period", "day", "--limit", "3"])
+    idx_rows = parse_kline_table(idx)
     if idx_rows:
         lines.append("| 指数 | 昨收 | 今收 | 涨跌幅 |")
         lines.append("|---|---|---|---|")
@@ -878,7 +872,8 @@ def gen_report(today_str):
         if rendered == 0:
             # batch查询失败，尝试逐只查询
             for code, name in symbols.items():
-                one_rows = fetch_kline_table([code], "day", 3)
+                one = run(["kline", code, "--period", "day", "--limit", "3"])
+                one_rows = parse_kline_table(one)
                 if len(one_rows) >= 2:
                     r_today, r_yest = one_rows[-1], one_rows[-2]
                     chg = (float(r_today["last"]) - float(r_yest["last"])) / float(r_yest["last"]) * 100
@@ -1081,7 +1076,7 @@ def gen_report(today_str):
     lines.append("\n## 五、尾盘异动\n")
     # 获取今日板块排行（hot board 输出首列为数字index，用 parse_board_table）
     try:
-        hot = run(["hot", "board", "--limit", "8"])
+        hot = _hot_board_text(8)
         hot_rows = parse_board_table(hot) if hot else []
         if hot_rows:
             lines.append("今日热门板块排行：\n")
