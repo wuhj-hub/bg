@@ -73,6 +73,7 @@ def fetch_preclose(wcode):
     """拉前一日收盘价（涨停检测用）。
     2026-10-15：委托统一取数层 fetch.kline（单股日线 limit 2）。"""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "quant_scripts"))
     try:
         from fetch import kline as _fk
         bars = _fk([wcode], period="day", limit=2).get(wcode, [])
