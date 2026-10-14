@@ -580,6 +580,93 @@ def ext_em_stock(code_or_secid, timeout=8):
         return None
 
 
+# ── 同花顺：v6 line（差分编码；日/周/月全历史）──
+THS_URL = "http://d.10jqka.com.cn/v6/line/hs_{code}/{seg}/all.js"
+THS_UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+          "(KHTML, like Gecko) Chrome/120 Safari/537.36")
+
+
+def parse_ths(txt):
+    """同花顺 v6 line JSONP → [bar{date,open,high,low,close}]（升序）。
+
+    差分编码：每根 bar 4 个值 = [low, open−low, high−low, close−low]，整体除以 priceFactor；
+    `dates` 为 MMDD，年份由 `sortYear`=[[year,count],...] 推得。
+    """
+    m = re.search(r"\((\{.*\})\)\s*;?\s*$", txt or "", re.S)
+    if not m:
+        return []
+    try:
+        j = json.loads(m.group(1))
+    except Exception:
+        return []
+    pf = float(j.get("priceFactor", 100) or 100)
+    p = [float(x) / pf for x in j["price"].split(",") if x != ""]
+    dates = [x for x in j["dates"].split(",") if x]
+    sy = j.get("sortYear", []) or []
+    n = min(len(p) // 4, len(dates))
+    full, yi, cnt = [], 0, 0
+    for k in range(n):
+        while yi < len(sy) and cnt >= int(sy[yi][1]):
+            yi += 1
+            cnt = 0
+        if yi >= len(sy):
+            break
+        full.append("%d%s" % (int(sy[yi][0]), dates[k]))
+        cnt += 1
+    bars = []
+    for k in range(min(n, len(full))):
+        lo = p[4 * k]
+        d = full[k]
+        bars.append({"date": "%s-%s-%s" % (d[:4], d[4:6], d[6:8]),
+                     "open": lo + p[4 * k + 1], "high": lo + p[4 * k + 2],
+                     "low": lo, "close": lo + p[4 * k + 3]})
+    return bars
+
+
+def ext_ths_kline(code, period="day", fq="hfq", timeout=40, retries=4):
+    """同花顺 v6 全历史 K 线（差分解码）→ [bar{date,open,high,low,close}] 升序。
+
+    period: day/week/month；fq 仅对 day 生效：'hfq'→seg 02（后复权，约 2001 起全历史），
+    'qfq'→seg 01（前复权）。week=11 / month=21（不复权，约 2001 起）。
+    多只调用请自行用 ThreadPoolExecutor（源对并发较宽容，实测 12 workers 稳定）。
+    """
+    code6 = re.sub(r"^(sh|sz|bj)", "", str(code).strip())
+    if period == "week":
+        seg = "11"
+    elif period == "month":
+        seg = "21"
+    else:
+        seg = "01" if str(fq).lower().startswith("q") else "02"
+    url = THS_URL.format(code=code6, seg=seg)
+    for i in range(retries):
+        try:
+            t = urllib.request.urlopen(
+                urllib.request.Request(url, headers={"User-Agent": THS_UA}),
+                timeout=timeout).read().decode("utf-8", "ignore")
+            if t and "quotebridge" in t:
+                return parse_ths(t)
+        except Exception:
+            pass
+        time.sleep(0.6 + 0.9 * i)
+    return []
+
+
+def aggregate_monthly(bars):
+    """日线 bars → 月线 bars（date='YYYY-MM'，OHLC 聚合，close=当月最后收盘）。"""
+    mm = {}
+    for b in bars or []:
+        ym = b["date"][:7]
+        if ym not in mm:
+            mm[ym] = {"date": ym, "open": b["open"], "high": b["high"],
+                      "low": b["low"], "close": b["close"]}
+        else:
+            m = mm[ym]
+            m["high"] = max(m["high"], b["high"])
+            m["low"] = min(m["low"], b["low"])
+            m["close"] = b["close"]
+    return [mm[k] for k in sorted(mm)]
+
+
 def raw(args, timeout=TIMEOUT):
     """通用透传：直接执行 westock 子命令并返回 **原始 stdout**（不解析）。
 
