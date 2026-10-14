@@ -77,29 +77,18 @@ def batch_asfund(codes, chunk=250):
     调用数 76→13，npx 子进程启动开销（约 2-4s/次）大幅下降。
     返回 {full_code: {m1..m20, tag}}；解析失败返回 {}（由调用方逐只兜底）。
     """
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     out = {}
-    for i in range(0, len(codes), chunk):
-        part = codes[i:i + chunk]
-        txt = run(["asfund", ",".join(part)], timeout=150)
-        if not txt:
-            continue
-        # 批量 asfund 输出长表：列名不含前缀，每只一行（symbol/code 均可作 key）
-        for block in txt.split("\n\n"):
-            lines = [ln.strip() for ln in block.splitlines() if ln.strip().startswith("|")]
-            if len(lines) < 3:
-                continue
-            header = [q.strip() for q in lines[0].strip("|").split("|")]
-            if "MainNetFlow" not in header:
-                continue
-            ki = header.index("symbol") if "symbol" in header else (header.index("code") if "code" in header else 0)
-            for ln in lines[2:]:
-                d = [q.strip() for q in ln.strip("|").split("|")]
-                if len(d) != len(header):
-                    continue
-                row = dict(zip(header, d))
-                key = d[ki]
-                if key and key.startswith(("sh", "sz")):
-                    out[key] = _layer_from_row(row)
+    try:
+        from fetch import asfund as _af
+        raw = _af(list(codes))
+    except Exception:
+        return out
+    for key, row in raw.items():
+        if key and key.startswith(("sh", "sz")):
+            lay = _layer_from_row(row)
+            if lay:
+                out[key] = lay
     return out
 
 
