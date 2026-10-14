@@ -38,6 +38,10 @@ jobs:
     if: needs.trade_gate.outputs.ok == '1'
     runs-on: ubuntu-latest
     timeout-minutes: 240  # ⚠️2026-09-25: 原180min，实测134min余量仅26%（9/23曾撞180被杀）→提至240min降风险
+    env:
+      # 2026-10-15 阶段3：打开统一取数层磁盘缓存（盘后同一次运行内跨 step 复用）
+      FETCH_CACHE: "1"
+      FETCH_CACHE_TTL: "18000"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
