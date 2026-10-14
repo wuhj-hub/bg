@@ -163,8 +163,7 @@ def build_judgment(idx_rows, sectors, quant):
     # 关键位：用上证近20日高低点粗算
     key_levels = "—"
     try:
-        txt = run(["kline", "sh000001", "--period", "day", "--limit", "25"])
-        rows = parse_kline_table(txt)
+        rows = fetch_kline_table(["sh000001"], "day", 25)
         if len(rows) >= 20:
             highs = [float(r["high"]) for r in rows[-20:] if r.get("high")]
             lows = [float(r["low"]) for r in rows[-20:] if r.get("low")]
@@ -213,6 +212,27 @@ def parse_kline_table(txt):
     rows.sort(key=lambda r: r.get("date", ""))
     return rows
 
+def fetch_kline_table(codes, period="day", limit=25):
+    """2026-10-15：委托统一取数层 fetch.kline。→ list[dict]（date 升序，键同 westock 表头，值为字符串）。"""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from fetch import kline as _fk
+        raw = _fk(list(codes), period=period, limit=limit)
+    except Exception:
+        return []
+    def _s(v):
+        return "" if v is None else str(v)
+    rows = []
+    for c, bars in raw.items():
+        for b in bars:
+            rows.append({"symbol": c, "date": b["date"], "open": _s(b.get("open")),
+                         "last": _s(b.get("close")), "high": _s(b.get("high")),
+                         "low": _s(b.get("low")), "volume": _s(b.get("volume")),
+                         "amount": _s(b.get("amount")), "exchange": ""})
+    rows.sort(key=lambda r: r.get("date", ""))
+    return rows
+
+
 def _hot_board_text(limit):
     """2026-10-15：优先统一取数层 fetch.hotboard，失败回退本地 run。"""
     try:
@@ -231,8 +251,7 @@ def get_index_data():
     codes = {"sh000001": "上证指数", "sz399001": "深证成指", "sz399006": "创业板指", "sh000688": "科创50"}
     
     for code, name in codes.items():
-        txt = run(["kline", code, "--period", "day", "--limit", "3"])
-        rows = parse_kline_table(txt)
+        rows = fetch_kline_table([code], "day", 3)
         if len(rows) >= 2:
             d1, d2 = rows[-1], rows[-2]  # 倒数第一和第二（升序）
             change = (float(d1["last"]) - float(d2["last"])) / float(d2["last"]) * 100
@@ -343,8 +362,7 @@ def get_index_monthly():
              "中小综指", "科创50", "创业板指", "中证500"]
     results = {}
     for code, name in zip(codes, names):
-        txt = run(["kline", code, "--period", "month", "--limit", "6"])
-        rows = parse_kline_table(txt)
+        rows = fetch_kline_table([code], "month", 6)
         if rows:
             results[name] = rows
     return results
@@ -355,17 +373,13 @@ def calc_zengxingzhi():
              "sz399101":"中小综指","sh000688":"科创50","sz399006":"创业板指","sh000905":"中证500"}
     data = {}
     for code in codes:
-        txt = run(["kline", code, "--period", "month", "--limit", "10"])
-        for ln in txt.splitlines():
-            s = ln.strip()
-            if not s.startswith("|"):
-                continue
-            parts = [p.strip() for p in s.strip("|").split("|")]
-            if len(parts) >= 6 and re.match(r"^\d{4}-\d{2}-\d{2}$", parts[1]) and parts[0] == code:
-                try:
-                    data.setdefault(code, []).append((parts[1], float(parts[3]), float(parts[4]), float(parts[5])))
-                except:
-                    pass
+        # 2026-10-15 修复：原内联解析按批量列序读取，单股输出无 symbol 列 → 恒空；改为表头驱动。
+        for r in fetch_kline_table([code], "month", 10):
+            try:
+                data.setdefault(code, []).append((r["date"], float(r["last"]),
+                                                  float(r["high"]), float(r["low"])))
+            except (ValueError, TypeError):
+                pass
     lines = []
     bear = bull = 0
     for code, name in codes.items():
@@ -453,8 +467,7 @@ def gen_report(today_str):
     # ① 外围环境
     lines.append("## ① 外围环境\n")
     lines.append("### 美股三大指数\n")
-    us = run(["kline", "usDJI,usIXIC,usINX", "--period", "day", "--limit", "3"])
-    rows = parse_kline_table(us)
+    rows = fetch_kline_table(["usDJI", "usIXIC", "usINX"], "day", 3)
     if rows:
         # 每股取最新2日 → 最新收盘 + 前收(前一交易日last) → 涨跌幅
         by_sym = {}
@@ -592,8 +605,7 @@ def gen_report(today_str):
     # ②.6 综合决策
     idx_rows_all = []
     for code in ["sh000001", "sz399001", "sz399006", "sh000688"]:
-        txt = run(["kline", code, "--period", "day", "--limit", "3"])
-        idx_rows_all.extend(parse_kline_table(txt))
+        idx_rows_all.extend(fetch_kline_table([code], "day", 3))
     board_txt = _hot_board_text(5)
     board_rows = []
     for ln in board_txt.splitlines():
@@ -770,8 +782,7 @@ def calc_factor_analysis():
     # 1. 均线+动量（上证25日K线）
     rows = []
     try:
-        txt = run(["kline", "sh000001", "--period", "day", "--limit", "25"])
-        rows = parse_kline_table(txt)
+        rows = fetch_kline_table(["sh000001"], "day", 25)
     except Exception:
         pass
     if len(rows) >= 21:
@@ -1019,8 +1030,7 @@ def render_ljsk(now=""):
         L.append("- 📈 价：⚠️成本线缺失")
     # 🕐 时：上证月线 MA6/MA12 级别
     try:
-        mtxt = run(["kline", "sh000001", "--period", "month", "--limit", "13"])
-        mrows = parse_kline_table(mtxt)
+        mrows = fetch_kline_table(["sh000001"], "month", 13)
         closes = [float(r["last"]) for r in mrows if "last" in r]
         if len(closes) >= 12:
             c = closes[-1]; ma6 = sum(closes[-6:]) / 6; ma12 = sum(closes[-12:]) / 12
