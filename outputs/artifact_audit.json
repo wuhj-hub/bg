@@ -869,5 +869,44 @@
   "盘前市场报告_{var}.md",
   "西湖rsv全市场_{var}.md",
   "资金快照_{var}.csv"
- ]
+ ],
+ "dup_freshness": [
+  {
+   "name": "env_latest.json",
+   "root": "2026-10-13",
+   "outputs": "2026-10-13",
+   "status": "同步"
+  },
+  {
+   "name": "market_width_latest.json",
+   "root": "2026-10-13",
+   "outputs": "2026-10-13",
+   "status": "同步"
+  },
+  {
+   "name": "qiankun_a_latest.json",
+   "root": "2026-10-13",
+   "outputs": "2026-10-13",
+   "status": "同步"
+  },
+  {
+   "name": "sector_component_em.json",
+   "root": "2026-10-13",
+   "outputs": "2026-10-13",
+   "status": "同步"
+  },
+  {
+   "name": "xihu_breadth_history.json",
+   "root": "2024-06-11",
+   "outputs": "2024-06-11",
+   "status": "同步"
+  },
+  {
+   "name": "四维共振_latest.json",
+   "root": "2026-10-13",
+   "outputs": "2026-10-13",
+   "status": "同步"
+  }
+ ],
+ "dup_stale": []
 }
