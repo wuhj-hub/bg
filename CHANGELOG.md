@@ -5,6 +5,25 @@
 
 ---
 
+## v2.10 (2026-10-14)
+
+### ✨ 报告读取公共层 `report_io.py`（副本治理二期·A）
+
+- 新增 `quant_scripts/report_io.py`：`load_latest(paths)` 按 `data_date>bar_date>trade_date>date` 取最新（首个无日期则保持）；另附 `first_readable()`。
+- `gen_premarket_report.py` / `gen_review_report.py`：**所有多副本 reader 统一**改为 `from report_io import load_latest as _ri_load`（带 try/except 兜底：模块缺失时回退"取第一个可读"）；删除各自本地 `_pick_newest_json`。
+- 验证：单元测试（板块共振/市场风格/西湖广度/乾坤/信号仲裁/一统股池 等 reader 在「根新-outputs旧」下均取"新"）；premarket CI run#54 success，③.3 正常。
+
+### ✨ 自检静态检查 `check_reader_bypass`（副本治理二期·B）
+
+- `quant_scripts/artifact_audit.py` 新增：列出「多副本产物被消费方**直接 `open()`**、却未走 `report_io.load_latest`」的读取点（编写期预警，不参与退出码）。
+- 验证：mock 命中；真实仓库 CI run#32 `reader_bypass=[]`（A① 改造后已无旁路）。
+
+### 📝 约定文档
+
+- 新增 `docs/产物副本约定.md`（仓库内规则 + 存储策略 + 守门）；知识库《产物副本口径与新鲜度约定.md》同步。
+
+---
+
 ## v2.9 (2026-10-14)
 
 ### 🐛 修复：报告产物「多副本陈旧劫持」
