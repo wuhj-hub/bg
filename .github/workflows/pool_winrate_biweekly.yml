@@ -107,3 +107,12 @@ jobs:
           else
             echo "未找到 $F，跳过上传"
           fi
+
+      - name: 🧪 产物契约自检（当日·pool_winrate_biweekly）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·pool_winrate_biweekly" \
+            --manifest config/daily_artifacts.json --workflow pool_winrate_biweekly --push || true

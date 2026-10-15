@@ -100,3 +100,12 @@ jobs:
             echo "::warning::beast_pool 提交失败(rc=$RC)"
             curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️猛兽突破池提交失败&content=git_api_commit 失败(rc=$RC),突破池产物未入库&template=txt" > /dev/null || true
           fi
+
+      - name: 🧪 产物契约自检（当日·beast_pool）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·beast_pool" \
+            --manifest config/daily_artifacts.json --workflow beast_pool --push || true

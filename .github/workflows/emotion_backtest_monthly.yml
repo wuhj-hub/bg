@@ -68,3 +68,12 @@ jobs:
           else
             echo "无产物，跳过"
           fi
+
+      - name: 🧪 产物契约自检（当日·emotion_backtest_monthly）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·emotion_backtest_monthly" \
+            --manifest config/daily_artifacts.json --workflow emotion_backtest_monthly --push || true

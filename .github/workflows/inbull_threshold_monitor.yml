@@ -51,3 +51,12 @@ jobs:
             python3 git_api_commit.py --msg "chore: inbull threshold monitor ($(date +%Y-%m-%d))" \
               "$F" outputs/入牛阈值漂移_latest.json || echo "阈值监控提交失败(非致命)"
           fi
+
+      - name: 🧪 产物契约自检（当日·inbull_threshold_monitor）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·inbull_threshold_monitor" \
+            --manifest config/daily_artifacts.json --workflow inbull_threshold_monitor --push || true

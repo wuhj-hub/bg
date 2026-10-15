@@ -117,3 +117,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 quant_scripts/wangzhe_commit.py
+
+      - name: 🧪 产物契约自检（当日·wangzhe_track）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·wangzhe_track" \
+            --manifest config/daily_artifacts.json --workflow wangzhe_track --push || true

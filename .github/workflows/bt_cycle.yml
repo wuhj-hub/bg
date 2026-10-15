@@ -76,3 +76,12 @@ jobs:
           else
             echo "OK 回测周期回归完成"
           fi
+
+      - name: 🧪 产物契约自检（当日·bt_cycle）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·bt_cycle" \
+            --manifest config/daily_artifacts.json --workflow bt_cycle --push || true

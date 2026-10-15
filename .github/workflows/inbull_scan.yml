@@ -62,3 +62,12 @@ jobs:
           cp outputs/入牛时点_latest.json 入牛时点_latest.json 2>/dev/null || true
           python3 git_api_commit.py --msg "chore: inbull scan ($(date +%Y-%m-%d))" \
             入牛时点_latest.json "outputs/入牛时点扫描_$(date +%Y-%m-%d).md" || echo "入牛时点提交失败(非致命)"
+
+      - name: 🧪 产物契约自检（当日·inbull_scan）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·inbull_scan" \
+            --manifest config/daily_artifacts.json --workflow inbull_scan --push || true

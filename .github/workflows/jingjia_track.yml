@@ -99,3 +99,12 @@ jobs:
           else
             echo "未找到 $F，跳过上传"
           fi
+
+      - name: 🧪 产物契约自检（当日·jingjia_track）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·jingjia_track" \
+            --manifest config/daily_artifacts.json --workflow jingjia_track --push || true

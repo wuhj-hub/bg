@@ -97,3 +97,12 @@ jobs:
           if [ "$RC" != "0" ]; then
             echo "::warning::产物入库审计提交失败(rc=$RC)"
           fi
+
+      - name: 🧪 产物契约自检（当日·artifact_audit）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·artifact_audit" \
+            --manifest config/daily_artifacts.json --workflow artifact_audit --push || true

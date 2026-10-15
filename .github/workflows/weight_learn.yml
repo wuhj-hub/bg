@@ -133,3 +133,12 @@ jobs:
           if [ "$RC" != "0" ]; then
             echo "::warning::权重闭环产物提交失败(rc=$RC)"
           fi
+
+      - name: 🧪 产物契约自检（当日·weight_learn）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·weight_learn" \
+            --manifest config/daily_artifacts.json --workflow weight_learn --push || true

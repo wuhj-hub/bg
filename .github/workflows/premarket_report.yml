@@ -107,3 +107,12 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
           PUSH_SERVICE: pushplus
         run: python3 push_notify.py
+
+      - name: 🧪 产物契约自检（当日·premarket_report）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·premarket_report" \
+            --manifest config/daily_artifacts.json --workflow premarket_report --push || true

@@ -108,3 +108,12 @@ jobs:
           except Exception as e:
               print("push failed:", e)
           PY
+
+      - name: 🧪 产物契约自检（当日·market_regime）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·market_regime" \
+            --manifest config/daily_artifacts.json --workflow market_regime --push || true

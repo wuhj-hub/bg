@@ -144,3 +144,12 @@ jobs:
           [ -n "$JSN" ] && cp "$JSN" fish_body_latest.json
           python3 git_api_commit.py --msg "chore: 多维度鱼身报告 ($(date +%Y-%m-%d))" \
             鱼身报告_latest.md fish_body_latest.json || echo "⚠️ 产物提交失败（不阻断）"
+
+      - name: 🧪 产物契约自检（当日·duowei_fish）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·duowei_fish" \
+            --manifest config/daily_artifacts.json --workflow duowei_fish --push || true
