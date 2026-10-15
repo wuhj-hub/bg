@@ -465,8 +465,7 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           cp outputs/market_style_latest.json market_style_latest.json 2>/dev/null || true
-          cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || true
-          cp outputs/四维共振_latest.json 四维共振_latest.json 2>/dev/null || true
+          # 2026-10-15（11.1 消灭双副本）：不再 cp 到仓库根；canonical = outputs/（直接提交）
           cp outputs/信号仲裁_latest.json 信号仲裁_latest.json 2>/dev/null || true
           cp outputs/ai_chokepoint_watch_$(date +%Y-%m-%d).json ai_chokepoint_watch_latest.json 2>/dev/null || true
           cp outputs/四维共振_chinext_kcb_latest.json 四维共振_chinext_kcb_latest.json 2>/dev/null || true
