@@ -5,6 +5,18 @@
 
 ---
 
+## v2.34 (2026-10-16)
+
+### 取数层 阶段 3（统一取数层调用点迁移）
+
+- **基础设施确认完备**：`quant_scripts/fetch.py` 已含 `kline/quote/asfund/board/hotboard/minute/raw`
+  + 外部源适配器（`ext_gtimg`/`ext_sina_quote`/`ext_fqkline`/`ext_em_ztpool`/`ext_ths_kline`）+ 磁盘缓存层
+- **缓存已开**：quant_scan / quant_report / premarket_report / duowei_fish 的 job env（`FETCH_CACHE=1` + `FETCH_CACHE_TTL=18000`，防倒灌）
+- **迁移样板**：`yearline_breadth.py` 取数委托 `fetch.raw`（免 npx + 重试退避），解析不变；沙箱冒烟 6 只样本 → 站上年线 3/6
+- **新增 `docs/取数层迁移进度.md`**：59 个主链待迁移脚本清单（A 完全未用 fetch 28 / B 部分迁移 31）+ 分 4 批的推进方案
+
+---
+
 ## v2.33 (2026-10-16)
 
 ### 数据可信度治理 11.5–11.6（契约自检扩散 + 参数契约）
