@@ -1,5 +1,5 @@
 {
-  "_note": "当日核心产物契约（2026-10-15 · 数据可信度治理 11.2）。单一事实来源：workflow 提交清单与 run_and_verify 自检均以此为准。path 支持 {date}。min_bytes 为经验下限（仅防「空产物/秒退」，非精确校验）。canonical = 生产者原生输出路径。",
+  "_note": "当日核心产物契约（2026-10-15 · 数据可信度治理 11.2/11.3）。单一事实来源：workflow 提交清单与 run_and_verify 自检均以此为准。path 支持 {date}（YYYY-MM-DD）。min_bytes 为经验下限（仅防「空产物/秒退」，非精确校验）。canonical = 生产者原生输出路径。optional=true 表示「偶发缺失属正常」（仅告警、不计入失败/不推送）——观察若干日后确认稳定者转正（去掉 optional）。",
   "quant_scan": [
     {"path": "quant_results_latest.json", "min_bytes": 300, "producer": "run_all_quant.py"},
     {"path": "outputs/market_width_latest.json", "min_bytes": 200, "producer": "market_width.py"},
@@ -12,7 +12,21 @@
     {"path": "双弦观察池_latest.json", "min_bytes": 100, "producer": "dual_pool_sync.py"},
     {"path": "outputs/env_latest.json", "min_bytes": 100, "producer": "env_engine.py"},
     {"path": "outputs/qiankun_a_latest.json", "min_bytes": 100, "producer": "full_market_dualdim.py"},
-    {"path": "outputs/四维共振_latest.json", "min_bytes": 100, "producer": "quad_resonance.py"}
+    {"path": "outputs/四维共振_latest.json", "min_bytes": 100, "producer": "quad_resonance.py"},
+
+    {"path": "123_2b_latest.json", "min_bytes": 100, "producer": "scan_123_2b.py", "optional": true},
+    {"path": "rsv_strength_latest.json", "min_bytes": 100, "producer": "rsv_strength.py", "optional": true},
+    {"path": "xihu_rsv_latest.json", "min_bytes": 100, "producer": "xihu_rsv.py", "optional": true},
+    {"path": "monthly_macd_latest.json", "min_bytes": 100, "producer": "monthly_macd_scan.py", "optional": true},
+    {"path": "断档分歧_latest.json", "min_bytes": 100, "producer": "gap_divergence.py", "optional": true},
+    {"path": "top_signal_latest.json", "min_bytes": 100, "producer": "top_signal.py", "optional": true},
+    {"path": "board_top_latest.json", "min_bytes": 100, "producer": "board_top.py", "optional": true},
+    {"path": "情绪预判_latest.json", "min_bytes": 100, "producer": "emotion_forecast.py", "optional": true},
+    {"path": "liangxue_latest.json", "min_bytes": 100, "producer": "liangxue.py", "optional": true},
+    {"path": "mode_aggregate_latest.json", "min_bytes": 100, "producer": "market_width.py", "optional": true},
+    {"path": "hot_emotion_history.json", "min_bytes": 100, "producer": "hot_emotion.py", "optional": true},
+    {"path": "panhou_lianghua.csv", "min_bytes": 100, "producer": "run_all_quant.py", "optional": true},
+    {"path": "outputs/资金快照_{date}.csv", "min_bytes": 50, "producer": "fund_snapshot.py", "optional": true}
   ],
   "quant_report": [
     {"path": "outputs/复盘报告_{date}.md", "min_bytes": 2000, "producer": "gen_review_report.py"},
@@ -24,6 +38,13 @@
     {"path": "乖离低买_latest.json", "min_bytes": 100, "producer": "yitong_guaili_screener.py"},
     {"path": "execution_cards_latest.json", "min_bytes": 100, "producer": "execution_card.py"},
     {"path": "outputs/glm_brief_review_{date}.md", "min_bytes": 100, "producer": "glm_brief.py"},
-    {"path": "outputs/仲裁信号日志.csv", "min_bytes": 100, "producer": "signal_arbiter.py"}
+    {"path": "outputs/仲裁信号日志.csv", "min_bytes": 100, "producer": "signal_arbiter.py"},
+
+    {"path": "ai_chokepoint_watch_latest.json", "min_bytes": 100, "producer": "ai_chokepoint_watch.py", "optional": true},
+    {"path": "四维共振_chinext_kcb_latest.json", "min_bytes": 100, "producer": "quad_resonance.py", "optional": true},
+    {"path": "执行纪律_latest.json", "min_bytes": 100, "producer": "discipline_check.py", "optional": true},
+    {"path": "outputs/四态胜率_{date}.md", "min_bytes": 100, "producer": "win_rate_tracker.py", "optional": true},
+    {"path": "入牛时点_latest.json", "min_bytes": 100, "producer": "inbull_scan.py", "optional": true},
+    {"path": "market_regime_latest.json", "min_bytes": 100, "producer": "market_regime.py", "optional": true}
   ]
 }
