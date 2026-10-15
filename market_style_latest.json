@@ -1,14 +1,14 @@
 {
- "date": "2026-10-14",
+ "date": "2026-10-15",
  "data_date": "2026-10-14",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 2,
+ "score": -8,
  "score_detail": {
   "size_style": -20,
   "limitup_structure": 9,
-  "volume_structure": 7,
-  "sector_fund": 6
+  "volume_structure": 0,
+  "sector_fund": 3
  },
  "size_style": {
   "hs300_5d": -3.21,
@@ -21,35 +21,41 @@
   "zz500_5d": -6.12
  },
  "limitup_structure": {
-  "limitup": 32,
-  "strong": 60,
-  "width_score": 51.9,
+  "limitup": 34,
+  "strong": 64,
+  "width_score": 52.1,
   "level": "结构分化（涨少跌多·资金抱团）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
   "strong_ratio": 2.1,
-  "zhaban_rate": 52.2,
+  "zhaban_rate": 52.8,
   "lianban": 14
  },
  "volume_structure": {
-  "small_big_ratio_now": 1.102,
-  "small_big_ratio_5d": 1.108,
-  "small_vol_pulse": 91.97
+  "small_big_ratio_now": 0.762,
+  "small_big_ratio_5d": 0.761
  },
  "sector_fund": {
   "sectors": [
-   {
-    "name": "元件",
-    "zdf": "-1.53",
-    "main_net5d": -131.8,
-    "retail_net": -13.8,
-    "tag": "游资型"
-   },
    {
     "name": "电力",
     "zdf": "1.00",
     "main_net5d": -25.8,
     "retail_net": -6.6,
+    "tag": "游资型"
+   },
+   {
+    "name": "传媒",
+    "zdf": "1.12",
+    "main_net5d": 29.3,
+    "retail_net": -24.0,
+    "tag": "机构型"
+   },
+   {
+    "name": "元件",
+    "zdf": "-1.53",
+    "main_net5d": -131.8,
+    "retail_net": -13.8,
     "tag": "游资型"
    },
    {
@@ -60,25 +66,32 @@
     "tag": "机构型"
    },
    {
-    "name": "半导体",
-    "zdf": "-3.20",
-    "main_net5d": -339.1,
-    "retail_net": 70.4,
+    "name": "昨日涨停",
+    "zdf": "0.09",
+    "main_net5d": -7.8,
+    "retail_net": 12.5,
     "tag": "游资型"
    }
   ]
  },
  "mode_cross": {
-  "dominant": "无显著主导",
+  "dominant": "欧马模式",
   "all": {
-   "堆量模式": 1,
-   "": 4
+   "堆量模式": 13,
+   "欧马模式": 2
   },
-  "leaders": {},
-  "pullbacks": {},
-  "gpoints": {},
+  "leaders": {
+   "堆量模式": 6,
+   "欧马模式": 2
+  },
+  "pullbacks": {
+   "堆量模式": 1
+  },
+  "gpoints": {
+   "欧马模式": 2
+  },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
-  "total_scored": 5
+  "total_scored": 15
  },
  "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
 }
