@@ -151,9 +151,9 @@ jobs:
           python3 full_market_dualdim.py all_mainboard.csv
           # 归档资金快照（含资金行为四态phase，供按四态胜率跟踪）
           cp panhou_lianghua.csv outputs/资金快照_$(date +%Y-%m-%d).csv || echo "归档失败(不影响扫描)"
-          # ⚠️ 2026-09-16 修复：乾坤A产物自 8/25 起从未提交（quant_scan 零引用 qiankun），
-          #    导致复盘④/信号仲裁读到 3 周前的陈旧快照。此处补 cp 到仓库根，并纳入提交列表。
-          cp outputs/qiankun_a_latest.json qiankun_a_latest.json 2>/dev/null || echo "乾坤A产物缺失(不影响扫描)"
+          # ⚠️ 2026-09-16 修复：乾坤A产物自 8/25 起从未提交 → 已纳入提交列表。
+          # 2026-10-15（11.1 消灭双副本）：不再 cp 到仓库根；canonical = outputs/qiankun_a_latest.json（直接提交）。
+          [ -f outputs/qiankun_a_latest.json ] || echo "::warning::乾坤A产物缺失(不影响扫描)"
 
       # ─── 第二步.1：市场宽度指标（黑石marketChangeDist启发：全主板涨跌家数分布）───
       - name: 市场宽度扫描（全主板涨跌家数分布）
@@ -161,7 +161,7 @@ jobs:
           python3 market_width.py all_mainboard.csv
           # 2026-10-15：产出后自检（本步无 continue-on-error，失败本就会红；此处仅补"秒退/空产物"提示）
           python3 quant_scripts/run_and_verify.py --tag "第二步.1.3·市场宽度" \
-            --expect "market_width_latest.json" --min-bytes 200 || true
+            --expect "outputs/market_width_latest.json" --min-bytes 200 || true
 
       # ─── 第二步.1.3b：热点情绪扫描（hot_emotion 连板梯队+情绪温度+退潮预警，westock自算42s，供次日盘前②.5/②.6引用；2026-09-03接入消除手动漏跑断链）───
       - name: 热点情绪扫描（hot_emotion 连板梯队+情绪温度）
@@ -462,7 +462,7 @@ jobs:
           cp outputs/fish_body_enhanced_*.json fish_body_latest.json 2>/dev/null || true
           cp outputs/鱼身报告_*.md 鱼身报告_latest.md 2>/dev/null || true
           # 市场宽度+双模式聚合JSON（盘前②.5/②.5.2从GitHub拉取）
-          cp outputs/market_width_latest.json market_width_latest.json 2>/dev/null || true
+          # 2026-10-15（11.1 消灭双副本）：不再 cp 到仓库根；canonical = outputs/market_width_latest.json（直接提交）
           cp outputs/mode_aggregate_latest.json mode_aggregate_latest.json 2>/dev/null || true
           # 年线广度（V纪元方法论：站上年线占比，盘前②.5.1从GitHub拉取）
           cp outputs/yearline_breadth_latest.json yearline_breadth_latest.json 2>/dev/null || true
