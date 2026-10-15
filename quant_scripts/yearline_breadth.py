@@ -37,17 +37,32 @@ from datetime import datetime
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 
 
-def cli(args, timeout=90):
-    """执行 westock CLI，返回原始输出；失败返回 None。"""
+def _fetch_raw(args, timeout):
+    """统一取数层 fetch.raw（免npx + 重试退避 + 超时）。不可用时返回 None。"""
     try:
-        r = subprocess.run(WESTOCK + args, capture_output=True, text=True, timeout=timeout)
-        out = r.stdout or ""
-        if "执行失败" in out or "error" in out.lower()[:500]:
-            return None
-        return out
-    except Exception as e:
-        print(f"[WARN] cli {args[:3]} failed: {e}", file=sys.stderr)
+        _root = os.path.dirname(os.path.abspath(__file__))
+        if _root not in sys.path:
+            sys.path.insert(0, _root)
+        from fetch import raw as _fraw
+        return _fraw(args, timeout=timeout)
+    except Exception:
         return None
+
+
+def cli(args, timeout=90):
+    """执行 westock 子命令，返回原始输出；失败返回 None。
+    优先统一取数层 fetch.raw（2026-10-16 阶段3 迁移：免npx + 重试退避）；不可用则回退本地 npx。"""
+    out = _fetch_raw(args, timeout)
+    if out is None:
+        try:
+            r = subprocess.run(WESTOCK + args, capture_output=True, text=True, timeout=timeout)
+            out = r.stdout or ""
+        except Exception as e:
+            print(f"[WARN] cli {args[:3]} failed: {e}", file=sys.stderr)
+            return None
+    if not out or "执行失败" in out or "error" in out.lower()[:500]:
+        return None
+    return out
 
 
 def norm_code(code):
