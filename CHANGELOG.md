@@ -5,6 +5,23 @@
 
 ---
 
+## v2.30 (2026-10-15)
+
+### ③.5 断更**根因**修复 + 一统 timeout 核实 + 10-15 复盘全绿
+
+**🐞 根因（v2.29 只改了 reader，未改生产者）**：`quant_report.yml` 第五步给 `pool_tracking_report.py` 传了 **脚本未定义的参数** `--holdings-file` 与 `--date` → **argparse 秒退 rc=2** → 两条命令（主命令 + 回退命令）全部瞬间失败 → 0.0min「success」（`continue-on-error` 吞掉）→ **默认名 `股池标的跟踪报告_{date}.md` 60+ 天未生成**。
+
+**修复（`quant_scripts/pool_tracking_report.py`，commit 2de5cdf988）**：
+- 补 `--date`（报告基准日；用于输出文件名 + 基准月）与 `--holdings-file`（读持仓码并入跟踪池）
+- 顺带修 2 处硬编码：报告头「生成时间 2026-08-04 18:11」→ 动态；「信号基准月 2026-07」→ 按基准日推算上月
+- 本地以 workflow 原始参数实测：rc=0，报告正常生成，基准月=2026-09
+
+**一统 timeout 核实结论**：**不存在**。一统步（quant_scan L325 / quant_report L196）**从未设置 timeout-minutes**；本人三次改 workflow（55c4dc63/7807ccb37b/cc8e900a/174ce91c）**全部只加 FETCH_CACHE env，未碰任何 timeout**。早先 run 被 `cancelled` 的真因是 **`concurrency: cancel-in-progress: true`**（cron 新 run 取消在跑的旧 run），非超时。→ 无需 rollback。
+
+**10-15 复盘 run #38714394719 全绿**：43/43 步 success，0 失败，含全部 30+ 迁移模块（一统 42.2min / 龙头战法 5.2min / 乖离低买 10.7min / 入牛时点 6.5min 等）。
+
+**⚠️ 旁路发现（待决策）**：`upload_ima.py` 默认 `IMA_SKIP_DUP=1` → 同日重跑的报告**同名被跳过、KB 不更新**（10-15 修复版 复盘被 01:54 旧版挡住）。KB 无删除 API，"同日覆盖"需另设计（时间戳版/或对特定产物关 dedup）。
+
 ## v2.29 (2026-10-15)
 
 ### 又一处静默问题 + 根因修复
