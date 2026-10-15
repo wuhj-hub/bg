@@ -336,6 +336,12 @@ def audit_all(out_dir="outputs", max_age_days=4):
 
 def main():
     args = sys.argv[1:]
+    # 参数契约（2026-10-16）：识别已知开关；对未知 --xxx 显式告警
+    # （防「传了不存在的参数被静默忽略」——如 gen_mainboard --universe 的历史教训）
+    _KNOWN = {"--probe", "--audit", "--audit-all", "--pool", "--json", "--limit", "--period", "-y"}
+    _unknown = [x for x in args if x.startswith("--") and x.split("=")[0] not in _KNOWN]
+    if _unknown:
+        print("[data_guard] ⚠️ 未知参数（已忽略）: " + " ".join(_unknown), file=sys.stderr)
     if "--audit-all" in args:
         n = audit_all()
         sys.exit(1 if n else 0)

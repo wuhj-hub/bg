@@ -15,9 +15,15 @@ gen_mainboard.py —— 生成沪深主板股票清单 all_mainboard.csv
 输出：all_mainboard.csv  (列: code,name)   code 为纯数字（如 603669）
       与 full_market_dualdim.py 的 to_westock_code 转换契约一致。
 
+2026-10-16：新增 --universe 支持（修复 quant_report「创业板/科创四维补充通道」静默失效——
+  该通道用 `--universe chinext_kcb` 调用本脚本，但旧版 main() 不解析任何参数 →
+  参数被静默忽略 → all_chinext_kcb.csv 从未生成 → 下游 if [ -f ] 分支跳过（自 2026-08-11 起）。
+  现支持 universe=mainboard(默认，向后兼容) / chinext_kcb(创业板 300/301 + 科创 688/689)。
+
 调试：设 GM_MAX=N 仅遍历前 N 个候选（沙箱小测用），不设则全量。
 """
 
+import argparse
 import os
 import re
 import sys
@@ -30,13 +36,19 @@ HEADERS = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com"}
 BATCH = 50
 
 
-def gen_candidates():
-    """生成主板候选代码（带 sh/sz 前缀）。"""
+def gen_candidates(universe="mainboard"):
+    """生成候选代码（带 sh/sz 前缀）。universe: mainboard(默认) / chinext_kcb。"""
     codes = []
-    for i in range(600000, 606000):          # 沪市主板 600/601/603/605*
-        codes.append("sh%06d" % i)
-    for i in range(1, 4000):                 # 深市主板 000/001/002/003*
-        codes.append("sz%06d" % i)
+    if universe == "chinext_kcb":
+        for i in range(300000, 302000):      # 创业板 300/301*
+            codes.append("sz%06d" % i)
+        for i in range(688000, 690000):      # 科创板 688/689*
+            codes.append("sh%06d" % i)
+    else:                                     # 沪深主板（默认）
+        for i in range(600000, 606000):      # 沪市主板 600/601/603/605*
+            codes.append("sh%06d" % i)
+        for i in range(1, 4000):             # 深市主板 000/001/002/003*
+            codes.append("sz%06d" % i)
     return codes
 
 
@@ -102,7 +114,16 @@ def fetch_names_batch(batch):
 
 
 def main():
-    codes = gen_candidates()
+    ap = argparse.ArgumentParser(description="生成股票清单（沪深主板 / 创业板+科创）")
+    ap.add_argument("--universe", default="mainboard",
+                    choices=["mainboard", "chinext_kcb"],
+                    help="股票池：mainboard(默认) / chinext_kcb(创业板300/301 + 科创688/689)")
+    ap.add_argument("--out", default="", help="输出 CSV 路径（默认按 universe 命名）")
+    a = ap.parse_args()
+
+    out_file = a.out or ("all_chinext_kcb.csv" if a.universe == "chinext_kcb"
+                         else "all_mainboard.csv")
+    codes = gen_candidates(a.universe)
     cap = os.environ.get("GM_MAX")
     if cap and cap.isdigit():
         codes = codes[:int(cap)]
@@ -120,14 +141,14 @@ def main():
         if (i // BATCH) % 20 == 0:
             print(f"[INFO] progress {i}/{n}, found={len(out)}", file=sys.stderr)
     if len(out) < 100:
-        print(f"[ERR] mainboard count too small ({len(out)}), abort", file=sys.stderr)
+        print(f"[ERR] {a.universe} count too small ({len(out)}), abort", file=sys.stderr)
         sys.exit(1)
-    with open("all_mainboard.csv", "w", newline="", encoding="utf-8") as f:
+    with open(out_file, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["code", "name"])
         for c in sorted(out.keys()):
             w.writerow([c, out[c]])
-    print(f"[OK] mainboard count={len(out)} -> all_mainboard.csv")
+    print(f"[OK] {a.universe} count={len(out)} -> {out_file}")
 
 
 if __name__ == "__main__":
