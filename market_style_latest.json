@@ -3,12 +3,12 @@
  "data_date": "2026-10-15",
  "style": "均衡市",
  "icon": "⚖️",
- "score": -7,
+ "score": -13,
  "score_detail": {
   "size_style": -20,
   "limitup_structure": 12,
   "volume_structure": -8,
-  "sector_fund": 9
+  "sector_fund": 3
  },
  "size_style": {
   "hs300_5d": -3.35,
@@ -21,15 +21,15 @@
   "zz500_5d": -6.61
  },
  "limitup_structure": {
-  "limitup": 34,
-  "strong": 44,
-  "width_score": 38.3,
+  "limitup": 36,
+  "strong": 46,
+  "width_score": 38.4,
   "level": "偏弱（跌多涨少）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 1.4,
+  "strong_ratio": 1.5,
   "zhaban_rate": 33.3,
-  "lianban": 6
+  "lianban": 7
  },
  "volume_structure": {
   "small_big_ratio_now": 0.653,
@@ -46,13 +46,6 @@
     "tag": "机构型"
    },
    {
-    "name": "证券Ⅱ",
-    "zdf": "0.51",
-    "main_net5d": -16.1,
-    "retail_net": -2.2,
-    "tag": "游资型"
-   },
-   {
     "name": "元件",
     "zdf": "-2.94",
     "main_net5d": -80.5,
@@ -60,17 +53,24 @@
     "tag": "游资型"
    },
    {
+    "name": "出版",
+    "zdf": "-0.71",
+    "main_net5d": 14.5,
+    "retail_net": -1.5,
+    "tag": "机构型"
+   },
+   {
+    "name": "证券Ⅱ",
+    "zdf": "0.51",
+    "main_net5d": -16.1,
+    "retail_net": -2.2,
+    "tag": "游资型"
+   },
+   {
     "name": "半导体",
     "zdf": "-2.71",
     "main_net5d": -310.8,
     "retail_net": 69.4,
-    "tag": "游资型"
-   },
-   {
-    "name": "电池",
-    "zdf": "-1.23",
-    "main_net5d": -1.9,
-    "retail_net": 11.8,
     "tag": "游资型"
    }
   ]
@@ -81,7 +81,7 @@
    "堆量模式": 15
   },
   "leaders": {
-   "堆量模式": 11
+   "堆量模式": 10
   },
   "pullbacks": {
    "堆量模式": 2
