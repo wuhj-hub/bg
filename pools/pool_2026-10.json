@@ -1,8 +1,20 @@
 {
   "year_month": "2026-10",
-  "updated_at": "2026-10-15 08:49:22",
-  "total_count": 259,
+  "updated_at": "2026-10-15 16:36:59",
+  "total_count": 260,
   "entries": [
+    {
+      "code": "sh600812",
+      "name": "华北制药",
+      "price": 6.57,
+      "signal_type": "共振",
+      "date_str": "2026-10-15",
+      "score": 77,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 | RS_D背离 | 伏击线 [堆量模式]",
+      "is_new": false
+    },
     {
       "code": "sh600252",
       "name": "中恒集团",
@@ -40,16 +52,16 @@
       "is_new": false
     },
     {
-      "code": "sh600812",
-      "name": "华北制药",
-      "price": 6.57,
+      "code": "sz000892",
+      "name": "欢瑞世纪",
+      "price": 5.45,
       "signal_type": "共振",
-      "date_str": "2026-10-15",
+      "date_str": "2026-10-09",
       "score": 72,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: SSV>100 | RS_D背离 | 伏击线 [堆量模式]",
-      "is_new": true
+      "reason": "双弦门控通过 | 猛兽: 伏击线 [堆量模式]",
+      "is_new": false
     },
     {
       "code": "sz002285",
@@ -73,18 +85,6 @@
       "resonance_label": "中性",
       "sector": "",
       "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 [欧马模式]",
-      "is_new": false
-    },
-    {
-      "code": "sz000892",
-      "name": "欢瑞世纪",
-      "price": 5.45,
-      "signal_type": "共振",
-      "date_str": "2026-10-09",
-      "score": 70,
-      "resonance_label": "中性",
-      "sector": "",
-      "reason": "双弦门控通过 | 猛兽: 伏击线 [堆量模式]",
       "is_new": false
     },
     {
@@ -169,7 +169,7 @@
       "resonance_label": "中性",
       "sector": "",
       "reason": "双弦门控通过 | 猛兽: SSV>100 | G点 | RS_D背离 | 伏击线 [欧马模式]",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002614",
@@ -312,7 +312,7 @@
       "score": 67,
       "resonance_label": "中性",
       "sector": "",
-      "reason": "双弦门控通过 | 猛兽: SSV>100 [堆量模式]",
+      "reason": "双弦门控通过 | 猛兽: SSV>100 | 伏击线 [堆量模式]",
       "is_new": false
     },
     {
@@ -409,6 +409,18 @@
       "resonance_label": "中性",
       "sector": "",
       "reason": "双弦门控通过 | 猛兽: SSV>100 | RS_D背离 [堆量模式]",
+      "is_new": false
+    },
+    {
+      "code": "sh600668",
+      "name": "尖峰集团",
+      "price": 7.99,
+      "signal_type": "共振",
+      "date_str": "2026-10-15",
+      "score": 67,
+      "resonance_label": "中性",
+      "sector": "",
+      "reason": "双弦门控通过",
       "is_new": true
     },
     {
@@ -589,7 +601,7 @@
       "resonance_label": "中性",
       "sector": "",
       "reason": "双弦门控通过 | 猛兽: 伏击线 [堆量模式]",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600851",
@@ -601,7 +613,7 @@
       "resonance_label": "中性",
       "sector": "",
       "reason": "双弦门控通过",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600310",
@@ -649,7 +661,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + VAD偏多 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000635",
@@ -1117,7 +1129,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 + VAD偏多 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000906",
@@ -1573,7 +1585,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 + VAD偏多 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002004",
@@ -1585,7 +1597,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 + VAD偏多 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600155",
@@ -1597,7 +1609,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 + VAD偏多 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600328",
@@ -1609,7 +1621,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + VAD偏多 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600643",
@@ -1621,7 +1633,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 + VAD偏多 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600805",
@@ -1633,7 +1645,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 + VAD偏多 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600864",
@@ -1645,7 +1657,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "伏击线 + VAD偏多 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600327",
@@ -1657,7 +1669,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002486",
@@ -1837,7 +1849,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600318",
@@ -1849,7 +1861,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "VAD偏多",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600603",
@@ -1861,7 +1873,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000750",
@@ -2394,7 +2406,7 @@
     {
       "code": "sh600320",
       "name": "振华重工",
-      "price": 4.18,
+      "price": 4.04,
       "signal_type": "低吸",
       "date_str": "2026-10-12",
       "score": 41,
@@ -2677,7 +2689,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000402",
@@ -2689,7 +2701,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000929",
@@ -2701,7 +2713,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002449",
@@ -2713,7 +2725,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002753",
@@ -2725,7 +2737,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600561",
@@ -2737,7 +2749,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600615",
@@ -2749,7 +2761,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600662",
@@ -2761,7 +2773,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600883",
@@ -2773,7 +2785,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002578",
@@ -2809,7 +2821,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600558",
@@ -2821,7 +2833,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002583",
@@ -2917,7 +2929,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz000822",
@@ -2929,7 +2941,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002206",
@@ -2941,7 +2953,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002421",
@@ -2953,7 +2965,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002523",
@@ -2965,7 +2977,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002809",
@@ -2977,7 +2989,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002820",
@@ -2989,7 +3001,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz003038",
@@ -3001,7 +3013,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600064",
@@ -3013,7 +3025,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + 伏击线 + G点 | G点 | RS_D背离 | 伏击线",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600322",
@@ -3025,7 +3037,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600533",
@@ -3037,7 +3049,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sh600784",
@@ -3049,7 +3061,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 + G点 | G点 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz001356",
@@ -3097,7 +3109,7 @@
       "resonance_label": "",
       "sector": "",
       "reason": "RS_D背离 | RS_D背离",
-      "is_new": true
+      "is_new": false
     },
     {
       "code": "sz002105",
