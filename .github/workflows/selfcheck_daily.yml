@@ -102,6 +102,18 @@ jobs:
           cp outputs/pipeline_audit.json outputs/pipeline_audit_latest.json 2>/dev/null || :
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
 
+      - name: ④ 参数契约审计（workflow 传参 vs 脚本识别）
+        id: param
+        continue-on-error: true   # 受控捕获
+        run: |
+          set +e
+          python3 quant_scripts/param_contract_audit.py --repo . --out outputs --strict \
+            > /tmp/param.log 2>&1
+          RC=$?
+          set -e
+          tail -20 /tmp/param.log
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+
       - name: 提交自检产物到仓库
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -114,7 +126,8 @@ jobs:
           python3 git_api_commit.py --msg "chore: 体系自检（数据源+静默失败+流水线巡检）$(date +%Y-%m-%d)" \
             outputs/cross_source_latest.md outputs/cross_source_latest.json \
             outputs/silent_failure_latest.md outputs/silent_failure_audit.json \
-            outputs/pipeline_audit.json outputs/pipeline_audit_latest.json
+            outputs/pipeline_audit.json outputs/pipeline_audit_latest.json \
+            outputs/param_contract_latest.md outputs/param_contract_latest.json
           RC=$?
           set -e
           if [ "$RC" != "0" ]; then
@@ -129,14 +142,15 @@ jobs:
           CR="${{ steps.cross.outputs.rc }}"
           ME="${{ steps.meta.outputs.rc }}"
           PI="${{ steps.pipe.outputs.rc }}"
-          if [ "$CR" != "0" ] || [ "$ME" != "0" ] || [ "$PI" != "0" ]; then
+          PC="${{ steps.param.outputs.rc }}"
+          if [ "$CR" != "0" ] || [ "$ME" != "0" ] || [ "$PI" != "0" ] || [ "$PC" != "0" ]; then
             EXTRA=$(python3 -c "import json;d=json.load(open('outputs/pipeline_audit.json'));print(' | '.join(d.get('issues',[]))[:400])" 2>/dev/null || :)
-            MSG="数据源 rc=${CR:-?} ｜ 静默失败 rc=${ME:-?} ｜ 流水线 rc=${PI:-?} ${EXTRA}"
+            MSG="数据源 rc=${CR:-?} ｜ 静默失败 rc=${ME:-?} ｜ 流水线 rc=${PI:-?} ｜ 参数契约 rc=${PC:-?} ${EXTRA}"
             curl -s "https://pushplus.plus/send" \
               -d "token=${PUSH_TOKEN}&title=⚠️体系自检异常&content=${MSG}&template=txt" > /dev/null || echo "推送失败"
             echo "::warning::体系自检异常 —— $MSG"
           else
-            echo "✅ 三项自检全部通过"
+            echo "✅ 四项自检全部通过"
           fi
 
       - name: 上传自检报告到盘后量化文件夹
@@ -149,7 +163,8 @@ jobs:
           IMA_FOLDER_ID: folder_7485264708529742
         run: |
           for f in "outputs/数据源交叉验证_$(date +%Y-%m-%d).md" \
-                   "outputs/静默失败审计_$(date +%Y-%m-%d).md"; do
+                   "outputs/静默失败审计_$(date +%Y-%m-%d).md" \
+                   "outputs/param_contract_latest.md"; do
             if [ -f "$f" ]; then
               python3 upload_ima.py --file "$f" --name "$(basename "$f")" || echo "上传失败(非致命): $f"
             fi
