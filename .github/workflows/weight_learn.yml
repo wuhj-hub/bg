@@ -84,7 +84,7 @@ jobs:
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: 6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs=
           IMA_FOLDER_ID: folder_7511239261453122
-          IMA_SKIP_DUP: "1"
+          # 2026-10-15（11.4）：移除显式查重开关 —— 上传名含日期时默认「同日覆盖+旧版归档」
         run: |
           D=$(date +%Y-%m-%d)
           F="outputs/仲裁权重学习报告_${D}.md"
