@@ -333,10 +333,8 @@ def main():
         "cost_line": cost,
     }
     json_path = os.path.join(OUT_DIR, "market_width_latest.json")
-    # 同步一份到仓库根（2026-09-14 修复）
-    # 此前根目录副本要等 workflow 末尾 cp 才更新 → 同一 job 内的后续步骤（emotion_forecast 等）
-    # 会读到「上一交易日」的旧值，日志曾出现 “来源: market_width(2026-09-12)”。
-    _root_json = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(json_path)), "..", "market_width_latest.json"))
+    # 2026-10-15（11.1 消灭双副本）：不再同步写仓库根副本。
+    # canonical = outputs/market_width_latest.json；同 job 后续步骤的读取候选本就以 outputs/ 优先。
 
     def _read_meta(_p):
         """读现有快照的 (运行日, 交易日, valid)，用于防倒灌判断"""
@@ -359,12 +357,6 @@ def main():
             print(f"[WARN] 同一交易日重复写入：{_new_key} 的快照将被本次覆盖（有效样本 {_prev_valid}→{n}）")
         _js_txt = json.dumps(js, ensure_ascii=False, indent=1)
         open(json_path, "w", encoding="utf-8").write(_js_txt)
-        try:
-            if os.path.abspath(_root_json) != os.path.abspath(json_path):
-                open(_root_json, "w", encoding="utf-8").write(_js_txt)
-                print(f"[OK] {_root_json}（同步仓库根·供同 job 后续步骤）")
-        except Exception as _e:
-            print(f"[WARN] 根目录同步失败: {_e}")
         print(f"[OK] {json_path}")
     print(f"[OK] {md_path}")
     print(f"宽度分={score}(广度{breadth}+赚钱效应{bonus}) 等级={level} 上涨{len(up)} 强势{len(strong)} 涨停{len(lu)} 弱势{len(weak)} 跌停{len(ld)} | 触板{n_touch} 炸板{n_zhaban}({zhaban_rate}%) 二连板{n_lianban}")
