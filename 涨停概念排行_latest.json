@@ -155,17 +155,17 @@
  "leaders": [
   {
    "concept": "物流",
-   "leader": "东方嘉盛",
-   "code": "sz002889",
+   "leader": "远大控股",
+   "code": "sz000626",
    "lianban": 1,
-   "score": 75,
-   "fbt": "10:50:27",
-   "fd_ratio": 0.53,
-   "fund_net": 70397194.0,
-   "fund_rate": 2.15,
-   "s_fund": 20,
-   "s_long": 9,
-   "ret5": 9.14
+   "score": 76,
+   "fbt": "09:30:00",
+   "fd_ratio": 1.62,
+   "fund_net": 88439143.0,
+   "fund_rate": 1.92,
+   "s_fund": 13,
+   "s_long": 15,
+   "ret5": 4.21
   },
   {
    "concept": "食品饮料",
@@ -245,8 +245,8 @@
    "concept": "电子",
    "name": "新亚制程",
    "code": "sz002388",
-   "amount_yi": 0.0,
-   "ret5": 14.32,
+   "amount_yi": 3.21,
+   "ret5": 14.47,
    "mdd": -2.51
   },
   {
@@ -261,7 +261,7 @@
    "concept": "机械设备",
    "name": "中国中车",
    "code": "sh601766",
-   "amount_yi": 16.56,
+   "amount_yi": 16.57,
    "ret5": 5.4,
    "mdd": 0.0
   },
@@ -345,9 +345,9 @@
    "s_fengdan": 17,
    "s_elastic": 0,
    "s_bianshi": 4,
-   "s_fund": 10,
+   "s_fund": 13,
    "s_long": 15,
-   "leader_score": 73
+   "leader_score": 76
   },
   {
    "code": "sz002696",
@@ -893,17 +893,17 @@
    "ltsz": 2338319990.4900002,
    "zbc": 0,
    "fdratio": 0.004983257658229318,
-   "fund_net": null,
-   "fund_rate": null,
-   "fund_net5": null,
+   "fund_net": 39197111.0,
+   "fund_rate": 1.68,
+   "fund_net5": 20686069.0,
    "s_qidong": 0,
    "s_danda": 0,
    "s_fengdan": 6,
    "s_elastic": 12,
    "s_bianshi": 9,
-   "s_fund": 0,
+   "s_fund": 7,
    "s_long": 15,
-   "leader_score": 42
+   "leader_score": 49
   },
   {
    "code": "sz002748",
