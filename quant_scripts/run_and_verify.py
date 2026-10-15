@@ -115,6 +115,8 @@ def main():
     ap.add_argument("--min-runtime", type=float, default=0.0,
                     help="秒退阈值(秒)：命令耗时低于此值即告警（0=关闭）")
     ap.add_argument("--push", action="store_true", help="失败时 PushPlus 推送（env PUSH_TOKEN）")
+    ap.add_argument("--manifest", default="", help="产物契约清单 JSON（如 config/daily_artifacts.json）")
+    ap.add_argument("--workflow", default="", help="清单内的分组键（如 quant_scan / quant_report）")
     ap.add_argument("--quiet", action="store_true", help="成功时不打印 OK 明细")
     a = ap.parse_args()
 
@@ -140,12 +142,34 @@ def main():
         problems.append("疑似秒退 SECONDS_EXIT: 仅运行 %.2fs < %.1fs（参数/导入错误常见特征）"
                         % (dur, a.min_runtime))
 
+    # 组装检查清单：(pattern, min_bytes)；--manifest 提供「当日应产出」的集中定义
+    checks = [(p, a.min_bytes) for p in a.expect]
+    if a.manifest:
+        try:
+            with open(a.manifest, encoding="utf-8") as _f:
+                m = json.load(_f)
+            group = None
+            if isinstance(m, list):
+                group = m
+            elif isinstance(m, dict):
+                group = m.get(a.workflow) if a.workflow else None
+                if group is None:      # 未指定分组 → 合并全部
+                    group = [it for v in m.values() if isinstance(v, list) for it in v]
+            for it in (group or []):
+                if isinstance(it, str):
+                    checks.append((it, a.min_bytes))
+                elif isinstance(it, dict) and it.get("path"):
+                    checks.append((it["path"], int(it.get("min_bytes", a.min_bytes))))
+            print("[manifest] %s%s → %d 项" % (a.manifest, ("#" + a.workflow) if a.workflow else "", len(group or [])))
+        except Exception as e:
+            problems.append("产物契约清单读取失败 MANIFEST_ERR(%s): %s" % (a.manifest, e))
+
     ok_details = []
-    for pat in a.expect:
-        ok, detail = check_one(pat, date, a.min_bytes)
+    for pat, mb in checks:
+        ok, detail = check_one(pat, date, mb)
         (ok_details if ok else problems).append(detail)
 
-    head = "[%s] date=%s cmd_rc=%s dur=%.1fs expect=%d" % (tag, date, rc, dur, len(a.expect))
+    head = "[%s] date=%s cmd_rc=%s dur=%.1fs checks=%d" % (tag, date, rc, dur, len(checks))
     if not problems:
         print("%s | ✅ ALL OK" % head)
         if not a.quiet:
