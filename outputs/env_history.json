@@ -85,19 +85,19 @@
   "degraded": false
  },
  "2026-10-15": {
-  "temp": 26.7,
+  "temp": 29.1,
   "level": "冰点",
   "position_cap": 20,
   "subs": {
-   "index_trend": 10.8,
-   "emotion": 57.0,
-   "width": 33.5,
+   "index_trend": 7.8,
+   "emotion": 74.0,
+   "width": 33.6,
    "breadth": 14.2,
-   "structure": 16.2
+   "structure": 12.4
   },
   "divergence": {
-   "index_vs_emotion": -46.2,
-   "breadth_vs_width": -19.3
+   "index_vs_emotion": -66.2,
+   "breadth_vs_width": -19.4
   },
   "degraded": false
  }
