@@ -255,6 +255,8 @@ def main():
     ap.add_argument("--hide-rejected", action="store_true", help="隐藏被否决标的（月线空头/纠缠合并行+否决明细表）")
     ap.add_argument("--auto-extend", action="store_true",
                     help="自动并入全盘量化当日主力信号（panhou_lianghua.md）")
+    ap.add_argument("--date", default="", help="报告基准日 YYYY-MM-DD（默认今天；2026-10-15 补）")
+    ap.add_argument("--holdings-file", default="", help="持仓文件（每行 code[ 名称]），并入跟踪池（2026-10-15 补）")
     a = ap.parse_args()
 
     DEFAULT_POOL = [
@@ -289,6 +291,26 @@ def main():
             new = [(c, n) for c, n in extend if c not in existing]
             pool = pool + new
             pool_src += f" + 当日主力信号{len(extend)}只(新增{len(new)})"
+    # 并入持仓（2026-10-15：workflow 传 --holdings-file 但原脚本未定义 → argparse 秒退 60+ 天）
+    if a.holdings_file:
+        hold = []
+        for _p in (a.holdings_file, "quant_scripts/" + a.holdings_file):
+            if os.path.exists(_p):
+                with open(_p, encoding="utf-8") as _f:
+                    for _ln in _f:
+                        _ln = _ln.strip()
+                        if not _ln or _ln.startswith("#"):
+                            continue
+                        _tok = _ln.split()[0].split(",")[0].strip()
+                        if re.match(r"^(sh|sz)?\d{6}$", _tok):
+                            _full = _tok if _tok[:2] in ("sh", "sz") else ("sh" if _tok[0] == "6" else "sz") + _tok
+                            hold.append((_full, ""))
+                break
+        if hold:
+            existing = {c for c, _ in pool}
+            newh = [(c, n) for c, n in hold if c not in existing]
+            pool = pool + newh
+            pool_src += f" + 持仓{len(hold)}只(新增{len(newh)})"
     print(f"跟踪标的: {len(pool)} 只（来源: {pool_src}）\n")
 
     # 实时ST/退市兜底（池文件可能是旧名称，按代码校验，如交大昂立→ST交昂）
@@ -320,9 +342,13 @@ def main():
     L = []
     A = L.append
     A(f"# 📊 {title} · 三阶漏斗整合版\n")
-    A("> 生成时间：2026-08-04 18:11 | 数据：月线K线+利润表（westock）")
+    A(f"> 生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M')} | 数据：月线K线+利润表（westock）")
     A("> **三阶漏斗**：① 月线反转（曾星智MA6/MA12+陶博士）→ ② 武威G1（双阴/一阴缩量回调）→ ③ v2.1质量否决（支撑≥5%+盈利）")
-    A(f"> 📅 信号基准月：**2026-07**（月末完整月） | 股池来源：**{pool_src}**\n")
+    _base_day = a.date or datetime.now().strftime("%Y-%m-%d")
+    _by, _bm = int(_base_day[:4]), int(_base_day[5:7]) - 1
+    if _bm == 0:
+        _bm, _by = 12, _by - 1
+    A(f"> 📅 信号基准月：**{_by:04d}-{_bm:02d}**（月末完整月） | 股池来源：**{pool_src}**\n")
 
     # 汇总表（只显示有信号价值的：月线PASS或有G1信号；其余合并统计）
     sig_results = [r for r in results if r["ok"] and
@@ -420,7 +446,7 @@ def main():
     A("⚠️ 本报告基于公开市场数据整理，不构成投资建议。三阶漏斗为量化历史规律总结，实战需结合大盘温度动态调整。")
 
     md = "\n".join(L)
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = a.date or datetime.now().strftime("%Y-%m-%d")
     os.makedirs("outputs", exist_ok=True)
     out = os.path.join("outputs", a.out_file or f"股池标的跟踪报告_{today}.md")
     with open(out, "w", encoding="utf-8") as f:
