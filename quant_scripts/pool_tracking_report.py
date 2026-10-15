@@ -16,9 +16,28 @@ import subprocess, sys, os, re, json, argparse
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+
+def _fetch_layer(args, timeout):
+    """统一取数层（fetch.raw；免npx + 重试退避 + 超时）。不可用/空返回 -> ""（回退原实现）。
+    2026-10-16 阶段3 迁移：https://…/docs/取数层迁移进度.md"""
+    try:
+        _root = os.path.dirname(os.path.abspath(__file__))
+        if _root not in sys.path:
+            sys.path.insert(0, _root)
+        from fetch import raw as _fraw
+        out = _fraw(list(args), timeout=timeout) or ""
+        if out.strip() and "执行失败" not in out and "SKILL_0" not in out:
+            return out
+    except Exception:
+        pass
+    return ""
+
 WESTOCK = ["npx", "-y", "westock-data-skillhub@1.0.3"]
 
 def run(args, timeout=60):
+    _o = _fetch_layer(args, timeout)
+    if _o:
+        return _o
     try:
         r = subprocess.run(WESTOCK + args, capture_output=True, text=True, timeout=timeout)
         return r.stdout

@@ -37,6 +37,22 @@ POOL_DIR = os.path.join(ROOT, "data")
 MAXGAP = {"day": 45, "week": 30, "month": 18}   # 最大跟踪期（根）
 
 
+def _fetch_layer(args, timeout):
+    """统一取数层（fetch.raw；免npx + 重试退避 + 超时）。不可用/空返回 -> ""（回退原实现）。
+    2026-10-16 阶段3 迁移（见 docs/取数层迁移进度.md）。"""
+    try:
+        for _p in (BASE, ROOT):
+            if _p and _p not in sys.path:
+                sys.path.insert(0, _p)
+        from fetch import raw as _fraw
+        out = _fraw(list(args), timeout=timeout) or ""
+        if out.strip() and "执行失败" not in out and "SKILL_0" not in out:
+            return out
+    except Exception:
+        pass
+    return ""
+
+
 def ema(series, n):
     out = [series[0]]
     k = 2 / (n + 1)
@@ -64,10 +80,10 @@ def fetch_batch(codes, period="day", limit=250):
     for i in range(0, len(codes), BATCH):
         batch = codes[i:i + BATCH]
         try:
-            r = subprocess.run(f"{WESTOCK} kline {','.join(batch)} --period {period} --limit {limit}",
-                               shell=True, capture_output=True, text=True, timeout=300)
+            _out = _fetch_layer(["kline", ",".join(batch), "--period", str(period),
+                                 "--limit", str(limit)], 300)
             rm = {}
-            for ln in r.stdout.splitlines():
+            for ln in _out.splitlines():
                 m = re.match(r"\|\s*([a-z]{2}\d{6})\s*\|\s*([\d-]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)", ln)
                 if m:
                     rm.setdefault(m.group(1), []).append(

@@ -35,6 +35,22 @@ except Exception:
 
 BJ = timezone(timedelta(hours=8))
 import shutil as _shutil
+
+
+def _fetch_layer(args, timeout):
+    """统一取数层（fetch.raw；免npx + 重试退避 + 超时）。不可用/空返回 -> ""（回退原实现）。
+    2026-10-16 阶段3 迁移：https://…/docs/取数层迁移进度.md"""
+    try:
+        _root = os.path.dirname(os.path.abspath(__file__))
+        if _root not in sys.path:
+            sys.path.insert(0, _root)
+        from fetch import raw as _fraw
+        out = _fraw(list(args), timeout=timeout) or ""
+        if out.strip() and "执行失败" not in out and "SKILL_0" not in out:
+            return out
+    except Exception:
+        pass
+    return ""
 _ws = _shutil.which("westock-data-skillhub")
 WESTOCK = [_ws] if _ws else ["npx", "-y", "westock-data-skillhub@1.0.3"]
 BATCH = 20
@@ -46,6 +62,9 @@ BASE_RISE = 0.30       # 距60日低点涨幅>30% = 低位启动
 ALERT_FLOW = 1.0       # 亿，出货预警阈值
 
 def cli(cmd, timeout=180):
+    _o = _fetch_layer(cmd.split(), timeout)
+    if _o:
+        return _o
     full = WESTOCK + cmd.split()
     for attempt in range(5):
         try:

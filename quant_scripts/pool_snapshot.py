@@ -21,10 +21,28 @@
     ② 产物分档 / 文件名带日期 / 多候选路径 → 追加到 EXTRA_POOLS + 写精确提取器
        （参考 _ex_quad / _ex_arbiter / _ex_guaili / _ex_rsv / _ex_123abc）。
 """
-import os, re, json, csv, argparse
+import os, re, json, csv, argparse, sys
 from datetime import datetime, timezone, timedelta
 
 BJT = timezone(timedelta(hours=8))
+
+
+def _fetch_layer(args, timeout):
+    """统一取数层（fetch.raw；免npx + 重试退避 + 超时）。不可用/空返回 -> ""（回退原实现）。
+    2026-10-16 阶段3 迁移（见 docs/取数层迁移进度.md）。"""
+    try:
+        _root = os.path.dirname(os.path.abspath(__file__))
+        for _p in (_root, os.path.dirname(_root), os.path.dirname(os.path.dirname(_root))):
+            if _p and _p not in sys.path:
+                sys.path.insert(0, _p)
+        from fetch import raw as _fraw
+        out = _fraw(list(args), timeout=timeout) or ""
+        if out.strip() and "执行失败" not in out and "SKILL_0" not in out:
+            return out
+    except Exception:
+        pass
+    return ""
+
 SNAP = "outputs/pool_snapshots.jsonl"
 ENTRY = "outputs/pool_entries.csv"
 POOL_SOURCES = [
@@ -214,8 +232,7 @@ def backtest():
 
     def fb(b):
         try:
-            out = subprocess.run(WEST + ["kline", ",".join(b), "--period", "day", "--limit", "120"],
-                                 capture_output=True, text=True, timeout=300).stdout or ""
+            out = _fetch_layer(["kline", ",".join(b), "--period", "day", "--limit", "120"], 300)
         except Exception:
             return {}
         d = {}
