@@ -1,22 +1,22 @@
 {
- "date": "2026-10-14",
- "total": 34,
- "lianban_cnt": 15,
- "max_lb": 4,
- "shouban": 19,
+ "date": "2026-10-15",
+ "total": 25,
+ "lianban_cnt": 4,
+ "max_lb": 5,
+ "shouban": 21,
  "by_lb": {
-  "4": 3,
-  "3": 2,
-  "2": 10,
-  "1": 19
+  "5": 2,
+  "3": 1,
+  "2": 1,
+  "1": 21
  },
  "score": {
-  "score": 58,
+  "score": 57,
   "level": "活跃",
   "parts": {
    "涨停家数": 5,
-   "连板高度": 18,
-   "连板占比": 35
+   "连板高度": 28,
+   "连板占比": 24
   }
  },
  "persistence": [],
@@ -27,8 +27,8 @@
    "name": "慈文传媒",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -41,108 +41,22 @@
    "name": "百洋股份",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": []
-  },
-  {
-   "code": "sh603096",
-   "name": "新经典",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sz000668",
-   "name": "荣丰控股",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "房地产",
-    "房地产开发",
-    "住宅开发"
-   ]
-  },
-  {
-   "code": "sh603968",
-   "name": "醋化股份",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "化学制品",
-    "基础化工"
-   ]
-  },
-  {
-   "code": "sz000823",
-   "name": "超声电子",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "印制电路板",
-    "元件",
-    "电子"
-   ]
-  },
-  {
-   "code": "sz000530",
-   "name": "冰山冷热",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "制冷空调设备",
-    "核能核电"
-   ]
   },
   {
    "code": "sz001318",
    "name": "阳光乳业",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -153,80 +67,8 @@
    ]
   },
   {
-   "code": "sz002813",
-   "name": "路畅科技",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "汽车电子电气系统",
-    "汽车零部件",
-    "汽车"
-   ]
-  },
-  {
-   "code": "sz002860",
-   "name": "星帅尔",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "家电零部件Ⅲ",
-    "家电零部件Ⅱ",
-    "家用电器"
-   ]
-  },
-  {
-   "code": "sz002917",
-   "name": "金奥博",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "化学制品",
-    "基础化工"
-   ]
-  },
-  {
-   "code": "sh600202",
-   "name": "哈空调",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "制冷空调设备",
-    "核能核电"
-   ]
-  },
-  {
-   "code": "sh600391",
-   "name": "航发科技",
+   "code": "sh601811",
+   "name": "新华文轩",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -237,39 +79,6 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": []
-  },
-  {
-   "code": "sh600847",
-   "name": "万里股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "电池",
-    "电力设备"
-   ]
-  },
-  {
-   "code": "sh601188",
-   "name": "龙江交通",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "高速公路"
-   ]
   }
  ],
  "leaders": {}
