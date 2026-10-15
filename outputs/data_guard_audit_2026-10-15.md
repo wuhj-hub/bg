@@ -10,8 +10,8 @@
 | 板块成分映射 | ✅ | outputs/sector_component_em.json |
 | 一统天下建仓区 | ✅ | 一统天下建仓区股池_latest.json |
 | 三系统原始输出 | ✅ | quant_results_latest.json |
-| 龙头池 | ✅ | quant_scripts/longtou_pool.txt(23只) |
-| 龙头战法池 | ✅ | quant_scripts/dragon_pool.txt(5只) |
-| 才哥战法池 | ✅ | quant_scripts/caige_pool.txt(74只) |
-| 一统天下池 | ✅ | quant_scripts/yitong_pool.txt(707只) |
-| 妖股池 | ✅ | quant_scripts/yao_pool.txt(61只) |
+| 龙头池 | ✅ | quant_scripts/longtou_pool.txt(10只) |
+| 龙头战法池 | ✅ | quant_scripts/dragon_pool.txt(2只) |
+| 才哥战法池 | ✅ | quant_scripts/caige_pool.txt(52只) |
+| 一统天下池 | ✅ | quant_scripts/yitong_pool.txt(841只) |
+| 妖股池 | ✅ | quant_scripts/yao_pool.txt(29只) |
