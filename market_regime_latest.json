@@ -1,7 +1,7 @@
 {
  "date": "20261015",
  "verdict": "熊市",
- "score": 0.237,
+ "score": 0.24,
  "long": {
   "score": 0.4,
   "state": "纠缠"
@@ -15,13 +15,13 @@
   "state": "弱势向下"
  },
  "width": {
-  "above250": 0.167,
-  "above60": 0.261,
-  "above20": 0.185,
-  "up_ratio": 0.083
+  "above250": 0.165,
+  "above60": 0.262,
+  "above20": 0.187,
+  "up_ratio": 0.084
  },
  "emotion": {
-  "limit_up": 34,
+  "limit_up": 36,
   "limit_down": 28
  },
  "indices": [
@@ -134,5 +134,5 @@
    "短分": 0.0
   }
  ],
- "n_stocks": 2949
+ "n_stocks": 3018
 }
