@@ -1,27 +1,42 @@
 {
  "date": "2026-10-15",
- "total": 25,
- "lianban_cnt": 4,
- "max_lb": 5,
- "shouban": 21,
+ "total": 36,
+ "lianban_cnt": 7,
+ "max_lb": 10,
+ "shouban": 30,
  "by_lb": {
+  "10": 1,
   "5": 2,
-  "3": 1,
-  "2": 1,
-  "1": 21
+  "3": 2,
+  "2": 2,
+  "1": 29
  },
  "score": {
-  "score": 57,
-  "level": "活跃",
+  "score": 74,
+  "level": "亢奋",
   "parts": {
    "涨停家数": 5,
-   "连板高度": 28,
+   "连板高度": 45,
    "连板占比": 24
   }
  },
  "persistence": [],
  "alerts": [],
  "lianban_rows": [
+  {
+   "code": "sh600825",
+   "name": "新华传媒",
+   "price": "",
+   "chg": "",
+   "lianban": 10,
+   "ji_ji_ban": "10天10板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
   {
    "code": "sz002343",
    "name": "慈文传媒",
@@ -51,6 +66,25 @@
    "sectors": []
   },
   {
+   "code": "sz000530",
+   "name": "冰山冷热",
+   "price": "",
+   "chg": "",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "通用设备",
+    "机械设备",
+    "制冷空调设备",
+    "核能核电"
+   ]
+  },
+  {
    "code": "sz001318",
    "name": "阳光乳业",
    "price": "",
@@ -69,6 +103,20 @@
   {
    "code": "sh601811",
    "name": "新华文轩",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh605189",
+   "name": "富春染织",
    "price": "",
    "chg": "",
    "lianban": 2,
