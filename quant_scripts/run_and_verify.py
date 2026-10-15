@@ -56,7 +56,10 @@ def gha(msg, kind="error"):
 
 
 def expand(pat, date):
-    return pat.replace("{date}", date).replace("{today}", date)
+    date8 = date.replace("-", "")
+    return (pat.replace("{date8}", date8)
+               .replace("{date}", date)
+               .replace("{today}", date))
 
 
 def check_one(pat, date, min_bytes, must_contain=None):
