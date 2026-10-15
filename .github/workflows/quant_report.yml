@@ -558,9 +558,6 @@ jobs:
           # 2026-10-15：产出后自检（复盘报告本体）
           python3 quant_scripts/run_and_verify.py --tag "第五.5·复盘报告" \
             --expect "outputs/复盘报告_{date}.md" --min-bytes 2000 --push || true
-          # 2026-10-15（11.2）：当日全量产物契约自检（清单集中定义），失败随复盘一并入库
-          python3 quant_scripts/run_and_verify.py --tag "契约自检·quant_report" \
-            --manifest config/daily_artifacts.json --workflow quant_report --push || true
           # 2026-10-15：复盘报告产出后**立即提交入库**（原先列在上一步「提交报告产物」清单，但那一步在本步之前 → 文件尚不存在 → 从未入库 git）
           python3 git_api_commit.py --msg "chore: review report ($(date +%Y-%m-%d))" \
             "outputs/复盘报告_$(date +%Y-%m-%d).md" "outputs/silent_failures_$(date +%Y-%m-%d).log" \
@@ -727,3 +724,14 @@ jobs:
             MSG="🏥 体系自检报告 - $(date +%Y-%m-%d)\n\n健康评分: ${SCORE}/100 (${GRADE})\n市场状态: ${REGIME}\n问题摘要: ${ISSUES}"
             curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=🏥体系自检&content=${MSG}&template=txt" > /dev/null
           fi
+
+      # ─── 产物契约自检（2026-10-15 · 11.2/11.3：清单集中在 config/daily_artifacts.json）───
+      # 置于作业末尾：确保「复盘之后」产出的产物（如 四态胜率_当日.md）也已就位，避免误报
+      - name: 🧪 产物契约自检（当日·quant_report）
+        if: always()
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 quant_scripts/run_and_verify.py --tag "契约自检·quant_report" \
+            --manifest config/daily_artifacts.json --workflow quant_report --push || true
