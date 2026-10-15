@@ -481,12 +481,11 @@ jobs:
             # 改用 Contents API 提交（git pull/push 浅克隆+并发冲突曾导致连续失败，API 绕开）
             set +e
             python3 git_api_commit.py --msg "chore: scan results ($(date +%Y-%m-%d))" \
-              quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md market_width_latest.json \
+              quant_results_latest.json fish_body_latest.json 鱼身报告_latest.md \
               outputs/data_guard_audit_$(date +%Y-%m-%d).md \
               outputs/西湖RSV全市场_$(date +%Y-%m-%d).md \
               outputs/sector_component_em.json \
-              outputs/market_width_latest.json \
-              outputs/qiankun_a_latest.json qiankun_a_latest.json \
+              outputs/market_width_latest.json outputs/qiankun_a_latest.json \
               outputs/资金快照_$(date +%Y-%m-%d).csv \
               mode_aggregate_latest.json 板块共振_latest.json yearline_breadth_latest.json xihu_breadth_latest.json 双弦观察池_latest.json \
               xihu_breadth_history.json outputs/xihu_breadth_history.json \
@@ -498,7 +497,7 @@ jobs:
               pools/pool_$(date +%Y-%m).json \
               一统天下建仓区股池_latest.json 一统天下建仓区股池_latest.md yitong_pool.txt \
               sector_component_em.json 涨停概念排行_latest.json 情绪指标跟踪.json \
-              env_latest.json outputs/env_latest.json outputs/env_history.json \
+              outputs/env_latest.json outputs/env_history.json \
               outputs/四维共振_latest.json outputs/silent_failures_$(date +%Y-%m-%d).log
             RC=$?
             set -e
