@@ -1,12 +1,12 @@
 {
- "date": "2026-10-14",
+ "date": "2026-10-15",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 47,
+ "pool_size": 53,
  "resonance_boards": [
   {
-   "name": "出版",
-   "code": "pt01801769",
-   "zdf": 2.83,
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "zdf": 1.72,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -15,82 +15,9 @@
    ]
   },
   {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "zdf": 2.75,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "传媒",
-   "code": "pt01801760",
-   "zdf": 1.12,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "煤炭",
-   "code": "pt01801950",
-   "zdf": 1.4,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "zdf": 1.67,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
-   "zdf": 0.64,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "炼化及贸易",
-   "code": "pt01801963",
-   "zdf": 0.79,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "文化传媒概念",
-   "code": "pt02002486",
-   "zdf": 0.4,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "中药Ⅱ",
-   "code": "pt01801155",
-   "zdf": 0.83,
+   "name": "白色家电",
+   "code": "pt01801111",
+   "zdf": 0.53,
    "strength": 5,
    "factors": [
     "进场",
@@ -100,137 +27,72 @@
  ],
  "grab_top": [
   {
-   "name": "出版",
-   "code": "pt01801769",
-   "value": 7
-  },
-  {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 7
-  },
-  {
-   "name": "传媒",
-   "code": "pt01801760",
-   "value": 7
-  },
-  {
-   "name": "煤炭",
-   "code": "pt01801950",
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "传媒",
-   "code": "pt01801760",
-   "value": 29.3
-  },
-  {
-   "name": "文化传媒概念",
-   "code": "pt02002486",
-   "value": 18.2
-  },
-  {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "value": 11.6
-  },
-  {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 10.5
-  },
-  {
-   "name": "炼化及贸易",
-   "code": "pt01801963",
-   "value": 9.6
-  },
-  {
    "name": "出版",
    "code": "pt01801769",
-   "value": 9.0
+   "value": 14.5
   },
   {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
-   "value": 5.5
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "value": 11.9
   },
   {
-   "name": "煤炭",
-   "code": "pt01801950",
-   "value": 3.2
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 9.2
   },
   {
-   "name": "中药Ⅱ",
-   "code": "pt01801155",
-   "value": 0.0
+   "name": "白色家电",
+   "code": "pt01801111",
+   "value": 4.8
   }
  ],
  "absorption_top": [
   {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 2.19
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "value": 2.02
   },
   {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "value": 1.82
-  },
-  {
-   "name": "炼化及贸易",
-   "code": "pt01801963",
-   "value": 1.66
+   "name": "白色家电",
+   "code": "pt01801111",
+   "value": 1.56
   },
   {
    "name": "出版",
    "code": "pt01801769",
-   "value": 1.36
+   "value": 0
   },
   {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
-   "value": 0.91
-  },
-  {
-   "name": "传媒",
-   "code": "pt01801760",
-   "value": 0.87
-  },
-  {
-   "name": "文化传媒概念",
-   "code": "pt02002486",
-   "value": 0.44
-  },
-  {
-   "name": "煤炭",
-   "code": "pt01801950",
-   "value": 0.41
-  },
-  {
-   "name": "中药Ⅱ",
-   "code": "pt01801155",
-   "value": 0.01
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 0
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "数字媒体",
-   "stock": "掌阅科技",
-   "code": "sh603533",
-   "zdf": "10.00",
-   "main1": 2.63,
-   "main5": 3.78
+   "board": "白酒Ⅱ",
+   "stock": "皇台酒业",
+   "code": "sz000995",
+   "zdf": "10.04",
+   "main1": 1.14,
+   "main5": 0.51
   },
   {
-   "board": "影视院线",
-   "stock": "慈文传媒",
-   "code": "sz002343",
-   "zdf": "10.05",
-   "main1": -0.66,
-   "main5": 1.19
+   "board": "白色家电",
+   "stock": "TCL智家",
+   "code": "sz002668",
+   "zdf": "1.30",
+   "main1": -0.03,
+   "main5": 0.23
   }
  ]
 }
