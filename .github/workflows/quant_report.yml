@@ -216,6 +216,9 @@ jobs:
             python3 upload_ima.py --file "$T" --name "$(basename $T)" || echo "一统天下跟踪上传失败"
             PUSH_REPORT="$T" python3 push_report.py || echo "一统天下推送失败(非致命)"
           fi
+          # 2026-10-15：产出后自检（一统天下跟踪报告）
+          python3 quant_scripts/run_and_verify.py --tag "第三步.4.8·一统天下跟踪" \
+            --expect "outputs/一统天下跟踪_{date}.md" --min-bytes 500 --push || true
 
       # ─── 第三步.4.9：妖股发现与跟踪池（启动发现+6维跟踪+出货/分歧预警）───
       - name: 妖股发现与跟踪池（启动入池+出货预警推送）
@@ -320,6 +323,9 @@ jobs:
           if [ -f "outputs/股池标的跟踪报告_$(date +%Y-%m-%d).md" ]; then
             python3 upload_ima.py --file "outputs/股池标的跟踪报告_$(date +%Y-%m-%d).md" --name "股池标的跟踪报告_$(date +%Y-%m-%d).md"
           fi
+          # 2026-10-15：产出后自检（抓「秒退却 success」；实证本步曾因未知参数 argparse 秒退 60+ 天）
+          python3 quant_scripts/run_and_verify.py --tag "第五步·股池标的跟踪" \
+            --expect "outputs/股池标的跟踪报告_{date}.md" --min-bytes 500 --push || true
 
       # ─── 第五.4.5步：持仓组合风控（P1-2：行业集中度+相关性矩阵+回撤预警三档+离场计分）───
       - name: 持仓组合风控（portfolio_risk）
@@ -549,6 +555,13 @@ jobs:
             python3 git_api_commit.py --msg "chore: system temp history ($(date +%Y-%m-%d))" system_temp_history.json \
               || echo "三系统温度历史提交失败(非致命)"
           fi
+          # 2026-10-15：产出后自检（复盘报告本体）
+          python3 quant_scripts/run_and_verify.py --tag "第五.5·复盘报告" \
+            --expect "outputs/复盘报告_{date}.md" --min-bytes 2000 --push || true
+          # 2026-10-15：复盘报告产出后**立即提交入库**（原先列在上一步「提交报告产物」清单，但那一步在本步之前 → 文件尚不存在 → 从未入库 git）
+          python3 git_api_commit.py --msg "chore: review report ($(date +%Y-%m-%d))" \
+            "outputs/复盘报告_$(date +%Y-%m-%d).md" "outputs/silent_failures_$(date +%Y-%m-%d).log" \
+            || echo "复盘报告入库失败(非致命)"
 
       # ─── 第五.5步：env 对照三系统温度（第1层环境唯一化·观察期，2026-10-03 上线）───
       - name: env 对照三系统温度（观察期）
