@@ -1,94 +1,93 @@
 {
  "date": "2026-10-15",
- "data_date": "2026-10-14",
+ "data_date": "2026-10-15",
  "style": "均衡市",
  "icon": "⚖️",
- "score": -8,
+ "score": -7,
  "score_detail": {
   "size_style": -20,
-  "limitup_structure": 9,
-  "volume_structure": 0,
-  "sector_fund": 3
+  "limitup_structure": 12,
+  "volume_structure": -8,
+  "sector_fund": 9
  },
  "size_style": {
-  "hs300_5d": -3.21,
-  "hs300_10d": -7.19,
-  "zz1000_5d": -5.39,
-  "zz1000_10d": -11.0,
-  "rel_5d": -2.18,
-  "rel_10d": -3.81,
-  "rel_20d": -2.37,
-  "zz500_5d": -6.12
+  "hs300_5d": -3.35,
+  "hs300_10d": -7.78,
+  "zz1000_5d": -6.44,
+  "zz1000_10d": -13.77,
+  "rel_5d": -3.1,
+  "rel_10d": -6.0,
+  "rel_20d": -3.79,
+  "zz500_5d": -6.61
  },
  "limitup_structure": {
   "limitup": 34,
-  "strong": 64,
-  "width_score": 52.1,
-  "level": "结构分化（涨少跌多·资金抱团）",
+  "strong": 44,
+  "width_score": 38.3,
+  "level": "偏弱（跌多涨少）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 2.1,
-  "zhaban_rate": 52.8,
-  "lianban": 14
+  "strong_ratio": 1.4,
+  "zhaban_rate": 33.3,
+  "lianban": 6
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.762,
-  "small_big_ratio_5d": 0.761
+  "small_big_ratio_now": 0.653,
+  "small_big_ratio_5d": 0.759,
+  "vol_shift": "资金回流大盘"
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "电力",
-    "zdf": "1.00",
-    "main_net5d": -25.8,
-    "retail_net": -6.6,
-    "tag": "游资型"
+    "name": "白酒Ⅱ",
+    "zdf": "1.72",
+    "main_net5d": 0.8,
+    "retail_net": -7.7,
+    "tag": "机构型"
    },
    {
-    "name": "传媒",
-    "zdf": "1.12",
-    "main_net5d": 29.3,
-    "retail_net": -24.0,
-    "tag": "机构型"
+    "name": "证券Ⅱ",
+    "zdf": "0.51",
+    "main_net5d": -16.1,
+    "retail_net": -2.2,
+    "tag": "游资型"
    },
    {
     "name": "元件",
-    "zdf": "-1.53",
-    "main_net5d": -131.8,
-    "retail_net": -13.8,
+    "zdf": "-2.94",
+    "main_net5d": -80.5,
+    "retail_net": 19.6,
     "tag": "游资型"
    },
    {
-    "name": "出版",
-    "zdf": "2.83",
-    "main_net5d": 9.0,
-    "retail_net": -4.8,
-    "tag": "机构型"
+    "name": "半导体",
+    "zdf": "-2.71",
+    "main_net5d": -310.8,
+    "retail_net": 69.4,
+    "tag": "游资型"
    },
    {
-    "name": "昨日涨停",
-    "zdf": "0.09",
-    "main_net5d": -7.8,
-    "retail_net": 12.5,
+    "name": "电池",
+    "zdf": "-1.23",
+    "main_net5d": -1.9,
+    "retail_net": 11.8,
     "tag": "游资型"
    }
   ]
  },
  "mode_cross": {
-  "dominant": "欧马模式",
+  "dominant": "堆量模式",
   "all": {
-   "堆量模式": 13,
-   "欧马模式": 2
+   "堆量模式": 15
   },
   "leaders": {
-   "堆量模式": 6,
-   "欧马模式": 2
+   "堆量模式": 11
   },
   "pullbacks": {
-   "堆量模式": 1
+   "堆量模式": 2
   },
   "gpoints": {
-   "欧马模式": 2
+   "堆量模式": 1
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
