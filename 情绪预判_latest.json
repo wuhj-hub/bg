@@ -1,9 +1,9 @@
 {
  "date": "2026-10-15",
- "limitup": 20,
+ "limitup": 34,
  "state": "偏弱",
  "next": "中性",
  "next_prob": 50,
  "advice": "偏弱修复期，75%次日修复→布局窗口不恐慌",
- "src": "实时计算"
+ "src": "market_width(2026-10-15)"
 }
