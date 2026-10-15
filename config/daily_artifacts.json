@@ -1,0 +1,29 @@
+{
+  "_note": "当日核心产物契约（2026-10-15 · 数据可信度治理 11.2）。单一事实来源：workflow 提交清单与 run_and_verify 自检均以此为准。path 支持 {date}。min_bytes 为经验下限（仅防「空产物/秒退」，非精确校验）。canonical = 生产者原生输出路径。",
+  "quant_scan": [
+    {"path": "quant_results_latest.json", "min_bytes": 300, "producer": "run_all_quant.py"},
+    {"path": "outputs/market_width_latest.json", "min_bytes": 200, "producer": "market_width.py"},
+    {"path": "xihu_breadth_latest.json", "min_bytes": 200, "producer": "xihu_breadth.py"},
+    {"path": "hot_emotion_latest.json", "min_bytes": 100, "producer": "hot_emotion.py"},
+    {"path": "涨停概念排行_latest.json", "min_bytes": 200, "producer": "limitup_concept_rank.py"},
+    {"path": "板块共振_latest.json", "min_bytes": 200, "producer": "sector_resonance_local.py"},
+    {"path": "yearline_breadth_latest.json", "min_bytes": 100, "producer": "yearline_breadth.py"},
+    {"path": "一统天下建仓区股池_latest.json", "min_bytes": 100, "producer": "yitong_screener.py"},
+    {"path": "双弦观察池_latest.json", "min_bytes": 100, "producer": "dual_pool_sync.py"},
+    {"path": "outputs/env_latest.json", "min_bytes": 100, "producer": "env_engine.py"},
+    {"path": "outputs/qiankun_a_latest.json", "min_bytes": 100, "producer": "full_market_dualdim.py"},
+    {"path": "outputs/四维共振_latest.json", "min_bytes": 100, "producer": "quad_resonance.py"}
+  ],
+  "quant_report": [
+    {"path": "outputs/复盘报告_{date}.md", "min_bytes": 2000, "producer": "gen_review_report.py"},
+    {"path": "outputs/股池标的跟踪报告_{date}.md", "min_bytes": 500, "producer": "pool_tracking_report.py"},
+    {"path": "outputs/一统天下跟踪_{date}.md", "min_bytes": 500, "producer": "pool_tracking_report.py"},
+    {"path": "market_style_latest.json", "min_bytes": 100, "producer": "market_style.py"},
+    {"path": "信号仲裁_latest.json", "min_bytes": 100, "producer": "signal_arbiter.py"},
+    {"path": "组合风控_latest.json", "min_bytes": 100, "producer": "portfolio_risk.py"},
+    {"path": "乖离低买_latest.json", "min_bytes": 100, "producer": "yitong_guaili_screener.py"},
+    {"path": "execution_cards_latest.json", "min_bytes": 100, "producer": "execution_card.py"},
+    {"path": "outputs/glm_brief_review_{date}.md", "min_bytes": 100, "producer": "glm_brief.py"},
+    {"path": "outputs/仲裁信号日志.csv", "min_bytes": 100, "producer": "signal_arbiter.py"}
+  ]
+}
