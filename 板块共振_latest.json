@@ -1,7 +1,7 @@
 {
  "date": "2026-10-15",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 53,
+ "pool_size": 46,
  "resonance_boards": [
   {
    "name": "白酒Ⅱ",
@@ -52,6 +52,11 @@
    "name": "白色家电",
    "code": "pt01801111",
    "value": 4.8
+  },
+  {
+   "name": "水泥",
+   "code": "pt01801711",
+   "value": 0.9
   }
  ],
  "absorption_top": [
@@ -61,19 +66,24 @@
    "value": 2.02
   },
   {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 1.92
+  },
+  {
    "name": "白色家电",
    "code": "pt01801111",
    "value": 1.56
   },
   {
-   "name": "出版",
-   "code": "pt01801769",
-   "value": 0
-  },
-  {
    "name": "贵金属",
    "code": "pt01801053",
-   "value": 0
+   "value": 1.41
+  },
+  {
+   "name": "水泥",
+   "code": "pt01801711",
+   "value": 0.58
   }
  ],
  "control_top": [],
