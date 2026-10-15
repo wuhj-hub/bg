@@ -476,18 +476,25 @@ def read_lianghua_csv():
 
 def read_pool_status(today):
     """读取当日股池跟踪报告（pool_tracking_report.py 产出），提取三阶共振/一阶通过标的。
-    当日缺失→自动沿用最近一份并标注来源日期
-    （2026-08-11修复：原try块缩进在else兜底分支内，当日文件存在走break时跳过读取直接返回None）"""
-    for path in (f"outputs/股池标的跟踪报告_{today}.md", f"股池标的跟踪报告_{today}.md"):
+    当日缺失→自动沿用最近一份并标注来源日期。
+    （2026-08-11修复：原try块缩进在else兜底分支内，当日文件存在走break时跳过读取直接返回None）
+    （2026-10-15修复：原只认默认名 `股池标的跟踪报告_{date}.md`，但 workflow 全部用
+     `--out-file` 自定义名（才哥战法跟踪 / 一统天下跟踪）→ 兜底永远停在 08-11）"""
+    candidates = ("outputs/股池标的跟踪报告_{today}.md", "股池标的跟踪报告_{today}.md",
+                  "outputs/才哥战法跟踪_{today}.md", "outputs/一统天下跟踪_{today}.md")
+    for c in candidates:
+        path = c.format(today=today)
         if os.path.exists(path):
             src_date = today
             break
     else:
-        path = find_latest_file("outputs/股池标的跟踪报告_{today}.md", today)
+        path = None
+        for c in candidates:
+            p = find_latest_file(c, today)
+            if p:
+                path = p
+                break
         src_date = ""
-        if path:
-            m = re.search(r"(\d{4}-\d{2}-\d{2})", path)
-            src_date = m.group(1) if m else "最近"
         if not path:
             return None, [], [], src_date
     try:
