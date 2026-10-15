@@ -5,6 +5,35 @@
 
 ---
 
+## v2.32 (2026-10-15)
+
+### 数据可信度治理 11.1–11.4（取数层对账与设计 同源归一）
+
+#### 11.1 消灭双副本（canonical = `outputs/`）
+- 4 个 `*_latest` 原先在**仓库根 + outputs/** 各存一份 → 只保留 `outputs/` 一份
+- 生产者停写根副本：`market_width.py`、`quant_scripts/env_engine.py`
+- workflow：提交清单去掉根副本 + 移除 `cp` 到根的步骤（quant_scan / quant_report）
+- 删除根副本：`env_latest.json` / `market_width_latest.json` / `qiankun_a_latest.json` / `四维共振_latest.json`
+
+#### 11.2 产物契约集中化（单一事实来源）
+- 新增 **`config/daily_artifacts.json`**：当日核心产物清单（`path` 支持 `{date}`，含 `min_bytes` / `producer`）
+- `quant_scripts/run_and_verify.py` 新增 `--manifest <file>` `--workflow <name>`（清单驱动整批自检）
+- quant_scan：**提交前**新增「🧪 产物契约自检」步（日志可随产物入库）
+- quant_report：复盘步内串联契约自检（失败随复盘一并入库）
+
+#### 11.3 清单扩容 + `optional` 语义
+- 清单扩至 **quant_scan 25 项 / quant_report 16 项**
+- 新增 `"optional": true`：偶发缺失仅 `::warning::`，**不计入退出码、不推送**（观察若干日稳定后转正）
+
+#### 11.4 KB 上传「同日去重」语义
+- `upload_ima.py`：新增 **`IMA_OVERWRITE`** + **自动判定**——文件名含日期（`YYYY-MM-DD` / `YYYYMMDD`）→ **同日覆盖**（旧同名条目先改名归档为 `<正名>_prev_<HHMMSS>`，再上传新版占用正名）；不含日期 → 同名跳过（原行为）
+  - 背景：KB 无删除 API，旧逻辑（同名跳过）导致**同日改进版被旧版挡住 → KB 静默不更新**（10-15 复盘即此症）
+- 移除 3 个 workflow 的显式 `IMA_SKIP_DUP`（jingjia_track / weight_learn / pool_winrate_biweekly），使日报类自动走覆盖
+
+**验证**：rename_knowledge 自回滚实测通过；覆盖分支 mock 四态验证（含日期/不含日期/显式覆盖/显式跳过）均符合预期；YAML/AST 全绿。
+
+---
+
 ## v2.31 (2026-10-15)
 
 ### P0-2「生产者产出后自检」落地 —— 让静默失败可见
