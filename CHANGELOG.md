@@ -5,6 +5,26 @@
 
 ---
 
+## v2.33 (2026-10-16)
+
+### 数据可信度治理 11.5–11.6（契约自检扩散 + 参数契约）
+
+#### 11.5 产物契约自检扩散到全 workflow
+- `config/daily_artifacts.json` 扩容：**17 组**（quant_scan / quant_report + 新增 15 组）
+- **15 个 workflow** 末尾新增「🧪 产物契约自检」步（`run_and_verify --manifest --workflow`）
+- `run_and_verify.py` 支持 `{date8}`(YYYYMMDD) 占位
+
+#### 11.6 A2 参数契约（防「传了参数但脚本不认」的静默失效）
+- **实锤修复**：`gen_mainboard.py` 静默忽略 `--universe` → quant_report「创业板/科创四维补充通道」(2026-08-11 上线)**从未生效**
+  - 新增 argparse `--universe {mainboard,chinext_kcb}` / `--out`；chinext_kcb = 创业板 300/301 + 科创 688/689 → `all_chinext_kcb.csv`（沙箱实测 1980 只）
+  - 向后兼容：无参数仍生成主板（quant_scan / duowei_fish / yao_gu_pool 调用不变）
+- `data_guard.py`：main() 增加未知 `--xxx` 参数显式告警
+- 新增 `quant_scripts/param_contract_audit.py`（参数契约审计）+ 接入 `selfcheck_daily`（第 4 项自检，`--strict`）
+  - 口径：脚本已知参数 = argparse add_argument ∪ 源码 `--选项` 字面量；对「无参数解析」脚本集空 → 任何传参判失配
+  - 现状：**179 个带参调用，0 失配**
+
+---
+
 ## v2.32 (2026-10-15)
 
 ### 数据可信度治理 11.1–11.4（取数层对账与设计 同源归一）
