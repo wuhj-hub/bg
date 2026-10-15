@@ -167,6 +167,41 @@ def list_existing_titles(kb_id, folder_id=None):
     return titles
 
 
+def list_existing_items(kb_id, folder_id=None):
+    """返回 [(title, media_id)]（分页，最多500条）。查询失败返回 None。
+
+    2026-10-15（11.4）新增：为「同日覆盖」语义提供 media_id，
+    以便把旧同名条目改名让位（KB 无删除 API，只能改名 → 保留历史、正名始终最新）。"""
+    items = []
+    cursor = ""
+    for _ in range(10):
+        body = {"cursor": cursor, "limit": 50, "knowledge_base_id": kb_id}
+        if folder_id:
+            body["folder_id"] = folder_id
+        try:
+            resp = send_ima("openapi/wiki/v1/get_knowledge_list", json.dumps(body))
+        except Exception as e:
+            print(f"[WARN] 列举已有条目失败({e})")
+            return None
+        d = resp.get("data") or resp
+        for it in (d.get("knowledge_list") or []):
+            t = it.get("title")
+            if t:
+                items.append((t, it.get("media_id") or ""))
+        if d.get("is_end"):
+            break
+        cursor = d.get("next_cursor") or ""
+        if not cursor:
+            break
+    return items
+
+
+def rename_knowledge(kb_id, media_id, new_name):
+    """重命名知识条目（KB 无删除 API → 用改名把旧版本归档，腾出正名）。"""
+    body = {"knowledge_base_id": kb_id, "media_id": media_id, "name": new_name}
+    return send_ima("openapi/wiki/v1/rename_knowledge", json.dumps(body))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", required=True)
@@ -187,12 +222,43 @@ def main():
     media_type, content_type = _MT.get(_ext, (7, "text/markdown"))
     file_ext = _ext or "md"
 
-    # Step 0: 查重（默认开启，设 IMA_SKIP_DUP=0 可关闭）
-    if os.environ.get("IMA_SKIP_DUP", "1") == "1":
+    # Step 0: 查重 / 覆盖（2026-10-15 · 11.4 同日去重语义）
+    #   决策优先级：IMA_OVERWRITE / IMA_SKIP_DUP 显式指定 > 文件名自动判定
+    #   自动判定：文件名含日期（YYYY-MM-DD 或 YYYYMMDD）→ 视为「日报类」→ 同日覆盖；
+    #             否则（latest/固定名文档）→ 同名跳过（防堆积）。
+    #   覆盖 = 旧同名条目先改名归档为 <正名>_prev_<HHMMSS>，再上传新版本占用正名
+    #   （KB 无删除 API，只能改名 → 保证「正名始终最新」且不丢历史）。
+    import re as _re
+    _is_dated = bool(_re.search(r"\d{4}-\d{2}-\d{2}|\d{8}", filename))
+    if "IMA_OVERWRITE" in os.environ:
+        _overwrite = os.environ.get("IMA_OVERWRITE", "0") == "1"
+    elif "IMA_SKIP_DUP" in os.environ:
+        _overwrite = os.environ.get("IMA_SKIP_DUP", "1") != "1"
+    else:
+        _overwrite = _is_dated
+    print(f"[MODE] {'同日覆盖(overwrite)' if _overwrite else '同名跳过(skip-dup)'}"
+          f" | 文件名{'含' if _is_dated else '不含'}日期={_is_dated} file={filename}")
+    if _overwrite:
+        existing = list_existing_items(kb_id, folder_id or None)
+        if existing is None:
+            print("[WARN] 覆盖模式：列举失败，按新文件直接上传（可能产生同名副本）")
+        else:
+            _stem, _ext2 = os.path.splitext(filename)
+            _stamp = time.strftime("%H%M%S")
+            for _t, _mid in existing:
+                if _t == filename and _mid:
+                    _arch = f"{_stem}_prev_{_stamp}{_ext2}"
+                    try:
+                        rename_knowledge(kb_id, _mid, _arch)
+                        print(f"[OK] 覆盖模式：旧版本已归档为 {_arch}")
+                    except Exception as e:
+                        print(f"[WARN] 归档旧版本失败({e})，继续上传（可能产生同名副本）")
+    elif os.environ.get("IMA_SKIP_DUP", "1") == "1":
         existing = list_existing_titles(kb_id, folder_id or None)
         if existing is not None and filename in existing:
             print(f"[SKIP] 知识库中已存在同名文件，跳过上传: {filename}")
-            print("[SKIP] （KB 无删除 API，避免同名堆积；如需强制重传设 IMA_SKIP_DUP=0）")
+            print("[SKIP] （KB 无删除 API，避免同名堆积；如需强制重传设 IMA_SKIP_DUP=0，"
+                  "如需「同名覆盖+旧版归档」设 IMA_OVERWRITE=1）")
             return
 
     # Step 1: 创建媒体条目，获取 COS 上传凭证
