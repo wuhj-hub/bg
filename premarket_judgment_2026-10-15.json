@@ -1,0 +1,22 @@
+{
+  "tone": "中性偏防守",
+  "operation": "仓位≤20%，轻仓参与，严格止损（⚖️均衡市(+2)仓位不变）（🌡️env总闸≤20%）",
+  "sectors": "传媒、电力、元件",
+  "key_levels": "支撑3742、压力3968",
+  "fish_temp": "—",
+  "beast_score": "10.8/100",
+  "shuangxian": "—",
+  "style_score": 2,
+  "style_name": "均衡市",
+  "base_pos": 40,
+  "style_fix": 0,
+  "temp_fix": 0,
+  "final_pos": 20,
+  "pos_uncapped": 40,
+  "env_temp": 28.9,
+  "env_level": "冰点",
+  "env_cap": 20,
+  "env_degraded": false,
+  "data_fresh": "ok",
+  "date": "2026-10-15"
+}
