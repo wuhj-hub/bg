@@ -5,6 +5,17 @@
 
 ---
 
+## v2.35 (2026-10-16)
+
+### 取数层 阶段 3 · 批次 1（4 脚本迁入统一层）
+
+- 新增 **`migrate_fetch.py`**（插入式·最小侵入迁移器）：保留原 subprocess 逻辑作兜底，仅在取数函数前加「优先 fetch.raw」分支 → 行为等价、零回归
+- 迁移 **4 脚本**（commit fc3e7417）：`yao_gu_pool` / `pool_tracking_report` / `pool_snapshot` / `reversal_daily_screener`
+- 验证：4 脚本 AST OK；yao_gu_pool/pool_tracking/reversal 冒烟均走统一层返回正常；pool_snapshot._fetch_layer 实测 500B 含 date
+- 更新 `docs/取数层迁移进度.md`（A 类完全未用 fetch 由 28 → 24）
+
+---
+
 ## v2.34 (2026-10-16)
 
 ### 取数层 阶段 3（统一取数层调用点迁移）
