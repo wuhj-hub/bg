@@ -477,7 +477,8 @@ jobs:
           cp outputs/乖离低买_latest.json 乖离低买_latest.json 2>/dev/null || true
           set +e
           python3 git_api_commit.py --msg "chore: report results ($(date +%Y-%m-%d))" \
-            market_style_latest.json qiankun_a_latest.json 四维共振_latest.json 信号仲裁_latest.json \
+            market_style_latest.json 信号仲裁_latest.json \
+            outputs/qiankun_a_latest.json outputs/四维共振_latest.json \
             ai_chokepoint_watch_latest.json \
             四维共振_chinext_kcb_latest.json 组合风控_latest.json 执行纪律_latest.json execution_cards_latest.json \
             一统天下建仓区股池_latest.json 乖离低买_latest.json \
