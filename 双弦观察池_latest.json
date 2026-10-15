@@ -1,16 +1,7 @@
 {
  "date": "2026-10-15",
- "count": 70,
+ "count": 68,
  "entries": [
-  {
-   "code": "sz002343",
-   "name": "慈文传媒",
-   "price": 8.91,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过 | 猛兽: SSV>100 [堆量模式]"
-  },
   {
    "code": "sz003037",
    "name": "三和管桩",
@@ -24,15 +15,6 @@
    "code": "sz002103",
    "name": "广博股份",
    "price": 7.5,
-   "score": 62,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sh600668",
-   "name": "尖峰集团",
-   "price": 7.99,
    "score": 62,
    "resonance_label": "中性",
    "sector": "",
@@ -127,6 +109,15 @@
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过 | 猛兽: 伏击线 [堆量模式]"
+  },
+  {
+   "code": "sz002343",
+   "name": "慈文传媒",
+   "price": 8.91,
+   "score": 57,
+   "resonance_label": "中性",
+   "sector": "",
+   "reason": "双弦门控通过 | 猛兽: SSV>100 [堆量模式]"
   },
   {
    "code": "sh600325",
@@ -394,15 +385,6 @@
    "name": "英力特",
    "price": 8.14,
    "score": 55,
-   "resonance_label": "中性",
-   "sector": "",
-   "reason": "双弦门控通过"
-  },
-  {
-   "code": "sz000530",
-   "name": "冰山冷热",
-   "price": 6.93,
-   "score": 53,
    "resonance_label": "中性",
    "sector": "",
    "reason": "双弦门控通过"
