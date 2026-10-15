@@ -99,7 +99,7 @@ jobs:
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
           IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
-          IMA_SKIP_DUP: "1"
+          # 2026-10-15（11.4）：移除显式查重开关 —— 上传名含日期时默认「同日覆盖+旧版归档」
         run: |
           F="outputs/股池胜率总览_$(date +%Y-%m-%d).md"
           if [ -f "$F" ]; then
