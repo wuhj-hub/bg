@@ -18,9 +18,9 @@
  ],
  "sectors_bull_l1_n": 2,
  "sectors_total_l1": 32,
- "stocks_bull_n": 209,
- "stocks_total": 3068,
- "breadth_pct": 6.81,
+ "stocks_bull_n": 210,
+ "stocks_total": 3073,
+ "breadth_pct": 6.83,
  "breadth_level": "🟢 退潮/非牛",
  "breadth_range": "<12%",
  "sector_entry": {
@@ -460,6 +460,11 @@
    "code": "sh601985",
    "ind": "电力",
    "entry": "2026-10"
+  },
+  {
+   "code": "sh601988",
+   "ind": "银行Ⅱ",
+   "entry": "2026-07"
   },
   {
    "code": "sh601989",
