@@ -391,15 +391,7 @@ def write_out(out, outdir="outputs"):
     txt = json.dumps(out, ensure_ascii=False, indent=1)
     open(latest, "w", encoding="utf-8").write(txt)
     print(f"[OK] {latest}")
-
-    # 仓库根副本（供同 job 后续步骤读取）
-    root_copy = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(latest)), "..", "env_latest.json"))
-    try:
-        with open(root_copy, "w", encoding="utf-8") as f:
-            f.write(txt)
-        print(f"[OK] {root_copy}")
-    except Exception as e:
-        print(f"[WARN] 写仓库根副本失败: {e}")
+    # 2026-10-15（11.1 消灭双副本）：不再写仓库根副本；canonical = outputs/env_latest.json
 
     # 按 data_date 累积 history
     h = {}
