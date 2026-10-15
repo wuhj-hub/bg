@@ -5,6 +5,29 @@
 
 ---
 
+## v2.31 (2026-10-15)
+
+### P0-2「生产者产出后自检」落地 —— 让静默失败可见
+
+**审计结论（23 workflow / 86 处脚本调用全扫）**：
+- 参数契约：**53 个 argparse 脚本传参全部匹配** ✅（pool_tracking_report 是唯一失配，已修）｜32 个手写 sys.argv（未知参数静默忽略）
+- 静默吞错面：**96 × `|| echo` + 103 × `continue-on-error` + 35 × `if: always()`** → 生产者崩了 CI 仍绿
+- 双副本结构：4 个 `*_latest` 同时在仓库根 & outputs/（env / market_width / qiankun_a / 四维共振）→ ③.3 类僵尸温床
+
+**新增 `quant_scripts/run_and_verify.py`**（生产者产出后自检 wrapper）：
+- 校验产物：存在 / ≥min-bytes / （可选）含指定文本；支持 `{date}` 与 `*`
+- 可选 `--run "<shell>"` 先执行命令；**秒退识别**（耗时 < --min-runtime → 告警，argparse/导入错误指纹）
+- 异常时：GitHub 注解 `::error::` + 追加 `outputs/silent_failures_{date}.log` + 可选 PushPlus 推送
+- 退出码：有问题 →1（无 continue-on-error 的步骤会显式失败）
+
+**接线（7 处，附加式·零风险）**：
+| workflow | 位置 |
+|---|---|
+| quant_scan | 市场宽度 / 西湖广度 / 涨停概念排行 / 一统天下多周期 |
+| quant_report | 一统天下跟踪 / 第五步·股池标的跟踪 / 复盘报告 |
+
+**🐞 顺带修复**：`outputs/复盘报告_{date}.md` 虽列在「提交报告产物」清单，但**该提交步（step 30）在复盘生成（step 31）之前运行** → 文件尚不存在 → **复盘报告从未入库 git**（KB-only 且受同名去重影响）。已在复盘步内补一次 `git_api_commit`（含 silent_failures 日志）。quant_scan 提交清单亦纳入该日志。
+
 ## v2.30 (2026-10-15)
 
 ### ③.5 断更**根因**修复 + 一统 timeout 核实 + 10-15 复盘全绿
