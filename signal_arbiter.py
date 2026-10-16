@@ -139,7 +139,14 @@ def load_json(paths):
 
 
 def load_four_dim():
-    d = load_json(["outputs/四维共振_latest.json", "四维共振_latest.json"])
+    # 2026-10-16 分支B P2：取数收口到 metrics（失败回退 load_json）
+    try:
+        import sys as _sys, os as _os
+        _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "quant_scripts"))
+        from metrics import quad_info as _quad_info
+        d = _quad_info()
+    except Exception:
+        d = load_json(["outputs/四维共振_latest.json", "四维共振_latest.json"])
     out = {}
     if not d:
         return out
@@ -241,7 +248,14 @@ def load_shuangxian():
 
 
 def load_qiankun():
-    d = load_json(["outputs/qiankun_a_latest.json", "qiankun_a_latest.json"])
+    # 2026-10-16 分支B P2：取数收口到 metrics（失败回退 load_json）
+    try:
+        import sys as _sys, os as _os
+        _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "quant_scripts"))
+        from metrics import qiankun_info as _qk_info
+        d = _qk_info()
+    except Exception:
+        d = load_json(["outputs/qiankun_a_latest.json", "qiankun_a_latest.json"])
     if not d:
         return {}
     out = {}
