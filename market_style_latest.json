@@ -1,76 +1,68 @@
 {
- "date": "2026-10-15",
- "data_date": "2026-10-15",
+ "date": "2026-10-16",
+ "data_date": "2026-10-16",
  "style": "均衡市",
  "icon": "⚖️",
- "score": -13,
+ "score": 11,
  "score_detail": {
   "size_style": -20,
-  "limitup_structure": 12,
-  "volume_structure": -8,
-  "sector_fund": 3
+  "limitup_structure": 21,
+  "volume_structure": 0,
+  "sector_fund": 10
  },
  "size_style": {
-  "hs300_5d": -3.35,
-  "hs300_10d": -7.78,
-  "zz1000_5d": -6.44,
-  "zz1000_10d": -13.77,
-  "rel_5d": -3.1,
-  "rel_10d": -6.0,
-  "rel_20d": -3.79,
-  "zz500_5d": -6.61
+  "hs300_5d": -3.4,
+  "hs300_10d": -6.05,
+  "zz1000_5d": -6.62,
+  "zz1000_10d": -11.73,
+  "rel_5d": -3.23,
+  "rel_10d": -5.68,
+  "rel_20d": -3.63,
+  "zz500_5d": -6.6
  },
  "limitup_structure": {
-  "limitup": 36,
-  "strong": 46,
-  "width_score": 38.4,
-  "level": "偏弱（跌多涨少）",
+  "limitup": 55,
+  "strong": 127,
+  "width_score": 93.0,
+  "level": "🔥 结构性偏强（涨多跌少·赚钱效应强）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 1.5,
-  "zhaban_rate": 33.3,
+  "strong_ratio": 4.2,
+  "zhaban_rate": 56.0,
   "lianban": 7
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.653,
-  "small_big_ratio_5d": 0.759,
-  "vol_shift": "资金回流大盘"
+  "small_big_ratio_now": 0.75,
+  "small_big_ratio_5d": 0.743
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "白酒Ⅱ",
-    "zdf": "1.72",
-    "main_net5d": 0.8,
-    "retail_net": -7.7,
-    "tag": "机构型"
-   },
-   {
-    "name": "元件",
-    "zdf": "-2.94",
-    "main_net5d": -80.5,
-    "retail_net": 19.6,
+    "name": "地面兵装Ⅱ",
+    "zdf": "5.96",
+    "main_net5d": -2.0,
+    "retail_net": -7.6,
     "tag": "游资型"
    },
    {
     "name": "出版",
-    "zdf": "-0.71",
-    "main_net5d": 14.5,
-    "retail_net": -1.5,
-    "tag": "机构型"
-   },
-   {
-    "name": "证券Ⅱ",
-    "zdf": "0.51",
-    "main_net5d": -16.1,
-    "retail_net": -2.2,
-    "tag": "游资型"
+    "zdf": "-0.01",
+    "main_net5d": 19.2,
+    "retail_net": 2.5,
+    "tag": "混合"
    },
    {
     "name": "半导体",
-    "zdf": "-2.71",
-    "main_net5d": -310.8,
-    "retail_net": 69.4,
+    "zdf": "-0.45",
+    "main_net5d": -223.6,
+    "retail_net": -39.0,
+    "tag": "游资型"
+   },
+   {
+    "name": "汽车零部件",
+    "zdf": "2.25",
+    "main_net5d": -37.1,
+    "retail_net": -19.4,
     "tag": "游资型"
    }
   ]
@@ -81,13 +73,13 @@
    "堆量模式": 15
   },
   "leaders": {
-   "堆量模式": 10
+   "堆量模式": 6
   },
   "pullbacks": {
    "堆量模式": 2
   },
   "gpoints": {
-   "堆量模式": 1
+   "堆量模式": 2
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
