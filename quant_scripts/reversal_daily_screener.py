@@ -7,6 +7,8 @@
   S1 突破2倍反转数值 : MACD > 2×0.618×BL_DEEP（BL_DEEP=死叉以来最深绿柱）且 MACD 上升
   S2 回调不破1倍反转数值: 回调深 = |LLV(MACD, 突破以来)| < 0.618 × HHV(MACD, 金叉以来)
   信号 = S1 已发生 且 S2 成立 且 死叉之后（SCB>0 且 JCB>SCB）；现价 < 上限（默认10元）
+  【2026-10-17 新增】突破段中大阳线：突破日所属「金叉」→「突破日」整段内，须出现至少一根
+     涨幅 ≥ --big-yang-pct（默认5%）的阳线（涨停板自然满足）；仅日线生效（周/月线保持原口径）
 
 跟踪轮动（v2 新增）：
   · 每次运行把命中标的并入**跟踪池**（data/reversal_pool_{tf}.json），跨日/跨周保留
@@ -33,6 +35,7 @@ _W = shutil.which("westock-data-skillhub")
 WESTOCK = _W if _W else "npx -y westock-data-skillhub@1.0.3"
 BATCH = 250
 K = 0.618
+BIG_YANG_PCT = 0.05    # 突破段「中大阳线」涨幅阈值（>=5%；涨停板自然满足）
 POOL_DIR = os.path.join(ROOT, "data")
 MAXGAP = {"day": 45, "week": 30, "month": 18}   # 最大跟踪期（根）
 
@@ -51,6 +54,16 @@ def _fetch_layer(args, timeout):
     except Exception:
         pass
     return ""
+
+
+def _westock_run(args, timeout=300):
+    """本地 westock CLI 兜底（fetch.raw 不可用/空返回时）。"""
+    cmd = (WESTOCK.split() if isinstance(WESTOCK, str) else [WESTOCK]) + list(args)
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        return r.stdout or ""
+    except Exception:
+        return ""
 
 
 def ema(series, n):
@@ -80,8 +93,10 @@ def fetch_batch(codes, period="day", limit=250):
     for i in range(0, len(codes), BATCH):
         batch = codes[i:i + BATCH]
         try:
-            _out = _fetch_layer(["kline", ",".join(batch), "--period", str(period),
-                                 "--limit", str(limit)], 300)
+            _args = ["kline", ",".join(batch), "--period", str(period), "--limit", str(limit)]
+            _out = _fetch_layer(_args, 300)
+            if not _out:
+                _out = _westock_run(_args, 300)
             rm = {}
             for ln in _out.splitlines():
                 m = re.match(r"\|\s*([a-z]{2}\d{6})\s*\|\s*([\d-]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)", ln)
@@ -96,9 +111,9 @@ def fetch_batch(codes, period="day", limit=250):
     return out
 
 
-def eval_state(rows, lookback_tp=120):
-    """对一只股票评估当前状态: 是否'突破2倍后回调不破1倍'
-    返回 dict(tp_date,tp_val,red_high,pullback,line,valid,gap,last_date,last_close) 或 None"""
+def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT):
+    """对一只股票评估当前状态: 是否'突破2倍后回调不破1倍'，且突破段含中大阳线
+    返回 dict(tp_date,tp_val,red_high,pullback,line,valid,big_yang,by_date,by_gain,gap,last_date,last_close) 或 None"""
     if len(rows) < 80:
         return None
     closes = [r[2] for r in rows]
@@ -133,10 +148,22 @@ def eval_state(rows, lookback_tp=120):
     m_low = min(seg)                      # 自突破以来 MACD 最低值（可为负）
     deep = abs(m_low)
     line = K * max(macd[max(0, i - int(JCB[i])):i + 1])
+    # ── 需求(2026-10-17)：突破段须出现「中大阳线」（涨幅>=big_yang_pct，涨停板自然满足）──
+    #    范围 = 突破日所属「金叉」→「突破日」整段（对应底部反转的启动过程）；by_* 记录涨幅最大的那根阳线
+    lj_tp = tp_bar - (int(JCB[tp_bar]) if JCB[tp_bar] is not None else 0)
+    by_idx, by_gain = None, 0.0
+    for j in range(max(1, lj_tp), tp_bar + 1):
+        if rows[j][2] > rows[j][1]:                       # 阳线（收 > 开）
+            g = rows[j][2] / rows[j - 1][2] - 1
+            if g >= big_yang_pct and g > by_gain:
+                by_idx, by_gain = j, g
+    big_yang = by_idx is not None
     return {"tp_date": rows[tp_bar][0], "tp_val": round(2 * K * bl, 2),
             "red_high": round(red_high, 2), "pullback": round(deep, 2),
             "line": round(line, 2), "m_low": round(m_low, 2),
             "angle": ("改1" if m_low > 0 else "改2"), "valid": deep < line,   # 窄口径：仅保留「回踩幅度 < 0.618×金叉以来最高红柱」(回踩确认)
+            "big_yang": big_yang, "by_date": (rows[by_idx][0] if by_idx is not None else ""),
+            "by_gain": round(by_gain * 100, 1),
             "gap": i - tp_bar, "last_date": rows[-1][0], "last_close": round(closes[-1], 2)}
 
 
@@ -172,12 +199,15 @@ def main():
     ap.add_argument("--pool-file", default="")
     ap.add_argument("--window", type=int, default=0, help="新信号检测窗口(根)；默认 day=5 / week=2")
     ap.add_argument("--max-price", type=float, default=10.0)
+    ap.add_argument("--big-yang-pct", type=float, default=5.0,
+                    help="突破段「中大阳线」涨幅阈值(%)，仅日线生效（默认5.0）")
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
     tf = a.tf
     win = a.window or (5 if tf == "day" else 2)
     only2 = tf in ("week", "month")   # 周线/月线：只保留「改2（死叉回调·不破水下反转数值线）」
     nowin = tf in ("week", "month")   # 周线/月线：取消「新信号窗口」，凡当前结构构成改2即纳入
+    req_bigyang = (tf == "day")       # 「突破段含中大阳线」条件仅作用于日线（2026-10-17 需求）
     period, limit = {"day": ("day", 250), "week": ("week", 130), "month": ("month", 124)}[tf]
 
     pool = load_pool(a.pool, a.pool_file)
@@ -203,7 +233,7 @@ def main():
         rows = rows_map.get(code)
         if not rows:
             continue
-        st = eval_state(rows)
+        st = eval_state(rows, big_yang_pct=(a.big_yang_pct / 100.0 if req_bigyang else 0.0))
         cur = tracked.get(code)
         # 数据时效（>15天视为停牌/退市）
         if st:
@@ -233,7 +263,7 @@ def main():
                 removed.append({**cur, "code": code, "name": name, "reason": "超过跟踪期"})
                 tracked.pop(code, None)
             else:
-                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "angle", "gap", "last_close", "last_date")})
+                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "angle", "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")})
                 cur["name"] = name
                 kept.append(cur)
         else:
@@ -241,6 +271,7 @@ def main():
             #   日线：须在「新信号窗口」内（gap ≤ win）
             #   周线/月线（only2+nowin）：取消窗口，凡当前结构构成「改2」即纳入跟踪
             ok_new = (bool(st) and st["valid"] and st["last_close"] < a.max_price
+                      and (not req_bigyang or st.get("big_yang"))
                       and (not only2 or st["angle"] == "改2")
                       and (nowin or st["gap"] <= win))
             if ok_new:
@@ -307,7 +338,7 @@ def main():
          (f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 现价 < {a.max_price:g}元" if only2
           else f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 新信号窗口 {win} 根{lbl} ｜ 现价 < {a.max_price:g}元"),
          (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
-          else f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）"),
+          else f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段（金叉→突破）须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足）**"),
          f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出", "",
          f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**",
          f"> 📊 入池后历史胜率：{perf_line} ｜ 出池结算（跌破等）：{_agg(10, True)[0]} / 均值 {_agg(10, True)[1]}（n={_agg(10, True)[2]}）", ""]
@@ -318,15 +349,16 @@ def main():
             L.append("")
             return
         cols = ["代码", "名称"] + (["入池日"] if with_first else []) + \
-               ["最新日期", "最新价", "角度", "突破日", "突破2倍值", "回调深", "不破线", "距突破"] + \
+               ["最新日期", "最新价", "角度", "突破日", "突破段阳线", "突破2倍值", "回调深", "不破线", "距突破"] + \
                (["移除原因"] if with_reason else [])
         L.append("| " + " | ".join(cols) + " |")
-        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "移除原因") else "--:" for c in cols) + "|")
+        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "突破段阳线", "移除原因") else "--:" for c in cols) + "|")
         for s in rows:
             cells = [s["code"], s["name"]]
             if with_first:
                 cells.append(s.get("first_date", ""))
-            cells += [s.get("last_date", ""), s.get("last_close", ""), s.get("angle", ""), s.get("tp_date", ""),
+            _by = f"{s.get('by_date','')} +{s.get('by_gain',0):.1f}%" if s.get("by_date") else "—"
+            cells += [s.get("last_date", ""), s.get("last_close", ""), s.get("angle", ""), s.get("tp_date", ""), _by,
                       f"{float(s.get('tp_val', 0)):+.2f}", f"{float(s.get('pullback', 0)):.2f}",
                       f"{_line_signed(s):+.2f}", s.get("gap", "")]
             if with_reason:
@@ -368,7 +400,8 @@ def main():
             if added:
                 P += ["", f"### 🆕 新增（{len(added)}）"]
                 for s in sorted(added, key=lambda x: x["gap"])[:12]:
-                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{s.get('angle','')}｜突破{s['tp_date']}｜回调{s['pullback']}<{s['line']}")
+                    _by = f"｜阳线{s.get('by_date','')} +{s.get('by_gain',0):.1f}%" if s.get('by_date') else ""
+                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{s.get('angle','')}｜突破{s['tp_date']}{_by}｜回调{s['pullback']}<{s['line']}")
                 if len(added) > 12:
                     P.append(f"- …等共 {len(added)} 只（完整见知识库报告）")
             if removed:
