@@ -205,8 +205,77 @@ def safety_score():
     return info["raw"] if info else None
 
 
+# ══════════════════════════ accessor：rsv_strength（P1）══════════════════════════
+def rsv_info():
+    d = load("rsv_strength")
+    return d if isinstance(d, dict) else None
+
+
+def rsv_lists():
+    """{launch,hold,exit}（各为 list）；缺失返回空 list。"""
+    d = rsv_info() or {}
+    return {k: (d.get(k) or []) for k in ("launch", "hold", "exit")}
+
+
+def rsv_launch():
+    return rsv_lists()["launch"]
+
+
+# ══════════════════════════ accessor：信号仲裁 arbiter（P1）══════════════════════════
+def arb_info():
+    d = load("arbiter")
+    return d if isinstance(d, dict) else None
+
+
+def arb_ranked():
+    """统一优先级排序后的候选清单。"""
+    return (arb_info() or {}).get("ranked") or []
+
+
+def arb_operations():
+    return (arb_info() or {}).get("operations") or {}
+
+
+def arb_counts():
+    return (arb_info() or {}).get("counts") or {}
+
+
+def arb_sources():
+    return (arb_info() or {}).get("sources") or {}
+
+
+def arb_date():
+    return (arb_info() or {}).get("date")
+
+
+# ══════════════════════════ accessor：yearline_breadth（P1）══════════════════════════
+def yearline_info():
+    """年线广度 {raw,date,src}；ratio_pct 缺失回退 ratio。"""
+    d = load("yearline")
+    if not isinstance(d, dict):
+        return None
+    v = _num(d.get("ratio_pct"))
+    if v is None:
+        v = _num(d.get("ratio"))
+    if v is None:
+        return None
+    return {"raw": v, "date": _norm_date(d.get("date")), "src": "yearline_breadth"}
+
+
+def yearline_ratio():
+    i = yearline_info()
+    return i["raw"] if i else None
+
+
+def yearline_level():
+    return get("yearline", "level")
+
+
 if __name__ == "__main__":
     print("safety_score     =", safety_score())
     print("width_raw        =", width_raw())
     print("width_level      =", width_level())
     print("width_normalized =", width_normalized())
+    print("rsv launch/hold/exit =", {k: len(v) for k, v in rsv_lists().items()})
+    print("arb ranked n     =", len(arb_ranked()), "| date =", arb_date())
+    print("yearline ratio   =", yearline_ratio())
