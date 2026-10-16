@@ -104,7 +104,7 @@ def sector_res()     -> dict  | None   # 板块共振 主结构
 
 ## 六、前置项与风险
 
-- **前置**：先决策 `skills_backup/盘前市场报告/scripts/*`（6 个副本消费者）**去留**——否则抽象被副本稀释。
+- ✅ **前置已处理（2026-10-16）**：`skills_backup/` 确认为**归档目录**（新增 `skills_backup/README.md`），并从 `sync_hot_emotion.py` 移除指向它的**死兜底路径**；语义消费者统计排除该目录（副本不再稀释分支 B）。唯一 CI 真依赖 `盘前市场报告/scripts/market_charts.py` 已在 README 标注（可选后续解耦）。skills_backup 由 guard_selfcheck/guard.py 守护，**不删除**。
 - **风险**：本体系有「改脚本引回归」教训 → 本层**只读、不改业务**；逐个切换 + 影子对拍 + 当天 CI。
 - **回滚**：accessor 失败一律返回 `None`，消费者保留原逻辑兜底（渐进切换期并存），可随时回退。
 - **边界**：不做字段级强类型校验、不做自动 schema 断言（留给后续「字段契约审计」扩展 `param_contract_audit`）。
