@@ -5,6 +5,21 @@
 
 ---
 
+## v2.39 (2026-10-16)
+
+### 取数层 阶段 3 · B 类残留清理
+
+- 把 15 个「已 import fetch 但仍自建 westock」的脚本取数函数迁入 `fetch.raw`（插入式，保留兜底）：
+  `beast_screener` `gen_premarket_report` `gen_review_report` `inbull_scan` `limitup_concept_rank`
+  `month_frame` `monthly_macd_monitor` `portfolio_risk` `rsv_strength` `scan_123_2b` `top_signal`
+  `xihu_breadth` `xihu_rsv` `wangzhe_track` `wangzhe_funnel`（commit 26432cea…e93031ed）
+- wangzhe_track/wangzhe_funnel：新增模块级 `_fp(args,timeout)` 助手（fetch-first），替换 5 处内联 subprocess
+- **有意保留** `cross_source_check.westock_close`（源自检基准，直连原始 westock）
+- 验证：AST OK + 沙箱冒烟全走统一层（kline 349B / `_run_kline` 2×3 bars / `_fb` 2×3 bars）
+- 更新 `docs/取数层迁移进度.md`（B 类残留 16 → 1）
+
+---
+
 ## v2.38 (2026-10-16)
 
 ### 取数层 阶段 3 · 批次 4（其余 A 类收口）
