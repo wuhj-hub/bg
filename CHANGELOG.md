@@ -5,6 +5,20 @@
 
 ---
 
+## v2.46 (2026-10-17)
+
+### 体系自检 · 归因层（B1）
+
+- 新增 `quant_scripts/attrib.py`：把自检的「X 失败」升级为「X 失败，**疑似原因 Y**」——**只建议、不自动改**
+  - 读 artifact_audit / pipeline_audit / silent_failure / param_contract（+cross_source）产物
+  - 规则 + **跨信号关联**（如"产物停更"×"同期 run 异常" → 归因到上游 run）
+  - 每条附**证据来源**与**置信度**（高/中/低）；🔴/🟠/🟡 分级
+  - 产物 `outputs/归因_latest.md` + `outputs/attrib_latest.json`
+- `selfcheck_daily.yml`：新增「⑤ 归因分析」步；归因产物纳入提交清单 + 微信告警 + KB 上传
+- 边界：**自动修复（B2）暂缓**——避免误修制造新的静默故障
+
+---
+
 ## v2.45 (2026-10-16)
 
 ### 分支 B · P2 编码 + 收尾（qiankun_a / 四维共振 / 板块共振 + 指标注册表）
