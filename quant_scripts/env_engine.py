@@ -54,11 +54,13 @@ try:
     sys.path.insert(0, HERE)
     from metrics import (WIDTH_ANCHORS as _WIDTH_ANCHORS,
                          safety_score_info as _safety_score_info,
-                         width_info as _width_info)
+                         width_info as _width_info,
+                         yearline_info as _yearline_info)
 except Exception:
     _WIDTH_ANCHORS = None
     _safety_score_info = None
     _width_info = None
+    _yearline_info = None
 
 # ── 权重（§5.3 默认组合，加总=1.00）─────────────────────────────
 WEIGHTS = {
@@ -257,6 +259,14 @@ def load_breadth():
 
 
 def load_structure():
+    # 2026-10-16 分支B P1：取数收口到 metrics.yearline_info()（回退原 find_json 逻辑）
+    if _yearline_info is not None:
+        try:
+            r = _yearline_info()
+            if r:
+                return r
+        except Exception:
+            pass
     p = find_json("yearline_breadth_latest.json")
     if p:
         try:
