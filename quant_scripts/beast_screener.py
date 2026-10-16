@@ -20,6 +20,20 @@ import numpy as np
 #              工具函数
 # ============================================================
 def cli(cmd: str) -> str:
+    # 2026-10-16 阶段3·B类残留：插入式迁移——优先统一取数层 fetch.raw，失败回退本地 npx
+    try:
+        import sys as _s, os as _o
+        _pd = _o.path.dirname(_o.path.abspath(__file__))
+        _qp = _o.path.join(_pd, 'quant_scripts')
+        for _c in (_pd, _qp):
+            if _c not in _s.path:
+                _s.path.insert(0, _c)
+        from fetch import raw as _fraw
+        _r = _fraw(cmd, timeout=120)
+        if _r and _r.strip() and '执行失败' not in _r:
+            return _r
+    except Exception:
+        pass
     full_cmd = f"npx -y westock-data-skillhub@1.0.3 {cmd}"
     try:
         r = subprocess.run(full_cmd, shell=True, capture_output=True,
