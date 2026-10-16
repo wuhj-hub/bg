@@ -271,7 +271,45 @@ def yearline_level():
     return get("yearline", "level")
 
 
-if __name__ == "__main__":
+# ══════════════════════════ accessor：qiankun_a（P2）══════════════════════════
+def qiankun_info():
+    d = load("qiankun_a")
+    return d if isinstance(d, dict) else None
+
+
+def qiankun_stocks():
+    return (qiankun_info() or {}).get("stocks") or []
+
+
+# ══════════════════════════ accessor：四维共振 quad（P2）══════════════════════════
+def quad_info():
+    d = load("quad")
+    return d if isinstance(d, dict) else None
+
+
+def quad_stocks():
+    return (quad_info() or {}).get("stocks") or []
+
+
+def quad_total():
+    return (quad_info() or {}).get("total")
+
+
+# ══════════════════════════ accessor：板块共振 sector_res（P2）══════════════════════════
+def sector_res_info():
+    d = load("sector_res")
+    return d if isinstance(d, dict) else None
+
+
+def sector_res_boards():
+    return (sector_res_info() or {}).get("resonance_boards") or []
+
+
+def sector_res_zhongjun():
+    return (sector_res_info() or {}).get("zhongjun_candidates") or []
+
+
+
     print("safety_score     =", safety_score())
     print("width_raw        =", width_raw())
     print("width_level      =", width_level())
@@ -279,3 +317,6 @@ if __name__ == "__main__":
     print("rsv launch/hold/exit =", {k: len(v) for k, v in rsv_lists().items()})
     print("arb ranked n     =", len(arb_ranked()), "| date =", arb_date())
     print("yearline ratio   =", yearline_ratio())
+    print("qiankun stocks   =", len(qiankun_stocks()))
+    print("quad stocks      =", len(quad_stocks()))
+    print("sector boards    =", len(sector_res_boards()))
