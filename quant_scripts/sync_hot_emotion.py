@@ -18,12 +18,12 @@ import urllib.parse
 
 REPO = "wuhj-hub/bg"
 BRANCH = "main"
-# 候选远程路径：仓库根（workflow 每日提交的最新）→ skills_backup 备份目录（兜底）
+# 候选远程路径：仓库根（workflow 每日提交的最新）
+# ⚠️ 2026-10-16：移除 skills_backup 兜底路径（该 outputs 目录在仓库中不存在=死路径，
+#    且把"备份"当数据源与 canonical 单一来源原则冲突）。
 REMOTE_CANDIDATES = [
     "hot_emotion_latest.json",
-    "skills_backup/盘前市场报告/scripts/outputs/hot_emotion_latest.json",
     "hot_emotion_history.json",
-    "skills_backup/盘前市场报告/scripts/outputs/hot_emotion_history.json",
 ]
 LOCAL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "outputs")
 
