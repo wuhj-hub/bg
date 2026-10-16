@@ -29,6 +29,19 @@ MIN_DAYS = 3       # 连续在榜天数门槛
 
 def load_latest_board():
     """读当日板块共振 → 强度榜（按 strength 排序取前TOP_N）"""
+    # 2026-10-16 分支B P2：优先指标只读层 metrics（失败回退原候选路径）
+    try:
+        import sys as _sys, os as _os
+        _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+        from metrics import sector_res_info as _sr_info
+        _d0 = _sr_info()
+    except Exception:
+        _d0 = None
+    if isinstance(_d0, dict) and _d0.get("resonance_boards"):
+        _b = _d0["resonance_boards"]
+        _r = sorted(_b, key=lambda b: -b.get("strength", 0))[:TOP_N]
+        _dt = _d0.get("date", datetime.now().strftime("%Y-%m-%d"))
+        return _dt, [b["name"] for b in _r]
     for p in ("板块共振_latest.json", "outputs/板块共振_latest.json",
               "../板块共振_latest.json", "../outputs/板块共振_latest.json",
               "/sandbox/workspace/github_bg/板块共振_latest.json",
