@@ -54,10 +54,27 @@ def fetch_weekly_batch(codes):
     for i in range(0, len(codes), 100):
         batch = codes[i:i + 100]
         try:
-            r = subprocess.run(f"{WESTOCK} kline {','.join(batch)} --period week --limit 130",
-                               shell=True, capture_output=True, text=True, timeout=180)
+            _txt = None
+            # 2026-10-16 阶段3·批次4b：插入式迁移——优先统一取数层 fetch.raw，失败回退本地 npx
+            try:
+                import sys as _s, os as _o
+                _pd = _o.path.dirname(_o.path.abspath(__file__))
+                _qp = _o.path.join(_pd, "quant_scripts")
+                for _c in (_pd, _qp):
+                    if _c not in _s.path:
+                        _s.path.insert(0, _c)
+                from fetch import raw as _fraw
+                _r0 = _fraw(f"kline {','.join(batch)} --period week --limit 130", timeout=180)
+                if _r0 and "执行失败" not in _r0:
+                    _txt = _r0
+            except Exception:
+                pass
+            if _txt is None:
+                r = subprocess.run(f"{WESTOCK} kline {','.join(batch)} --period week --limit 130",
+                                   shell=True, capture_output=True, text=True, timeout=180)
+                _txt = r.stdout
             rows_map = {}
-            for ln in r.stdout.splitlines():
+            for ln in _txt.splitlines():
                 m = re.match(r"\|\s*([a-z]{2}\d{6})\s*\|\s*([\d-]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)", ln)
                 if m:
                     sym = m.group(1)
