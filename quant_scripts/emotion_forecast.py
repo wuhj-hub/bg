@@ -43,6 +43,14 @@ ADVICE = {
 }
 
 def cli(cmd, timeout=180):
+    # 2026-10-16 阶段3·批次2：插入式迁移——优先统一取数层 fetch.raw，失败回退本地 npx
+    try:
+        from fetch import raw as _fraw
+        _o = _fraw(cmd, timeout=timeout)
+        if _o and _o.strip() and "执行失败" not in _o:
+            return _o
+    except Exception:
+        pass
     full = WESTOCK + cmd.split()
     for attempt in range(3):
         try:
