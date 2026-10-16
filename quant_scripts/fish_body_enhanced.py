@@ -435,6 +435,23 @@ def detect_fish_patterns(tech, multi_score, resonance, kline_rows=None):
 def load_rsg_map():
     """读取 rsv_strength_latest.json 的 RSG 标注 → {code: {rsg_dev, rsg_strong}}；失败返回空"""
     rsg = {}
+    # 2026-10-16 分支B P1：取数收口到指标只读层 metrics（失败回退原路径逻辑）
+    try:
+        import sys as _sys, os as _os
+        _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+        from metrics import rsv_lists as _rsv_lists
+    except Exception:
+        _rsv_lists = None
+    if _rsv_lists is not None:
+        try:
+            _L = _rsv_lists()
+            for r in (_L["launch"] + _L["hold"] + _L["exit"]):
+                if r.get("code"):
+                    rsg[r["code"]] = {"rsg_dev": r.get("rsg_dev"),
+                                      "rsg_strong": bool(r.get("rsg_strong"))}
+            return rsg
+        except Exception:
+            rsg = {}
     for p in ("outputs/rsv_strength_latest.json", "rsv_strength_latest.json",
               "quant_scripts/outputs/rsv_strength_latest.json"):
         if os.path.exists(p):
