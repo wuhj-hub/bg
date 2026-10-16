@@ -5,6 +5,19 @@
 
 ---
 
+## v2.45 (2026-10-16)
+
+### 分支 B · P2 编码 + 收尾（qiankun_a / 四维共振 / 板块共振 + 指标注册表）
+
+- `quant_scripts/metrics.py` 增补 accessor：`qiankun_info/stocks`、`quad_info/stocks/total`、`sector_res_info/boards/zhongjun`（f7c5595b07）
+- 消费者迁移：`signal_arbiter.load_qiankun` + `load_four_dim`（13c67393bc）、`sector_divergence.load_latest_board`（a155c8e59b）
+- **影子对拍**：三处旧 vs 新 → 0 差异（qiankun/four_dim/sector_board）
+- 新增 `docs/指标注册表_2026-10-16.md`：把「指标→生产者→关键字段→消费者→accessor」固化为显式契约
+- 修复隐患：P2 的 signal_arbiter 改从**当前仓库版**重建（避免覆盖 P1 的 load_rsv 迁移）
+- 分支 B 三批（P0/P1/P2）完成；未迁项（intraday_monitor 内联块 / helper 读取者 / 长尾）已登记
+
+---
+
 ## v2.44 (2026-10-16)
 
 ### 分支 B · P1 编码（rsv_strength / 信号仲裁 / yearline 迁入 metrics）
