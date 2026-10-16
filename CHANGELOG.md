@@ -5,6 +5,20 @@
 
 ---
 
+## v2.43 (2026-10-16)
+
+### 分支 B · P0 编码（指标只读访问层 metrics.py + env dogfood）
+
+- 新增 `quant_scripts/metrics.py`：指标**只读访问层**（`report_io` 的姊妹）
+  - `load(name)` / `get(name,*keys)`：多副本交 `report_io` 选最新；缺失一律 `None`（不假装中性）
+  - accessor：`safety_score()`（收口猛兽「安全评分」正则 + premarket 回退）、`width_raw/level/normalized()`（收口 market_width 的「50≈中性」下压锚点）
+  - 登记 top-8 指标；rsv_strength/arbiter/qiankun_a/yearline/quad/sector_res 留待 P1/P2
+- `quant_scripts/env_engine.py` dogfood：`load_index_trend`→`metrics.safety_score_info()`、`load_width`→`metrics.width_info()`、`ANCHORS["width"]`→`metrics.WIDTH_ANCHORS`（原逻辑保留为兜底）
+- **影子对拍**：同一批真实产物，旧逻辑 vs 新 → **0 差异**（temp 33.7 / 6 子分全等）
+- 只读、不改业务逻辑；失败回退原实现
+
+---
+
 ## v2.42 (2026-10-16)
 
 ### 副本治理 · skills_backup 归档定位明确化
