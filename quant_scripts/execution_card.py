@@ -275,18 +275,29 @@ def load_pool_candidates(min_star=1):
     """从当日信号池读候选：信号仲裁_latest.json 的 ranked（★ 及以上，排除"观察"）
     返回 [{code,name,signal,from_pool,pool_date}]
     """
-    for pth in ("outputs/信号仲裁_latest.json", "信号仲裁_latest.json",
-                "/sandbox/workspace/github_bg/outputs/信号仲裁_latest.json",
-                "/sandbox/workspace/github_bg/信号仲裁_latest.json"):
-        if not os.path.exists(pth):
-            continue
-        try:
-            d = json.load(open(pth, encoding="utf-8"))
-        except Exception:
-            continue
-        ranked = d.get("ranked") or []
-        if not ranked:
-            continue
+    # 2026-10-16 分支B P1：取数收口到指标只读层 metrics（失败/无 ranked 回退原候选路径）
+    d = None
+    try:
+        import sys as _sys, os as _os
+        _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+        from metrics import arb_info as _arb_info
+        d = _arb_info()
+    except Exception:
+        d = None
+    if not (isinstance(d, dict) and (d.get("ranked") or [])):
+        for pth in ("outputs/信号仲裁_latest.json", "信号仲裁_latest.json",
+                    "/sandbox/workspace/github_bg/outputs/信号仲裁_latest.json",
+                    "/sandbox/workspace/github_bg/信号仲裁_latest.json"):
+            if not os.path.exists(pth):
+                continue
+            try:
+                d = json.load(open(pth, encoding="utf-8"))
+            except Exception:
+                continue
+            if d.get("ranked"):
+                break
+    ranked = (d or {}).get("ranked") or []
+    if ranked:
         names = load_names()
         out = []
         for r in ranked:
