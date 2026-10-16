@@ -5,6 +5,17 @@
 
 ---
 
+## v2.42 (2026-10-16)
+
+### 副本治理 · skills_backup 归档定位明确化
+
+- 结论：`skills_backup/`（14 个已发布技能的仓库内备份）**不删除**——由 `guard_selfcheck.py` / `quant_scripts/guard.py` 每日守护完整性
+- 新增 `skills_backup/README.md`：声明「归档目录、非线上运行目录」；标注唯一 CI 例外 `盘前市场报告/scripts/market_charts.py`
+- `quant_scripts/sync_hot_emotion.py`：移除指向 `skills_backup/.../outputs/` 的**死兜底路径**（该目录在仓库中不存在），回到 canonical 单一来源
+- 效果：`skills_backup/` 不再计入指标「语义消费者」统计（分支 B 范围不受副本稀释）
+
+---
+
 ## v2.41 (2026-10-16)
 
 ### 分支 B · 指标层标准化（对账 + 设计定稿，docs）
