@@ -5,6 +5,20 @@
 
 ---
 
+## v2.44 (2026-10-16)
+
+### 分支 B · P1 编码（rsv_strength / 信号仲裁 / yearline 迁入 metrics）
+
+- `quant_scripts/metrics.py` 增补 accessor：`rsv_info/rsv_lists/rsv_launch`、`arb_info/arb_ranked/arb_operations/arb_counts/arb_sources/arb_date`、`yearline_info/yearline_ratio/yearline_level`（bd42ab80a8）
+- 消费者迁移（取数收口到 metrics，原逻辑保留兜底）：
+  - rsv：`beast_screener.load_rsg_map`(2cd9ae1a87) · `fish_body_enhanced.load_rsg_map`(0863c1ffd5) · `signal_arbiter.load_rsv`(ba953836dc)
+  - arbiter：`execution_card.load_pool_candidates`(3635b4f3e7)
+  - yearline：`env_engine.load_structure`(7bd09d2cc2)
+- **影子对拍**：逐个函数 旧 vs 新 → **全部 0 差异**（load_rsg_map×2 / load_rsv / load_pool_candidates / load_structure）
+- 有意未迁：`intraday_monitor.load_dynamic_pool` 的 arbiter 子块（多源函数内联，动手风险 > 收益）→ 留 P2
+
+---
+
 ## v2.43 (2026-10-16)
 
 ### 分支 B · P0 编码（指标只读访问层 metrics.py + env dogfood）
