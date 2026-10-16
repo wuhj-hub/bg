@@ -348,7 +348,14 @@ def load_123_2b():
 
 def load_rsv():
     """RSV均信号（腰缠万贯）：launch启动+2 / hold持有+1 / exit离场-1"""
-    d = load_json(["outputs/rsv_strength_latest.json", "rsv_strength_latest.json"])
+    # 2026-10-16 分支B P1：取数收口到指标只读层 metrics（失败回退 load_json）
+    try:
+        import sys as _sys, os as _os
+        _sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "quant_scripts"))
+        from metrics import rsv_info as _rsv_info
+        d = _rsv_info()
+    except Exception:
+        d = load_json(["outputs/rsv_strength_latest.json", "rsv_strength_latest.json"])
     out = {}
     if not d:
         return out
