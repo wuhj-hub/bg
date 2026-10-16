@@ -30,6 +30,14 @@ IDX = {
 
 
 def sh(args, timeout=420):
+    # 2026-10-16 阶段3·批次2：插入式迁移——优先统一取数层 fetch.raw，失败回退本地 npx
+    try:
+        from fetch import raw as _fraw
+        _o = _fraw(args, timeout=timeout)
+        if _o and "执行失败" not in _o:
+            return _o
+    except Exception:
+        pass
     for i in range(3):
         try:
             r = subprocess.run(f"{WESTOCK} {args}", shell=True, capture_output=True,
