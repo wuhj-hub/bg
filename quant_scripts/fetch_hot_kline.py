@@ -17,6 +17,20 @@ def norm(code):
 def fetch_batch(batch_codes, limit):
     """拉一批，返回文本。失败重试2次。"""
     codes = ','.join(norm(c) for c in batch_codes)
+    # 2026-10-16 阶段3·批次4b：插入式迁移——优先统一取数层 fetch.raw，失败回退本地 npx
+    try:
+        import sys as _s, os as _o
+        _pd = _o.path.dirname(_o.path.abspath(__file__))
+        _qp = _o.path.join(_pd, "quant_scripts")
+        for _c in (_pd, _qp):
+            if _c not in _s.path:
+                _s.path.insert(0, _c)
+        from fetch import raw as _fraw
+        _r = _fraw(['kline', codes, '--period', 'day', '--limit', str(limit)], timeout=120)
+        if _r and '执行失败' not in _r and 'SKILL_006' not in _r:
+            return _r
+    except Exception:
+        pass
     for attempt in range(3):
         try:
             r = subprocess.run(
