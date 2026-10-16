@@ -114,6 +114,6 @@ def sector_res()     -> dict  | None   # 板块共振 主结构
 ## 七、交付分阶段
 
 1. ✅ **P0（2026-10-16 完成）**：`metrics.py`（`804a05e906`）+ `width_normalized`/`safety_score` 两个 accessor + env_engine dogfood（`8598759021`）+ 影子对拍 **0 差异**。
-2. **P1**：rsv_strength / 信号仲裁 / yearline 三指标迁移。
+2. ✅ **P1（2026-10-16 完成）**：rsv_strength / 信号仲裁 / yearline 三指标 accessor + 5 处消费者迁移（影子对拍 0 差异）。
 3. **P2**：qiankun_a / quad / sector_res。
 4. **收尾**：产出显式「指标注册表」（名→生产者→schema→消费者）并入 `docs/`，补上契约这一环。
