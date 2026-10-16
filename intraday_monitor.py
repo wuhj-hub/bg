@@ -65,6 +65,19 @@ def log(msg):
     print(f"[{ts}] {msg}", flush=True)
 
 def cli(cmd, timeout=45):
+    # 2026-10-16 阶段3·批次3：插入式迁移——优先统一取数层 fetch.raw
+    # 注意：本脚本在仓库根，fetch.py 在 quant_scripts/ → 需补 sys.path（根脚本取数层坑）
+    try:
+        import sys as _s, os as _o
+        _p = _o.path.join(_o.path.dirname(_o.path.abspath(__file__)), "quant_scripts")
+        if _p not in _s.path:
+            _s.path.insert(0, _p)
+        from fetch import raw as _fraw
+        _r = _fraw(cmd, timeout=timeout)
+        if _r and _r.strip():
+            return _r
+    except Exception:
+        pass
     full = f"npx -y westock-data-skillhub@1.0.3 {cmd}"
     try:
         r = subprocess.run(full, shell=True, capture_output=True, text=True, timeout=timeout)
