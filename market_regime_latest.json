@@ -1,7 +1,7 @@
 {
  "date": "20261016",
  "verdict": "熊市",
- "score": 0.283,
+ "score": 0.301,
  "long": {
   "score": 0.4,
   "state": "纠缠"
@@ -15,14 +15,14 @@
   "state": "弱势向下"
  },
  "width": {
-  "above250": 0.16,
-  "above60": 0.303,
-  "above20": 0.214,
-  "up_ratio": 0.63
+  "above250": 0.166,
+  "above60": 0.305,
+  "above20": 0.215,
+  "up_ratio": 0.629
  },
  "emotion": {
-  "limit_up": 43,
-  "limit_down": 8
+  "limit_up": 55,
+  "limit_down": 12
  },
  "indices": [
   {
@@ -134,5 +134,5 @@
    "短分": 0.0
   }
  ],
- "n_stocks": 2308
+ "n_stocks": 3001
 }
