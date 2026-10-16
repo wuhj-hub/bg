@@ -5,6 +5,19 @@
 
 ---
 
+## v2.40 (2026-10-16)
+
+### env 环境唯一化 · 新增第 6 子分「入牛广度」
+
+- `quant_scripts/env_engine.py`：5 子分 → **6 子分**，新增 `inbull`（月线 5 力·入牛个股占比 %；源 `入牛时点_latest.json` 的 `breadth_pct`）
+- 权重重分配（加总 = 1.00）：index_trend .28 / emotion .20 / width .18 / breadth .16 / structure .09 / **inbull .09**
+- 锚点：`inbull [(0,0),(6,20),(12,40),(15,55),(20,72),(25,85),(40,98),(100,100)]`（对齐入牛三档 12/15/20 与回测中位 非牛 7.8 / 牛 39.1）
+- 新增背离 `structure_vs_inbull`（慢变量内部一致性）
+- 兼容性：消费方（gen_premarket_report / env_compare）均泛化读取，`subs` 增键向后兼容；缺失时 degraded + 权重按比例分摊
+- 验证：AST OK + 沙箱冒烟（含 inbull → 温度 47.9 / 缺失 → 50.4 + degraded）
+
+---
+
 ## v2.39 (2026-10-16)
 
 ### 取数层 阶段 3 · B 类残留清理
