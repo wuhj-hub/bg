@@ -3,7 +3,7 @@
 """
 env_engine.py —— 环境唯一化引擎（第 1 层 env）
 =========================================================
-把散落的 5 个「环境/温度」子分收敛为【一个 env 温度】，消除"同一问题多个答案"。
+把散落的 6 个「环境/温度」子分收敛为【一个 env 温度】，消除"同一问题多个答案"。
 定位：**仓位总闸**（温度 → position_cap）。
 设计文档：《env设计草案_第1层环境唯一化_2026-10-03.md》（知识库「报告」→「指标存档」）
 
@@ -23,6 +23,7 @@ env_engine.py —— 环境唯一化引擎（第 1 层 env）
   width       ← market_width_latest.json       score
   breadth     ← xihu_breadth_latest.json       qsg_pct（+ 新高/新低净额微调）
   structure   ← yearline_breadth_latest.json   ratio_pct（回退 market_regime_latest.json width.above250）
+  inbull      ← 入牛时点_latest.json           breadth_pct（月线5力·入牛个股占比；慢变量·数据月级）
   style       ← market_style_latest.json       （独立轴，**不进温度**）
   phase       ← 情绪预判_latest.json            （独立字段）
 
@@ -50,11 +51,12 @@ ROOT = os.path.normpath(os.path.join(HERE, ".."))
 
 # ── 权重（§5.3 默认组合，加总=1.00）─────────────────────────────
 WEIGHTS = {
-    "index_trend": 0.30,
-    "emotion":     0.22,
-    "width":       0.20,
-    "breadth":     0.18,
-    "structure":   0.10,
+    "index_trend": 0.28,
+    "emotion":     0.20,
+    "width":       0.18,
+    "breadth":     0.16,
+    "structure":   0.09,
+    "inbull":      0.09,   # 2026-10-16 新增第6子分「入牛广度」（月线5力·慢变量）
 }
 SUBS = list(WEIGHTS.keys())
 
@@ -71,6 +73,9 @@ ANCHORS = {
     "breadth":     [(0, 0), (6, 30), (13.2, 50), (20, 70), (36, 100)],
     # 年线广度（站上年线占比%）：20/40/60 为深度熊/熊/分化/牛 分档边界
     "structure":   [(0, 0), (20, 15), (40, 40), (60, 65), (100, 100)],
+    # 入牛广度（月线5力·入牛个股占比%）：档位 6/12=退潮, 15=中性→扩散, 20=牛市确认；
+    # 锚定回测中位（非牛 7.8 / 牛 39.1），把慢变量拉到 50≈中性
+    "inbull":      [(0, 0), (6, 20), (12, 40), (15, 55), (20, 72), (25, 85), (40, 98), (100, 100)],
 }
 
 # ── 温度分档 → 建议仓位上限（§7 f(E) 初值）────────────────────
@@ -252,12 +257,29 @@ def load_structure():
     return None
 
 
+def load_inbull():
+    """入牛广度（月线5力·入牛个股占比%）——第6子分（慢变量，数据月级）。"""
+    p = find_json("入牛时点_latest.json")
+    if not p:
+        return None
+    try:
+        d = _read(p)
+        v = _num(d.get("breadth_pct"))
+        if v is None:
+            return None
+        return {"raw": v, "date": norm_date(d.get("date")), "src": "inbull_scan",
+                "level": d.get("breadth_level"), "month": d.get("data_month")}
+    except Exception:
+        return None
+
+
 LOADERS = {
     "index_trend": load_index_trend,
     "emotion":     load_emotion,
     "width":       load_width,
     "breadth":     load_breadth,
     "structure":   load_structure,
+    "inbull":      load_inbull,
 }
 
 
@@ -348,6 +370,8 @@ def compose(use_gate=True):
         div["index_vs_emotion"] = round(subs["index_trend"]["mapped"] - subs["emotion"]["mapped"], 1)
     if "breadth" in subs and "width" in subs:
         div["breadth_vs_width"] = round(subs["breadth"]["mapped"] - subs["width"]["mapped"], 1)
+    if "structure" in subs and "inbull" in subs:
+        div["structure_vs_inbull"] = round(subs["structure"]["mapped"] - subs["inbull"]["mapped"], 1)
 
     out = {
         "data_date": pick_date(subs),
