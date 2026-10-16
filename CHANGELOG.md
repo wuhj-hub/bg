@@ -5,6 +5,17 @@
 
 ---
 
+## v2.36 (2026-10-16)
+
+### 取数层 阶段 3 · 批次 2（4 脚本迁入统一层）
+
+- 迁移 **4 脚本**（插入式，保留本地 npx 兜底；commit f8eac5b2 / ff2ab6eb / d49c7b85 / 85ac9d73）：
+  `data_guard._run` / `market_regime.sh` / `emotion_forecast.cli` / `kaipan_8.cli` → 委托 `fetch.raw`
+- 验证：4 脚本 AST OK；沙箱冒烟 4 函数均走统一层返回真数据（kline 349B、指数批量 24557B）
+- 更新 `docs/取数层迁移进度.md`（A 类完全未用 fetch 由 24 → 20）
+
+---
+
 ## v2.35 (2026-10-16)
 
 ### 取数层 阶段 3 · 批次 1（4 脚本迁入统一层）
