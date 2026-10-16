@@ -49,6 +49,17 @@ from datetime import datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, ".."))
 
+# ── 指标只读访问层（第2层·分支B P0 dogfood）：安全评分提取 + width 刻度修饰 收口 ──
+try:
+    sys.path.insert(0, HERE)
+    from metrics import (WIDTH_ANCHORS as _WIDTH_ANCHORS,
+                         safety_score_info as _safety_score_info,
+                         width_info as _width_info)
+except Exception:
+    _WIDTH_ANCHORS = None
+    _safety_score_info = None
+    _width_info = None
+
 # ── 权重（§5.3 默认组合，加总=1.00）─────────────────────────────
 WEIGHTS = {
     "index_trend": 0.28,
@@ -68,7 +79,7 @@ ANCHORS = {
     # hot_emotion：score 50 = 中性（叶岚校准，8/18 涨停80只→50分"中性"）→ 恒等
     "emotion":     [(0, 0), (25, 25), (40, 40), (55, 55), (70, 70), (100, 100)],
     # market_width：含最高 +30 赚钱效应加成，天然偏高 → 下压（40/55/70 为其震荡/偏强/强分档边界）
-    "width":       [(0, 0), (40, 35), (55, 50), (70, 70), (100, 100)],
+    "width":       _WIDTH_ANCHORS or [(0, 0), (40, 35), (55, 50), (70, 70), (100, 100)],
     # 西湖 QSG%：原文参考线 6 / 20；13.2 = 563 日历史均值（映射到 50）
     "breadth":     [(0, 0), (6, 30), (13.2, 50), (20, 70), (36, 100)],
     # 年线广度（站上年线占比%）：20/40/60 为深度熊/熊/分化/牛 分档边界
@@ -146,7 +157,14 @@ def _read(path):
 
 # ══════════════════════════ 子分加载器 ══════════════════════════
 def load_index_trend():
-    """猛兽大盘安全评分（index_trend）。"""
+    """猛兽大盘安全评分（index_trend）。取数/提取已收口到 metrics.safety_score_info()。"""
+    if _safety_score_info is not None:
+        try:
+            r = _safety_score_info()
+            if r:
+                return r
+        except Exception:
+            pass
     cands, seen = [], set()
     for base in (os.getcwd(), ROOT, os.path.join(ROOT, "outputs"), os.path.join(os.getcwd(), "outputs")):
         p = os.path.join(base, "quant_results_latest.json")
@@ -199,6 +217,13 @@ def load_emotion():
 
 
 def load_width():
+    if _width_info is not None:
+        try:
+            r = _width_info()
+            if r:
+                return r
+        except Exception:
+            pass
     p = find_json("market_width_latest.json")
     if not p:
         return None
