@@ -50,6 +50,14 @@ OK_RATIO = 0.5         # 成功率阈值（≥50% 视为数据源健康）
 
 
 def _run(args, timeout=40):
+    # 2026-10-16 阶段3·批次2：插入式迁移——优先统一取数层 fetch.raw，失败回退本地 npx
+    try:
+        from fetch import raw as _fraw
+        _o = _fraw(list(args), timeout=timeout)
+        if _o and _o.strip():
+            return _o
+    except Exception:
+        pass
     try:
         r = subprocess.run(WESTOCK + args, capture_output=True, text=True, timeout=timeout)
         return r.stdout or ""
