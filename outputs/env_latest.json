@@ -1,9 +1,9 @@
 {
- "data_date": "2026-10-15",
- "run_date": "2026-10-15",
- "temp": 29.1,
- "level": "冰点",
- "position_cap": 20,
+ "data_date": "2026-10-16",
+ "run_date": "2026-10-16",
+ "temp": 34.5,
+ "level": "偏冷",
+ "position_cap": 30,
  "subs": {
   "index_trend": {
    "raw": 7.8,
@@ -13,47 +13,47 @@
    "date": "2026-10-15"
   },
   "emotion": {
-   "raw": 74.0,
-   "score": 74.0,
+   "raw": 44.0,
+   "score": 44.0,
    "w": 0.22,
    "src": "hot_emotion",
-   "date": "2026-10-15"
+   "date": "2026-10-16"
   },
   "width": {
-   "raw": 38.4,
-   "score": 33.6,
+   "raw": 93.0,
+   "score": 93.0,
    "w": 0.2,
    "src": "market_width",
-   "date": "2026-10-15"
+   "date": "2026-10-16"
   },
   "breadth": {
-   "raw": 3.83,
-   "score": 14.2,
+   "raw": 3.99,
+   "score": 14.9,
    "w": 0.18,
    "src": "xihu_breadth",
-   "date": "2026-10-15"
+   "date": "2026-10-16"
   },
   "structure": {
-   "raw": 16.5,
-   "score": 12.4,
+   "raw": 16.4,
+   "score": 12.3,
    "w": 0.1,
    "src": "yearline_breadth",
-   "date": "2026-10-15"
+   "date": "2026-10-16"
   }
  },
  "style": {
-  "score": -7,
+  "score": -13,
   "label": "均衡市",
   "icon": "⚖️"
  },
  "phase": {
-  "label": "偏弱",
-  "limitup": 36,
-  "date": "2026-10-15"
+  "label": "中性",
+  "limitup": 55,
+  "date": "2026-10-16"
  },
  "divergence": {
-  "index_vs_emotion": -66.2,
-  "breadth_vs_width": -19.4
+  "index_vs_emotion": -36.2,
+  "breadth_vs_width": -78.1
  },
  "degraded": false,
  "missing": [],
