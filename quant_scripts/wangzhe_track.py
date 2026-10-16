@@ -251,11 +251,9 @@ def fetch_vol_ratios(codes, chunk=40):
         return out
     for k in range(0, len(codes), chunk):
         batch = codes[k:k + chunk]
-        cmd = ["npx", "-y", "westock-data-skillhub@1.0.3", "kline",
-               ",".join(batch), "--period", "day", "--limit", "3"]
+        args_k = ["kline", ",".join(batch), "--period", "day", "--limit", "3"]
         try:
-            r = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
-            txt = r.stdout or ""
+            txt = _fp(args_k, 240) or ""
         except Exception as e:
             log(f"[WARN] 量比批量拉取失败（第{k//chunk+1}批）: {e}")
             continue
@@ -294,12 +292,32 @@ def fetch_vol_ratios(codes, chunk=40):
 
 
 
+def _fp(args, timeout):
+    """取数（阶段3·B类残留迁移）：优先统一层 fetch.raw，失败回退本地 npx。"""
+    try:
+        import sys as _s, os as _o
+        _pd = _o.path.dirname(_o.path.abspath(__file__))
+        _qp = _o.path.join(_pd, "quant_scripts")
+        for _c in (_pd, _qp):
+            if _c not in _s.path:
+                _s.path.insert(0, _c)
+        from fetch import raw as _fraw
+        _r = _fraw(args, timeout=timeout)
+        if _r and _r.strip() and "执行失败" not in _r:
+            return _r
+    except Exception:
+        pass
+    try:
+        import subprocess as _sp
+        return _sp.run(_WESTOCK + list(args), capture_output=True, text=True, timeout=timeout).stdout or ""
+    except Exception:
+        return ""
+
+
 def _run_kline(batch, limit):
     """单次调用 westock kline → 解析结果 {code: [bars]}（空/异常则返回 {}）"""
-    cmd = _WESTOCK + ["kline", ",".join(batch), "--period", "day", "--limit", str(limit)]
     try:
-        r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-        txt = r.stdout or ""
+        txt = _fp(["kline", ",".join(batch), "--period", "day", "--limit", str(limit)], 300) or ""
     except Exception as e:
         log(f"[WARN] 日线批量拉取异常: {e}")
         return {}
@@ -599,8 +617,7 @@ def update_live(rows, lookback=45):
     # 基准：上证指数
     bmap = {}
     try:
-        out = subprocess.run(["npx", "-y", "westock-data-skillhub@1.0.3", "kline", "sh000001",
-                              "--period", "day", "--limit", "80"], capture_output=True, text=True, timeout=90).stdout
+        out = _fp(["kline", "sh000001", "--period", "day", "--limit", "80"], 90) or ""
         ser = []
         for ln in out.splitlines():
             if ln.strip().startswith("|") and "---" not in ln:
@@ -620,8 +637,7 @@ def update_live(rows, lookback=45):
     for i in range(0, len(codes), 50):
         chunk = codes[i:i + 50]
         try:
-            out = subprocess.run(["npx", "-y", "westock-data-skillhub@1.0.3", "kline", ",".join(chunk),
-                                  "--period", "day", "--limit", "80"], capture_output=True, text=True, timeout=180).stdout
+            out = _fp(["kline", ",".join(chunk), "--period", "day", "--limit", "80"], 180) or ""
             cur = None
             for ln in out.splitlines():
                 if not ln.strip().startswith("|") or "---" in ln:
