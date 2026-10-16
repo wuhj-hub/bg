@@ -5,6 +5,21 @@
 
 ---
 
+## v2.38 (2026-10-16)
+
+### 取数层 阶段 3 · 批次 4（其余 A 类收口）
+
+- **批次 4a**（12 脚本；commit df5b3e83…7c10d8e3）：`jinji_emotion_backtest` `learn_weights`
+  `liangxue_minute_check` `liangxue_month_join` `liangxue_screener` `longtou` `monthly_pool_sync`
+  `paper_tracker` `pool_winrate_biweekly` `weight_change_review` `win_rate_tracker` `caige_pool`
+- **批次 4b**（3 脚本；commit ac37de3d/20d6db26/33fbd894）：`ai_chokepoint_guard` `fetch_hot_kline` `reversal_funnel_screener`
+  - paper_tracker 额外把 `get_bars_batch` 内联 subprocess 改走 `run()`（从而走 fetch）
+- 手法：通用 AST 迁移器自动定位「含 subprocess+WESTOCK」的取数函数，按首参名+timeout 插入 fetch.raw 优先分支
+- 验证：15 脚本 AST OK + 沙箱冒烟均走统一层返回真数据（kline 349B / 周线批量 130 bar×2 / fetch_chg120 -8.49）
+- 更新 `docs/取数层迁移进度.md`（A 类 19 → 4，余 4 个为外部源工具）
+
+---
+
 ## v2.37 (2026-10-16)
 
 ### 取数层 阶段 3 · 批次 3（盘中监控迁入统一层）
