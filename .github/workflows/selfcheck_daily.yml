@@ -114,6 +114,19 @@ jobs:
           tail -20 /tmp/param.log
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
 
+      - name: ⑤ 归因分析（只建议·不自动改）
+        id: attrib
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set +e
+          python3 quant_scripts/attrib.py --out outputs > /tmp/attrib.log 2>&1
+          RC=$?
+          set -e
+          tail -60 /tmp/attrib.log
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+
       - name: 提交自检产物到仓库
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -127,7 +140,8 @@ jobs:
             outputs/cross_source_latest.md outputs/cross_source_latest.json \
             outputs/silent_failure_latest.md outputs/silent_failure_audit.json \
             outputs/pipeline_audit.json outputs/pipeline_audit_latest.json \
-            outputs/param_contract_latest.md outputs/param_contract_latest.json
+            outputs/param_contract_latest.md outputs/param_contract_latest.json \
+            outputs/归因_latest.md outputs/attrib_latest.json
           RC=$?
           set -e
           if [ "$RC" != "0" ]; then
@@ -139,13 +153,14 @@ jobs:
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
+          AT_SUM=$(python3 -c "import json;d=json.load(open('outputs/attrib_latest.json'));c=d['counts'];print('归因 red%d org%d yel%d'%(c['red'],c['orange'],c['yellow']));print((d['items'][0]['phen']) if d['items'] else '')" 2>/dev/null || :)
           CR="${{ steps.cross.outputs.rc }}"
           ME="${{ steps.meta.outputs.rc }}"
           PI="${{ steps.pipe.outputs.rc }}"
           PC="${{ steps.param.outputs.rc }}"
           if [ "$CR" != "0" ] || [ "$ME" != "0" ] || [ "$PI" != "0" ] || [ "$PC" != "0" ]; then
             EXTRA=$(python3 -c "import json;d=json.load(open('outputs/pipeline_audit.json'));print(' | '.join(d.get('issues',[]))[:400])" 2>/dev/null || :)
-            MSG="数据源 rc=${CR:-?} ｜ 静默失败 rc=${ME:-?} ｜ 流水线 rc=${PI:-?} ｜ 参数契约 rc=${PC:-?} ${EXTRA}"
+            MSG="数据源 rc=${CR:-?} ｜ 静默失败 rc=${ME:-?} ｜ 流水线 rc=${PI:-?} ｜ 参数契约 rc=${PC:-?} ｜ ${AT_SUM} ${EXTRA}"
             curl -s "https://pushplus.plus/send" \
               -d "token=${PUSH_TOKEN}&title=⚠️体系自检异常&content=${MSG}&template=txt" > /dev/null || echo "推送失败"
             echo "::warning::体系自检异常 —— $MSG"
@@ -164,7 +179,8 @@ jobs:
         run: |
           for f in "outputs/数据源交叉验证_$(date +%Y-%m-%d).md" \
                    "outputs/静默失败审计_$(date +%Y-%m-%d).md" \
-                   "outputs/param_contract_latest.md"; do
+                   "outputs/param_contract_latest.md" \
+                   "outputs/归因_latest.md"; do
             if [ -f "$f" ]; then
               python3 upload_ima.py --file "$f" --name "$(basename "$f")" || echo "上传失败(非致命): $f"
             fi
