@@ -57,11 +57,27 @@ def fetch_chg120(code):
     if not code.startswith(("sh", "sz", "bj")):
         code = ("sh" if code.startswith(("6", "9")) else "sz") + code
     try:
-        r = subprocess.run(["npx", "westock-data-skillhub@1.0.3", "kline", code,
-                            "--limit", "130"], capture_output=True, text=True, timeout=90)
-        out = r.stdout
-        if "执行失败" in out or "数据为空" in out or r.returncode != 0:
-            return None
+        out = None
+        # 2026-10-16 阶段3·批次4b：插入式迁移——优先统一取数层 fetch.raw，失败回退本地 npx
+        try:
+            import sys as _s, os as _o
+            _pd = _o.path.dirname(_o.path.abspath(__file__))
+            _qp = _o.path.join(_pd, "quant_scripts")
+            for _c in (_pd, _qp):
+                if _c not in _s.path:
+                    _s.path.insert(0, _c)
+            from fetch import raw as _fraw
+            _r = _fraw(["kline", code, "--limit", "130"], timeout=90)
+            if _r and "执行失败" not in _r and "数据为空" not in _r:
+                out = _r
+        except Exception:
+            pass
+        if out is None:
+            r = subprocess.run(["npx", "westock-data-skillhub@1.0.3", "kline", code,
+                                "--limit", "130"], capture_output=True, text=True, timeout=90)
+            out = r.stdout
+            if "执行失败" in out or "数据为空" in out or r.returncode != 0:
+                return None
         rows = []
         for blk in out.split("\n\n"):
             lines = [l for l in blk.splitlines() if l.strip()]
