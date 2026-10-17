@@ -665,6 +665,34 @@ jobs:
             python3 upload_ima.py --file "outputs/反转数值月线跟踪_$(date +%Y-%m-%d).md" --name "反转数值月线跟踪_$(date +%Y-%m-%d).md" || true
           fi
 
+      # ─── 第五.9步：王者突破（神龙摆尾尾部突破K × 王者倍量柱）选股 + 跟踪池 + 入库 + 上传（2026-10-17）───
+      #   文章来源：林中独步《神龙摆尾（三线合一）指标的一个小妙用》
+      #   纪律：信号K 实顶(收盘)=强支撑、实底(开盘)=止损位；跟踪池每日更新，跌破实底即删除
+      - name: 王者突破选股·跟踪池更新
+        if: always()  # 防阻断：前置步骤失败仍执行
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          FETCH_CACHE: "1"
+          FETCH_CACHE_TTL: "18000"
+        run: |
+          python3 quant_scripts/wangzhe_breakout.py --pool-file all_mainboard.csv --push || echo "王者突破扫描失败(非致命)"
+          # 池/报告生成后立即提交（不可放进前面「提交报告产物」步——那一步在本步之前，文件尚未生成）
+          RP=$(ls -t outputs/王者突破_*.md 2>/dev/null | head -1)
+          if [ -n "$RP" ]; then
+            python3 git_api_commit.py --msg "chore: wangzhe breakout ($(date +%Y-%m-%d))" \
+              data/wangzhe_breakout_pool.json outputs/wangzhe_breakout_latest.json "$RP" \
+              || echo "王者突破产物入库失败(非致命)"
+            python3 upload_ima.py --file "$RP" --name "$(basename $RP)" || echo "王者突破报告上传失败(非致命)"
+          fi
+          python3 quant_scripts/run_and_verify.py --tag "第五.9·王者突破" \
+            --expect "outputs/王者突破_{date}.md" --min-bytes 500 || true
+
       - name: 推送扫描结果到微信+邮件（完整版报告）
         if: always()
         env:
