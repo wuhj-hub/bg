@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v3）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v4）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -8,7 +8,8 @@
   S2 回调不破1倍反转数值: 回调深 = |LLV(MACD, 突破以来)| < 0.618 × HHV(MACD, 金叉以来)
   信号 = S1 已发生 且 S2 成立 且 死叉之后（SCB>0 且 JCB>SCB）；现价 < 上限（默认10元）
   【2026-10-17 新增】突破段中大阳线：突破日所属「金叉」→「突破日」整段内，须出现至少一根
-     涨幅 ≥ --big-yang-pct（默认5%）的阳线（涨停板自然满足）；仅日线生效（周/月线保持原口径）
+     涨幅 ≥ --big-yang-pct（默认5%）的阳线（涨停板自然满足）；
+     2026-10-18 起三周期（日/周/月）均要求该条件
 
 跟踪轮动（v2 新增）：
   · 每次运行把命中标的并入**跟踪池**（data/reversal_pool_{tf}.json），跨日/跨周保留
@@ -16,9 +17,11 @@
   · 另两类移出：现价 ≥ 上限、距突破超过最大跟踪期（日线45根 / 周线30根 / 月线18根）
   · 报告区分：本次新增 / 在池跟踪 / 本次移除
 
-口径差异（v3）：
-  · 日线：保留「改1+改2」；新信号须在窗口内（--window，默认5）
-  · 周线/月线：只保留「改2」，且取消新信号窗口（凡当前结构构成改2即纳入跟踪）
+口径（v4 · 2026-10-18 周/月线对齐日线）：
+  · 三周期统一：改1 + 改2 双角度都收
+  · 三周期统一：新信号须在窗口内（--window，默认 day=5 / week=3 / month=2）
+  · 三周期统一：须有「突破段中大阳线」（≥ --big-yang-pct，默认5%）
+  · 仅存的差异：最大跟踪期（日线45根 / 周线30根 / 月线18根）、数据周期与长度
 用法:
   python3 reversal_daily_screener.py --tf day   --window 5 --max-price 10 --pool-file all_mainboard.csv
   python3 reversal_daily_screener.py --tf week  --max-price 10 --pool-file all_mainboard.csv
@@ -111,10 +114,10 @@ def fetch_batch(codes, period="day", limit=250):
     return out
 
 
-def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT):
+def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80):
     """对一只股票评估当前状态: 是否'突破2倍后回调不破1倍'，且突破段含中大阳线
     返回 dict(tp_date,tp_val,red_high,pullback,line,valid,big_yang,by_date,by_gain,gap,last_date,last_close) 或 None"""
-    if len(rows) < 80:
+    if len(rows) < min_bars:
         return None
     closes = [r[2] for r in rows]
     dif, dea, macd = calc_dif_dea(closes)
@@ -197,23 +200,29 @@ def main():
     ap.add_argument("--tf", default="day", choices=["day", "week", "month"])
     ap.add_argument("--pool", default="")
     ap.add_argument("--pool-file", default="")
-    ap.add_argument("--window", type=int, default=0, help="新信号检测窗口(根)；默认 day=5 / week=2")
+    ap.add_argument("--window", type=int, default=0,
+                    help="新信号检测窗口(根)；默认 day=5 / week=3 / month=2")
     ap.add_argument("--max-price", type=float, default=10.0)
     ap.add_argument("--big-yang-pct", type=float, default=5.0,
-                    help="突破段「中大阳线」涨幅阈值(%)，仅日线生效（默认5.0）")
+                    help="突破段「中大阳线」涨幅阈值(%)，三周期均生效（默认5.0）")
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
     tf = a.tf
-    win = a.window or (5 if tf == "day" else 2)
-    only2 = tf in ("week", "month")   # 周线/月线：只保留「改2（死叉回调·不破水下反转数值线）」
-    nowin = tf in ("week", "month")   # 周线/月线：取消「新信号窗口」，凡当前结构构成改2即纳入
-    req_bigyang = (tf == "day")       # 「突破段含中大阳线」条件仅作用于日线（2026-10-17 需求）
+    WIN_DEFAULT = {"day": 5, "week": 3, "month": 2}   # 新信号窗口默认根数
+    win = a.window or WIN_DEFAULT[tf]
+    # ── 2026-10-18：周线/月线口径对齐日线，三周期一致。三个开关保留于此，便于按需回退 ──
+    only2 = False       # 曾(v3)：周/月线只保留「改2」→ 现：改1 + 改2 双角度都收
+    nowin = False       # 曾(v3)：周/月线取消新信号窗口 → 现：同样按窗口判定新信号
+    req_bigyang = True  # 曾(2026-10-17)：大阳线条件仅日线 → 现：三周期均要求
     period, limit = {"day": ("day", 250), "week": ("week", 130), "month": ("month", 124)}[tf]
+    # 最少K线根数：月线 westock 硬上限仅 61 根（--limit 更大也无用），故门槛必须低于 61，
+    # 否则月线永远返回 None（v3 时期月线实际从未产出过信号）。40 个月≈3.3 年，EMA26 已预热。
+    MIN_BARS = {"day": 80, "week": 60, "month": 40}
 
     pool = load_pool(a.pool, a.pool_file)
     if not pool:
         print("❌ 无股票池"); return
-    print(f"🔍 反转数值[{tf}] 跟踪扫描 | 标的{len(pool)}只 | " + ("只留改2·无窗口 | " if only2 else f"新信号窗口{win}根 | ") + f"现价<{a.max_price:g}元")
+    print(f"🔍 反转数值[{tf}] 跟踪扫描 | 标的{len(pool)}只 | " + ("只留改2·无窗口 | " if only2 else f"新信号窗口{win}根·大阳线≥{a.big_yang_pct:g}% | ") + f"现价<{a.max_price:g}元")
 
     rows_map = fetch_batch([c for c, n in pool], period, limit)
     print(f"  数据就绪: {len(rows_map)}/{len(pool)}只")
@@ -233,7 +242,8 @@ def main():
         rows = rows_map.get(code)
         if not rows:
             continue
-        st = eval_state(rows, big_yang_pct=(a.big_yang_pct / 100.0 if req_bigyang else 0.0))
+        st = eval_state(rows, big_yang_pct=(a.big_yang_pct / 100.0 if req_bigyang else 0.0),
+                        min_bars=MIN_BARS[tf])
         cur = tracked.get(code)
         # 数据时效（>15天视为停牌/退市）
         if st:
@@ -268,8 +278,7 @@ def main():
                 kept.append(cur)
         else:
             # 新信号：突破2倍后回调不破1倍
-            #   日线：须在「新信号窗口」内（gap ≤ win）
-            #   周线/月线（only2+nowin）：取消窗口，凡当前结构构成「改2」即纳入跟踪
+            #   三周期统一（v4）：须在「新信号窗口」内（gap ≤ win）、须有突破段中大阳线、改1/改2 都收
             ok_new = (bool(st) and st["valid"] and st["last_close"] < a.max_price
                       and (not req_bigyang or st.get("big_yang"))
                       and (not only2 or st["angle"] == "改2")
