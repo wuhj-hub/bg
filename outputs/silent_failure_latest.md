@@ -1,13 +1,13 @@
-# 🔍 体系自检元审计 · 2026-10-16
+# 🔍 体系自检元审计 · 2026-10-19
 
-> 扫描 23 个 workflow ｜ 风险项 **152** ｜ 🔴高危 **2**
+> 扫描 23 个 workflow ｜ 风险项 **154** ｜ 🔴高危 **2**
 
 ## 🔴高危·静默失败（2）
 
 - market_regime.yml :: 🧪 产物契约自检（当日·market_regime） (L112) — 命中 continue-on-error: true, || true；且包裹核心脚本 → 失败会被吞掉，workflow 仍绿
 - quant_scan.yml :: 市场宽度扫描（全主板涨跌家数分布） (L159) — 命中 || true；且包裹核心脚本 → 失败会被吞掉，workflow 仍绿
 
-## 🟡中危·吞错误（137）
+## 🟡中危·吞错误（139）
 
 - artifact_audit.yml :: 运行产物入库审计 (L62) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
 - artifact_audit.yml :: 提交审计报告 (L84) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || true
@@ -81,14 +81,15 @@
 - quant_report.yml :: 股池守护（数据源故障则不覆盖历史股池） (L435) — 命中 continue-on-error: true
 - quant_report.yml :: 盘后数据健康审计（产物可信度） (L447) — 命中 continue-on-error: true, set +e, || true
 - quant_report.yml :: 提交报告产物到仓库（供盘前报告引用） (L461) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
-- quant_report.yml :: 自动生成复盘报告并上传 (L502) — 命中 continue-on-error: true, || echo（吞错误）, || true
-- quant_report.yml :: env 对照三系统温度（观察期） (L567) — 命中 continue-on-error: true, || echo（吞错误）
-- quant_report.yml :: 资金四态胜率（抢筹/进场/控盘/观望） (L581) — 命中 continue-on-error: true, || echo（吞错误）, || true
-- quant_report.yml :: 股池入池快照（OOS 数据维护） (L602) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 反转数值周线信号上传推送 (L639) — 命中 continue-on-error: true, || true
-- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L686) — 命中 continue-on-error: true, set +e, || true
-- quant_report.yml :: 推送自检报告到微信 (L704) — 命中 continue-on-error: true
-- quant_report.yml :: 🧪 产物契约自检（当日·quant_report） (L730) — 命中 continue-on-error: true, || true
+- quant_report.yml :: 自动生成复盘报告并上传 (L500) — 命中 continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: env 对照三系统温度（观察期） (L572) — 命中 continue-on-error: true, || echo（吞错误）
+- quant_report.yml :: 资金四态胜率（抢筹/进场/控盘/观望） (L586) — 命中 continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: 股池入池快照（OOS 数据维护） (L607) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 反转数值周线信号上传推送 (L644) — 命中 continue-on-error: true, || true
+- quant_report.yml :: 王者突破选股·跟踪池更新 (L671) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
+- quant_report.yml :: 体系自检 — 健康评分 / 市场状态 / 异常检测 (L719) — 命中 continue-on-error: true, set +e, || true
+- quant_report.yml :: 推送自检报告到微信 (L737) — 命中 continue-on-error: true
+- quant_report.yml :: 🧪 产物契约自检（当日·quant_report） (L763) — 命中 continue-on-error: true, || true
 - quant_scan.yml :: 生成沪深主板清单（失败回退缓存 all_mainboard.csv，不阻断） (L78) — 命中 continue-on-error: true, || echo（吞错误）
 - quant_scan.yml :: IMA 凭证早期预检（失效立即微信告警，不阻断扫描） (L86) — 命中 continue-on-error: true, || true
 - quant_scan.yml :: 预热westock数据包 (L96) — 命中 set +e, || true
@@ -124,10 +125,11 @@
 - selfcheck_daily.yml :: ② 静默失败元审计（扫 workflow 自身的假绿风险） (L78) — 命中 continue-on-error: true, set +e
 - selfcheck_daily.yml :: ③ 流水线自愈巡检（run状态/步骤耗时/产物新鲜度/脚本异常） (L90) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e
 - selfcheck_daily.yml :: ④ 参数契约审计（workflow 传参 vs 脚本识别） (L105) — 命中 continue-on-error: true, set +e
-- selfcheck_daily.yml :: 提交自检产物到仓库 (L117) — 命中 2>/dev/null（屏蔽 stderr）, set +e
-- selfcheck_daily.yml :: 异常告警到微信 (L137) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）
-- selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L156) — 命中 continue-on-error: true, || echo（吞错误）
-- selfcheck_daily.yml :: 🧪 产物契约自检（当日·selfcheck_daily） (L173) — 命中 continue-on-error: true, || true
+- selfcheck_daily.yml :: ⑤ 归因分析（只建议·不自动改） (L117) — 命中 continue-on-error: true, set +e
+- selfcheck_daily.yml :: 提交自检产物到仓库 (L130) — 命中 2>/dev/null（屏蔽 stderr）, set +e
+- selfcheck_daily.yml :: 异常告警到微信 (L151) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）
+- selfcheck_daily.yml :: 上传自检报告到盘后量化文件夹 (L171) — 命中 continue-on-error: true, || echo（吞错误）
+- selfcheck_daily.yml :: 🧪 产物契约自检（当日·selfcheck_daily） (L189) — 命中 continue-on-error: true, || true
 - wangzhe_track.yml :: 安装 westock 取数 CLI（免 npx） (L63) — 命中 continue-on-error: true
 - wangzhe_track.yml :: 涨停王者·合格标的漏斗 (L87) — 命中 continue-on-error: true
 - wangzhe_track.yml :: 合格标的上传知识库 + 推送 (L92) — 命中 continue-on-error: true, || echo（吞错误）
@@ -185,8 +187,8 @@
 | probe_em.yml | 5 | — |
 | probe_kpl.yml | 0 | — |
 | probe_search.yml | 0 | — |
-| quant_report.yml | 33 | — |
-| selfcheck_daily.yml | 10 | — |
+| quant_report.yml | 34 | — |
+| selfcheck_daily.yml | 11 | — |
 | wangzhe_track.yml | 6 | — |
 | weight_learn.yml | 8 | — |
 | yao_gu_pool.yml | 7 | — |
