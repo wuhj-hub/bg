@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v4）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v5）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -16,6 +16,8 @@
   · 后续若**跌破**（回调深 ≥ 1倍反转数值）→ 从池中**删除**
   · 另两类移出：现价 ≥ 上限、距突破超过最大跟踪期（日线45根 / 周线30根 / 月线18根）
   · 报告区分：本次新增 / 在池跟踪 / 本次移除
+  · 【v5·2026-10-18】另设「📎 存量结构观察」：结构仍有效（valid + 有突破段大阳线）但不满足入池条件
+     （超新信号窗口 / 现价≥上限）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
 
 口径（v4 · 2026-10-18 周/月线对齐日线）：
   · 三周期统一：改1 + 改2 双角度都收
@@ -237,7 +239,7 @@ def main():
     except Exception:
         tracked = {}
 
-    added, removed, kept = [], [], []
+    added, removed, kept, watch = [], [], [], []
     for code, name in pool:
         rows = rows_map.get(code)
         if not rows:
@@ -287,6 +289,15 @@ def main():
                 item = {"code": code, "name": name, "first_date": today, **st}
                 tracked[code] = item
                 added.append(item)
+            elif bool(st) and st["valid"] and st.get("big_yang") and st["gap"] <= MAXGAP[tf]:
+                # 📎 存量结构观察：形态仍成立，仅因「超新信号窗口 / 现价超上限」未入池；不入池、不计胜率
+                _why = []
+                if st["gap"] > win:
+                    _why.append(f"超窗口 {st['gap']}>{win}根")
+                if st["last_close"] >= a.max_price:
+                    _why.append(f"现价{st['last_close']:g}≥{a.max_price:g}")
+                if _why:
+                    watch.append({**st, "code": code, "name": name, "reason": "·".join(_why)})
 
     json.dump({"tf": tf, "updated": today, "total": len(tracked), "items": tracked},
               open(pool_fp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -349,19 +360,21 @@ def main():
          (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
           else f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段（金叉→突破）须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足）**"),
          f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出", "",
-         f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**",
+         (f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
+          f"观察 {len(watch)} ｜ 池内合计 {len(tracked)}**" if watch else
+          f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**"),
          f"> 📊 入池后历史胜率：{perf_line} ｜ 出池结算（跌破等）：{_agg(10, True)[0]} / 均值 {_agg(10, True)[1]}（n={_agg(10, True)[2]}）", ""]
 
-    def tbl(rows, with_reason=False, with_first=False):
+    def tbl(rows, with_reason=False, with_first=False, reason_label="移除原因"):
         if not rows:
             L.append("> 无")
             L.append("")
             return
         cols = ["代码", "名称"] + (["入池日"] if with_first else []) + \
                ["最新日期", "最新价", "角度", "突破日", "突破段阳线", "突破2倍值", "回调深", "不破线", "距突破"] + \
-               (["移除原因"] if with_reason else [])
+               ([reason_label] if with_reason else [])
         L.append("| " + " | ".join(cols) + " |")
-        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "突破段阳线", "移除原因") else "--:" for c in cols) + "|")
+        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "突破段阳线", reason_label) else "--:" for c in cols) + "|")
         for s in rows:
             cells = [s["code"], s["name"]]
             if with_first:
@@ -384,6 +397,13 @@ def main():
     L.append(f"## 🗑️ 本次移除（{len(removed)}）")
     L.append("")
     tbl(sorted(removed, key=lambda x: x.get("pullback", 0), reverse=True), with_reason=True, with_first=True)
+    if watch:
+        L.append(f"## 📎 存量结构观察（{len(watch)}）")
+        L.append("")
+        L.append(f"> 结构仍有效（回调未跌破1倍反转数值 + 突破段有大阳线），但不满足入池条件——**不入池、不计胜率**，"
+                 f"仅作形态跟踪（限 {MAXGAP[tf]} 根跟踪期内）。")
+        L.append("")
+        tbl(sorted(watch, key=lambda x: x["gap"]), with_reason=True, reason_label="未入池原因")
     L.append("---")
     L.append("> ⚠️ 量化规律统计，不构成投资建议。跌破1倍反转数值即出池。")
 
@@ -391,7 +411,7 @@ def main():
     fn = {"day": f"反转数值日线信号_{today}.md", "week": f"反转数值周线跟踪_{today}.md", "month": f"反转数值月线跟踪_{today}.md"}[tf]
     fp = os.path.join("outputs", fn)
     open(fp, "w", encoding="utf-8").write("\n".join(L))
-    print(f"✅ [{tf}] 新增{len(added)} 在池{len(kept)} 移除{len(removed)} 池内{len(tracked)} | 报告: {fp} | 池: {pool_fp}")
+    print(f"✅ [{tf}] 新增{len(added)} 在池{len(kept)} 移除{len(removed)} 观察{len(watch)} 池内{len(tracked)} | 报告: {fp} | 池: {pool_fp}")
     for s in added[:12]:
         print(f"   + [{s.get('angle','')}] {s['code']} {s['name']} 价{s['last_close']} 突破{s['tp_date']} 回调{s['pullback']}<{s['line']}")
     for s in removed[:8]:
@@ -406,6 +426,8 @@ def main():
                  f"- 本次：🆕新增 **{len(added)}** ｜ 📌在池 **{len(kept)}** ｜ 🗑️移除 **{len(removed)}**",
                  f"- 池内合计：**{len(tracked)}** 只（现价<{a.max_price:g}元）",
                  f"- 📊 入池后胜率：{perf_line}"]
+            if watch:
+                P.append(f"- 📎 存量结构观察：**{len(watch)}** 只（超窗口/超价，未入池）")
             if added:
                 P += ["", f"### 🆕 新增（{len(added)}）"]
                 for s in sorted(added, key=lambda x: x["gap"])[:12]:
