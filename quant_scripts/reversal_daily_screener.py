@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v5）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v6）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -16,6 +16,8 @@
   · 后续若**跌破**（回调深 ≥ 1倍反转数值）→ 从池中**删除**
   · 另两类移出：现价 ≥ 上限、距突破超过最大跟踪期（日线45根 / 周线30根 / 月线18根）
   · 报告区分：本次新增 / 在池跟踪 / 本次移除
+  · 【v6·2026-10-18】报告各节（新增/在池/移除/观察）一律按角度归类为「改1 / 改2」两组子表，
+     并给出角度分布统计
   · 【v5·2026-10-18】另设「📎 存量结构观察」：结构仍有效（valid + 有突破段大阳线）但不满足入池条件
      （超新信号窗口 / 现价≥上限）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
 
@@ -365,13 +367,14 @@ def main():
           f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**"),
          f"> 📊 入池后历史胜率：{perf_line} ｜ 出池结算（跌破等）：{_agg(10, True)[0]} / 均值 {_agg(10, True)[1]}（n={_agg(10, True)[2]}）", ""]
 
-    def tbl(rows, with_reason=False, with_first=False, reason_label="移除原因"):
+    def tbl(rows, with_reason=False, with_first=False, reason_label="移除原因", with_angle=True):
         if not rows:
             L.append("> 无")
             L.append("")
             return
         cols = ["代码", "名称"] + (["入池日"] if with_first else []) + \
-               ["最新日期", "最新价", "角度", "突破日", "突破段阳线", "突破2倍值", "回调深", "不破线", "距突破"] + \
+               ["最新日期", "最新价"] + (["角度"] if with_angle else []) + \
+               ["突破日", "突破段阳线", "突破2倍值", "回调深", "不破线", "距突破"] + \
                ([reason_label] if with_reason else [])
         L.append("| " + " | ".join(cols) + " |")
         L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "突破段阳线", reason_label) else "--:" for c in cols) + "|")
@@ -380,7 +383,9 @@ def main():
             if with_first:
                 cells.append(s.get("first_date", ""))
             _by = f"{s.get('by_date','')} +{s.get('by_gain',0):.1f}%" if s.get("by_date") else "—"
-            cells += [s.get("last_date", ""), s.get("last_close", ""), s.get("angle", ""), s.get("tp_date", ""), _by,
+            cells += [s.get("last_date", ""), s.get("last_close", "")] + \
+                     ([s.get("angle", "")] if with_angle else []) + \
+                     [s.get("tp_date", ""), _by,
                       f"{float(s.get('tp_val', 0)):+.2f}", f"{float(s.get('pullback', 0)):.2f}",
                       f"{_line_signed(s):+.2f}", s.get("gap", "")]
             if with_reason:
@@ -388,22 +393,51 @@ def main():
             L.append("| " + " | ".join(str(c) for c in cells) + " |")
         L.append("")
 
+    ANG_LABEL = (("改1", "🅰️ 改1 · 保持强势（突破后 MACD 未下水）"),
+                 ("改2", "🅱️ 改2 · 死叉回调（水下反转数值线上方）"))
+
+    def tbl_group(rows, with_reason=False, with_first=False, reason_label="移除原因"):
+        """按角度归类渲染：改1 / 改2 各一张子表；组内保持传入顺序。空组不显示"""
+        if not rows:
+            L.append("> 无")
+            L.append("")
+            return
+        for ang, lab in ANG_LABEL:
+            sub = [s for s in rows if s.get("angle") == ang]
+            if not sub:
+                continue
+            L.append(f"### {lab} · {len(sub)} 只")
+            L.append("")
+            tbl(sub, with_reason=with_reason, with_first=with_first,
+                reason_label=reason_label, with_angle=False)
+        other = [s for s in rows if s.get("angle") not in ("改1", "改2")]
+        if other:
+            L.append(f"### 其他角度 · {len(other)} 只")
+            L.append("")
+            tbl(other, with_reason=with_reason, with_first=with_first, reason_label=reason_label)
+
+    _all = added + kept + watch        # 全表口径（新增 + 在池 + 存量观察；移除的不计）
+    _a1 = sum(1 for s in _all if s.get("angle") == "改1")
+    _a2 = sum(1 for s in _all if s.get("angle") == "改2")
+    L.append(f"> 🧭 角度分布（新增+在池+观察）：**改1 保持强势 {_a1} 只** ｜ **改2 死叉回调 {_a2} 只**")
+    L.append("")
+
     L.append(f"## 🆕 本次新增（{len(added)}）")
     L.append("")
-    tbl(sorted(added, key=lambda x: x["gap"]), with_first=True)
+    tbl_group(sorted(added, key=lambda x: x["gap"]), with_first=True)
     L.append(f"## 📌 在池跟踪（{len(kept)}）")
     L.append("")
-    tbl(sorted(kept, key=lambda x: x["gap"]))
+    tbl_group(sorted(kept, key=lambda x: x["gap"]))
     L.append(f"## 🗑️ 本次移除（{len(removed)}）")
     L.append("")
-    tbl(sorted(removed, key=lambda x: x.get("pullback", 0), reverse=True), with_reason=True, with_first=True)
+    tbl_group(sorted(removed, key=lambda x: x.get("pullback", 0), reverse=True), with_reason=True, with_first=True)
     if watch:
         L.append(f"## 📎 存量结构观察（{len(watch)}）")
         L.append("")
         L.append(f"> 结构仍有效（回调未跌破1倍反转数值 + 突破段有大阳线），但不满足入池条件——**不入池、不计胜率**，"
                  f"仅作形态跟踪（限 {MAXGAP[tf]} 根跟踪期内）。")
         L.append("")
-        tbl(sorted(watch, key=lambda x: x["gap"]), with_reason=True, reason_label="未入池原因")
+        tbl_group(sorted(watch, key=lambda x: x["gap"]), with_reason=True, reason_label="未入池原因")
     L.append("---")
     L.append("> ⚠️ 量化规律统计，不构成投资建议。跌破1倍反转数值即出池。")
 
@@ -426,6 +460,7 @@ def main():
                  f"- 本次：🆕新增 **{len(added)}** ｜ 📌在池 **{len(kept)}** ｜ 🗑️移除 **{len(removed)}**",
                  f"- 池内合计：**{len(tracked)}** 只（现价<{a.max_price:g}元）",
                  f"- 📊 入池后胜率：{perf_line}"]
+            P.append(f"- 🧭 角度：改1 **{_a1}** ｜ 改2 **{_a2}**（新增+在池+观察）")
             if watch:
                 P.append(f"- 📎 存量结构观察：**{len(watch)}** 只（超窗口/超价，未入池）")
             if added:
