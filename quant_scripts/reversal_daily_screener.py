@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v6）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -16,6 +16,12 @@
   · 后续若**跌破**（回调深 ≥ 1倍反转数值）→ 从池中**删除**
   · 另两类移出：现价 ≥ 上限、距突破超过最大跟踪期（日线45根 / 周线30根 / 月线18根）
   · 报告区分：本次新增 / 在池跟踪 / 本次移除
+  · 【v7·2026-10-18】①分角度窗口：改1 走 --window（day5/week3/month2）；改2 走 --window-gai2
+     （day5/week8/month6）——改2 需「突破→回调→死叉」的演化时间，用改1 的窄窗口会把改2 全部挡掉
+     （实测全市场周/月线新增 0 只改2）。②存量观察区按 --watch-max-gap 截断（day15/week8/month6），
+     避免月线观察区膨胀到数百只。③周/月线「突破段大阳线」区间改为「突破日前 N 根」
+     （--bigyang-lookback，默认 week6/month6；日线仍为「突破日所属金叉→突破日」）——
+     月线金叉可跨 1-2 年，原口径下该条件几乎形同虚设
   · 【v6·2026-10-18】报告各节（新增/在池/移除/观察）一律按角度归类为「改1 / 改2」两组子表，
      并给出角度分布统计
   · 【v5·2026-10-18】另设「📎 存量结构观察」：结构仍有效（valid + 有突破段大阳线）但不满足入池条件
@@ -118,7 +124,7 @@ def fetch_batch(codes, period="day", limit=250):
     return out
 
 
-def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80):
+def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bigyang_lookback=0):
     """对一只股票评估当前状态: 是否'突破2倍后回调不破1倍'，且突破段含中大阳线
     返回 dict(tp_date,tp_val,red_high,pullback,line,valid,big_yang,by_date,by_gain,gap,last_date,last_close) 或 None"""
     if len(rows) < min_bars:
@@ -157,7 +163,10 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80):
     line = K * max(macd[max(0, i - int(JCB[i])):i + 1])
     # ── 需求(2026-10-17)：突破段须出现「中大阳线」（涨幅>=big_yang_pct，涨停板自然满足）──
     #    范围 = 突破日所属「金叉」→「突破日」整段（对应底部反转的启动过程）；by_* 记录涨幅最大的那根阳线
-    lj_tp = tp_bar - (int(JCB[tp_bar]) if JCB[tp_bar] is not None else 0)
+    if bigyang_lookback and int(bigyang_lookback) > 0:
+        lj_tp = max(1, tp_bar - int(bigyang_lookback) + 1)        # 突破日前 N 根（含突破日）
+    else:
+        lj_tp = tp_bar - (int(JCB[tp_bar]) if JCB[tp_bar] is not None else 0)
     by_idx, by_gain = None, 0.0
     for j in range(max(1, lj_tp), tp_bar + 1):
         if rows[j][2] > rows[j][1]:                       # 阳线（收 > 开）
@@ -205,15 +214,28 @@ def main():
     ap.add_argument("--pool", default="")
     ap.add_argument("--pool-file", default="")
     ap.add_argument("--window", type=int, default=0,
-                    help="新信号检测窗口(根)；默认 day=5 / week=3 / month=2")
+                    help="改1（保持强势）新信号窗口(根)；默认 day=5 / week=3 / month=2")
+    ap.add_argument("--window-gai2", type=int, default=0,
+                    help="改2（死叉回调）新信号窗口(根)；默认 day=5 / week=8 / month=6")
+    ap.add_argument("--watch-max-gap", type=int, default=0,
+                    help="存量观察区最大「距突破」根数；默认 day=15 / week=8 / month=6")
+    ap.add_argument("--bigyang-lookback", type=int, default=0,
+                    help="大阳线区间取「突破日前N根」；默认 day=0(金叉→突破) / week=6 / month=6")
     ap.add_argument("--max-price", type=float, default=10.0)
     ap.add_argument("--big-yang-pct", type=float, default=5.0,
                     help="突破段「中大阳线」涨幅阈值(%)，三周期均生效（默认5.0）")
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
     tf = a.tf
-    WIN_DEFAULT = {"day": 5, "week": 3, "month": 2}   # 新信号窗口默认根数
-    win = a.window or WIN_DEFAULT[tf]
+    WIN1 = {"day": 5, "week": 3, "month": 2}    # 改1（保持强势）新信号窗口
+    WIN2 = {"day": 5, "week": 8, "month": 6}    # 改2（死叉回调）新信号窗口（需演化时间，故更宽）
+    WMAX = {"day": 15, "week": 8, "month": 6}   # 存量观察区最大「距突破」根数
+    BYLB = {"day": 0, "week": 6, "month": 6}    # 大阳线区间 0=金叉→突破
+    win = a.window or WIN1[tf]
+    win2 = a.window_gai2 or WIN2[tf]
+    wmax = a.watch_max_gap or WMAX[tf]
+    bylb = a.bigyang_lookback or BYLB[tf]
+    _by_desc = ("突破日所属金叉→突破日" if bylb <= 0 else f"突破日前 {bylb} 根内")
     # ── 2026-10-18：周线/月线口径对齐日线，三周期一致。三个开关保留于此，便于按需回退 ──
     only2 = False       # 曾(v3)：周/月线只保留「改2」→ 现：改1 + 改2 双角度都收
     nowin = False       # 曾(v3)：周/月线取消新信号窗口 → 现：同样按窗口判定新信号
@@ -226,7 +248,7 @@ def main():
     pool = load_pool(a.pool, a.pool_file)
     if not pool:
         print("❌ 无股票池"); return
-    print(f"🔍 反转数值[{tf}] 跟踪扫描 | 标的{len(pool)}只 | " + ("只留改2·无窗口 | " if only2 else f"新信号窗口{win}根·大阳线≥{a.big_yang_pct:g}% | ") + f"现价<{a.max_price:g}元")
+    print(f"🔍 反转数值[{tf}] 跟踪扫描 | 标的{len(pool)}只 | " + ("只留改2·无窗口 | " if only2 else f"窗口 改1 {win}/改2 {win2} 根·大阳线≥{a.big_yang_pct:g}%（{_by_desc}） | ") + f"现价<{a.max_price:g}元")
 
     rows_map = fetch_batch([c for c, n in pool], period, limit)
     print(f"  数据就绪: {len(rows_map)}/{len(pool)}只")
@@ -247,7 +269,7 @@ def main():
         if not rows:
             continue
         st = eval_state(rows, big_yang_pct=(a.big_yang_pct / 100.0 if req_bigyang else 0.0),
-                        min_bars=MIN_BARS[tf])
+                        min_bars=MIN_BARS[tf], bigyang_lookback=bylb)
         cur = tracked.get(code)
         # 数据时效（>15天视为停牌/退市）
         if st:
@@ -286,16 +308,17 @@ def main():
             ok_new = (bool(st) and st["valid"] and st["last_close"] < a.max_price
                       and (not req_bigyang or st.get("big_yang"))
                       and (not only2 or st["angle"] == "改2")
-                      and (nowin or st["gap"] <= win))
+                      and (nowin or st["gap"] <= (win2 if st["angle"] == "改2" else win)))
             if ok_new:
                 item = {"code": code, "name": name, "first_date": today, **st}
                 tracked[code] = item
                 added.append(item)
-            elif bool(st) and st["valid"] and st.get("big_yang") and st["gap"] <= MAXGAP[tf]:
+            elif bool(st) and st["valid"] and st.get("big_yang") and st["gap"] <= wmax:
                 # 📎 存量结构观察：形态仍成立，仅因「超新信号窗口 / 现价超上限」未入池；不入池、不计胜率
                 _why = []
-                if st["gap"] > win:
-                    _why.append(f"超窗口 {st['gap']}>{win}根")
+                _w = win2 if st["angle"] == "改2" else win
+                if st["gap"] > _w:
+                    _why.append(f"超窗口 {st['gap']}>{_w}根")
                 if st["last_close"] >= a.max_price:
                     _why.append(f"现价{st['last_close']:g}≥{a.max_price:g}")
                 if _why:
@@ -358,10 +381,11 @@ def main():
     lbl = {"day": "日线", "week": "周线", "month": "月线"}[tf]
     L = [f"# 🔄 反转数值·{lbl}信号跟踪（{today}）", "",
          (f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 现价 < {a.max_price:g}元" if only2
-          else f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 新信号窗口 {win} 根{lbl} ｜ 现价 < {a.max_price:g}元"),
+          else f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ "
+               f"新信号窗口：改1 {win} 根 / 改2 {win2} 根（{lbl}） ｜ 现价 < {a.max_price:g}元"),
          (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
-          else f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段（金叉→突破）须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足）**"),
-         f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出", "",
+          else f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
+         f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；存量观察区限「距突破≤{wmax}根」", "",
          (f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
           f"观察 {len(watch)} ｜ 池内合计 {len(tracked)}**" if watch else
           f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**"),
@@ -435,7 +459,7 @@ def main():
         L.append(f"## 📎 存量结构观察（{len(watch)}）")
         L.append("")
         L.append(f"> 结构仍有效（回调未跌破1倍反转数值 + 突破段有大阳线），但不满足入池条件——**不入池、不计胜率**，"
-                 f"仅作形态跟踪（限 {MAXGAP[tf]} 根跟踪期内）。")
+                 f"仅作形态跟踪（限「距突破≤{wmax}根」）。")
         L.append("")
         tbl_group(sorted(watch, key=lambda x: x["gap"]), with_reason=True, reason_label="未入池原因")
     L.append("---")
