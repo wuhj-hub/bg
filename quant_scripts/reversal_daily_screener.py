@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7.2）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -25,7 +25,9 @@
   · 【v6·2026-10-18】报告各节（新增/在池/移除/观察）一律按角度归类为「改1 / 改2」两组子表，
      并给出角度分布统计
   · 【v5·2026-10-18】另设「📎 存量结构观察」：结构仍有效（valid + 有突破段大阳线）但不满足入池条件
-     （超新信号窗口 / 现价≥上限）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
+     （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
+  · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
+     价格门槛统一，不再把超价标的混进观察区
 
 口径（v4 · 2026-10-18 周/月线对齐日线）：
   · 三周期统一：改1 + 改2 双角度都收
@@ -313,7 +315,8 @@ def main():
                 item = {"code": code, "name": name, "first_date": today, **st}
                 tracked[code] = item
                 added.append(item)
-            elif bool(st) and st["valid"] and st.get("big_yang") and st["gap"] <= wmax:
+            elif (bool(st) and st["valid"] and st.get("big_yang") and st["gap"] <= wmax
+                  and st["last_close"] < a.max_price):   # 价格门槛与入池一致
                 # 📎 存量结构观察：形态仍成立，仅因「超新信号窗口 / 现价超上限」未入池；不入池、不计胜率
                 _why = []
                 _w = win2 if st["angle"] == "改2" else win
@@ -458,8 +461,8 @@ def main():
     if watch:
         L.append(f"## 📎 存量结构观察（{len(watch)}）")
         L.append("")
-        L.append(f"> 结构仍有效（回调未跌破1倍反转数值 + 突破段有大阳线），但不满足入池条件——**不入池、不计胜率**，"
-                 f"仅作形态跟踪（限「距突破≤{wmax}根」）。")
+        L.append(f"> 结构仍有效（回调未跌破1倍反转数值 + 突破段有大阳线 + **现价 < {a.max_price:g}元**），"
+                 f"仅因**超出新信号窗口**未入池——不作为新信号、不计胜率，仅作形态跟踪（限「距突破≤{wmax}根」）。")
         L.append("")
         tbl_group(sorted(watch, key=lambda x: x["gap"]), with_reason=True, reason_label="未入池原因")
     L.append("---")
