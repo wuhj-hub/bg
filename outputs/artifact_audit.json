@@ -1,5 +1,5 @@
 {
- "date": "2026-10-19",
+ "date": "2026-10-20",
  "writes": {
   "panhou_lianghua.csv": [
    "full_market_dualdim.py"
@@ -675,6 +675,9 @@
   "attrib_latest.json": [
    "selfcheck_daily.yml"
   ],
+  "regime_history.csv": [
+   "pool_winrate_biweekly.yml"
+  ],
   "妖股池_{var}.md": [
    "yao_gu_pool.yml"
   ],
@@ -906,6 +909,7 @@
   "pipeline_audit_latest.json",
   "pool_entries.csv",
   "pool_quality.json",
+  "regime_history.csv",
   "reversal_perf_day.csv",
   "reversal_perf_month.csv",
   "reversal_perf_week.csv",
@@ -931,8 +935,8 @@
  "dup_freshness": [
   {
    "name": "sector_component_em.json",
-   "root": "2026-10-16",
-   "outputs": "2026-10-16",
+   "root": "2026-10-19",
+   "outputs": "2026-10-19",
    "status": "同步"
   },
   {
