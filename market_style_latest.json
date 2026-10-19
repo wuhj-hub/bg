@@ -1,68 +1,68 @@
 {
- "date": "2026-10-16",
- "data_date": "2026-10-16",
+ "date": "2026-10-19",
+ "data_date": "2026-10-19",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 11,
+ "score": 7,
  "score_detail": {
   "size_style": -20,
   "limitup_structure": 21,
   "volume_structure": 0,
-  "sector_fund": 10
+  "sector_fund": 6
  },
  "size_style": {
-  "hs300_5d": -3.4,
-  "hs300_10d": -6.05,
-  "zz1000_5d": -6.62,
-  "zz1000_10d": -11.73,
-  "rel_5d": -3.23,
-  "rel_10d": -5.68,
-  "rel_20d": -3.63,
-  "zz500_5d": -6.6
+  "hs300_5d": -2.65,
+  "hs300_10d": -3.83,
+  "zz1000_5d": -4.6,
+  "zz1000_10d": -8.17,
+  "rel_5d": -1.96,
+  "rel_10d": -4.34,
+  "rel_20d": -2.37,
+  "zz500_5d": -4.12
  },
  "limitup_structure": {
-  "limitup": 55,
-  "strong": 127,
-  "width_score": 93.0,
+  "limitup": 40,
+  "strong": 98,
+  "width_score": 75.0,
   "level": "🔥 结构性偏强（涨多跌少·赚钱效应强）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 4.2,
-  "zhaban_rate": 56.0,
-  "lianban": 7
+  "strong_ratio": 3.2,
+  "zhaban_rate": 51.2,
+  "lianban": 11
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.75,
-  "small_big_ratio_5d": 0.743
+  "small_big_ratio_now": 0.77,
+  "small_big_ratio_5d": 0.736
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "地面兵装Ⅱ",
-    "zdf": "5.96",
-    "main_net5d": -2.0,
-    "retail_net": -7.6,
+    "name": "通信设备",
+    "zdf": "0.03",
+    "main_net5d": -199.4,
+    "retail_net": -25.9,
     "tag": "游资型"
    },
    {
-    "name": "出版",
-    "zdf": "-0.01",
-    "main_net5d": 19.2,
-    "retail_net": 2.5,
-    "tag": "混合"
+    "name": "地面兵装Ⅱ",
+    "zdf": "5.22",
+    "main_net5d": 7.3,
+    "retail_net": -0.9,
+    "tag": "机构型"
    },
    {
     "name": "半导体",
-    "zdf": "-0.45",
-    "main_net5d": -223.6,
-    "retail_net": -39.0,
+    "zdf": "-2.07",
+    "main_net5d": -142.7,
+    "retail_net": -4.5,
     "tag": "游资型"
    },
    {
-    "name": "汽车零部件",
-    "zdf": "2.25",
-    "main_net5d": -37.1,
-    "retail_net": -19.4,
+    "name": "元件",
+    "zdf": "-1.13",
+    "main_net5d": -39.2,
+    "retail_net": 16.7,
     "tag": "游资型"
    }
   ]
@@ -73,13 +73,11 @@
    "堆量模式": 15
   },
   "leaders": {
-   "堆量模式": 6
+   "堆量模式": 7
   },
-  "pullbacks": {
-   "堆量模式": 2
-  },
+  "pullbacks": {},
   "gpoints": {
-   "堆量模式": 2
+   "堆量模式": 1
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
