@@ -17,6 +17,9 @@
        7 步日常流程 → 新增「🎯 今日备选热点概念（2-4 个）」小节（第④步：收敛备选概念）
        + 龙头评分并入「长期力量」维（第⑤步：龙头判据之一「底部长期力量」= 月线5力，与入牛体系同源）
        + 备选龙头「分时走势」校验（第⑤步：分时走势）+「📅 事件前瞻」（第⑥步：结合时间节点）。
+  ⑦ 曾星智《悟道01：短线行情的本质是什么》(2026-10-19)：短线行情分三类
+       （第1类大盘普涨/第2类行业级/第3类概念炒作），环境决定推动力、推动力决定形态、形态决定有效手法
+       → 新增「🧭 行情类型」判定小节 + 策略侧重建议（本脚本的定位：第2/3类环境中做概念龙头）。
 
 版本演进：
   v1 (2026-09-25) 涨停家数 / 连板家数排行
@@ -35,6 +38,9 @@
                     ★新增 --no-minute / --no-calendar
   v4.5 (2026-10-11) ★分时走势扩展至「龙头榜」全部龙头（minute_cache 共享，免重复取数）
                     ★新增「📑 龙头财报披露日（事件风险预警）」小节（westock reserve，随 --no-calendar 关闭）
+  v4.6 (2026-10-20) ★新增「🧭 行情类型」小节（曾星智《悟道01》三类短线行情）
+                    ★判据=指数三力(MA250/MA60/MA20 方向)+全市场上涨广度+涨停结构+行业集中度
+                    ★判定结果入报告/JSON/情绪跟踪.json；★新增 --no-regime
 
 数据源：all_mainboard.csv + westock 日线 + westock asfund 资金 + outputs/sector_component_em.json + 东财涨停池(push2ex)。
 口径提示：概念来自东财板块成分（一票多概念会放大家数）；市值接口在沙箱不可用，
@@ -43,7 +49,7 @@
 用法：
   python3 quant_scripts/limitup_concept_rank.py [--days 20] [--top 20] [--date YYYY-MM-DD]
          [--main-zt 8] [--main-jj 35] [--sub-jj 20] [--max-stocks N] [--outdir DIR]
-         [--no-fund] [--no-glm] [--no-long] [--no-minute] [--no-calendar]
+         [--no-fund] [--no-glm] [--no-long] [--no-minute] [--no-calendar] [--no-regime]
 """
 import os, re, sys, csv, json, time, shutil, argparse, subprocess, urllib.request
 from datetime import datetime, timezone, timedelta
@@ -410,6 +416,7 @@ def fast_prepare(a):
         ups.append({"code": ("sh" if c[0] == "6" else "sz") + c, "c6": c, "name": p.get("n", ""),
                     "chg": round(p.get("zdp") or 0, 2), "lianban": p.get("lbc") or 1,
                     "price": None, "ret5": None,
+                    "hybk": p.get("hybk") or "",
                     "fbt": p.get("fbt"), "fund": fund, "ltsz": ltsz, "zbc": p.get("zbc"),
                     "fdratio": (fund / ltsz) if ltsz else None})
     prev_zt_codes = {p.get("c") for p in prev_pool if main_filter(p.get("c"))}
@@ -642,6 +649,192 @@ def glm_news_check(rank, ups, mood, today, code_sector=None, events=None):
     return reply
 
 
+# ══════════════════════════════════════════════════════════════════════════
+#  行情类型 · 曾星智《悟道01：短线行情的本质是什么》(2026-10-19)
+#  三类短线行情：
+#    第1类 大盘级全面上涨（牛市）  → 推动力=整体市场氛围 → 各种手法都有效
+#    第2类 行业级普遍上涨（震荡市）→ 推动力=行业普遍利好 → 涨势持续(非连板)，龙头新高+底部股跟随反弹
+#    第3类 概念级炒作（熊市/弱震荡）→ 推动力=资金投机概念 → 少数股连续涨停，多数股下跌
+#  核心：环境错了，买点再好也是负期望 → 先判"今天属于哪一类"，再决定"用哪套手法"。
+#  判据（可测量）：指数三力方向（长期MA250/中期MA60/短期MA20）+ 全市场上涨广度 + 涨停结构 + 行业集中度
+# ══════════════════════════════════════════════════════════════════════════
+REGIME_UP_HOT = 0.55      # 上涨家数占比 ≥ 此值 = 广度强
+REGIME_UP_COLD = 0.45     # 上涨家数占比 ≤ 此值 = 广度弱
+REGIME_ZT_HOT = 50        # 涨停家数 ≥ 此值（广度缺失时的辅证：普涨日）
+REGIME_IND_CONC = 0.45    # 行业集中度阈值（前3行业占涨停比 ≥ 此值 → 行业级特征明确）
+
+REGIME_TXT = {
+    1: ("🟢 第1类 · 大盘普涨型（牛市环境）", [
+        "✅ 首选：趋势突破（箱体/高阳）、均线回踩、强势体系、资金流向选股",
+        "⚪ 次选：龙头打板（赚钱效应外溢，不必抢占）",
+        "❌ 避免：逆势低吸、超跌反弹（普涨里抄底跑输趋势）",
+        "仓位：可按环境温度给足（本类环境对仓位最宽容）"]),
+    2: ("🟡 第2类 · 行业级上涨型（震荡市环境）", [
+        "✅ 首选：行业龙头（板块共振 + 行业内相对强度 RSV）、行业内低位补涨/二线跟风",
+        "⚪ 次选：概念龙头（仅当概念与强行业重合时）",
+        "❌ 避免：跨行业追涨、弱势行业的「价值补涨」",
+        "仓位：中等（行业行情持续 5~15 个交易日，须跟随行业指数走弱即退）"]),
+    3: ("🔴 第3类 · 概念炒作型（熊市/弱震荡环境）", [
+        "✅ 首选：概念龙头，只做连板（≥2板），次日竞价确认后介入；按「3 概念 × 1 龙头」收敛",
+        "⚪ 次选：超跌低吸（弱市实测：低吸 20 日胜率≈73% vs 共振≈26%）",
+        "❌ 避免：首板打板（实测连板 cohort +2.39% vs 首板 +1.04%）、趋势突破追高、重仓",
+        "仓位：轻（单票试错，止损优先）"]),
+}
+
+
+def fetch_index_bars(sym="sh000001", count=800):
+    """指数日线（优先腾讯长历史 fetch.ext_fqkline，回退 fetch.kline）→ [bar,...] 升序。失败返回 []。"""
+    bars = []
+    try:
+        _d = os.path.dirname(os.path.abspath(__file__))        # quant_scripts
+        for _c in (_d, BASE):
+            if _c not in sys.path:
+                sys.path.insert(0, _c)
+        from fetch import ext_fqkline as _ef
+        d = _ef([sym], period="day", count=count) or {}
+        bars = d.get(sym) or []
+        if len(bars) >= 260:
+            return bars
+    except Exception:
+        bars = []
+    try:
+        from fetch import kline as _fk
+        d = _fk([sym], period="day", limit=250, fq=None) or {}
+        b2 = d.get(sym) or []
+        if len(b2) > len(bars):
+            bars = b2
+    except Exception:
+        pass
+    return bars
+
+
+def index_trend(bars):
+    """指数三力（长期/中期/短期）+ 年线位置。数据不足 70 根返回 None。"""
+    if not bars or len(bars) < 70:
+        return None
+    closes = [b["close"] if isinstance(b, dict) else b[2] for b in bars]
+    n = len(closes)
+
+    def ma(m, off=0):
+        end = n - off
+        if m <= 0 or end - m < 0:
+            return None
+        return sum(closes[end - m:end]) / m
+
+    long_n = 250 if n >= 260 else (120 if n >= 130 else 60)
+    out = {"close": closes[-1], "bars": n, "long_n": long_n,
+           "ma_long": ma(long_n), "ma60": ma(60), "ma20": ma(20)}
+    for key, m, look in (("long_up", long_n, 20), ("mid_up", 60, 10), ("short_up", 20, 5)):
+        a, b0 = ma(m, 0), ma(m, look)
+        out[key] = None if (a is None or b0 is None) else (a > b0)
+    out["above_long"] = (out["ma_long"] is not None and closes[-1] > out["ma_long"])
+    out["above_mid"] = (out["ma60"] is not None and closes[-1] > out["ma60"])
+    return out
+
+
+def industry_conc(ups, code_sector):
+    """涨停股行业集中度：前3行业占涨停比。
+    优先东财行业（涨停池 hybk），缺失时回退概念口径（一票多概念会放大，已截顶 1.0）。"""
+    from collections import Counter
+    hy = [u.get("hybk") for u in ups if u.get("hybk")]
+    if len(hy) >= 5:
+        c = Counter(hy)
+        total = sum(c.values())
+        top3 = c.most_common(3)
+        return {"ind_share": min(1.0, sum(v for _, v in top3) / total), "ind_top": top3, "src": "行业"}
+    cc = Counter()
+    for u in ups:
+        for s in (code_sector.get(u.get("c6")) or code_sector.get(u.get("code")) or []):
+            cc[s] += 1
+    if cc and ups:
+        top3 = cc.most_common(3)
+        return {"ind_share": min(1.0, sum(v for _, v in top3) / len(ups)),
+                "ind_top": top3, "src": "概念"}
+    return {"ind_share": None, "ind_top": [], "src": "行业"}
+
+
+def judge_regime(itrend, up_pct, cnt, conc):
+    """三类短线行情判定 → {type,label,sub,conf,evidence[],strategy[]}"""
+    zt = cnt.get("zt") or 0
+    maxlb = cnt.get("maxlb") or 0
+    jj = cnt.get("jj_first")
+    ev = []
+    ups_cnt = None
+    if itrend:
+        ups_cnt = sum(1 for k in ("long_up", "mid_up", "short_up") if itrend.get(k))
+        ev.append("指数三力：" + "／".join([
+            "长期%s MA%d" % ("↑" if itrend.get("long_up") else "↓", itrend["long_n"]),
+            "中期%s MA60" % ("↑" if itrend.get("mid_up") else "↓"),
+            "短期%s MA20" % ("↑" if itrend.get("short_up") else "↓")]))
+        if itrend.get("ma_long"):
+            ev.append("年线位置：收盘 %.2f，%s年线，距年线 %+.1f%%" % (
+                itrend["close"], "站上" if itrend["above_long"] else "跌破",
+                (itrend["close"] / itrend["ma_long"] - 1) * 100))
+    else:
+        ev.append("指数数据缺失：判定降级（广度+涨停结构）")
+    ev.append("市场广度：上涨家数占比 %.1f%%" % (up_pct * 100) if up_pct is not None
+              else "市场广度：缺失（轻量模式无全市场K线）")
+    ev.append("涨停结构：%d 家（连板 %d / 首板 %d / 最高 %d 板）%s" % (
+        zt, cnt.get("lb") or 0, cnt.get("first") or 0, maxlb,
+        "，首板晋级率 %.0f%%" % jj if jj is not None else ""))
+    if conc.get("ind_share") is not None:
+        ev.append("%s集中度：前3占 %.0f%%（%s）" % (
+            conc.get("src", "行业"), conc["ind_share"] * 100,
+            "、".join("%s%d家" % (k, v) for k, v in conc.get("ind_top") or [])))
+
+    conf, sub = "高", ""
+    if itrend and up_pct is None:
+        conf = "中（广度缺失）"
+    if ups_cnt is None:
+        conf = "低（指数缺失）"
+        if up_pct is not None and zt >= REGIME_ZT_HOT and up_pct >= REGIME_UP_HOT:
+            t = 1
+        elif up_pct is not None and up_pct <= REGIME_UP_COLD:
+            t = 3
+        else:
+            t = 2
+    else:
+        breadth_hot = (up_pct >= REGIME_UP_HOT) if up_pct is not None else (zt >= REGIME_ZT_HOT)
+        breadth_cold = (up_pct <= REGIME_UP_COLD) if up_pct is not None else (zt <= 40)
+        if ups_cnt >= 2 and itrend.get("long_up") and itrend.get("above_long") and breadth_hot:
+            t = 1
+        elif ups_cnt <= 1 and not itrend.get("above_mid") and breadth_cold:
+            t = 3
+        else:
+            t = 2
+            if ups_cnt == 3 and not breadth_hot:
+                conf = "中（指数强但广度不足=结构性）"
+
+    label, strategy = REGIME_TXT[t]
+    if t == 2:
+        share = conc.get("ind_share")
+        if share is not None and share >= REGIME_IND_CONC:
+            sub = "（行业集中，前3行业占 %.0f%% → 按「行业级」做）" % (share * 100)
+        else:
+            sub = "（行业/概念分散 → 结构性、过渡性行情，手法从简）"
+    if t == 3 and maxlb >= 3:
+        sub += "（最高 %d 板，概念炒作特征明确）" % maxlb
+    return {"type": t, "label": label, "sub": sub, "conf": conf,
+            "evidence": [e for e in ev if e], "strategy": strategy}
+
+
+def render_regime(reg):
+    """行情类型 → markdown 行（插在「市场情绪刻度」之前）"""
+    if not reg:
+        return []
+    L = ["## 🧭 行情类型（曾星智《悟道01》三类短线行情）", "",
+         "**今日判定：%s**%s　｜　置信：%s" % (reg["label"], reg.get("sub", ""), reg["conf"]), "",
+         "> 三类无优劣，只是**手法不同**——环境错了，买点再好也是负期望。", "",
+         "| 判据 | 数值 |", "|---|---|"]
+    for e in reg["evidence"]:
+        k, _, v = e.partition("：")
+        L.append("| %s | %s |" % (k, v) if v else "| 判据 | %s |" % e)
+    L += ["", "**策略侧重**："]
+    L += ["- %s" % s for s in reg["strategy"]]
+    L.append("")
+    return L
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=20)
@@ -658,6 +851,8 @@ def main():
     ap.add_argument("--no-long", action="store_true", dest="no_long", help="跳过长期力量维度（月线5力）")
     ap.add_argument("--no-minute", action="store_true", dest="no_minute", help="跳过分时走势校验（备选热点龙头）")
     ap.add_argument("--no-calendar", action="store_true", dest="no_calendar", help="跳过事件前瞻（财经日历）")
+    ap.add_argument("--no-regime", action="store_true", dest="no_regime",
+                    help="跳过行情类型判定（曾星智三类短线行情）")
     a = ap.parse_args()
     outdir = a.outdir or os.path.join(BASE, "outputs")
     os.makedirs(outdir, exist_ok=True)
@@ -735,6 +930,7 @@ def main():
                 fund = z.get("fund") or 0
                 ups.append({"code": w, "c6": c6, "name": z.get("name") or "", "chg": round(z.get("zdp") or 0, 2),
                             "lianban": z.get("lbc") or 1, "price": None, "ret5": ret5,
+                            "hybk": z.get("hybk") or "",
                             "fbt": z.get("fbt"), "fund": fund, "ltsz": ltsz, "zbc": z.get("zbc"),
                             "fdratio": (fund / ltsz) if ltsz else None})
             prev_zt_codes = {c6 for c6 in prev_pool if main_filter(c6)}
@@ -770,7 +966,8 @@ def main():
                 ret5 = (closes[-1] / closes[-6] - 1) * 100 if len(closes) >= 6 else None
                 ups.append({"code": wcode, "c6": c6, "name": nm, "chg": round(chg, 2),
                             "lianban": lb[-1], "price": closes[-1], "ret5": ret5,
-                            "fbt": None, "fund": 0, "ltsz": 0, "zbc": None, "fdratio": None})
+                            "hybk": "", "fbt": None, "fund": 0, "ltsz": 0, "zbc": None,
+                            "fdratio": None})
 
     # ── 资金流向（首板/二板重点；曾星智第④步）──
     if ups and not a.no_fund:
@@ -817,6 +1014,37 @@ def main():
             "🔥 活跃（题材接力强）" if mkt_first_jj >= JJ_HOT else
             "🧊 退潮（谨慎打板）" if mkt_first_jj < JJ_COLD else "⚖️ 中性")
 
+    # ── 行情类型（曾星智《悟道01》三类短线行情）──
+    reg = None
+    if not a.no_regime:
+        try:
+            up_pct = None
+            if km:
+                _tot = _up = 0
+                for _sym, _bars in km.items():
+                    if not _bars or len(_bars) < 2 or _bars[-1][0] != today:
+                        continue
+                    _pc = _bars[-2][2]
+                    if _pc <= 0:
+                        continue
+                    _tot += 1
+                    if _bars[-1][2] > _pc:
+                        _up += 1
+                if _tot >= 200:
+                    up_pct = _up / _tot
+            _itrend = index_trend(fetch_index_bars())
+            _conc = industry_conc(ups, code_sector)
+            reg = judge_regime(_itrend, up_pct,
+                               {"zt": len(ups), "lb": n_lb, "first": n_first,
+                                "maxlb": max((u["lianban"] for u in ups), default=0),
+                                "jj_first": mkt_first_jj}, _conc)
+            print(f"[INFO] 行情类型：{reg['label']}（置信 {reg['conf']}）", flush=True)
+            if _itrend is None:
+                print("[WARN] 指数数据缺失，行情类型判定降级", flush=True)
+        except Exception as e:
+            print(f"[WARN] 行情类型判定失败: {e}", flush=True)
+            reg = None
+
     # 概念聚合
     agg = defaultdict(lambda: {"n": 0, "lb": 0, "first": 0, "maxlb": 0, "prev": 0, "stocks": []})
     for u in ups:
@@ -852,6 +1080,7 @@ def main():
     L = [f"# 🔥 热板作战面板 {today}", "",
          f"> 数据源：{srcdesc}｜题材映射 {len(code_sector)} 只（{sec_date}）｜涨停池 {len(ztpool)} 只",
          f"> 当日涨停 **{len(ups)}** 只｜连板 **{n_lb}** 只｜首板 **{n_first}** 只", "",
+         *render_regime(reg),
          "## 📊 市场情绪刻度",
          f"- 昨日涨停 **{prev_zt_n}** 只 → 今日连板 **{n_lb}** 只，**连板晋级率 {mkt_lb_jj:.0f}%**" if prev_zt_n else "- 连板晋级率 —",
          f"- 昨日首板 {len(prev_first_codes)} 只 → 今日晋级 {prev_first_jinji} 只，**首板晋级率 {mkt_first_jj:.0f}%**" if prev_first_codes else "- 首板晋级率 —",
@@ -995,7 +1224,9 @@ def main():
           "龙头为板块内相对排名打分（七维：启动=首封最早 / 弹性=5日涨幅 / 封单=封单/流通 / 带动=首封后跟涨 / 辨识=最高板+未炸板 / **资金=当日主力净流入强度** / **长期力量=月线5力(MA5/10/20/30全向上+月线DIF向上)**）；",
           "资金流向来自 westock asfund（首板/二板当日主力净流入是关键，缺失则该维为0）；中军以成交额近似市值；",
           "分时走势=当日分时（westock minute，龙头榜全龙头 + 备选概念龙头共享缓存；判据=运行最大回撤+均价线上方占比+尾盘方向）；事件前瞻=未来1-2周财经日历（westock calendar，权重≥3）+ 龙头财报披露日（westock reserve）；",
-          "概念催化链与蹭概念校验来自 GLM（glm-4-flash，输入=当日涨停明细+近期要闻+未来事件日历），仅作参考、可能有误，请结合实盘判断。"]
+          "概念催化链与蹭概念校验来自 GLM（glm-4-flash，输入=当日涨停明细+近期要闻+未来事件日历），仅作参考、可能有误，请结合实盘判断；",
+          "行情类型判据（曾星智《悟道01》三类短线行情）= 指数三力方向（上证 MA250/MA60/MA20 近5~20根斜率）+ 全市场上涨家数占比（强≥55%/弱≤45%）+ 涨停结构 + 行业集中度（前3行业占涨停比≥45%）；",
+          "三类行情无优劣，只是手法不同：第1类做趋势、第2类做行业龙头与补涨、第3类只做概念龙头（连板优先）。"]
     md = "\n".join(L)
     mp = os.path.join(outdir, f"涨停概念排行_{today}.md")
     open(mp, "w", encoding="utf-8").write(md)
@@ -1006,6 +1237,7 @@ def main():
                "market": {"lianban_jinji_rate": round(mkt_lb_jj, 1) if mkt_lb_jj is not None else None,
                           "first_jinji_rate": round(mkt_first_jj, 1) if mkt_first_jj is not None else None,
                           "mood": mood},
+               "regime": reg,
                "grade_summary": {"main": n_main, "sub": n_sub, "oneday": n_day},
                "concept_rank": [{"concept": k, "n": v["n"], "lb": v["lb"], "prev_zt": v["prev"],
                                  "jinji_rate": round(v["jj"], 1) if v["jj"] is not None else None,
@@ -1025,7 +1257,9 @@ def main():
                        "maxlb": max((u["lianban"] for u in ups), default=0),
                        "jj_first": round(mkt_first_jj, 1) if mkt_first_jj is not None else None,
                        "jj_lb": round(mkt_lb_jj, 1) if mkt_lb_jj is not None else None,
-                       "mood": mood}
+                       "mood": mood,
+                       "regime": (reg or {}).get("type"),
+                       "regime_label": (reg or {}).get("label")}
         json.dump(dict(sorted(hist.items())), open(tk, "w", encoding="utf-8"),
                   ensure_ascii=False, indent=1)
         print(f"[OK] 情绪指标跟踪 {len(hist)} 天 → {tk}")
