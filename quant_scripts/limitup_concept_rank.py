@@ -1250,9 +1250,24 @@ def main():
               ensure_ascii=False, indent=1)
 
     # 跨月跟踪：把当日情绪指标并入 情绪指标跟踪.json（按日期累积去重）
+    # 跨月跟踪：把当日情绪指标并入 情绪指标跟踪.json（按日期累积去重）
+    # 2026-10-20 修复：原只读写 outdir 一份，而 CI 提交的是**仓库根**那份（workflow 用 cp 覆盖）
+    #   → 每次全新 checkout 都从空开始、根目录历史被覆盖，跨月累积实际从未生效（10-19 实测只剩 1 天）。
+    #   现改为「多路径合并读取 + 双写（outdir 与仓库根）」，任一路径有历史都不会丢。
     tk = os.path.join(outdir, "情绪指标跟踪.json")
+    tk_root = os.path.join(BASE, "情绪指标跟踪.json")
     try:
-        hist = json.load(open(tk, encoding="utf-8")) if os.path.exists(tk) else {}
+        hist = {}
+        for _p in (tk, tk_root):
+            if not os.path.exists(_p):
+                continue
+            try:
+                _d = json.load(open(_p, encoding="utf-8"))
+            except Exception:
+                continue
+            if isinstance(_d, dict):
+                for _k, _v in _d.items():          # 先读者优先（outdir 在前=本次/最新）
+                    hist.setdefault(_k, _v)
         hist[today] = {"zt": len(ups), "lb": n_lb, "first": n_first,
                        "maxlb": max((u["lianban"] for u in ups), default=0),
                        "jj_first": round(mkt_first_jj, 1) if mkt_first_jj is not None else None,
@@ -1260,9 +1275,11 @@ def main():
                        "mood": mood,
                        "regime": (reg or {}).get("type"),
                        "regime_label": (reg or {}).get("label")}
-        json.dump(dict(sorted(hist.items())), open(tk, "w", encoding="utf-8"),
-                  ensure_ascii=False, indent=1)
-        print(f"[OK] 情绪指标跟踪 {len(hist)} 天 → {tk}")
+        _sorted = dict(sorted(hist.items()))
+        for _p in {tk, tk_root}:
+            os.makedirs(os.path.dirname(_p) or ".", exist_ok=True)
+            json.dump(_sorted, open(_p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        print(f"[OK] 情绪指标跟踪 {len(_sorted)} 天（累积·双写）→ {tk_root}")
     except Exception as e:
         print(f"[WARN] 情绪指标跟踪写入失败: {e}")
 
