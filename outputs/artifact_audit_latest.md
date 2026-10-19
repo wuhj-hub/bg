@@ -1,7 +1,7 @@
-# 🔍 产物入库审计 · 2026-10-19
+# 🔍 产物入库审计 · 2026-10-20
 
-> 扫描 85 个产出路径 / 108 个提交路径 / 30 个消费读取路径
-> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **7** ｜ ✅ 已提交 **78** ｜ ❔ 提交但未见生成 42 ｜ 🧬 陈旧副本 **0**
+> 扫描 85 个产出路径 / 109 个提交路径 / 30 个消费读取路径
+> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **7** ｜ ✅ 已提交 **78** ｜ ❔ 提交但未见生成 43 ｜ 🧬 陈旧副本 **0**
 
 ## 🟡 写而未提交（其余，多为研究/一次性产物）
 
@@ -44,6 +44,7 @@
 | `pipeline_audit_latest.json` | selfcheck_daily.yml |
 | `pool_entries.csv` | quant_report.yml |
 | `pool_quality.json` | quant_report.yml |
+| `regime_history.csv` | pool_winrate_biweekly.yml |
 | `reversal_perf_day.csv` | quant_report.yml |
 | `reversal_perf_month.csv` | quant_report.yml |
 | `reversal_perf_week.csv` | quant_report.yml |
@@ -70,5 +71,5 @@
 
 | 产物 | 根日期 | outputs日期 | 判定 |
 |---|---|---|---|
-| `sector_component_em.json` | 2026-10-16 | 2026-10-16 | 同步 |
+| `sector_component_em.json` | 2026-10-19 | 2026-10-19 | 同步 |
 | `xihu_breadth_history.json` | 2024-06-11 | 2024-06-11 | 同步 |
