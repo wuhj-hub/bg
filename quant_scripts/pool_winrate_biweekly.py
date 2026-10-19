@@ -304,6 +304,16 @@ def main():
                 rows_out.append(f"| {name} · {_RL[reg]} | "
                                 + " | ".join(cell(agg(d_.get(h, []))) for h in HOLDS) + " |")
         L += rows_out if rows_out else ["| （暂无可分层样本，等待累积） | — | — | — | — |"]
+        # 样本期警示：某类型覆盖的入池日过少 → 分层近似「时间切片」，不可当纯环境效应读
+        cov = {}
+        for _, _c, _ed in p_rows:
+            _r = regime_of(_ed)
+            if _r:
+                cov.setdefault(_r, set()).add((_ed or "")[:10])
+        thin = sorted(k for k, v in cov.items() if len(v) < 20)
+        if thin:
+            L += ["", "> ⚠️ 样本期警示：" + "、".join(f"{_RL[k]} 仅覆盖 {len(cov[k])} 个入池日" for k in thin)
+                  + " → 该分组近似「按入池时间切片」，**不能当作纯环境效应**；按月累积（每类 ≥20 个入池日）后结论才成立。"]
         L += ["", "> 每格 = 胜率 / 均值（n=样本数），样本 <5 仅供观察。三类无优劣、只是手法不同——"
               "分层的目的就是验证「哪种手法在哪类环境里正期望」。", ""]
 
