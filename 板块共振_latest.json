@@ -1,12 +1,12 @@
 {
- "date": "2026-10-16",
+ "date": "2026-10-19",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 52,
+ "pool_size": 47,
  "resonance_boards": [
   {
-   "name": "水泥",
-   "code": "pt01801711",
-   "zdf": 4.17,
+   "name": "厨卫电器",
+   "code": "pt01801114",
+   "zdf": 3.2,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -15,20 +15,9 @@
    ]
   },
   {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "zdf": 3.71,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "zdf": 1.22,
+   "name": "国有大型银行Ⅱ",
+   "code": "pt01801782",
+   "zdf": 2.22,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -39,10 +28,52 @@
   {
    "name": "贵金属",
    "code": "pt01801053",
-   "zdf": 2.2,
+   "zdf": 1.85,
    "strength": 7,
    "factors": [
     "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "航空装备Ⅱ",
+   "code": "pt01801742",
+   "zdf": 1.51,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "数字媒体",
+   "code": "pt01801767",
+   "zdf": 1.15,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "地面兵装Ⅱ",
+   "code": "pt01801743",
+   "zdf": 5.22,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "zdf": 0.16,
+   "strength": 5,
+   "factors": [
     "进场",
     "吸筹"
    ]
@@ -50,8 +81,18 @@
  ],
  "grab_top": [
   {
-   "name": "水泥",
-   "code": "pt01801711",
+   "name": "厨卫电器",
+   "code": "pt01801114",
+   "value": 7
+  },
+  {
+   "name": "国有大型银行Ⅱ",
+   "code": "pt01801782",
+   "value": 7
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
    "value": 7
   },
   {
@@ -60,21 +101,16 @@
    "value": 7
   },
   {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "value": 7
-  },
-  {
-   "name": "贵金属",
-   "code": "pt01801053",
+   "name": "数字媒体",
+   "code": "pt01801767",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "value": 13.3
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "value": 14.4
   },
   {
    "name": "航空装备Ⅱ",
@@ -82,47 +118,85 @@
    "value": 12.3
   },
   {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "value": 11.9
+   "name": "国有大型银行Ⅱ",
+   "code": "pt01801782",
+   "value": 8.6
   },
   {
-   "name": "水泥",
-   "code": "pt01801711",
-   "value": 1.4
+   "name": "地面兵装Ⅱ",
+   "code": "pt01801743",
+   "value": 7.3
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 4.0
+  },
+  {
+   "name": "数字媒体",
+   "code": "pt01801767",
+   "value": 4.0
+  },
+  {
+   "name": "厨卫电器",
+   "code": "pt01801114",
+   "value": 0.9
   }
  ],
  "absorption_top": [
   {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "value": 1.91
-  },
-  {
-   "name": "水泥",
-   "code": "pt01801711",
-   "value": 0
-  },
-  {
-   "name": "航空装备Ⅱ",
-   "code": "pt01801742",
-   "value": 0
+   "name": "地面兵装Ⅱ",
+   "code": "pt01801743",
+   "value": 2.35
   },
   {
    "name": "白酒Ⅱ",
    "code": "pt01801125",
-   "value": 0
+   "value": 2.05
+  },
+  {
+   "name": "厨卫电器",
+   "code": "pt01801114",
+   "value": 1.4
+  },
+  {
+   "name": "航空装备Ⅱ",
+   "code": "pt01801742",
+   "value": 1.34
+  },
+  {
+   "name": "国有大型银行Ⅱ",
+   "code": "pt01801782",
+   "value": 1.19
+  },
+  {
+   "name": "数字媒体",
+   "code": "pt01801767",
+   "value": 0.65
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 0.64
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "水泥",
-   "stock": "福建水泥",
-   "code": "sh600802",
-   "zdf": "10.06",
-   "main1": 1.95,
-   "main5": 1.24
+   "board": "国有大型银行Ⅱ",
+   "stock": "农业银行",
+   "code": "sh601288",
+   "zdf": "3.45",
+   "main1": 2.1,
+   "main5": 4.79
+  },
+  {
+   "board": "地面兵装Ⅱ",
+   "stock": "甘化科工",
+   "code": "sz000576",
+   "zdf": "10.03",
+   "main1": 0.53,
+   "main5": 0.44
   }
  ]
 }
