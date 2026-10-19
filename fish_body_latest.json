@@ -1,6 +1,6 @@
 {
   "market_temp": {
-    "temp": 50,
+    "temp": 45,
     "level": "中性",
     "idx": "3730.92"
   },
@@ -179,7 +179,7 @@
       "reasons": [
         "DIF/DEA在0轴上方",
         "DIF(0.13)>=DEA(0.08)金叉",
-        "MACD柱0.100刚翻红加油成功",
+        "MACD柱0.110刚翻红加油成功",
         "收盘9.57>MA59.39",
         "MA20>MA60多头排列"
       ],
@@ -200,23 +200,22 @@
       "rsg_strong": true
     },
     {
-      "code": "sh600028",
-      "name": "中国石化",
+      "code": "sz002027",
+      "name": "分众传媒",
       "pattern": "MACD空中加油",
       "raw_score": 90,
-      "final_score": 70,
-      "multi_score": 72,
+      "final_score": 69,
+      "multi_score": 67,
       "resonance": "共振向下",
-      "price": 5.47,
+      "price": 5.28,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.08)>=DEA(0.06)金叉",
-        "MACD柱0.040刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=62未超买"
+        "DIF(0.09)>=DEA(0.03)金叉",
+        "MACD柱0.130刚翻红加油成功",
+        "收盘5.28>MA55.2"
       ],
-      "stop_loss": "5.23",
-      "target": "6.29",
+      "stop_loss": "4.94",
+      "target": "6.07",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
@@ -228,8 +227,8 @@
       "month_trend": "纠缠",
       "month_gate": "WARN",
       "month_reversal": null,
-      "rsg_dev": 176.2,
-      "rsg_strong": true
+      "rsg_dev": null,
+      "rsg_strong": false
     },
     {
       "code": "sh600400",
@@ -261,6 +260,38 @@
       "month_gate": "PASS",
       "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": 580.4,
+      "rsg_strong": true
+    },
+    {
+      "code": "sh601919",
+      "name": "中远海控",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 68,
+      "multi_score": 60,
+      "resonance": "共振向下",
+      "price": 16.73,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.19)>=DEA(0.16)金叉",
+        "MACD柱0.040刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=41未超买"
+      ],
+      "stop_loss": "16.15",
+      "target": "19.24",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": 303.6,
       "rsg_strong": true
     },
     {
@@ -359,6 +390,37 @@
       "month_reversal": "平台突破(12月新高)",
       "rsg_dev": null,
       "rsg_strong": false
+    },
+    {
+      "code": "sz000651",
+      "name": "格力电器",
+      "pattern": "MACD空中加油",
+      "raw_score": 75,
+      "final_score": 59,
+      "multi_score": 76,
+      "resonance": "共振向下",
+      "price": 39.91,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.30)>=DEA(0.14)金叉",
+        "MACD柱0.32>0但已走高",
+        "收盘39.91>MA539.69"
+      ],
+      "stop_loss": "37.71",
+      "target": "45.90",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": 238.4,
+      "rsg_strong": true
     },
     {
       "code": "sh601398",
@@ -548,7 +610,7 @@
       "resonance": "共振向下",
       "price": 43.05,
       "reasons": [
-        "MA20(41.51)>MA60(40.23)多头",
+        "MA20(41.51)>MA60(40.24)多头",
         "MACD在0轴上方",
         "在MA10附近(偏离2.2%)",
         "收盘43.05>MA542.73",
