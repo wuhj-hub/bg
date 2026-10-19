@@ -1,5 +1,5 @@
 {
- "date": "2026-08-26",
+ "date": "2026-10-19",
  "score": 0,
  "level": "🟢 正常",
  "advice": "无顶部信号，正常执行",
@@ -16,32 +16,22 @@
   },
   "5_情绪亢奋": {
    "hit": false,
-   "detail": "2026-08-25成交额8589亿分位20%",
+   "detail": "2026-10-16成交额7325亿分位8%",
    "data": {}
   },
   "2_龙头崩塌": {
    "hit": false,
-   "detail": "龙头池19只中0只破位(0%)<30%",
+   "detail": "龙头池17只中1只破位(6%)<30%",
    "data": {
-    "pool": 19,
-    "collapsed": 0,
-    "ratio": 0.0
+    "pool": 17,
+    "collapsed": 1,
+    "ratio": 5.9
    }
   },
   "3_轮动散乱": {
    "hit": false,
-   "detail": "板块TOP5重合2个，轮动有序",
-   "data": {
-    "prev": [
-     "turnoverRate",
-     "mainNetInflow"
-    ],
-    "cur": [
-     "turnoverRate",
-     "mainNetInflow"
-    ],
-    "same": 2
-   }
+   "detail": "板块快照待累积（需连续运行2日）",
+   "data": {}
   }
  },
  "triggered": []
