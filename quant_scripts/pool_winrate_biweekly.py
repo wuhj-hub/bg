@@ -20,7 +20,7 @@
 触发：.github/workflows/pool_winrate_biweekly.yml（每周一触发，脚本内做 ISO 双周判断）。
 用法：python3 pool_winrate_biweekly.py [--force] [--push] [--out PATH]
 """
-import os, re, csv, json, argparse, subprocess, shutil, urllib.parse, urllib.request
+import os, re, sys, csv, json, argparse, subprocess, shutil, urllib.parse, urllib.request
 from datetime import datetime, timezone, timedelta
 
 BJ = timezone(timedelta(hours=8))
@@ -230,6 +230,82 @@ def main():
     else:
         L.append("| （无信号源数据） | — | — | — | — |")
     L += ["", "> 王者=其自带 r5/r10/r20 回测列；量学/竞价=按上表统一口径现算（竞价原为开盘口径，此处统一为收盘口径）。", ""]
+
+    # ── 四、按行情类型分层（曾星智《悟道01》三类短线行情 · 指数口径）──
+    reg_map = {}
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from regime_history import ensure as _rge, REGIME_LABEL as _RL
+        reg_map = _rge()
+    except Exception as e:
+        print(f"[WARN] 行情类型历史不可用: {e}", flush=True)
+
+    L += ["## 四、按行情类型分层（曾星智《悟道01》三类短线行情 · 指数口径）", ""]
+    if not reg_map:
+        L += ["| （行情类型历史不可用，本节跳过） | — | — | — | — |", ""]
+    else:
+        import bisect
+        import collections
+        rdates = sorted(reg_map)
+
+        def regime_of(d):
+            d = (d or "")[:10]
+            i = bisect.bisect_right(rdates, d) - 1
+            return reg_map[rdates[i]] if i >= 0 else None
+
+        def split(pairs):
+            out = {}
+            for d, c in pairs:
+                r = regime_of(d)
+                if not r:
+                    continue
+                for h in HOLDS:
+                    v = trading_ret(kline.get(c), d, h)
+                    if v is not None:
+                        out.setdefault(r, {}).setdefault(h, []).append(v)
+            return out
+
+        cnt250 = collections.Counter(reg_map[d] for d in rdates[-250:])
+        L += ["> 分层依据：`quant_scripts/regime_history.py` 回算的**每日行情类型**"
+              "（上证 MA250/60/20 方向 + 年线位置；历史口径无广度，比实盘 v4.6 判定略粗）；"
+              "样本按**信号日/入池日所属类型**归组。",
+              f"> 序列覆盖 {rdates[0]} ~ {rdates[-1]}（{len(rdates)} 交易日）；近250日分布："
+              + "｜".join(f"{_RL[k]} {cnt250.get(k, 0)}日" for k in (1, 2, 3)), "",
+              "| 来源 · 行情类型 | 5日 胜率/均值 | 10日 | 20日 | 60日 |", "|---|---|---|---|---|"]
+
+        src_pairs = [("全池基准", [(ed, c) for _, c, ed in p_rows])]
+        for p in sorted(agg_pool, key=lambda x: -len(agg_pool[x].get(20, agg_pool[x].get(5, []))))[:6]:
+            src_pairs.append((f"池·{p}", [(ed, c) for pp, c, ed in p_rows if pp == p]))
+        if wz:
+            src_pairs.append(("涨停王者（自带回测列）", None))
+        src_pairs.append(("量学", lx))
+        src_pairs.append(("竞价（合并策略）", [(d, c) for d, c, _ in jj]))
+
+        rows_out = []
+        for name, pairs in src_pairs:
+            if pairs is None:                       # 涨停王者：用自带 r5/r10/r20，不重取
+                d_by_reg = {}
+                for r in wz:
+                    reg = regime_of(r.get("date"))
+                    if not reg:
+                        continue
+                    for h, col in ((5, "r5"), (10, "r10"), (20, "r20")):
+                        try:
+                            v = float(r.get(col))
+                        except (TypeError, ValueError):
+                            continue
+                        d_by_reg.setdefault(reg, {}).setdefault(h, []).append(v)
+            else:
+                d_by_reg = split(pairs)
+            for reg in (1, 2, 3):
+                d_ = d_by_reg.get(reg)
+                if not d_:
+                    continue
+                rows_out.append(f"| {name} · {_RL[reg]} | "
+                                + " | ".join(cell(agg(d_.get(h, []))) for h in HOLDS) + " |")
+        L += rows_out if rows_out else ["| （暂无可分层样本，等待累积） | — | — | — | — |"]
+        L += ["", "> 每格 = 胜率 / 均值（n=样本数），样本 <5 仅供观察。三类无优劣、只是手法不同——"
+              "分层的目的就是验证「哪种手法在哪类环境里正期望」。", ""]
 
     L += ["---", "",
           "**口径与边界**：",
