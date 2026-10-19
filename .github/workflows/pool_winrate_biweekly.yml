@@ -86,7 +86,7 @@ jobs:
           F="outputs/股池胜率总览_$(date +%Y-%m-%d).md"
           if [ -f "$F" ]; then
             python3 git_api_commit.py --msg "chore: 股池胜率总览 $(date +%Y-%m-%d)" "$F" \
-              || echo "::warning::总览提交失败"
+              data/regime_history.csv || echo "::warning::总览提交失败"
           else
             echo "本周为非报告周或未生成，跳过提交"
           fi
