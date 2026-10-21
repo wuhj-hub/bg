@@ -1,9 +1,25 @@
 {
- "date": "2026-10-21 07:01",
+ "date": "2026-10-22 07:01",
  "runs": {
-  "total": 74,
-  "bad": [],
+  "total": 72,
+  "bad": [
+   {
+    "name": "多维度·鱼身报告更新",
+    "conclusion": "cancelled",
+    "created": "2026-10-21T13:39",
+    "id": 39609895645,
+    "event": "schedule"
+   }
+  ],
   "noise": [
+   {
+    "name": "盘中监控",
+    "conclusion": "cancelled",
+    "created": "2026-10-21T01:45",
+    "id": 39529124185,
+    "event": "repository_dispatch",
+    "reason": "并发/重复触发取消"
+   },
    {
     "name": "盘中监控",
     "conclusion": "cancelled",
@@ -18,38 +34,39 @@
   {
    "workflow": "多维度·鱼身报告更新",
    "step": "动态生成鱼身股票池（近20日日均成交额排名前300）",
-   "minutes": 37.4
+   "minutes": 86.8
   },
   {
    "workflow": "盘后报告生成",
    "step": "一统天下建仓区股池扫描+跟踪（多周期共振）",
-   "minutes": 40.8
+   "minutes": 51.5
   },
   {
    "workflow": "全盘量化扫描",
    "step": "一统天下多周期扫描（建仓区+月线反转+RSV50三线强度）",
-   "minutes": 33.2
+   "minutes": 38.5
   },
   {
    "workflow": "竞价统计·逐日跟踪",
    "step": "采集竞价 + 逐日跟踪 + 报告",
-   "minutes": 31.4
+   "minutes": 32.9
   }
  ],
  "stale_products": [
   {
    "path": "market_width_latest.json",
-   "status": "停更4个交易日(自然5天)",
-   "age": 4,
+   "status": "停更5个交易日(自然6天)",
+   "age": 5,
    "max": 1
   }
  ],
  "freshness_skipped": false,
  "script_errors": [],
  "issues": [
-  "⏹️ 并发/重复触发取消 1 个（已忽略，不计入异常）",
-  "⚠️ 重步骤：多维度·鱼身报告更新/动态生成鱼身股票池（近20日日均成交额排名前300） 37.4min、盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 40.8min、全盘量化扫描/一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） 33.2min、竞价统计·逐日跟踪/采集竞价 + 逐日跟踪 + 报告 31.4min",
-  "⚠️ 产物停更：market_width_latest.json(停更4个交易日(自然5天))"
+  "❌ run 异常 1 个（多维度·鱼身报告更新:cancelled）",
+  "⏹️ 并发/重复触发取消 2 个（已忽略，不计入异常）",
+  "⚠️ 重步骤：多维度·鱼身报告更新/动态生成鱼身股票池（近20日日均成交额排名前300） 86.8min、盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 51.5min、全盘量化扫描/一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） 38.5min、竞价统计·逐日跟踪/采集竞价 + 逐日跟踪 + 报告 32.9min",
+  "⚠️ 产物停更：market_width_latest.json(停更5个交易日(自然6天))"
  ],
- "status": "WARN"
+ "status": "FAIL"
 }
