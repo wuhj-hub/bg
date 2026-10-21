@@ -1,49 +1,21 @@
 {
- "date": "2026-10-20",
+ "date": "2026-10-21",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 51,
- "resonance_boards": [
-  {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "zdf": 2.37,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  }
- ],
- "grab_top": [
-  {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 7
-  }
- ],
+ "pool_size": 50,
+ "resonance_boards": [],
+ "grab_top": [],
  "entry_top": [
   {
-   "name": "国有大型银行Ⅱ",
-   "code": "pt01801782",
-   "value": 8.6
-  },
-  {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 3.7
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 4.3
   }
  ],
  "absorption_top": [
   {
-   "name": "国有大型银行Ⅱ",
-   "code": "pt01801782",
-   "value": 1.18
-  },
-  {
-   "name": "数字媒体",
-   "code": "pt01801767",
-   "value": 0.6
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 0.8
   }
  ],
  "control_top": [],
