@@ -1,6 +1,6 @@
 {
   "date": "2026-10-21",
-  "total": 1183,
+  "total": 1184,
   "results": [
     {
       "code": "sz000036",
@@ -8177,6 +8177,19 @@
       "stars": 3,
       "reversal": null,
       "strength": "+6.7>+0.7>-2.9",
+      "note": "日线建仓2026-10-15"
+    },
+    {
+      "code": "sz001237",
+      "name": "惠康科技",
+      "entry": "2026-10-15",
+      "guaili": false,
+      "in_now": true,
+      "week": null,
+      "m60": false,
+      "stars": 3,
+      "reversal": null,
+      "strength": null,
       "note": "日线建仓2026-10-15"
     },
     {
