@@ -1,5 +1,5 @@
 {
- "date": "2026-10-21",
+ "date": "2026-10-22",
  "writes": {
   "panhou_lianghua.csv": [
    "full_market_dualdim.py"
@@ -935,8 +935,8 @@
  "dup_freshness": [
   {
    "name": "sector_component_em.json",
-   "root": "2026-10-20",
-   "outputs": "2026-10-20",
+   "root": "2026-10-21",
+   "outputs": "2026-10-21",
    "status": "同步"
   },
   {
