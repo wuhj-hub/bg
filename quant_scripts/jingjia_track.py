@@ -172,6 +172,108 @@ def special_section(by_strat):
     return md
 
 
+# ---------------- 竞价快报（盘前轻量模式） ----------------
+def brief_report(uni, args):
+    """09:27 盘前竞价快报：只读腾讯行情快照，不做日线/信号重算 → 目标 <2min。
+
+    数据来源 fetch.ext_gtimg（qt.gtimg）：open=集合竞价撮合价、prev_close=昨收、
+    amount=累计成交额（万元；09:25 撮合完成至 09:30 连续竞价前，该值即竞价成交额）。
+    数据未就绪（有效只数不足）时等待重试，仍无则输出提示并以 0 退出（不误报红）。
+    完整「三策略信号判定 + T+1~T+5 收益回填」仍由收盘后的完整模式产出。
+    """
+    _d = os.path.dirname(os.path.abspath(__file__))
+    if _d not in sys.path:
+        sys.path.insert(0, _d)
+    from fetch import ext_gtimg
+
+    today = args.date
+    wcodes = [w for _, _, w in uni]
+    recs, ready = {}, 0
+    for attempt in range(3):
+        try:
+            recs = ext_gtimg(wcodes, batch=50) or {}
+        except Exception as e:
+            print(f"[brief] 行情抓取失败：{e}", file=sys.stderr)
+            recs = {}
+        ready = sum(1 for r in recs.values() if (r.get("amount") or 0) > 0 and (r.get("open") or 0) > 0)
+        if ready >= 100:
+            break
+        if attempt < 2:
+            print(f"[brief] 竞价数据未就绪（有效 {ready} 只），60s 后重试", file=sys.stderr)
+            time.sleep(60)
+
+    rows = []
+    for code, nm, w in uni:
+        r = recs.get(w) or {}
+        op, pc = r.get("open") or 0, r.get("prev_close") or 0
+        amt = (r.get("amount") or 0) * 1e4          # 万元 → 元
+        if op <= 0 or pc <= 0:
+            continue
+        rows.append({"code": code, "name": nm, "open": op, "prev": pc,
+                     "gap": op / pc - 1, "amt": amt})
+    if not rows:
+        print(f"[brief] 无有效竞价数据（{today}），可能未开盘或休市，跳过", file=sys.stderr)
+        return None
+
+    tot_amt = sum(x["amt"] for x in rows)
+    by_amt = sorted(rows, key=lambda x: -x["amt"])[:20]
+    by_gap = sorted(rows, key=lambda x: -x["gap"])[:20]
+    by_low = sorted(rows, key=lambda x: x["gap"])[:15]
+
+    # 昨日（最近信号日）信号 → 今日竞价表现
+    sig_prev = []
+    if os.path.exists(SIGNAL_CSV):
+        last_dates = {}
+        with open(SIGNAL_CSV, encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                if r.get("date") and r["date"] < today:
+                    last_dates[r["date"]] = 1
+        if last_dates:
+            d0 = sorted(last_dates)[-1]
+            px = {x["code"]: x for x in rows}
+            with open(SIGNAL_CSV, encoding="utf-8") as f:
+                for r in csv.DictReader(f):
+                    if r.get("date") == d0 and r.get("code") in px:
+                        x = px[r["code"]]
+                        sig_prev.append({"date": d0, "code": r["code"], "name": r.get("name") or x["name"],
+                                         "strat": r.get("strategy", ""), "prev": x["prev"],
+                                         "open": x["open"], "gap": x["gap"]})
+
+    def _tbl(head, keys, data):
+        out = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+        for x in data:
+            out.append("| " + " | ".join(keys(x)) + " |")
+        return out
+
+    md = [f"# ⚡ 竞价快报 · {today}", "",
+          f"- 数据：腾讯行情快照（09:25 集合竞价撮合结果），有效 **{len(rows)}** 只沪深主板",
+          f"- 全市场竞价成交额合计 **{tot_amt / 1e8:.1f} 亿元**",
+          "- 用途：盘前资金/情绪参考。**三策略信号判定与 T+1~T+5 收益回填由收盘后 15:05 的完整统计产出**", "",
+          "## 一、竞价金额 Top 20（资金主攻方向）", ""]
+    md += _tbl(["代码", "名称", "竞价金额(亿)", "今开", "高开%", "昨收"],
+               lambda x: [x["code"], x["name"], f"{x['amt'] / 1e8:.2f}", f"{x['open']:.2f}",
+                          f"{x['gap'] * 100:+.2f}%", f"{x['prev']:.2f}"], by_amt)
+    md += ["", "## 二、竞价高开 Top 20（强势预期）", ""]
+    md += _tbl(["代码", "名称", "高开%", "今开", "竞价金额(亿)"],
+               lambda x: [x["code"], x["name"], f"{x['gap'] * 100:+.2f}%", f"{x['open']:.2f}",
+                          f"{x['amt'] / 1e8:.2f}"], by_gap)
+    md += ["", "## 三、竞价低开 Top 15（风险名单）", ""]
+    md += _tbl(["代码", "名称", "低开%", "今开", "竞价金额(亿)"],
+               lambda x: [x["code"], x["name"], f"{x['gap'] * 100:+.2f}%", f"{x['open']:.2f}",
+                          f"{x['amt'] / 1e8:.2f}"], by_low)
+    if sig_prev:
+        md += ["", f"## 四、昨日信号今日竞价（{sig_prev[0]['date']} 信号 · {len(sig_prev)} 条）", ""]
+        md += _tbl(["代码", "名称", "策略", "昨收", "今开", "高开%"],
+                   lambda x: [x["code"], x["name"], x["strat"], f"{x['prev']:.2f}",
+                              f"{x['open']:.2f}", f"{x['gap'] * 100:+.2f}%"], sig_prev[:30])
+
+    out = os.path.join(OUT_DIR, f"竞价快报_{today}.md")
+    with open(out, "w", encoding="utf-8") as f:
+        f.write("\n".join(md) + "\n")
+    print(f"[brief] {out}  有效 {len(rows)} 只 / 竞价额 {tot_amt / 1e8:.1f} 亿", file=sys.stderr)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--universe", default="all_mainboard.csv")
@@ -181,10 +283,15 @@ def main():
     ap.add_argument("--ingest", default="", help="摄入通达信竞价 json 文件")
     ap.add_argument("--ingest-date", default="", help="--ingest 对应的日期")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--brief", action="store_true", help="盘前竞价快报模式（只读行情快照，不做日线/信号重算）")
     ap.add_argument("--date", default=time.strftime("%Y-%m-%d"))
     args = ap.parse_args()
 
     uni = J.load_universe(os.path.join(ROOT, args.universe))
+    if args.brief:
+        out = brief_report(uni, args)
+        print(json.dumps({"brief": out, "stocks": len(uni)}, ensure_ascii=False))
+        return
     wcodes = [w for _, _, w in uni]
     name_of = {c: n for c, n, _ in uni}
     print(f"[universe] {len(uni)} 只", file=sys.stderr)
