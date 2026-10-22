@@ -89,7 +89,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: 6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs=
+          IMA_KB_ID: ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7511006091703733
           # 2026-10-15（11.4）：移除显式查重开关 —— 上传名含日期时默认「同日覆盖+旧版归档」
         run: |
