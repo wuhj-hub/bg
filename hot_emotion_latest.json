@@ -1,21 +1,21 @@
 {
- "date": "2026-10-21",
- "total": 44,
- "lianban_cnt": 16,
- "max_lb": 4,
- "shouban": 28,
+ "date": "2026-10-22",
+ "total": 30,
+ "lianban_cnt": 9,
+ "max_lb": 5,
+ "shouban": 21,
  "by_lb": {
-  "4": 3,
-  "3": 1,
-  "2": 12,
-  "1": 28
+  "5": 2,
+  "3": 2,
+  "2": 5,
+  "1": 21
  },
  "score": {
-  "score": 61,
+  "score": 68,
   "level": "活跃",
   "parts": {
-   "涨停家数": 8,
-   "连板高度": 18,
+   "涨停家数": 5,
+   "连板高度": 28,
    "连板占比": 35
   }
  },
@@ -27,8 +27,8 @@
    "name": "海洋王",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -42,31 +42,12 @@
    ]
   },
   {
-   "code": "sh600178",
-   "name": "东安动力",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "汽车零部件",
-    "汽车",
-    "底盘与发动机系统",
-    "飞行汽车(eVTOL)"
-   ]
-  },
-  {
    "code": "sh603278",
    "name": "大业股份",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -80,48 +61,12 @@
    ]
   },
   {
-   "code": "sz002929",
-   "name": "润建股份",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "私募重仓",
-    "基金减仓",
-    "QFII新进"
-   ]
-  },
-  {
-   "code": "sz001239",
-   "name": "永达股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "机械设备",
-    "工程机械",
-    "工程机械器件"
-   ]
-  },
-  {
    "code": "sz002076",
    "name": "星光股份",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -134,70 +79,25 @@
    ]
   },
   {
-   "code": "sz002181",
-   "name": "粤传媒",
+   "code": "sh600293",
+   "name": "三峡新材",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sz002242",
-   "name": "九阳股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "家用电器"
+    "玻璃制造",
+    "建筑材料"
    ]
   },
   {
-   "code": "sz002696",
-   "name": "百洋股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "私募重仓"
-   ]
-  },
-  {
-   "code": "sz002313",
-   "name": "日海智能",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通信终端及配件"
-   ]
-  },
-  {
-   "code": "sz002347",
-   "name": "泰尔股份",
+   "code": "sh600202",
+   "name": "哈空调",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -210,12 +110,13 @@
    "sectors": [
     "通用设备",
     "机械设备",
-    "金属制品"
+    "制冷空调设备",
+    "核能核电"
    ]
   },
   {
-   "code": "sz002835",
-   "name": "同为股份",
+   "code": "sh600838",
+   "name": "上海九百",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -226,14 +127,12 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "安防设备",
-    "计算机设备",
     "QFII新进"
    ]
   },
   {
-   "code": "sh600293",
-   "name": "三峡新材",
+   "code": "sh603138",
+   "name": "海量数据",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -244,13 +143,13 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "玻璃制造",
-    "建筑材料"
+    "基金减仓",
+    "QFII新进"
    ]
   },
   {
-   "code": "sh603236",
-   "name": "移远通信",
+   "code": "sh601999",
+   "name": "出版传媒",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -261,14 +160,12 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "通信终端及配件",
-    "水利建设",
-    "基金增仓"
+    "基金减仓"
    ]
   },
   {
-   "code": "sh603636",
-   "name": "南威软件",
+   "code": "sh603330",
+   "name": "天洋新材",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -279,25 +176,9 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "网络安全",
-    "电子车牌"
-   ]
-  },
-  {
-   "code": "sh603696",
-   "name": "安记食品",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "调味发酵品Ⅲ",
-    "调味发酵品Ⅱ"
+    "塑料",
+    "其他塑料制品",
+    "基础化工"
    ]
   }
  ],
