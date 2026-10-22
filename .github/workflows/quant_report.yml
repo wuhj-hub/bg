@@ -116,7 +116,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: 9wlJWgbFxvKhhxzobeMHSJ7_eaUmHutVQXMzeNxh4DM=
+          IMA_KB_ID: ima_kb_LCxys0NP
           IMA_FOLDER_ID: folder_7483172363202542
         run: |
           python3 quant_scripts/monthly_pool_sync.py --date "$(date +%Y-%m-%d)"
@@ -131,7 +131,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: zw56pWsoAd18wp9A_2-_vFFAPbG51UZsuaGyvynm66g=
+          IMA_KB_ID: ima_kb_zmenvjf6
           IMA_FOLDER_ID: folder_7484244066591607
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
