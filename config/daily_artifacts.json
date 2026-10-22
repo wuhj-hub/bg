@@ -1,420 +1,427 @@
 {
- "_note": "当日核心产物契约（2026-10-15 建 · 2026-10-16 扩容至全 workflow）。单一事实来源：workflow 提交清单与 run_and_verify 自检均以此为准。path 支持 {date}(YYYY-MM-DD) / {date8}(YYYYMMDD) / * 通配。min_bytes 为经验下限（仅防「空产物/秒退」，非精确校验）。optional=true 表示「偶发缺失属正常」（仅告警、不计入失败/不推送）——周期类 workflow（月/季/双周）与易降级产物一律 optional，观察稳定后转正。",
- "quant_scan": [
-  {
-   "path": "quant_results_latest.json",
-   "min_bytes": 300,
-   "producer": "run_all_quant.py"
-  },
-  {
-   "path": "outputs/market_width_latest.json",
-   "min_bytes": 200,
-   "producer": "market_width.py"
-  },
-  {
-   "path": "xihu_breadth_latest.json",
-   "min_bytes": 200,
-   "producer": "xihu_breadth.py"
-  },
-  {
-   "path": "hot_emotion_latest.json",
-   "min_bytes": 100,
-   "producer": "hot_emotion.py"
-  },
-  {
-   "path": "涨停概念排行_latest.json",
-   "min_bytes": 200,
-   "producer": "limitup_concept_rank.py"
-  },
-  {
-   "path": "板块共振_latest.json",
-   "min_bytes": 200,
-   "producer": "sector_resonance_local.py"
-  },
-  {
-   "path": "yearline_breadth_latest.json",
-   "min_bytes": 100,
-   "producer": "yearline_breadth.py"
-  },
-  {
-   "path": "一统天下建仓区股池_latest.json",
-   "min_bytes": 100,
-   "producer": "yitong_screener.py"
-  },
-  {
-   "path": "双弦观察池_latest.json",
-   "min_bytes": 100,
-   "producer": "dual_pool_sync.py"
-  },
-  {
-   "path": "outputs/env_latest.json",
-   "min_bytes": 100,
-   "producer": "env_engine.py"
-  },
-  {
-   "path": "outputs/qiankun_a_latest.json",
-   "min_bytes": 100,
-   "producer": "full_market_dualdim.py"
-  },
-  {
-   "path": "outputs/四维共振_latest.json",
-   "min_bytes": 100,
-   "producer": "quad_resonance.py"
-  },
-  {
-   "path": "123_2b_latest.json",
-   "min_bytes": 100,
-   "producer": "scan_123_2b.py",
-   "optional": true
-  },
-  {
-   "path": "rsv_strength_latest.json",
-   "min_bytes": 100,
-   "producer": "rsv_strength.py",
-   "optional": true
-  },
-  {
-   "path": "xihu_rsv_latest.json",
-   "min_bytes": 100,
-   "producer": "xihu_rsv.py",
-   "optional": true
-  },
-  {
-   "path": "monthly_macd_latest.json",
-   "min_bytes": 100,
-   "producer": "monthly_macd_scan.py",
-   "optional": true
-  },
-  {
-   "path": "断档分歧_latest.json",
-   "min_bytes": 100,
-   "producer": "gap_divergence.py",
-   "optional": true
-  },
-  {
-   "path": "top_signal_latest.json",
-   "min_bytes": 100,
-   "producer": "top_signal.py",
-   "optional": true
-  },
-  {
-   "path": "board_top_latest.json",
-   "min_bytes": 100,
-   "producer": "board_top.py",
-   "optional": true
-  },
-  {
-   "path": "情绪预判_latest.json",
-   "min_bytes": 100,
-   "producer": "emotion_forecast.py",
-   "optional": true
-  },
-  {
-   "path": "liangxue_latest.json",
-   "min_bytes": 100,
-   "producer": "liangxue.py",
-   "optional": true
-  },
-  {
-   "path": "mode_aggregate_latest.json",
-   "min_bytes": 100,
-   "producer": "market_width.py",
-   "optional": true
-  },
-  {
-   "path": "hot_emotion_history.json",
-   "min_bytes": 100,
-   "producer": "hot_emotion.py",
-   "optional": true
-  },
-  {
-   "path": "panhou_lianghua.csv",
-   "min_bytes": 100,
-   "producer": "run_all_quant.py",
-   "optional": true
-  },
-  {
-   "path": "outputs/资金快照_{date}.csv",
-   "min_bytes": 50,
-   "producer": "fund_snapshot.py",
-   "optional": true
-  }
- ],
- "quant_report": [
-  {
-   "path": "outputs/复盘报告_{date}.md",
-   "min_bytes": 2000,
-   "producer": "gen_review_report.py"
-  },
-  {
-   "path": "outputs/股池标的跟踪报告_{date}.md",
-   "min_bytes": 500,
-   "producer": "pool_tracking_report.py"
-  },
-  {
-   "path": "outputs/一统天下跟踪_{date}.md",
-   "min_bytes": 500,
-   "producer": "pool_tracking_report.py"
-  },
-  {
-   "path": "market_style_latest.json",
-   "min_bytes": 100,
-   "producer": "market_style.py"
-  },
-  {
-   "path": "信号仲裁_latest.json",
-   "min_bytes": 100,
-   "producer": "signal_arbiter.py"
-  },
-  {
-   "path": "组合风控_latest.json",
-   "min_bytes": 100,
-   "producer": "portfolio_risk.py"
-  },
-  {
-   "path": "乖离低买_latest.json",
-   "min_bytes": 100,
-   "producer": "yitong_guaili_screener.py"
-  },
-  {
-   "path": "execution_cards_latest.json",
-   "min_bytes": 100,
-   "producer": "execution_card.py"
-  },
-  {
-   "path": "outputs/glm_brief_review_{date}.md",
-   "min_bytes": 100,
-   "producer": "glm_brief.py"
-  },
-  {
-   "path": "outputs/仲裁信号日志.csv",
-   "min_bytes": 100,
-   "producer": "signal_arbiter.py"
-  },
-  {
-   "path": "ai_chokepoint_watch_latest.json",
-   "min_bytes": 100,
-   "producer": "ai_chokepoint_watch.py",
-   "optional": true
-  },
-  {
-   "path": "四维共振_chinext_kcb_latest.json",
-   "min_bytes": 100,
-   "producer": "quad_resonance.py",
-   "optional": true
-  },
-  {
-   "path": "执行纪律_latest.json",
-   "min_bytes": 100,
-   "producer": "discipline_check.py",
-   "optional": true
-  },
-  {
-   "path": "outputs/四态胜率_{date}.md",
-   "min_bytes": 100,
-   "producer": "win_rate_tracker.py",
-   "optional": true
-  },
-  {
-   "path": "入牛时点_latest.json",
-   "min_bytes": 100,
-   "producer": "inbull_scan.py",
-   "optional": true
-  },
-  {
-   "path": "market_regime_latest.json",
-   "min_bytes": 100,
-   "producer": "market_regime.py",
-   "optional": true
-  },
-  {
-   "path": "outputs/王者突破_{date}.md",
-   "min_bytes": 1500,
-   "producer": "wangzhe_breakout.py"
-  },
-  {
-   "path": "data/wangzhe_breakout_pool.json",
-   "min_bytes": 100,
-   "producer": "wangzhe_breakout.py"
-  },
-  {
-   "path": "outputs/wangzhe_breakout_latest.json",
-   "min_bytes": 300,
-   "producer": "wangzhe_breakout.py"
-  }
- ],
- "premarket_report": [
-  {
-   "path": "premarket_judgment_latest.json",
-   "min_bytes": 200,
-   "producer": "gen_premarket_report.py"
-  },
-  {
-   "path": "盘前市场报告_{date}.md",
-   "min_bytes": 1000,
-   "producer": "gen_premarket_report.py"
-  },
-  {
-   "path": "premarket_judgment_{date}.json",
-   "min_bytes": 200,
-   "producer": "gen_premarket_report.py",
-   "optional": true
-  },
-  {
-   "path": "outputs/glm_brief_{date}.md",
-   "min_bytes": 100,
-   "producer": "glm_brief.py",
-   "optional": true
-  }
- ],
- "beast_pool": [
-  {
-   "path": "outputs/beast_pool_latest.json",
-   "min_bytes": 100,
-   "producer": "beast_pool_screener.py"
-  },
-  {
-   "path": "outputs/猛兽突破池_{date8}.md",
-   "min_bytes": 200,
-   "producer": "beast_pool_screener.py",
-   "optional": true
-  }
- ],
- "inbull_scan": [
-  {
-   "path": "入牛时点_latest.json",
-   "min_bytes": 100,
-   "producer": "inbull_scan.py"
-  },
-  {
-   "path": "outputs/入牛时点扫描_{date}.md",
-   "min_bytes": 200,
-   "producer": "inbull_scan.py",
-   "optional": true
-  }
- ],
- "market_regime": [
-  {
-   "path": "market_regime_latest.json",
-   "min_bytes": 100,
-   "producer": "market_regime.py"
-  },
-  {
-   "path": "market_regime_latest.md",
-   "min_bytes": 100,
-   "producer": "market_regime.py"
-  }
- ],
- "jingjia_track": [
-  {
-   "path": "data/jingjia_auction.csv",
-   "min_bytes": 50,
-   "producer": "jingjia_track.py"
-  },
-  {
-   "path": "data/jingjia_signals.csv",
-   "min_bytes": 50,
-   "producer": "jingjia_track.py"
-  },
-  {
-   "path": "outputs/竞价统计_{date}.md",
-   "min_bytes": 200,
-   "producer": "jingjia_track.py"
-  }
- ],
- "yao_gu_pool": [
-  {
-   "path": "outputs/妖股池_{date}.md",
-   "min_bytes": 200,
-   "producer": "yao_gu_pool.py"
-  },
-  {
-   "path": "outputs/妖股池_{date}.json",
-   "min_bytes": 100,
-   "producer": "yao_gu_pool.py"
-  }
- ],
- "duowei_fish": [
-  {
-   "path": "鱼身报告_latest.md",
-   "min_bytes": 200,
-   "producer": "fish_body_enhanced.py"
-  },
-  {
-   "path": "fish_body_latest.json",
-   "min_bytes": 100,
-   "producer": "fish_body_enhanced.py"
-  }
- ],
- "wangzhe_track": [
-  {
-   "path": "outputs/涨停王者_合格标的_{date}.md",
-   "min_bytes": 200,
-   "producer": "wangzhe_funnel.py"
-  },
-  {
-   "path": "wangzhe_signals.csv",
-   "min_bytes": 100,
-   "producer": "wangzhe_track.py"
-  }
- ],
- "bt_cycle": [
-  {
-   "path": "outputs/bt_cycle_latest.json",
-   "min_bytes": 100,
-   "producer": "bt_cycle.py",
-   "optional": true
-  }
- ],
- "emotion_backtest_monthly": [
-  {
-   "path": "outputs/情绪温度计回测_latest.json",
-   "min_bytes": 100,
-   "producer": "jinji_emotion_backtest.py",
-   "optional": true
-  }
- ],
- "pool_winrate_biweekly": [
-  {
-   "path": "outputs/股池胜率总览_{date}.md",
-   "min_bytes": 200,
-   "producer": "pool_winrate_biweekly.py",
-   "optional": true
-  }
- ],
- "weight_learn": [
-  {
-   "path": "outputs/仲裁权重学习报告_{date}.md",
-   "min_bytes": 200,
-   "producer": "learn_weights.py",
-   "optional": true
-  }
- ],
- "inbull_threshold_monitor": [
-  {
-   "path": "outputs/入牛阈值漂移_latest.json",
-   "min_bytes": 100,
-   "producer": "inbull_threshold_monitor.py",
-   "optional": true
-  }
- ],
- "artifact_audit": [
-  {
-   "path": "outputs/artifact_audit_latest.md",
-   "min_bytes": 500,
-   "producer": "artifact_audit.py"
-  }
- ],
- "selfcheck_daily": [
-  {
-   "path": "outputs/cross_source_latest.md",
-   "min_bytes": 100,
-   "producer": "cross_source_check.py"
-  },
-  {
-   "path": "outputs/silent_failure_latest.md",
-   "min_bytes": 100,
-   "producer": "silent_failure_audit.py"
-  }
- ]
+  "_note": "当日核心产物契约（2026-10-15 建 · 2026-10-16 扩容至全 workflow）。单一事实来源：workflow 提交清单与 run_and_verify 自检均以此为准。path 支持 {date}(YYYY-MM-DD) / {date8}(YYYYMMDD) / * 通配。min_bytes 为经验下限（仅防「空产物/秒退」，非精确校验）。optional=true 表示「偶发缺失属正常」（仅告警、不计入失败/不推送）——周期类 workflow（月/季/双周）与易降级产物一律 optional，观察稳定后转正。",
+  "quant_scan": [
+    {
+      "path": "quant_results_latest.json",
+      "min_bytes": 300,
+      "producer": "run_all_quant.py"
+    },
+    {
+      "path": "outputs/market_width_latest.json",
+      "min_bytes": 200,
+      "producer": "market_width.py"
+    },
+    {
+      "path": "xihu_breadth_latest.json",
+      "min_bytes": 200,
+      "producer": "xihu_breadth.py"
+    },
+    {
+      "path": "hot_emotion_latest.json",
+      "min_bytes": 100,
+      "producer": "hot_emotion.py"
+    },
+    {
+      "path": "涨停概念排行_latest.json",
+      "min_bytes": 200,
+      "producer": "limitup_concept_rank.py"
+    },
+    {
+      "path": "板块共振_latest.json",
+      "min_bytes": 200,
+      "producer": "sector_resonance_local.py"
+    },
+    {
+      "path": "yearline_breadth_latest.json",
+      "min_bytes": 100,
+      "producer": "yearline_breadth.py"
+    },
+    {
+      "path": "一统天下建仓区股池_latest.json",
+      "min_bytes": 100,
+      "producer": "yitong_screener.py"
+    },
+    {
+      "path": "双弦观察池_latest.json",
+      "min_bytes": 100,
+      "producer": "dual_pool_sync.py"
+    },
+    {
+      "path": "outputs/env_latest.json",
+      "min_bytes": 100,
+      "producer": "env_engine.py"
+    },
+    {
+      "path": "outputs/qiankun_a_latest.json",
+      "min_bytes": 100,
+      "producer": "full_market_dualdim.py"
+    },
+    {
+      "path": "outputs/四维共振_latest.json",
+      "min_bytes": 100,
+      "producer": "quad_resonance.py"
+    },
+    {
+      "path": "123_2b_latest.json",
+      "min_bytes": 100,
+      "producer": "scan_123_2b.py",
+      "optional": true
+    },
+    {
+      "path": "rsv_strength_latest.json",
+      "min_bytes": 100,
+      "producer": "rsv_strength.py",
+      "optional": true
+    },
+    {
+      "path": "xihu_rsv_latest.json",
+      "min_bytes": 100,
+      "producer": "xihu_rsv.py",
+      "optional": true
+    },
+    {
+      "path": "monthly_macd_latest.json",
+      "min_bytes": 100,
+      "producer": "monthly_macd_scan.py",
+      "optional": true
+    },
+    {
+      "path": "断档分歧_latest.json",
+      "min_bytes": 100,
+      "producer": "gap_divergence.py",
+      "optional": true
+    },
+    {
+      "path": "top_signal_latest.json",
+      "min_bytes": 100,
+      "producer": "top_signal.py",
+      "optional": true
+    },
+    {
+      "path": "board_top_latest.json",
+      "min_bytes": 100,
+      "producer": "board_top.py",
+      "optional": true
+    },
+    {
+      "path": "情绪预判_latest.json",
+      "min_bytes": 100,
+      "producer": "emotion_forecast.py",
+      "optional": true
+    },
+    {
+      "path": "liangxue_latest.json",
+      "min_bytes": 100,
+      "producer": "liangxue.py",
+      "optional": true
+    },
+    {
+      "path": "mode_aggregate_latest.json",
+      "min_bytes": 100,
+      "producer": "market_width.py",
+      "optional": true
+    },
+    {
+      "path": "hot_emotion_history.json",
+      "min_bytes": 100,
+      "producer": "hot_emotion.py",
+      "optional": true
+    },
+    {
+      "path": "panhou_lianghua.csv",
+      "min_bytes": 100,
+      "producer": "run_all_quant.py",
+      "optional": true
+    },
+    {
+      "path": "outputs/资金快照_{date}.csv",
+      "min_bytes": 50,
+      "producer": "fund_snapshot.py",
+      "optional": true
+    }
+  ],
+  "quant_report": [
+    {
+      "path": "outputs/复盘报告_{date}.md",
+      "min_bytes": 2000,
+      "producer": "gen_review_report.py"
+    },
+    {
+      "path": "outputs/股池标的跟踪报告_{date}.md",
+      "min_bytes": 500,
+      "producer": "pool_tracking_report.py"
+    },
+    {
+      "path": "outputs/一统天下跟踪_{date}.md",
+      "min_bytes": 500,
+      "producer": "pool_tracking_report.py"
+    },
+    {
+      "path": "market_style_latest.json",
+      "min_bytes": 100,
+      "producer": "market_style.py"
+    },
+    {
+      "path": "信号仲裁_latest.json",
+      "min_bytes": 100,
+      "producer": "signal_arbiter.py"
+    },
+    {
+      "path": "组合风控_latest.json",
+      "min_bytes": 100,
+      "producer": "portfolio_risk.py"
+    },
+    {
+      "path": "乖离低买_latest.json",
+      "min_bytes": 100,
+      "producer": "yitong_guaili_screener.py"
+    },
+    {
+      "path": "execution_cards_latest.json",
+      "min_bytes": 100,
+      "producer": "execution_card.py"
+    },
+    {
+      "path": "outputs/glm_brief_review_{date}.md",
+      "min_bytes": 100,
+      "producer": "glm_brief.py"
+    },
+    {
+      "path": "outputs/仲裁信号日志.csv",
+      "min_bytes": 100,
+      "producer": "signal_arbiter.py"
+    },
+    {
+      "path": "ai_chokepoint_watch_latest.json",
+      "min_bytes": 100,
+      "producer": "ai_chokepoint_watch.py",
+      "optional": true
+    },
+    {
+      "path": "四维共振_chinext_kcb_latest.json",
+      "min_bytes": 100,
+      "producer": "quad_resonance.py",
+      "optional": true
+    },
+    {
+      "path": "执行纪律_latest.json",
+      "min_bytes": 100,
+      "producer": "discipline_check.py",
+      "optional": true
+    },
+    {
+      "path": "outputs/四态胜率_{date}.md",
+      "min_bytes": 100,
+      "producer": "win_rate_tracker.py",
+      "optional": true
+    },
+    {
+      "path": "入牛时点_latest.json",
+      "min_bytes": 100,
+      "producer": "inbull_scan.py",
+      "optional": true
+    },
+    {
+      "path": "market_regime_latest.json",
+      "min_bytes": 100,
+      "producer": "market_regime.py",
+      "optional": true
+    },
+    {
+      "path": "outputs/王者突破_{date}.md",
+      "min_bytes": 1500,
+      "producer": "wangzhe_breakout.py"
+    },
+    {
+      "path": "data/wangzhe_breakout_pool.json",
+      "min_bytes": 100,
+      "producer": "wangzhe_breakout.py"
+    },
+    {
+      "path": "outputs/wangzhe_breakout_latest.json",
+      "min_bytes": 300,
+      "producer": "wangzhe_breakout.py"
+    }
+  ],
+  "premarket_report": [
+    {
+      "path": "premarket_judgment_latest.json",
+      "min_bytes": 200,
+      "producer": "gen_premarket_report.py"
+    },
+    {
+      "path": "盘前市场报告_{date}.md",
+      "min_bytes": 1000,
+      "producer": "gen_premarket_report.py"
+    },
+    {
+      "path": "premarket_judgment_{date}.json",
+      "min_bytes": 200,
+      "producer": "gen_premarket_report.py",
+      "optional": true
+    },
+    {
+      "path": "outputs/glm_brief_{date}.md",
+      "min_bytes": 100,
+      "producer": "glm_brief.py",
+      "optional": true
+    }
+  ],
+  "beast_pool": [
+    {
+      "path": "outputs/beast_pool_latest.json",
+      "min_bytes": 100,
+      "producer": "beast_pool_screener.py"
+    },
+    {
+      "path": "outputs/猛兽突破池_{date8}.md",
+      "min_bytes": 200,
+      "producer": "beast_pool_screener.py",
+      "optional": true
+    }
+  ],
+  "inbull_scan": [
+    {
+      "path": "入牛时点_latest.json",
+      "min_bytes": 100,
+      "producer": "inbull_scan.py"
+    },
+    {
+      "path": "outputs/入牛时点扫描_{date}.md",
+      "min_bytes": 200,
+      "producer": "inbull_scan.py",
+      "optional": true
+    }
+  ],
+  "market_regime": [
+    {
+      "path": "market_regime_latest.json",
+      "min_bytes": 100,
+      "producer": "market_regime.py"
+    },
+    {
+      "path": "market_regime_latest.md",
+      "min_bytes": 100,
+      "producer": "market_regime.py"
+    }
+  ],
+  "jingjia_track": [
+    {
+      "path": "data/jingjia_auction.csv",
+      "min_bytes": 50,
+      "producer": "jingjia_track.py"
+    },
+    {
+      "path": "data/jingjia_signals.csv",
+      "min_bytes": 50,
+      "producer": "jingjia_track.py"
+    },
+    {
+      "path": "outputs/竞价快报_{date}.md",
+      "min_bytes": 200,
+      "producer": "jingjia_track.py --brief",
+      "optional": true
+    },
+    {
+      "path": "outputs/竞价统计_{date}.md",
+      "min_bytes": 200,
+      "producer": "jingjia_track.py",
+      "optional": true
+    }
+  ],
+  "yao_gu_pool": [
+    {
+      "path": "outputs/妖股池_{date}.md",
+      "min_bytes": 200,
+      "producer": "yao_gu_pool.py"
+    },
+    {
+      "path": "outputs/妖股池_{date}.json",
+      "min_bytes": 100,
+      "producer": "yao_gu_pool.py"
+    }
+  ],
+  "duowei_fish": [
+    {
+      "path": "鱼身报告_latest.md",
+      "min_bytes": 200,
+      "producer": "fish_body_enhanced.py"
+    },
+    {
+      "path": "fish_body_latest.json",
+      "min_bytes": 100,
+      "producer": "fish_body_enhanced.py"
+    }
+  ],
+  "wangzhe_track": [
+    {
+      "path": "outputs/涨停王者_合格标的_{date}.md",
+      "min_bytes": 200,
+      "producer": "wangzhe_funnel.py"
+    },
+    {
+      "path": "wangzhe_signals.csv",
+      "min_bytes": 100,
+      "producer": "wangzhe_track.py"
+    }
+  ],
+  "bt_cycle": [
+    {
+      "path": "outputs/bt_cycle_latest.json",
+      "min_bytes": 100,
+      "producer": "bt_cycle.py",
+      "optional": true
+    }
+  ],
+  "emotion_backtest_monthly": [
+    {
+      "path": "outputs/情绪温度计回测_latest.json",
+      "min_bytes": 100,
+      "producer": "jinji_emotion_backtest.py",
+      "optional": true
+    }
+  ],
+  "pool_winrate_biweekly": [
+    {
+      "path": "outputs/股池胜率总览_{date}.md",
+      "min_bytes": 200,
+      "producer": "pool_winrate_biweekly.py",
+      "optional": true
+    }
+  ],
+  "weight_learn": [
+    {
+      "path": "outputs/仲裁权重学习报告_{date}.md",
+      "min_bytes": 200,
+      "producer": "learn_weights.py",
+      "optional": true
+    }
+  ],
+  "inbull_threshold_monitor": [
+    {
+      "path": "outputs/入牛阈值漂移_latest.json",
+      "min_bytes": 100,
+      "producer": "inbull_threshold_monitor.py",
+      "optional": true
+    }
+  ],
+  "artifact_audit": [
+    {
+      "path": "outputs/artifact_audit_latest.md",
+      "min_bytes": 500,
+      "producer": "artifact_audit.py"
+    }
+  ],
+  "selfcheck_daily": [
+    {
+      "path": "outputs/cross_source_latest.md",
+      "min_bytes": 100,
+      "producer": "cross_source_check.py"
+    },
+    {
+      "path": "outputs/silent_failure_latest.md",
+      "min_bytes": 100,
+      "producer": "silent_failure_audit.py"
+    }
+  ]
 }
