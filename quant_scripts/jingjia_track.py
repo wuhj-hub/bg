@@ -220,24 +220,26 @@ def brief_report(uni, args):
     by_gap = sorted(rows, key=lambda x: -x["gap"])[:20]
     by_low = sorted(rows, key=lambda x: x["gap"])[:15]
 
-    # 昨日（最近信号日）信号 → 今日竞价表现
-    sig_prev = []
+    # 上一交易日（最近信号日）三策略信号 → 今日竞价买点表现
+    sig_by = defaultdict(list)
+    d0 = ""
     if os.path.exists(SIGNAL_CSV):
-        last_dates = {}
+        ds = set()
         with open(SIGNAL_CSV, encoding="utf-8") as f:
             for r in csv.DictReader(f):
                 if r.get("date") and r["date"] < today:
-                    last_dates[r["date"]] = 1
-        if last_dates:
-            d0 = sorted(last_dates)[-1]
+                    ds.add(r["date"])
+        if ds:
+            d0 = max(ds)
             px = {x["code"]: x for x in rows}
             with open(SIGNAL_CSV, encoding="utf-8") as f:
                 for r in csv.DictReader(f):
-                    if r.get("date") == d0 and r.get("code") in px:
-                        x = px[r["code"]]
-                        sig_prev.append({"date": d0, "code": r["code"], "name": r.get("name") or x["name"],
-                                         "strat": r.get("strategy", ""), "prev": x["prev"],
-                                         "open": x["open"], "gap": x["gap"]})
+                    if r.get("date") != d0 or r.get("code") not in px:
+                        continue
+                    x = px[r["code"]]
+                    sig_by[r.get("strategy", "")].append(
+                        {"code": r["code"], "name": r.get("name") or x["name"],
+                         "prev": x["prev"], "open": x["open"], "gap": x["gap"], "amt": x["amt"]})
 
     def _tbl(head, keys, data):
         out = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
@@ -261,11 +263,31 @@ def brief_report(uni, args):
     md += _tbl(["代码", "名称", "低开%", "今开", "竞价金额(亿)"],
                lambda x: [x["code"], x["name"], f"{x['gap'] * 100:+.2f}%", f"{x['open']:.2f}",
                           f"{x['amt'] / 1e8:.2f}"], by_low)
-    if sig_prev:
-        md += ["", f"## 四、昨日信号今日竞价（{sig_prev[0]['date']} 信号 · {len(sig_prev)} 条）", ""]
-        md += _tbl(["代码", "名称", "策略", "昨收", "今开", "高开%"],
-                   lambda x: [x["code"], x["name"], x["strat"], f"{x['prev']:.2f}",
-                              f"{x['open']:.2f}", f"{x['gap'] * 100:+.2f}%"], sig_prev[:30])
+    ORDER = ["紫霞牛", "一进二", "超级竞价"]
+    if sig_by:
+        md += ["", f"## 四、三策略今日竞价候选（信号日 {d0} 收盘确认 → 今日集合竞价买点）", "",
+               "> 说明：三策略均为「当日收盘确认信号 → 次日集合竞价买入」，故今日可执行的是"
+               f"**上一交易日（{d0}）**的信号；今日新信号要等收盘后完整统计产出。", ""]
+        summ = []
+        for st in ORDER:
+            xs = sig_by.get(st) or []
+            if not xs:
+                continue
+            up = sum(1 for x in xs if x["gap"] > 0)
+            summ.append((st, len(xs), up, sum(x["gap"] for x in xs) / len(xs)))
+        md += _tbl(["策略", "候选数", "竞价高开", "竞价低开", "均值高开%"],
+                   lambda x: [x[0], str(x[1]), str(x[2]), str(x[1] - x[2]), f"{x[3] * 100:+.2f}%"], summ)
+        for st in ORDER:
+            xs = sig_by.get(st) or []
+            md += ["", f"### {st}（{len(xs)} 条）" if xs else f"### {st}（当日无信号）", ""]
+            if xs:
+                xs = sorted(xs, key=lambda x: -x["gap"])
+                md += _tbl(["代码", "名称", "昨收", "今开", "高开%", "竞价额(亿)"],
+                           lambda x: [x["code"], x["name"], f"{x['prev']:.2f}", f"{x['open']:.2f}",
+                                      f"{x['gap'] * 100:+.2f}%", f"{x['amt'] / 1e8:.2f}"], xs)
+    else:
+        md += ["", "## 四、三策略今日竞价候选", "",
+               f"- 信号库中无 {today} 之前的信号记录（`--brief` 依赖收盘后完整统计写入的 signals）"]
 
     out = os.path.join(OUT_DIR, f"竞价快报_{today}.md")
     with open(out, "w", encoding="utf-8") as f:
