@@ -27,7 +27,7 @@ FRESH = {
     "quant_results_latest.json": 1,
     "outputs/paper_portfolio.json": 2,
     "outputs/pool_entries.csv": 2,
-    "market_width_latest.json": 1,
+    "outputs/market_width_latest.json": 1,   # 2026-10-22：10-15「消灭双副本」后 canonical=outputs/，旧根路径已删除→每日误报「停更」
     "hot_emotion_latest.json": 1,
     "execution_cards_latest.json": 1,
     "market_regime_latest.json": 2,
