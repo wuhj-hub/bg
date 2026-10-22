@@ -3,7 +3,7 @@ name: 多维度·鱼身报告更新
 # 用途：独立维护「多维量化」订阅知识库（7位订阅）→「多维度」文件夹的每日盘后更新。
 #       与主流水线（全盘量化扫描 / 盘后报告生成）完全解耦，互不影响。
 # 内容：鱼身交易系统报告 · 动态股票池（近20日日均成交额排名前300，非固定池）
-# 目标：kb_id=RgPmCvOW2CgN3I-HVGEYfmBS_W0mkiYzHRuTGHP8_6o=  folder_id=folder_7478204537267754
+# 目标：kb_id=ima_kb_bcxqaAnF  folder_id=folder_7478204537267754
 on:
   # 外部精确触发（cron-job.org → repository_dispatch）。
   # ⚠️ 现状（2026-10-14 核实）：本事件此前从未实际触发过，唯一实际触发源是下方原生 schedule。
@@ -103,15 +103,15 @@ jobs:
 
       # ─── 第四步：上传鱼身报告到「多维量化 → 多维度」文件夹 ───
       - name: 上传鱼身报告到「多维量化→多维度」文件夹
-        # 2026-10-22：目标库 kb_id 被 OpenAPI 判 invalid（220004 invalid knowledge_base_id；
-        #   同凭证对「报告」库多处上传同日 success，库内最新内容为 10-21、kb_id 自 09-29 未改）
-        #   → 属平台侧/库可访问性问题，非代码问题。该步失败不阻断链路：产物已提交仓库，
-        #   且下方已有 PushPlus「⚠️多维度上传失败」告警，避免每天把整条 run 拖红。
+        # 2026-10-22：ima 平台完成知识库 ID 体系迁移 —— 旧「base64 长 ID」(RgPmCvOW…=) 全部
+        #   返回 220004 invalid knowledge_base_id，新格式为 ima_kb_xxxxxxxx（本库=ima_kb_bcxqaAnF，
+        #   用 openapi/wiki/v1/search_knowledge_base 按名称查到；folder_id 未变，仍是 folder_7478204537267754）。
+        #   该步失败不阻断链路（产物已提交仓库 + 下方 PushPlus 告警），避免把它拖红掩盖其它问题。
         continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: RgPmCvOW2CgN3I-HVGEYfmBS_W0mkiYzHRuTGHP8_6o=
+          IMA_KB_ID: ima_kb_bcxqaAnF
           IMA_FOLDER_ID: folder_7478204537267754
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
