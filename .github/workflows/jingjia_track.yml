@@ -1,13 +1,16 @@
 name: 竞价统计·逐日跟踪
 
 on:
-  # 交易日盘前 09:35（北京）= UTC 01:35。已启用原生 schedule（用户选择）；
-  # repository_dispatch（cron-job.org）保留为备用补触发通道。
+  # 2026-10-22 起拆分两段（用户需求：9:30 先出报告，收盘后再做统计）：
+  #   ① 09:27（北京）= UTC 01:27 → 【竞价快报】只读腾讯行情快照，秒级出「竞价金额/高开/低开榜」
+  #      触发源：cron-job.org 的 repository_dispatch（准点）+ 本条原生 schedule（兜底，GitHub 常延迟）
+  #   ② 15:05（北京）= UTC 07:05 → 【完整统计】抓当日竞价入库 + 三策略信号 + T+1~T+5 收益回填 + 完整报告
   schedule:
-    - cron: '35 1 * * 1-5'
+    - cron: '27 1 * * 1-5'   # 09:27 北京 → 竞价快报（轻量）
+    - cron: '5 7 * * 1-5'    # 15:05 北京 → 完整统计（重）
   repository_dispatch:
-    types: [jingjia-track-run]
-  workflow_dispatch:
+    types: [jingjia-track-run]   # 盘前补触发（等同 brief）
+  workflow_dispatch:             # 手动 → 走完整统计（补数据/重算）
 
 # 显式写权限：github.token 默认只读，否则 commit 403
 permissions:
@@ -63,12 +66,20 @@ jobs:
       - name: 安装依赖
         run: pip install pandas numpy -q
 
+      # ─── 盘前 09:27：竞价快报（轻量，只读行情快照，目标 <2min）───
+      - name: 竞价快报（盘前·金额/高开/低开榜）
+        if: github.event_name == 'repository_dispatch' || github.event.schedule == '27 1 * * 1-5'
+        run: |
+          python3 quant_scripts/jingjia_track.py --universe all_mainboard.csv --brief
+
+      # ─── 收盘后 15:05：完整统计（采集入库 + 三策略信号 + 收益回填 + 完整报告）───
       # ① 采集当日集合竞价（westock m1 的 09:30 竞价 bar = 开盘金额）
       #    → 追加 data/jingjia_auction.csv（去重）
       # ② 回算三策略(紫霞牛/一进二/超级竞价)信号 → 追加 data/jingjia_signals.csv
       # ③ 更新历史信号 T+1~T+5 收益 → 生成 outputs/竞价统计_{date}.md
       # 说明：--backfill 2 顺手补齐近 2 个交易日缺口（如上次运行失败），保证连续
-      - name: 采集竞价 + 逐日跟踪 + 报告
+      - name: 完整统计（采集竞价 + 逐日跟踪 + 收益回填 + 报告）
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '5 7 * * 1-5'
         run: |
           python3 quant_scripts/jingjia_track.py \
             --universe all_mainboard.csv --fetch --backfill 2 --report
@@ -81,9 +92,9 @@ jobs:
           D=$(TZ=Asia/Shanghai date +%Y-%m-%d)
           python3 git_api_commit.py --msg "chore: 竞价统计逐日更新 ${D}" \
             data/jingjia_auction.csv data/jingjia_signals.csv \
-            "outputs/竞价统计_${D}.md"
+            "outputs/竞价统计_${D}.md" "outputs/竞价快报_${D}.md"
  
-      - name: 上传竞价报告到知识库「报告/竞价」
+      - name: 上传竞价报告/快报到知识库「报告/竞价」
         if: always()
         continue-on-error: true
         env:
@@ -93,12 +104,14 @@ jobs:
           IMA_FOLDER_ID: folder_7511006091703733
           # 2026-10-15（11.4）：移除显式查重开关 —— 上传名含日期时默认「同日覆盖+旧版归档」
         run: |
-          F="outputs/竞价统计_$(TZ=Asia/Shanghai date +%Y-%m-%d).md"
-          if [ -f "$F" ]; then
-            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "⚠️ 竞价报告上传失败(非致命)"
-          else
-            echo "未找到 $F，跳过上传"
-          fi
+          D=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          for F in "outputs/竞价快报_${D}.md" "outputs/竞价统计_${D}.md"; do
+            if [ -f "$F" ]; then
+              python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "⚠️ $F 上传失败(非致命)"
+            else
+              echo "未找到 $F，跳过上传（另一模式产物）"
+            fi
+          done
 
       - name: 🧪 产物契约自检（当日·jingjia_track）
         if: always()
