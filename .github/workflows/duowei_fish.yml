@@ -103,6 +103,11 @@ jobs:
 
       # ─── 第四步：上传鱼身报告到「多维量化 → 多维度」文件夹 ───
       - name: 上传鱼身报告到「多维量化→多维度」文件夹
+        # 2026-10-22：目标库 kb_id 被 OpenAPI 判 invalid（220004 invalid knowledge_base_id；
+        #   同凭证对「报告」库多处上传同日 success，库内最新内容为 10-21、kb_id 自 09-29 未改）
+        #   → 属平台侧/库可访问性问题，非代码问题。该步失败不阻断链路：产物已提交仓库，
+        #   且下方已有 PushPlus「⚠️多维度上传失败」告警，避免每天把整条 run 拖红。
+        continue-on-error: true
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
