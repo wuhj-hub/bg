@@ -5,6 +5,39 @@
 
 ---
 
+## v2.57 (2026-10-22)
+
+### 修「动态鱼身股票池」取数失控（86.8min 被 cancel → 12.5min）+ pipeline_audit 宽度停更误报
+
+**(A) `quant_scripts/gen_fish_pool.py` 取数重构（体系体检 P1）**
+
+- 症状：该步耗时 10-15 **49.7min** → 10-16 36.9 → 10-19 23.4 → 10-20 37.4 → **10-21 86.8min**
+  （duowei 链路整体 90.7min 后被 cancel）；10-22 quant_scan 卡在同一处，当日扫描拖到 **192min**
+- 根因（实测三处叠加）：
+  1. `_fetch_layer` 调 `fetch.ext_fqkline(codes, count=20)` **未传 workers** → 默认 workers=1
+     **逐只串行**取腾讯 fqkline（全市场 3100 只 × 1 请求），遇 WAF 限流再叠加 4 次重试退避；
+  2. 试改批量后仍不稳：westock 批量在 **250/批** 时大面积限流 —— 实测
+     `[Batch] 状态: success | 总数: 250 | 成功: 10 | 失败: 240`（覆盖 4%），**100/批才稳定（覆盖 95%）**；
+  3. main 的「逐只兜底」对 1556 只缺失标的逐只调腾讯 → 又一轮重试退避 30min+
+- 改法：
+  - 批量 kline **100/批**（批间 0.4s），单块覆盖 <60% 时 sleep 8s 重试一次，整体 <50% 才回落腾讯（workers=6）
+  - 去掉「逐只回补」（all_mainboard 固有 ~7.6% 退市/停牌，本就无成交额、不该入池）
+  - 新增 `_fill_by_quote()`：仍缺失的用**当日成交额**（qt.gtimg amount，万元→元）近似补排名依据
+  - 成交额口径：优先真实 `amount`（元，westock 自带），缺失回退 volume×100×均价（旧估算口径）
+- 实测（沙箱·无缓存·3127 只）：**751s（12.5min）**，有效覆盖 **3053/3127 = 97.6%**（行情兜底补 730 只）；
+  产出 302 只（300+核心），Top10 = 药明康德 60.4亿 / 京东方 58.6亿 等大票，排序合理
+- CI 预期：quant_scan job 内 FETCH_CACHE=1 且前面步骤已批量拉过全市场 K 线 → 缓存命中后再降；
+  duowei 冷启动约 12~15min（原 86.8min 超时被杀）
+
+**(B) `quant_scripts/pipeline_audit.py` 产物停更误报（体系体检 P2）**
+
+- 症状：pipeline_audit 每天 status=FAIL，唯一 issue「market_width_latest.json 停更 5 个交易日」→ 每日微信告警
+- 根因：`FRESH` 表仍监控**根副本**，而 10-15「消灭双副本」(11.1) 已删除根副本、canonical 移到 `outputs/`；
+  `outputs/market_width_latest.json` 实际每日更新（10-19/20/21 均有 commit）
+- 改法：FRESH 键改为 `outputs/market_width_latest.json`
+
+---
+
 ## v2.56 (2026-10-20)
 
 ### 行情类型 → 股池分层（regime_history + 股池胜率总览第四节）+ 修「情绪指标跟踪」累积静默 bug
