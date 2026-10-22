@@ -1,21 +1,54 @@
 {
- "date": "2026-10-21",
+ "date": "2026-10-22",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 50,
- "resonance_boards": [],
- "grab_top": [],
+ "pool_size": 51,
+ "resonance_boards": [
+  {
+   "name": "电机Ⅱ",
+   "code": "pt01801731",
+   "zdf": 3.58,
+   "strength": 8,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  }
+ ],
+ "grab_top": [
+  {
+   "name": "电机Ⅱ",
+   "code": "pt01801731",
+   "value": 8
+  }
+ ],
  "entry_top": [
   {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "value": 4.3
+   "name": "个护用品",
+   "code": "",
+   "value": 17.9
+  },
+  {
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "value": 13.1
+  },
+  {
+   "name": "电机Ⅱ",
+   "code": "pt01801731",
+   "value": 11.3
   }
  ],
  "absorption_top": [
   {
-   "name": "贵金属",
-   "code": "pt01801053",
-   "value": 0.8
+   "name": "电机Ⅱ",
+   "code": "pt01801731",
+   "value": 4.57
+  },
+  {
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "value": 1.68
   }
  ],
  "control_top": [],
