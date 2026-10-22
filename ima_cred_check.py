@@ -46,7 +46,7 @@ def probe():
     """调 IMA 轻量 API 验证凭证。返回 (ok, detail)"""
     cid, key = get_cred()
     body = json.dumps({
-        "knowledge_base_id": "6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs=",
+        "knowledge_base_id": "ima_kb_b5qpEC7v",
         "names": ["__ima_cred_probe__"],
     }).encode()
     req = urllib.request.Request(
