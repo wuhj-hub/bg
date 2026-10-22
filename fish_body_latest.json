@@ -6,39 +6,6 @@
   },
   "signals": [
     {
-      "code": "sh601939",
-      "name": "建设银行",
-      "pattern": "MACD空中加油",
-      "raw_score": 100,
-      "final_score": 78,
-      "multi_score": 71,
-      "resonance": "共振向下",
-      "price": 11.66,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.21)>=DEA(0.18)金叉",
-        "MACD柱0.060刚翻红加油成功",
-        "收盘11.66>MA511.53",
-        "MA20>MA60多头排列",
-        "KDJ_J=85未超买"
-      ],
-      "stop_loss": "10.95",
-      "target": "13.41",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "平台突破(12月新高)",
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
       "code": "sz002639",
       "name": "雪人集团",
       "pattern": "MACD空中加油",
@@ -72,23 +39,23 @@
       "rsg_strong": true
     },
     {
-      "code": "sh601166",
-      "name": "兴业银行",
+      "code": "sh601988",
+      "name": "中国银行",
       "pattern": "MACD空中加油",
       "raw_score": 95,
-      "final_score": 73,
-      "multi_score": 69,
+      "final_score": 75,
+      "multi_score": 76,
       "resonance": "共振向下",
-      "price": 18.49,
+      "price": 7.22,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.13)>=DEA(0.08)金叉",
-        "MACD柱0.090刚翻红加油成功",
-        "收盘18.49>MA518.46",
-        "KDJ_J=80未超买"
+        "DIF(0.20)>=DEA(0.18)金叉",
+        "MACD柱0.050刚翻红加油成功",
+        "收盘7.22>MA57.13",
+        "MA20>MA60多头排列"
       ],
-      "stop_loss": "17.54",
-      "target": "21.26",
+      "stop_loss": "6.77",
+      "target": "8.30",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
@@ -97,10 +64,10 @@
         "resonance": "共振向下",
         "score": 20
       },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 200.1,
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "平台突破(12月新高)",
+      "rsg_dev": 487.4,
       "rsg_strong": true
     },
     {
@@ -136,39 +103,6 @@
       "rsg_strong": true
     },
     {
-      "code": "sh601328",
-      "name": "交通银行",
-      "pattern": "MACD空中加油",
-      "raw_score": 100,
-      "final_score": 72,
-      "multi_score": 43,
-      "resonance": "共振向下",
-      "price": 8.21,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.23)>=DEA(0.20)金叉",
-        "MACD柱0.060刚翻红加油成功",
-        "收盘8.21>MA58.2",
-        "MA20>MA60多头排列",
-        "KDJ_J=85未超买"
-      ],
-      "stop_loss": "7.79",
-      "target": "9.44",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "平台突破(12月新高)",
-      "rsg_dev": 410.6,
-      "rsg_strong": true
-    },
-    {
       "code": "sh600941",
       "name": "中国移动",
       "pattern": "MACD空中加油",
@@ -201,56 +135,23 @@
       "rsg_strong": true
     },
     {
-      "code": "sz002181",
-      "name": "粤 传 媒",
-      "pattern": "MACD空中加油",
-      "raw_score": 85,
-      "final_score": 65,
-      "multi_score": 66,
-      "resonance": "共振向下",
-      "price": 10.03,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.26)>=DEA(0.16)金叉",
-        "MACD柱0.20>0但已走高",
-        "收盘10.03>MA59.99",
-        "MA20>MA60多头排列",
-        "KDJ_J=62未超买"
-      ],
-      "stop_loss": "9.49",
-      "target": "11.53",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "空头",
-      "month_gate": "BLOCK",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sh601766",
-      "name": "中国中车",
+      "code": "sh601985",
+      "name": "中国核电",
       "pattern": "MACD空中加油",
       "raw_score": 90,
       "final_score": 65,
-      "multi_score": 44,
+      "multi_score": 43,
       "resonance": "共振向下",
-      "price": 6.33,
+      "price": 9.44,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.11)>=DEA(0.09)金叉",
-        "MACD柱0.020刚翻红加油成功",
+        "DIF(0.14)>=DEA(0.11)金叉",
+        "MACD柱0.070刚翻红加油成功",
         "MA20>MA60多头排列",
-        "KDJ_J=36未超买"
+        "KDJ_J=69未超买"
       ],
-      "stop_loss": "6.01",
-      "target": "7.28",
+      "stop_loss": "9.02",
+      "target": "10.86",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
@@ -259,61 +160,30 @@
         "resonance": "共振向下",
         "score": 20
       },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 229.2,
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "平台突破(12月新高)",
+      "rsg_dev": 282.2,
       "rsg_strong": true
     },
     {
-      "code": "sh601668",
-      "name": "中国建筑",
-      "pattern": "MACD空中加油",
-      "raw_score": 85,
-      "final_score": 62,
-      "multi_score": 49,
-      "resonance": "共振向下",
-      "price": 4.5,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.04)>=DEA(0.02)金叉",
-        "MACD柱0.040刚翻红加油成功",
-        "KDJ_J=74未超买"
-      ],
-      "stop_loss": "4.29",
-      "target": "5.17",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sh603236",
-      "name": "移远通信",
+      "code": "sz002242",
+      "name": "九阳股份",
       "pattern": "MACD空中加油",
       "raw_score": 80,
       "final_score": 60,
-      "multi_score": 61,
+      "multi_score": 60,
       "resonance": "共振向下",
-      "price": 82.02,
+      "price": 21.71,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(3.58)>=DEA(2.85)金叉",
-        "MACD柱1.45>0但已走高",
-        "收盘82.02>MA575.58",
+        "DIF(3.10)>=DEA(2.31)金叉",
+        "MACD柱1.57>0但已走高",
+        "收盘21.71>MA520.27",
         "MA20>MA60多头排列"
       ],
-      "stop_loss": "71.80",
-      "target": "94.32",
+      "stop_loss": "19.26",
+      "target": "24.97",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
@@ -325,8 +195,71 @@
       "month_trend": "多头",
       "month_gate": "PASS",
       "month_reversal": "平台突破(12月新高)",
+      "rsg_dev": 1521.5,
+      "rsg_strong": true
+    },
+    {
+      "code": "sz002027",
+      "name": "分众传媒",
+      "pattern": "MACD空中加油",
+      "raw_score": 85,
+      "final_score": 60,
+      "multi_score": 35,
+      "resonance": "共振向下",
+      "price": 4.96,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.08)>=DEA(0.06)金叉",
+        "MACD柱0.040刚翻红加油成功",
+        "KDJ_J=19未超买"
+      ],
+      "stop_loss": "4.88",
+      "target": "5.70",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股弱势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "空头",
+      "month_gate": "BLOCK",
+      "month_reversal": null,
       "rsg_dev": null,
       "rsg_strong": false
+    },
+    {
+      "code": "sh601988",
+      "name": "中国银行",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 59,
+      "multi_score": 76,
+      "resonance": "共振向下",
+      "price": 7.22,
+      "reasons": [
+        "MA20(6.85)>MA60(6.40)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离2.3%)",
+        "收盘7.22>MA57.13",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "6.51",
+      "target": "8.09",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "平台突破(12月新高)",
+      "rsg_dev": 487.4,
+      "rsg_strong": true
     },
     {
       "code": "sh605058",
@@ -393,38 +326,6 @@
       "rsg_strong": true
     },
     {
-      "code": "sh601939",
-      "name": "建设银行",
-      "pattern": "均线回踩支撑",
-      "raw_score": 75,
-      "final_score": 58,
-      "multi_score": 71,
-      "resonance": "共振向下",
-      "price": 11.66,
-      "reasons": [
-        "MA20(11.19)>MA60(10.79)多头",
-        "MACD在0轴上方",
-        "在MA10附近(偏离2.1%)",
-        "收盘11.66>MA511.53",
-        "站在布林中轨上方"
-      ],
-      "stop_loss": "10.63",
-      "target": "13.06",
-      "mode": 2,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "平台突破(12月新高)",
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
       "code": "sh601288",
       "name": "农业银行",
       "pattern": "均线回踩支撑",
@@ -457,67 +358,36 @@
       "rsg_strong": true
     },
     {
-      "code": "sz002181",
-      "name": "粤 传 媒",
-      "pattern": "均线回踩支撑",
-      "raw_score": 75,
-      "final_score": 57,
-      "multi_score": 66,
-      "resonance": "共振向下",
-      "price": 10.03,
-      "reasons": [
-        "MA20(9.56)>MA60(9.12)多头",
-        "MACD在0轴上方",
-        "在MA10附近(偏离1.1%)",
-        "收盘10.03>MA59.99",
-        "站在布林中轨上方"
-      ],
-      "stop_loss": "9.08",
-      "target": "11.23",
-      "mode": 2,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "空头",
-      "month_gate": "BLOCK",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sh600519",
-      "name": "贵州茅台",
+      "code": "sh601857",
+      "name": "中国石油",
       "pattern": "MACD空中加油",
-      "raw_score": 70,
+      "raw_score": 75,
       "final_score": 55,
-      "multi_score": 76,
+      "multi_score": 51,
       "resonance": "共振向下",
-      "price": 1318.49,
+      "price": 12.7,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(10.71)>=DEA(3.27)金叉",
-        "MACD柱14.89>0但已走高",
-        "KDJ_J=63未超买"
+        "DIF(0.51)>=DEA(0.41)金叉",
+        "MACD柱0.20>0但已走高",
+        "MA20>MA60多头排列",
+        "KDJ_J=84未超买"
       ],
-      "stop_loss": "1256.67",
-      "target": "1516.26",
+      "stop_loss": "12.07",
+      "target": "14.60",
       "mode": 1,
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
-        "stock": "个股强势",
+        "stock": "个股中性",
         "resonance": "共振向下",
         "score": 20
       },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": 463.6,
+      "rsg_strong": true
     },
     {
       "code": "sh601088",
