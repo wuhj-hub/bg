@@ -1,4 +1,4 @@
-# 🔍 体系自检元审计 · 2026-10-22
+# 🔍 体系自检元审计 · 2026-10-23
 
 > 扫描 23 个 workflow ｜ 风险项 **154** ｜ 🔴高危 **2**
 
@@ -21,9 +21,9 @@
 - bt_cycle.yml :: 🧪 产物契约自检（当日·bt_cycle） (L80) — 命中 continue-on-error: true, || true
 - duowei_fish.yml :: 生成沪深主板清单（失败回退仓库缓存） (L77) — 命中 continue-on-error: true, || echo（吞错误）
 - duowei_fish.yml :: 预热westock数据包 (L85) — 命中 continue-on-error: true, || true
-- duowei_fish.yml :: 上传鱼身报告到「多维量化→多维度」文件夹 (L105) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || true
-- duowei_fish.yml :: 提交产物到仓库 (L131) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- duowei_fish.yml :: 🧪 产物契约自检（当日·duowei_fish） (L148) — 命中 continue-on-error: true, || true
+- duowei_fish.yml :: 上传鱼身报告到「多维量化→多维度」文件夹 (L105) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true
+- duowei_fish.yml :: 提交产物到仓库 (L136) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
+- duowei_fish.yml :: 🧪 产物契约自检（当日·duowei_fish） (L153) — 命中 continue-on-error: true, || true
 - emotion_backtest_monthly.yml :: 预热 westock 数据包 (L39) — 命中 || true
 - emotion_backtest_monthly.yml :: 运行回测（120 交易日） (L48) — 命中 || true
 - emotion_backtest_monthly.yml :: 提交报告 (L51) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || true
@@ -41,8 +41,8 @@
 - inbull_threshold_monitor.yml :: 季度复算 + 漂移对比 + 上传知识库 + 推送 + 提交 (L35) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
 - inbull_threshold_monitor.yml :: 🧪 产物契约自检（当日·inbull_threshold_monitor） (L55) — 命中 continue-on-error: true, || true
 - intraday_monitor.yml :: 开盘八法强形态扫描+突破监控 (L116) — 命中 continue-on-error: true
-- jingjia_track.yml :: 上传竞价报告到知识库「报告/竞价」 (L86) — 命中 continue-on-error: true, || echo（吞错误）
-- jingjia_track.yml :: 🧪 产物契约自检（当日·jingjia_track） (L103) — 命中 continue-on-error: true, || true
+- jingjia_track.yml :: 上传竞价报告/快报到知识库「报告/竞价」 (L97) — 命中 continue-on-error: true, || echo（吞错误）
+- jingjia_track.yml :: 🧪 产物契约自检（当日·jingjia_track） (L116) — 命中 continue-on-error: true, || true
 - market_regime.yml :: 提交判定结果到仓库 (L68) — 命中 continue-on-error: true, set +e, || true
 - pool_winrate_biweekly.yml :: 安装依赖 + 全局 westock（免 npx 加速） (L66) — 命中 || echo（吞错误）
 - pool_winrate_biweekly.yml :: 提交总览到仓库 (L79) — 命中 continue-on-error: true, || echo（吞错误）
