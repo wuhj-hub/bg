@@ -57,26 +57,87 @@ def _calc_amount(node):
 
 
 def _calc_amount_bars(bars):
-    """统一取数层 bar 列表 → 日均成交额(元)（口径同 _calc_amount）"""
+    """bar 列表 → 日均成交额(元)。
+
+    2026-10-22：优先用真实 amount（westock 批量 kline 自带，元）；缺失时回退
+    volume(手)×100×均价 估算（旧口径，腾讯 fqkline 无 amount 列时走这里）。
+    """
     tot, n = 0.0, 0
     for b in bars or []:
-        v = b.get("volume")
-        if v is None:
-            continue
-        avg = (b["open"] + b["high"] + b["low"] + b["close"]) / 4.0
-        tot += v * 100 * avg
+        a = b.get("amount")
+        if not a:
+            v = b.get("volume")
+            if v is None:
+                continue
+            avg = (b["open"] + b["high"] + b["low"] + b["close"]) / 4.0
+            a = v * 100 * avg
+        tot += a
         n += 1
     return tot / n if n else 0.0
 
 
 def _fetch_layer(codes):
-    """2026-10-15：统一取数层 fetch.ext_fqkline（逐只 + 受控并发 + host 轮转 + 重试）。"""
+    """统一取数层：westock 批量 kline（100/批 + 批间退避）优先，整体失败回落腾讯逐只(并发6)。
+
+    2026-10-22 修复（两次实测数据支撑）：
+      ① 旧实现 ext_fqkline(workers=1) 逐只串行取全市场 3100 只 → 耗时 23~87min 且抖动，
+         曾使 quant_scan 尾部拖长、duowei「动态生成鱼身股票池」跑到 86.8min 被取消；
+      ② 批量也不能开 250/批：实测同一时段 `[Batch] 状态: success | 总数: 250 | 成功: 10 | 失败: 240`，
+         即服务端在 250 只时大面积限流（覆盖仅 4%~50%），100/批才稳定（覆盖 95%）；
+      ③ 缺失的 ~8% 多为退市/长期停牌（all_mainboard.csv 固有），本就无成交额、不该入池，
+         故不再逐只回补（旧代码回补 1556 只 → 被腾讯重试退避拖 30min+）。
+    """
     import sys as _sys
     _d = os.path.dirname(os.path.abspath(__file__))      # quant_scripts
     if _d not in _sys.path:
         _sys.path.insert(0, _d)
-    from fetch import ext_fqkline as _f
-    return _f(codes, count=RECENT)
+    from fetch import kline as _k, ext_fqkline as _f
+    BATCH = 100
+    got = {}
+    for s in range(0, len(codes), BATCH):
+        part = codes[s:s + BATCH]
+        r = {}
+        for attempt in range(2):
+            try:
+                r = {c: b for c, b in _k(part, period="day", limit=RECENT + 5, fq="qfq").items() if b}
+            except Exception as e:
+                print(f"      [WARN] 批量 kline 第 {s // BATCH + 1} 块异常：{e}", file=sys.stderr)
+            if len(r) >= 0.6 * len(part) or attempt:
+                break
+            time.sleep(8)      # 疑似限流 → 退避后重试本块一次
+        got.update(r)
+        time.sleep(0.4)
+    if len(got) < 0.5 * max(1, len(codes)):
+        print(f"      [WARN] 批量覆盖仅 {len(got)}/{len(codes)}，回落腾讯逐只（并发6）", file=sys.stderr)
+        try:
+            got.update(_f([c for c in codes if c not in got], count=RECENT, workers=6))
+        except Exception as e:
+            print(f"      [WARN] 腾讯补取失败：{e}", file=sys.stderr)
+    return got
+
+
+def _fill_by_quote(codes):
+    """行情兜底：用当日成交额（qt.gtimg 字段 amount，万元 → 元）近似补全缺失标的。
+
+    仅用于「20 日批量取数失败且非退市」的少量标的（CI 上前面步骤已拉过全市场 K 线，
+    缓存命中后缺失通常极少）。当日成交额与 20 日均值同量级，用于排名边界判断足够。
+    """
+    import sys as _sys
+    _d = os.path.dirname(os.path.abspath(__file__))
+    if _d not in _sys.path:
+        _sys.path.insert(0, _d)
+    try:
+        from fetch import ext_gtimg as _g
+        recs = _g(codes, batch=50)
+    except Exception as e:
+        print(f"      [WARN] 行情兜底失败：{e}", file=sys.stderr)
+        return {}
+    out = {}
+    for c, r in (recs or {}).items():
+        a = r.get("amount")          # 万元
+        if a and a > 0:
+            out[c] = float(a) * 1e4
+    return out
 
 
 def _est_daily_amount_local(code):
@@ -89,7 +150,7 @@ def _est_daily_amount_local(code):
 
 
 def est_daily_amount(code):
-    """返回 近RECENT日 日均估算成交额(元)。无数据返回 0.0。"""
+    """单只 近RECENT日 日均成交额(元)。无数据返回 0.0。"""
     try:
         got = _fetch_layer([code])
         if got.get(code):
@@ -100,14 +161,20 @@ def est_daily_amount(code):
 
 
 def est_batch(codes):
-    """批量估算。优先统一取数层（逐只+受控并发），失败返回 None（调用方降级单股）。"""
+    """批量估算 近RECENT日日均成交额 → {code: 元}；退市/无行情返回 0。"""
+    got = {}
     try:
         got = _fetch_layer(codes)
-        if got:
-            return {c: _calc_amount_bars(got.get(c, [])) for c in codes}
-    except Exception:
-        pass
-    return None
+    except Exception as e:
+        print(f"      [WARN] 取数失败：{e}", file=sys.stderr)
+    scored = {c: _calc_amount_bars(got.get(c, [])) for c in codes}
+    miss = [c for c in codes if not scored.get(c)]
+    if miss:
+        fill = _fill_by_quote(miss)
+        if fill:
+            scored.update({c: v for c, v in fill.items() if c in scored})
+            print(f"      行情兜底补全 {len(fill)}/{len(miss)} 只（按当日成交额近似）")
+    return scored
 
 
 def main():
@@ -129,25 +196,12 @@ def main():
                 codes.append(("sh" if c[0] == "6" else "sz") + c)
     print(f"      主板 {len(codes)} 只")
 
-    print(f"[2/3] 估算近{RECENT}日日均成交额（统一取数层 fetch.ext_fqkline：逐只+受控并发8）...")
-    from concurrent.futures import ThreadPoolExecutor
-    scored = {}
-    batches = [codes[i:i + 50] for i in range(0, len(codes), 50)]
-
-    def _batch(cs):
-        r = est_batch(cs)
-        if r is None:  # 批量失败 → 降级单股
-            return {c: est_daily_amount(c) for c in cs}
-        return r
-
-    done = 0
-    with ThreadPoolExecutor(max_workers=8) as ex:
-        for r in ex.map(_batch, batches):
-            scored.update(r)
-            done += len(r)
-            if done % 1000 == 0:
-                print(f"      进度 {done}/{len(codes)}")
-    scored = sorted(((amt, c) for c, amt in scored.items()), reverse=True)
+    print(f"[2/3] 估算近{RECENT}日日均成交额（westock 批量 kline 250/批 + 腾讯逐只兜底）...")
+    t0 = time.time()
+    scored = est_batch(codes) or {}
+    valid = [c for c in codes if scored.get(c)]
+    print(f"      有效 {len(valid)}/{len(codes)} 只（缺失为退市/停牌，无成交额不入池），耗时 {time.time() - t0:.1f}s")
+    scored = sorted(((amt, c) for c, amt in scored.items() if amt > 0), reverse=True)
     top = scored[:TOP_N]
     core_codes = {c for c, _ in CORE}
 
