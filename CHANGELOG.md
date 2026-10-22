@@ -5,6 +5,34 @@
 
 ---
 
+## v2.58 (2026-10-22)
+
+### ima 平台知识库 ID 迁移：旧 base64 长 ID 全部失效 → 统一改 `ima_kb_*` 新 ID
+
+- 现象：duowei「上传鱼身报告到多维量化」步报 `create_media failed: {'code': 220004,
+  'msg': 'invalid knowledge_base_id'}`；该 kb_id 值自 09-29 建链后从未改动，10-20 上传仍成功
+- 定位（用 `openapi/wiki/v1/search_knowledge_base` 按名称查当前 ID + 逐个 `get_knowledge_list` 验活）：
+
+  | 知识库 | 旧 ID（已失效） | 新 ID（有效） |
+  |---|---|---|
+  | 多维量化 | `RgPmCvOW2CgN3I-HVGEYfmBS_W0mkiYzHRuTGHP8_6o=` | **`ima_kb_bcxqaAnF`** |
+  | 猛兽 | `9wlJWgbFxvKhhxzobeMHSJ7_eaUmHutVQXMzeNxh4DM=` | **`ima_kb_LCxys0NP`** |
+  | 双弦 | `zw56pWsoAd18wp9A_2-_vFFAPbG51UZsuaGyvynm66g=` | **`ima_kb_zmenvjf6`** |
+  | 报告 | `6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs=` | **`ima_kb_b5qpEC7v`** |
+
+- 结论：**不是知识库被删/重建**，是平台把 kb_id 体系从 base64 长串换成 `ima_kb_xxxxxxxx`；
+  旧 ID 一律返回 220004。**folder_id 未迁移**（`folder_7478204537267754` 等仍有效）。
+- 改动（5 文件 7 处，全部校验 yaml/ast 后提交）：
+  - `duowei_fish.yml`（多维量化，含注释更正）｜`quant_report.yml`（猛兽 + 双弦）
+  - `jingjia_track.yml`、`weight_learn.yml`、`ima_cred_check.py`（报告库旧 ID）
+- 排查手法沉淀：`search_knowledge_base` body `{query|keyword, limit<=20}` 返回 `kb_id/kb_name/creator/base_type`；
+  这是**唯一**能按名称查到知识库 ID 的 OpenAPI（list_* 系列全部 404）。
+- 影响面：`secrets.IMA_KB_ID` 引用的多数上传步今日实测 success（说明 secret 已是新 ID）；
+  写死旧 ID 的路径（含上传失败被 `|| echo` 吞掉的）此前已静默失效，本次一并修复。
+- 上传步保留 `continue-on-error: true`（失败仍有 PushPlus 告警 + 产物已提交仓库），避免拖红主链路。
+
+---
+
 ## v2.57 (2026-10-22)
 
 ### 修「动态鱼身股票池」取数失控（86.8min 被 cancel → 12.5min）+ pipeline_audit 宽度停更误报
