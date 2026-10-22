@@ -1,68 +1,75 @@
 {
- "date": "2026-10-21",
- "data_date": "2026-10-21",
- "style": "情绪市",
- "icon": "🔥",
- "score": 26,
+ "date": "2026-10-22",
+ "data_date": "2026-10-22",
+ "style": "均衡市",
+ "icon": "⚖️",
+ "score": 13,
  "score_detail": {
   "size_style": 0,
-  "limitup_structure": 16,
+  "limitup_structure": 4,
   "volume_structure": 0,
-  "sector_fund": 10
+  "sector_fund": 9
  },
  "size_style": {
-  "hs300_5d": -2.51,
-  "hs300_10d": -5.64,
-  "zz1000_5d": -1.81,
-  "zz1000_10d": -7.1,
-  "rel_5d": 0.7,
-  "rel_10d": -1.47,
-  "rel_20d": -1.24,
-  "zz500_5d": -2.0
+  "hs300_5d": -3.11,
+  "hs300_10d": -6.36,
+  "zz1000_5d": -1.5,
+  "zz1000_10d": -7.85,
+  "rel_5d": 1.61,
+  "rel_10d": -1.49,
+  "rel_20d": -3.39,
+  "zz500_5d": -1.68
  },
  "limitup_structure": {
-  "limitup": 44,
-  "strong": 91,
-  "width_score": 67.6,
-  "level": "结构性偏强（涨停潮·涨少跌多分化）",
+  "limitup": 30,
+  "strong": 48,
+  "width_score": 39.3,
+  "level": "偏弱（跌多涨少）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 3.0,
-  "zhaban_rate": 48.8,
-  "lianban": 16
+  "strong_ratio": 1.6,
+  "zhaban_rate": 58.9,
+  "lianban": 9
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.723,
-  "small_big_ratio_5d": 0.725
+  "small_big_ratio_now": 0.67,
+  "small_big_ratio_5d": 0.718
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "电池",
-    "zdf": "-7.56",
-    "main_net5d": -99.9,
-    "retail_net": 50.7,
-    "tag": "游资型"
-   },
-   {
-    "name": "元件",
-    "zdf": "1.50",
-    "main_net5d": -32.6,
-    "retail_net": -19.9,
-    "tag": "游资型"
-   },
-   {
-    "name": "出版",
-    "zdf": "1.81",
-    "main_net5d": -18.5,
-    "retail_net": 1.0,
+    "name": "电机Ⅱ",
+    "zdf": "3.58",
+    "main_net5d": -1.5,
+    "retail_net": -10.8,
     "tag": "游资型"
    },
    {
     "name": "半导体",
-    "zdf": "0.29",
-    "main_net5d": -108.3,
-    "retail_net": -13.4,
+    "zdf": "-2.93",
+    "main_net5d": -24.4,
+    "retail_net": 51.4,
+    "tag": "游资型"
+   },
+   {
+    "name": "通信设备",
+    "zdf": "-7.09",
+    "main_net5d": -51.7,
+    "retail_net": 91.4,
+    "tag": "游资型"
+   },
+   {
+    "name": "白酒Ⅱ",
+    "zdf": "-0.04",
+    "main_net5d": 13.1,
+    "retail_net": -1.2,
+    "tag": "机构型"
+   },
+   {
+    "name": "元件",
+    "zdf": "-6.21",
+    "main_net5d": -26.5,
+    "retail_net": 62.7,
     "tag": "游资型"
    }
   ]
@@ -74,15 +81,17 @@
    "欧马模式": 2
   },
   "leaders": {
-   "堆量模式": 8,
+   "堆量模式": 7,
    "欧马模式": 1
   },
   "pullbacks": {
    "堆量模式": 1
   },
-  "gpoints": {},
-  "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
+  "gpoints": {
+   "欧马模式": 1
+  },
+  "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
- "advice": "游资主导·中小盘题材场子：主扫猛兽堆量模式/武威G1低吸，快进快出；警惕A字杀跌（文章：游资票暴涨暴跌、退潮即A杀），连板退潮日减仓"
+ "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
 }
