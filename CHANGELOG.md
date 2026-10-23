@@ -26,8 +26,9 @@
   自动调 `search_knowledge_base` 解析最新 id，并打 `::warning::`；另在入口加 `::error::` 注解，
   避免失败被 `|| echo` 完全吞掉。
 
-**待用户操作**：GitHub 仓库 → Settings → Secrets and variables → Actions → `IMA_KB_ID` 更新为
-`ima_kb_b5qpEC7v`（之后可把 24 处硬编码回退为引用 secret）。
+**已闭环（2026-10-23 22:58）**：secret `IMA_KB_ID` 已由用户更新为 `ima_kb_b5qpEC7v`，24 处硬编码
+已回退为 `${{ secrets.IMA_KB_ID }}` 引用。验证：手动 dispatch `inbull_scan`（run 39974436102）全绿，
+日志 `[OK] 报告已发布: 入牛时点扫描_2026-10-23.md`，KB「报告/全盘量化」侧确认新增该文件。
 
 ---
 
