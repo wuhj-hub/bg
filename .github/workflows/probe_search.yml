@@ -19,7 +19,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
           IMA_FOLDER_ID: ${{ secrets.IMA_FOLDER_ID }}
         run: |
           python3 - <<'PY'
