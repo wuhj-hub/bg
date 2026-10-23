@@ -6,6 +6,39 @@
   },
   "signals": [
     {
+      "code": "sh601766",
+      "name": "中国中车",
+      "pattern": "MACD空中加油",
+      "raw_score": 100,
+      "final_score": 71,
+      "multi_score": 36,
+      "resonance": "共振向下",
+      "price": 6.35,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.10)>=DEA(0.10)金叉",
+        "MACD柱0.020刚翻红加油成功",
+        "收盘6.35>MA56.32",
+        "MA20>MA60多头排列",
+        "KDJ_J=35未超买"
+      ],
+      "stop_loss": "6.00",
+      "target": "7.30",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股弱势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": 204.2,
+      "rsg_strong": true
+    },
+    {
       "code": "sh601398",
       "name": "工商银行",
       "pattern": "MACD空中加油",
@@ -38,6 +71,38 @@
       "rsg_strong": true
     },
     {
+      "code": "sh601816",
+      "name": "京沪高铁",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 66,
+      "multi_score": 49,
+      "resonance": "共振向下",
+      "price": 5.15,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.10)>=DEA(0.06)金叉",
+        "MACD柱0.060刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=75未超买"
+      ],
+      "stop_loss": "4.92",
+      "target": "5.92",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股弱势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": 228.1,
+      "rsg_strong": true
+    },
+    {
       "code": "sh601088",
       "name": "中国神华",
       "pattern": "MACD空中加油",
@@ -67,6 +132,38 @@
       "month_gate": "PASS",
       "month_reversal": "平台突破(12月新高)",
       "rsg_dev": 335.5,
+      "rsg_strong": true
+    },
+    {
+      "code": "sh601985",
+      "name": "XD中国核",
+      "pattern": "MACD空中加油",
+      "raw_score": 90,
+      "final_score": 65,
+      "multi_score": 43,
+      "resonance": "共振向下",
+      "price": 9.34,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.13)>=DEA(0.12)金叉",
+        "MACD柱0.040刚翻红加油成功",
+        "MA20>MA60多头排列",
+        "KDJ_J=50未超买"
+      ],
+      "stop_loss": "9.00",
+      "target": "10.74",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股弱势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "趋势确立(MA6上行)",
+      "rsg_dev": 242.1,
       "rsg_strong": true
     },
     {
@@ -194,56 +291,6 @@
       "month_gate": "PASS",
       "month_reversal": "平台突破(12月新高)",
       "rsg_dev": 571.0,
-      "rsg_strong": true
-    },
-    {
-      "code": "sz002472",
-      "name": "双环传动",
-      "pattern": "箱体突破",
-      "raw_score": 80,
-      "final_score": 59,
-      "multi_score": 49,
-      "resonance": "共振向下",
-      "price": 41.03,
-      "reasons": [
-        "MA20(37.10)>MA60(36.90)",
-        "MACD金叉(DIF=0.42)",
-        "KDJ向上(J=111)",
-        "收盘41.03>MA538.61",
-        "突破验证通过：量2.0倍/回踩待确认/位置-13%"
-      ],
-      "stop_loss": "35.91",
-      "target": "47.18",
-      "mode": 3,
-      "tag": "突破待回踩确认",
-      "breakout": {
-        "valid": true,
-        "reason": "量2.0倍/回踩待确认/位置-13%",
-        "checks": {
-          "volume": true,
-          "pullback": true,
-          "position": true,
-          "pullback_state": "pending"
-        },
-        "box": {
-          "top": 39.79,
-          "bottom": 32.78,
-          "height": 21.4,
-          "break_date": "2026-10-23",
-          "vol_ratio": 2.02,
-          "pos_dev": -13.3
-        }
-      },
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 204.1,
       "rsg_strong": true
     },
     {
