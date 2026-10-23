@@ -5,6 +5,28 @@
 
 ---
 
+## v2.66 (2026-10-24)
+
+### 新增：知识库上传健康检查（selfcheck 第 ⑥ 项）
+
+**动因**：2026-10-23 kb_id 失效导致全链路上传静默失败一整天。`upload_ima.py` 侧已加 `::error::`
+注解，但仍需一个**从知识库侧反向核对**的守卫，否则"报告没进库"依旧只能靠人工发现。
+
+- 新增 `quant_scripts/kb_health_check.py`：按「最近 N 个交易日」逐日核对「报告」KB 的四个文件夹
+  —— 复盘报告 / 盘前报告 / 全盘量化（任意当日文件）/ 竞价统计；从 `get_knowledge_list` 拉真实标题
+  匹配（兼容 `_prev_` 归档），缺失即 `::warning::`，`--strict` 时 exit 1。产物
+  `outputs/kb_health_{date}.md` + `kb_health_latest.{md,json}`。
+- `selfcheck_daily.yml` 接入第 ⑥ 项（与其它四项同款受控捕获 `set +e → RC → $GITHUB_OUTPUT`）：
+  - 产物纳入「提交自检产物到仓库」清单 → 入库
+  - 告警步纳入 `KB` rc 判断 + 缺失明细（`知识库缺失:日期·类别/…`）→ 微信
+  - 「上传自检报告到盘后量化文件夹」清单加 `kb_health_latest.md`
+- 本地实测：最近 3 个交易日（10-23/10-22/10-21）全部 ✅；指定 `--date 2026-09-29` 时正确报
+  `盘前报告 ❌缺 / 竞价统计 ❌缺` 并 exit 1。
+- CI 结构校验：手动 dispatch selfcheck（run 40018576012）→ trade_gate success、selfcheck skipped
+  （2026-10-24 为周六，守卫正常跳过）；端到端将于下周一 07:00 首次运行。
+
+---
+
 ## v2.65 (2026-10-23)
 
 ### 修复：ima 平台强制 kb_id 新格式 → 全链路上传知识库静默失败
