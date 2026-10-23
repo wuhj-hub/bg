@@ -157,11 +157,13 @@ jobs:
 
       # ─── 第二步.1：市场宽度指标（黑石marketChangeDist启发：全主板涨跌家数分布）───
       - name: 市场宽度扫描（全主板涨跌家数分布）
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}   # 2026-10-23：供 run_and_verify --push 告警
         run: |
           python3 market_width.py all_mainboard.csv
           # 2026-10-15：产出后自检（本步无 continue-on-error，失败本就会红；此处仅补"秒退/空产物"提示）
           python3 quant_scripts/run_and_verify.py --tag "第二步.1.3·市场宽度" \
-            --expect "outputs/market_width_latest.json" --min-bytes 200 || true
+            --expect "outputs/market_width_latest.json" --min-bytes 200 --push || true
 
       # ─── 第二步.1.3b：热点情绪扫描（hot_emotion 连板梯队+情绪温度+退潮预警，westock自算42s，供次日盘前②.5/②.6引用；2026-09-03接入消除手动漏跑断链）───
       - name: 热点情绪扫描（hot_emotion 连板梯队+情绪温度）
