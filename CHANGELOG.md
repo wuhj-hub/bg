@@ -5,6 +5,27 @@
 
 ---
 
+## v2.67 (2026-10-24)
+
+### 知识库上传核对接入盘后链路（当日守卫，滞后由 1 天缩短到 0）
+
+- `quant_report.yml` 末尾（体系自检推送后、产物契约自检前）新增步骤
+  「🩺 知识库上传健康检查（当日·核对报告是否真的进库）」：
+  `kb_health_check.py --date <北京今日> --no-auction --strict`，缺失即 `::warning::` +
+  PushPlus 当晚推微信（标题「⚠️当日报告未进知识库(日期)」），并把 `outputs/kb_health_latest.{md,json}`
+  提交入库。`if: always()` + `continue-on-error`，不阻断主链路。
+- `kb_health_check.py` 打磨（首次实测暴露的问题）：
+  - **修复 judge 返回元组误判**：`trade_day_check.judge` 返回 `(bool, reason)`，
+    直接当布尔用会恒真 → 周末也被当交易日。改为取 `[0]`。
+  - **403 限流重试**：连续调用 `get_knowledge_list` 会返回 403 Forbidden（实测），
+    加 4 次指数退避重试 + 分页间 0.2s 退避。
+  - **非交易日跳过**：`--date` 指定日期若为周末/休市日，直接 `⏭️ 跳过` 并 exit 0
+    （避免周六手动触发 quant_report 时误报）。
+- 实测：2026-10-23 齐全 RC=0；`--date 2026-09-29` 报「盘前报告 ❌缺」RC=1；
+  `--date 2026-10-24`（周六）跳过 RC=0。
+
+---
+
 ## v2.66 (2026-10-24)
 
 ### 新增：知识库上传健康检查（selfcheck 第 ⑥ 项）
