@@ -36,11 +36,18 @@ except Exception:
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
-    from trade_day_check import judge as _is_trade_day
+    from trade_day_check import judge as _judge
+
+    def _is_trade_day(dt):
+        """trade_day_check.judge 返回 (bool, reason) → 取布尔位"""
+        r = _judge(dt)
+        return r[0] if isinstance(r, tuple) else bool(r)
 except Exception:                                   # 兜底：周末判定
     def _is_trade_day(dt):
         return dt.weekday() < 5
 
+import time
+import urllib.error
 import urllib.request
 
 DEFAULT_KB = "ima_kb_b5qpEC7v"      # 「报告」知识库（新格式）
@@ -66,8 +73,24 @@ def _api(api_path, body):
                  "Content-Type": "application/json"},
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read().decode("utf-8"))
+    last = None
+    for att in range(4):                 # 2026-10-24：403/429 限流重试（实测连续调用会被拒）
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            last = e
+            if e.code in (403, 429, 500, 502, 503) and att < 3:
+                time.sleep(2 * (att + 1))
+                continue
+            raise
+        except Exception as e:
+            last = e
+            if att < 3:
+                time.sleep(2 * (att + 1))
+                continue
+            raise
+    raise last
 
 
 def list_titles(kb_id, folder_id, max_pages=20):
@@ -89,6 +112,7 @@ def list_titles(kb_id, folder_id, max_pages=20):
         if d.get("is_end") or not nxt or nxt == cursor:
             break
         cursor = nxt
+        time.sleep(0.2)                  # 分页间退避，避免限流
     return titles
 
 
@@ -119,7 +143,14 @@ def main():
     if not kb_id.startswith("ima_kb_"):
         print(f"::warning::IMA_KB_ID 不是新格式（{kb_id[:16]}…），检查可能失败")
 
-    days = [datetime.strptime(a.date, "%Y-%m-%d").date()] if a.date else recent_trade_days(a.lookback, a.include_today)
+    if a.date:
+        _d = datetime.strptime(a.date, "%Y-%m-%d").date()
+        if not _is_trade_day(_d):
+            print(f"⏭️ {a.date} 非交易日，跳过知识库上传检查")
+            return
+        days = [_d]
+    else:
+        days = recent_trade_days(a.lookback, a.include_today)
     checks = list(CHECKS)
     if a.no_auction:
         checks = [c for c in checks if c[0] != "竞价统计"]
