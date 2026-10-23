@@ -28,6 +28,8 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v7.4·2026-10-23】取消「新信号窗口」的改动由日线**扩展到周线/月线**（三周期统一）；
+     同时撤销「创业板入池」尝试（股票池回到 all_mainboard.csv）。--use-window 可整体回退。
   · 【v7.3·2026-10-23】日线**取消「新信号窗口」**（--use-window 可回退）：结构有效即入池，
      仅受最大跟踪期约束（gap ≤ MAXGAP[tf]），存量观察区随之关闭；改2 判定明确为
      「回调至水下、且 MACD 不低于 −0.618×金叉以来最高红柱」（改1 保持「回踩幅度<0.618H」）；
@@ -256,9 +258,9 @@ def main():
     ap.add_argument("--big-yang-pct", type=float, default=5.0,
                     help="突破段「中大阳线」涨幅阈值(%)，三周期均生效（默认5.0）")
     ap.add_argument("--use-window", action="store_true",
-                    help="日线恢复「新信号窗口」过滤（2026-10-23 起日线默认取消窗口）")
+                    help="恢复「新信号窗口」过滤（2026-10-23 起日/周/月线默认全部取消窗口）")
     ap.add_argument("--no-window", action="store_true",
-                    help="周/月线也取消「新信号窗口」过滤（默认仅日线取消）")
+                    help="（保留兼容，已默认生效）取消「新信号窗口」过滤")
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
     tf = a.tf
@@ -273,9 +275,9 @@ def main():
     _by_desc = ("突破日所属金叉→突破日" if bylb <= 0 else f"突破日前 {bylb} 根内")
     # ── 2026-10-18：周线/月线口径对齐日线，三周期一致。三个开关保留于此，便于按需回退 ──
     only2 = False       # 曾(v3)：周/月线只保留「改2」→ 现：改1 + 改2 双角度都收
-    # ── 2026-10-23 用户口径：日线取消「新信号窗口」——结构有效即入池（改1/改2 判定照旧），
-    #    仅受「最大跟踪期 MAXGAP」约束；--use-window 可回退日线窗口，--no-window 可推广到周/月线
-    nowin = (tf == "day" and not a.use_window) or (tf != "day" and bool(a.no_window))
+    # ── 2026-10-23 用户口径：三周期（日/周/月）统一取消「新信号窗口」——结构有效即入池
+    #    （改1/改2 判定照旧），仅受「最大跟踪期 MAXGAP」约束；--use-window 可回退到原窗口口径
+    nowin = not a.use_window
     req_bigyang = True  # 曾(2026-10-17)：大阳线条件仅日线 → 现：三周期均要求
     period, limit = {"day": ("day", 250), "week": ("week", 130), "month": ("month", 124)}[tf]
     # 最少K线根数：月线 westock 硬上限仅 61 根（--limit 更大也无用），故门槛必须低于 61，
@@ -285,7 +287,9 @@ def main():
     pool = load_pool(a.pool, a.pool_file)
     if not pool:
         print("❌ 无股票池"); return
-    print(f"🔍 反转数值[{tf}] 跟踪扫描 | 标的{len(pool)}只 | " + ("只留改2·无窗口 | " if only2 else f"窗口 改1 {win}/改2 {win2} 根·大阳线≥{a.big_yang_pct:g}%（{_by_desc}） | ") + f"现价<{a.max_price:g}元")
+    _mode = ("只留改2·无窗口" if only2 else
+             f"不限新信号窗口(跟踪期{MAXGAP[tf]}根)" if nowin else f"窗口 改1 {win}/改2 {win2} 根")
+    print(f"🔍 反转数值[{tf}] 跟踪扫描 | 标的{len(pool)}只 | {_mode}·大阳线≥{a.big_yang_pct:g}%（{_by_desc}） | 现价<{a.max_price:g}元")
 
     rows_map = fetch_batch([c for c, n in pool], period, limit)
     print(f"  数据就绪: {len(rows_map)}/{len(pool)}只")
@@ -425,7 +429,7 @@ def main():
                   f"新信号窗口：改1 {win} 根 / 改2 {win2} 根（{lbl}） ｜ 现价 < {a.max_price:g}元")),
          (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
           else f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
-         (f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；**日线不限新信号窗口**（结构有效即入池）" if nowin else
+         (f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；**不限新信号窗口**（结构有效即入池）" if nowin else
           f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；存量观察区限「距突破≤{wmax}根」"), "",
          (f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
           f"观察 {len(watch)} ｜ 池内合计 {len(tracked)}**" if watch else
