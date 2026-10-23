@@ -556,7 +556,8 @@ jobs:
           # 先运行反转数值周线扫描（≤10元），供复盘报告明日展望章节引用
           python3 quant_scripts/reversal_funnel_screener.py --weeks 2 --max-price 10 || echo "反转数值扫描失败, 复盘继续"
           # 反转数值·日线扫描（突破2倍反转数值 → 回调不破1倍反转数值，≤10元；保留改1+改2）
-          python3 quant_scripts/reversal_daily_screener.py --tf day --window 5 --max-price 10 --pool-file all_mainboard.csv --push || echo "反转数值日线跟踪失败, 复盘继续"
+          # 2026-10-23：日线取消「新信号窗口」（结构有效即入池，仅受跟踪期 45 根约束）；股票池扩到创业板
+          python3 quant_scripts/reversal_daily_screener.py --tf day --max-price 10 --pool-file all_mainboard.csv,all_chinext.csv --push || echo "反转数值日线跟踪失败, 复盘继续"
           # 反转数值·周线跟踪（2026-10-18 对齐日线口径：改1+改2、新信号窗口3根、突破段中大阳线）
           python3 quant_scripts/reversal_daily_screener.py --tf week --window 3 --max-price 10 --pool-file all_mainboard.csv --push || echo "反转数值周线跟踪失败, 复盘继续"
           # 反转数值·月线跟踪（2026-10-18 对齐日线口径：改1+改2、新信号窗口2根、突破段中大阳线）
