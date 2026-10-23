@@ -59,7 +59,7 @@ jobs:
             python3 git_api_commit.py --msg "chore: 回测周期月度回归 $(date +%Y-%m)" $FILES
             RC=$?
             set -e
-            [ "$RC" != "0" ] && echo "::warning::回测周期提交失败(rc=$RC)"
+            if [ "$RC" != "0" ]; then echo "::warning::回测周期提交失败(rc=$RC)"; fi
           else
             echo "无产物，跳过"
           fi
