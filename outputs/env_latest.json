@@ -1,67 +1,67 @@
 {
- "data_date": "2026-10-22",
- "run_date": "2026-10-22",
- "temp": 28.8,
- "level": "冰点",
- "position_cap": 20,
+ "data_date": "2026-10-23",
+ "run_date": "2026-10-23",
+ "temp": 41.5,
+ "level": "偏冷",
+ "position_cap": 30,
  "subs": {
   "index_trend": {
-   "raw": 15.7,
-   "score": 15.7,
+   "raw": 15.4,
+   "score": 15.4,
    "w": 0.28,
    "src": "beast_safety",
-   "date": "2026-10-21"
+   "date": "2026-10-22"
   },
   "emotion": {
-   "raw": 68.0,
-   "score": 68.0,
+   "raw": 74.0,
+   "score": 74.0,
    "w": 0.2,
    "src": "hot_emotion",
-   "date": "2026-10-22"
+   "date": "2026-10-23"
   },
   "width": {
-   "raw": 39.3,
-   "score": 34.4,
+   "raw": 100.0,
+   "score": 100.0,
    "w": 0.18,
    "src": "market_width",
-   "date": "2026-10-22"
+   "date": "2026-10-23"
   },
   "breadth": {
-   "raw": 3.2,
-   "score": 11.0,
+   "raw": 3.43,
+   "score": 12.2,
    "w": 0.16,
    "src": "xihu_breadth",
-   "date": "2026-10-22"
+   "date": "2026-10-23"
   },
   "structure": {
-   "raw": 13.4,
-   "score": 10.1,
+   "raw": 14.6,
+   "score": 10.9,
    "w": 0.09,
    "src": "yearline_breadth",
-   "date": "2026-10-22"
+   "date": "2026-10-23"
   },
   "inbull": {
-   "raw": 6.44,
-   "score": 21.5,
+   "raw": 4.72,
+   "score": 15.7,
    "w": 0.09,
    "src": "inbull_scan",
-   "date": "2026-10-21"
+   "date": "2026-10-22"
   }
  },
  "style": {
-  "score": 26,
-  "label": "情绪市",
-  "icon": "🔥"
+  "score": 13,
+  "label": "均衡市",
+  "icon": "⚖️"
  },
  "phase": {
-  "label": "偏弱",
-  "limitup": 30,
-  "date": "2026-10-22"
+  "label": "中性",
+  "limitup": 66,
+  "date": "2026-10-23"
  },
  "divergence": {
-  "index_vs_emotion": -52.3,
-  "breadth_vs_width": -23.4,
-  "structure_vs_inbull": -11.4
+  "index_vs_emotion": -58.6,
+  "breadth_vs_width": -87.8,
+  "structure_vs_inbull": -4.8
  },
  "degraded": false,
  "missing": [],
