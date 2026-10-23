@@ -1,15 +1,80 @@
 {
- "date": "2026-10-22",
+ "date": "2026-10-23",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 51,
+ "pool_size": 49,
  "resonance_boards": [
+  {
+   "name": "自动化设备",
+   "code": "pt01801078",
+   "zdf": 5.66,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "半导体",
+   "code": "pt01801081",
+   "zdf": 3.3,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "消费电子",
+   "code": "pt01801085",
+   "zdf": 4.49,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "zdf": 1.83,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "zdf": 3.03,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "工程机械",
+   "code": "pt01801077",
+   "zdf": 3.58,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
   {
    "name": "电机Ⅱ",
    "code": "pt01801731",
-   "zdf": 3.58,
-   "strength": 8,
+   "zdf": 5.55,
+   "strength": 6,
    "factors": [
-    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -17,38 +82,108 @@
  ],
  "grab_top": [
   {
-   "name": "电机Ⅱ",
-   "code": "pt01801731",
-   "value": 8
-  }
- ],
- "entry_top": [
+   "name": "自动化设备",
+   "code": "pt01801078",
+   "value": 7
+  },
   {
-   "name": "个护用品",
-   "code": "",
-   "value": 17.9
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 7
+  },
+  {
+   "name": "消费电子",
+   "code": "pt01801085",
+   "value": 7
   },
   {
    "name": "白酒Ⅱ",
    "code": "pt01801125",
-   "value": 13.1
+   "value": 7
+  },
+  {
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "value": 7
+  },
+  {
+   "name": "工程机械",
+   "code": "pt01801077",
+   "value": 7
+  }
+ ],
+ "entry_top": [
+  {
+   "name": "消费电子",
+   "code": "pt01801085",
+   "value": 43.2
+  },
+  {
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 23.5
   },
   {
    "name": "电机Ⅱ",
    "code": "pt01801731",
    "value": 11.3
+  },
+  {
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "value": 9.3
+  },
+  {
+   "name": "白酒Ⅱ",
+   "code": "pt01801125",
+   "value": 6.7
+  },
+  {
+   "name": "自动化设备",
+   "code": "pt01801078",
+   "value": 5.4
+  },
+  {
+   "name": "工程机械",
+   "code": "pt01801077",
+   "value": 2.5
   }
  ],
  "absorption_top": [
   {
    "name": "电机Ⅱ",
    "code": "pt01801731",
-   "value": 4.57
+   "value": 3.21
+  },
+  {
+   "name": "消费电子",
+   "code": "pt01801085",
+   "value": 1.62
   },
   {
    "name": "白酒Ⅱ",
    "code": "pt01801125",
-   "value": 1.68
+   "value": 0.84
+  },
+  {
+   "name": "工程机械",
+   "code": "pt01801077",
+   "value": 0.71
+  },
+  {
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "value": 0.35
+  },
+  {
+   "name": "自动化设备",
+   "code": "pt01801078",
+   "value": 0.27
+  },
+  {
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 0.2
   }
  ],
  "control_top": [],
