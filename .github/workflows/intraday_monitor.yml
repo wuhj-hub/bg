@@ -40,7 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     # ⚠️ 2026-09-15：原 15min 不够——开盘八法"补算扫描"实测耗时 649s(11min)+ 盘中监控 3.5min
     #    会正好撞上超时被 cancelled（首次补算当日尤其明显）。补算每日只发生一次，之后走监控(快)。
-    timeout-minutes: 30
+    # 2026-10-23：30 → 45min。实测漏单日补算可超 27min，30min 会让**整个 job**被 cancelled
+    #    （连带已成功的盘中监控产出与状态保存）。现由「开盘八法」step 级 15min 超时兜底，
+    #    job 层只留宽裕余量给前面各步。
+    timeout-minutes: 45
     
     steps:
       - name: 检出代码
@@ -114,8 +117,22 @@ jobs:
 
       # ─── 开盘八法：9:45扫描强形态 + 盘中突破监控（auto分阶段）───
       - name: 开盘八法强形态扫描+突破监控
+        id: kp8
         continue-on-error: true
+        # 2026-10-23：新增 step 级超时。此前只靠 job 级 30min 兜底 —— 一旦当日「补算」超 30min，
+        #   整个 job（含已成功的盘中监控产出）被 cancelled，且下次触发又从头补算 → 全天 24 次全废
+        #   （2026-10-23 实况：11:00~14:45 每 15min 一次，24/24 cancelled）。
+        #   现超时只失败本步，continue-on-error 保证 job 继续、其它产物照常提交。
+        timeout-minutes: 15
         env:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
           python3 quant_scripts/kaipan_8.py --auto
+
+      - name: 开盘八法异常告警
+        if: always() && steps.kp8.outcome == 'failure'
+        continue-on-error: true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️开盘八法未完成&content=kaipan_8.py --auto 超时或失败（多为 cron 早盘漏单导致补算超时），本次仅缺开盘八法产物，盘中监控其余部分正常&template=txt" > /dev/null || echo "推送失败"
