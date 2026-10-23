@@ -28,6 +28,11 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v7.3·2026-10-23】日线**取消「新信号窗口」**（--use-window 可回退）：结构有效即入池，
+     仅受最大跟踪期约束（gap ≤ MAXGAP[tf]），存量观察区随之关闭；改2 判定明确为
+     「回调至水下、且 MACD 不低于 −0.618×金叉以来最高红柱」（改1 保持「回踩幅度<0.618H」）；
+     死叉当日（SCB==0）不再判「无结构」，消除在池票逢死叉日被移出、次日又入池的抖动；
+     --pool-file 支持逗号分隔多文件（主板 + 创业板）
 
 口径（v4 · 2026-10-18 周/月线对齐日线）：
   · 三周期统一：改1 + 改2 双角度都收
@@ -41,14 +46,14 @@
 输出: outputs/反转数值日线信号_{date}.md（day）/ outputs/反转数值周线跟踪_{date}.md（week）
       / outputs/反转数值月线跟踪_{date}.md（month）
 """
-import os, sys, re, json, subprocess, argparse, shutil
+import os, sys, re, json, subprocess, argparse, shutil, time
 from datetime import datetime
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(BASE)
 _W = shutil.which("westock-data-skillhub")
 WESTOCK = _W if _W else "npx -y westock-data-skillhub@1.0.3"
-BATCH = 250
+BATCH = 100    # 2026-10-23：250/批在实测中覆盖不足（返回 success 但丢股），改 100/批 + 批间退避
 K = 0.618
 BIG_YANG_PCT = 0.05    # 突破段「中大阳线」涨幅阈值（>=5%；涨停板自然满足）
 POOL_DIR = os.path.join(ROOT, "data")
@@ -112,17 +117,27 @@ def fetch_batch(codes, period="day", limit=250):
             _out = _fetch_layer(_args, 300)
             if not _out:
                 _out = _westock_run(_args, 300)
+            if not _out or _out.strip() == "数据为空":
+                time.sleep(3)
+                _out = _fetch_layer(_args, 300) or _westock_run(_args, 300)
             rm = {}
             for ln in _out.splitlines():
                 m = re.match(r"\|\s*([a-z]{2}\d{6})\s*\|\s*([\d-]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)", ln)
                 if m:
                     rm.setdefault(m.group(1), []).append(
                         (m.group(2), float(m.group(3)), float(m.group(4)), float(m.group(5)), float(m.group(6))))
+                elif len(batch) == 1:
+                    # 单只调用时 westock 输出不含 symbol 列（2026-10-23 补）
+                    m2 = re.match(r"\|\s*([\d-]{10})\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)\s*\|\s*([\d.]+)", ln)
+                    if m2:
+                        rm.setdefault(batch[0], []).append(
+                            (m2.group(1), float(m2.group(2)), float(m2.group(3)), float(m2.group(4)), float(m2.group(5))))
             for sym, rows in rm.items():
                 rows.sort(key=lambda x: x[0])
                 out[sym] = rows
         except Exception as e:
             print(f"  [warn] 批{i//BATCH+1}拉取失败: {e}")
+        time.sleep(0.4)
     return out
 
 
@@ -146,7 +161,7 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bi
         JCB[i] = None if lj is None else i - lj
         SCB[i] = None if ls is None else i - ls
     i = n - 1
-    if SCB[i] is None or JCB[i] is None or SCB[i] == 0:
+    if SCB[i] is None or JCB[i] is None:
         return None
     bl = abs(min(macd[max(0, i - int(SCB[i])):i + 1]))
     tp_bar = None
@@ -179,21 +194,29 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bi
     return {"tp_date": rows[tp_bar][0], "tp_val": round(2 * K * bl, 2),
             "red_high": round(red_high, 2), "pullback": round(deep, 2),
             "line": round(line, 2), "m_low": round(m_low, 2),
-            "angle": ("改1" if m_low > 0 else "改2"), "valid": deep < line,   # 窄口径：仅保留「回踩幅度 < 0.618×金叉以来最高红柱」(回踩确认)
+            "angle": ("改1" if m_low > 0 else "改2"),
+            # 2026-10-23 口径：改2（死叉回调）= 回调至水下、且 MACD 不低于 −0.618×金叉以来最高红柱（m_low ≥ −0.618H）；
+            #                改1（保持强势）= 突破后未下水，且回踩幅度 < 0.618×金叉以来最高红柱
+            "valid": (deep < line) if m_low > 0 else (deep <= line),
             "big_yang": big_yang, "by_date": (rows[by_idx][0] if by_idx is not None else ""),
             "by_gain": round(by_gain * 100, 1),
             "gap": i - tp_bar, "last_date": rows[-1][0], "last_close": round(closes[-1], 2)}
 
 
 def load_pool(pool_arg="", pool_file=""):
+    """读股票池；--pool-file 支持逗号分隔多文件（2026-10-23 起：all_mainboard.csv,all_chinext.csv）"""
     if pool_arg:
         return [(c.strip(), "") for c in pool_arg.split(",") if c.strip()]
-    name = pool_file or "hs300.csv"
-    cands = [name] if os.path.isabs(name) else [
-        os.path.join(BASE, name), os.path.join(ROOT, name), os.path.join(os.getcwd(), name)]
-    fp = next((p for p in cands if os.path.exists(p)), None)
-    rows = []
-    if fp:
+    names = [x.strip() for x in (pool_file or "hs300.csv").split(",") if x.strip()]
+    rows, used = [], []
+    for name in names:
+        cands = [name] if os.path.isabs(name) else [
+            os.path.join(BASE, name), os.path.join(ROOT, name), os.path.join(os.getcwd(), name)]
+        fp = next((p for p in cands if os.path.exists(p)), None)
+        if not fp:
+            print(f"  [warn] 未找到股票池文件: {name}")
+            continue
+        used.append(os.path.basename(fp))
         for ln in open(fp, encoding="utf-8-sig"):
             p = ln.strip().split(",")
             if len(p) < 2:
@@ -205,9 +228,15 @@ def load_pool(pool_arg="", pool_file=""):
                 rows.append((p[0], nm))
             elif re.match(r"^\d{6}$", p[0]):
                 rows.append((("sh" if p[0].startswith("6") else "sz") + p[0], nm))
-    else:
-        print(f"  [warn] 未找到股票池文件: {name}")
-    return rows
+    if not rows:
+        print(f"  [warn] 股票池为空: {names}")
+    # 去重（多池合并时可能重叠）
+    seen, uniq = set(), []
+    for c, nm in rows:
+        if c in seen:
+            continue
+        seen.add(c); uniq.append((c, nm))
+    return uniq
 
 
 def main():
@@ -226,6 +255,10 @@ def main():
     ap.add_argument("--max-price", type=float, default=10.0)
     ap.add_argument("--big-yang-pct", type=float, default=5.0,
                     help="突破段「中大阳线」涨幅阈值(%)，三周期均生效（默认5.0）")
+    ap.add_argument("--use-window", action="store_true",
+                    help="日线恢复「新信号窗口」过滤（2026-10-23 起日线默认取消窗口）")
+    ap.add_argument("--no-window", action="store_true",
+                    help="周/月线也取消「新信号窗口」过滤（默认仅日线取消）")
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
     tf = a.tf
@@ -240,7 +273,9 @@ def main():
     _by_desc = ("突破日所属金叉→突破日" if bylb <= 0 else f"突破日前 {bylb} 根内")
     # ── 2026-10-18：周线/月线口径对齐日线，三周期一致。三个开关保留于此，便于按需回退 ──
     only2 = False       # 曾(v3)：周/月线只保留「改2」→ 现：改1 + 改2 双角度都收
-    nowin = False       # 曾(v3)：周/月线取消新信号窗口 → 现：同样按窗口判定新信号
+    # ── 2026-10-23 用户口径：日线取消「新信号窗口」——结构有效即入池（改1/改2 判定照旧），
+    #    仅受「最大跟踪期 MAXGAP」约束；--use-window 可回退日线窗口，--no-window 可推广到周/月线
+    nowin = (tf == "day" and not a.use_window) or (tf != "day" and bool(a.no_window))
     req_bigyang = True  # 曾(2026-10-17)：大阳线条件仅日线 → 现：三周期均要求
     period, limit = {"day": ("day", 250), "week": ("week", 130), "month": ("month", 124)}[tf]
     # 最少K线根数：月线 westock 硬上限仅 61 根（--limit 更大也无用），故门槛必须低于 61，
@@ -310,12 +345,12 @@ def main():
             ok_new = (bool(st) and st["valid"] and st["last_close"] < a.max_price
                       and (not req_bigyang or st.get("big_yang"))
                       and (not only2 or st["angle"] == "改2")
-                      and (nowin or st["gap"] <= (win2 if st["angle"] == "改2" else win)))
+                      and (st["gap"] <= MAXGAP[tf] if nowin else st["gap"] <= (win2 if st["angle"] == "改2" else win)))
             if ok_new:
                 item = {"code": code, "name": name, "first_date": today, **st}
                 tracked[code] = item
                 added.append(item)
-            elif (bool(st) and st["valid"] and st.get("big_yang") and st["gap"] <= wmax
+            elif (not nowin and bool(st) and st["valid"] and st.get("big_yang") and st["gap"] <= wmax
                   and st["last_close"] < a.max_price):   # 价格门槛与入池一致
                 # 📎 存量结构观察：形态仍成立，仅因「超新信号窗口 / 现价超上限」未入池；不入池、不计胜率
                 _why = []
@@ -385,10 +420,13 @@ def main():
     L = [f"# 🔄 反转数值·{lbl}信号跟踪（{today}）", "",
          (f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ 现价 < {a.max_price:g}元" if only2
           else f"> 股票池：{a.pool_file or ('自定义' if a.pool else '沪深300')} {len(pool)}只 ｜ "
-               f"新信号窗口：改1 {win} 根 / 改2 {win2} 根（{lbl}） ｜ 现价 < {a.max_price:g}元"),
+               + ("**不限新信号窗口**（结构有效即入池，仅受跟踪期 "
+                  f"{MAXGAP[tf]} 根约束） ｜ 现价 < {a.max_price:g}元" if nowin else
+                  f"新信号窗口：改1 {win} 根 / 改2 {win2} 根（{lbl}） ｜ 现价 < {a.max_price:g}元")),
          (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
           else f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值后回踩，分两角度——**改1（保持强势）**：突破后 MACD 未下水（自突破以来最低值 > 0）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
-         f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；存量观察区限「距突破≤{wmax}根」", "",
+         (f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；**日线不限新信号窗口**（结构有效即入池）" if nowin else
+          f"> 跟踪规则：并入池后持续跟踪，**跌破1倍反转数值即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；存量观察区限「距突破≤{wmax}根」"), "",
          (f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
           f"观察 {len(watch)} ｜ 池内合计 {len(tracked)}**" if watch else
           f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**"),
