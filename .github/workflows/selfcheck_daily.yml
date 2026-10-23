@@ -127,6 +127,22 @@ jobs:
           tail -60 /tmp/attrib.log
           echo "rc=$RC" >> "$GITHUB_OUTPUT"
 
+      - name: ⑥ 知识库上传健康检查（复盘/盘前/全盘量化是否真的进了 KB）
+        id: kb
+        continue-on-error: true   # 受控捕获
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+        run: |
+          set +e
+          python3 quant_scripts/kb_health_check.py --out outputs --lookback 3 --strict \
+            > /tmp/kb.log 2>&1
+          RC=$?
+          set -e
+          tail -25 /tmp/kb.log
+          echo "rc=$RC" >> "$GITHUB_OUTPUT"
+
       - name: 提交自检产物到仓库
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -141,7 +157,8 @@ jobs:
             outputs/silent_failure_latest.md outputs/silent_failure_audit.json \
             outputs/pipeline_audit.json outputs/pipeline_audit_latest.json \
             outputs/param_contract_latest.md outputs/param_contract_latest.json \
-            outputs/归因_latest.md outputs/attrib_latest.json
+            outputs/归因_latest.md outputs/attrib_latest.json \
+            outputs/kb_health_latest.md outputs/kb_health_latest.json
           RC=$?
           set -e
           if [ "$RC" != "0" ]; then
@@ -158,14 +175,16 @@ jobs:
           ME="${{ steps.meta.outputs.rc }}"
           PI="${{ steps.pipe.outputs.rc }}"
           PC="${{ steps.param.outputs.rc }}"
-          if [ "$CR" != "0" ] || [ "$ME" != "0" ] || [ "$PI" != "0" ] || [ "$PC" != "0" ]; then
+          KB="${{ steps.kb.outputs.rc }}"
+          if [ "$CR" != "0" ] || [ "$ME" != "0" ] || [ "$PI" != "0" ] || [ "$PC" != "0" ] || [ "$KB" != "0" ]; then
             EXTRA=$(python3 -c "import json;d=json.load(open('outputs/pipeline_audit.json'));print(' | '.join(d.get('issues',[]))[:400])" 2>/dev/null || :)
-            MSG="数据源 rc=${CR:-?} ｜ 静默失败 rc=${ME:-?} ｜ 流水线 rc=${PI:-?} ｜ 参数契约 rc=${PC:-?} ｜ ${AT_SUM} ${EXTRA}"
+            KB_HINT=$(python3 -c "import json;d=json.load(open('outputs/kb_health_latest.json'));print('知识库缺失:'+'/'.join(d.get('missing',[])[:4]))" 2>/dev/null || :)
+            MSG="数据源 rc=${CR:-?} ｜ 静默失败 rc=${ME:-?} ｜ 流水线 rc=${PI:-?} ｜ 参数契约 rc=${PC:-?} ｜ 知识库 rc=${KB:-?} ${KB_HINT} ｜ ${AT_SUM} ${EXTRA}"
             curl -s "https://pushplus.plus/send" \
               -d "token=${PUSH_TOKEN}&title=⚠️体系自检异常&content=${MSG}&template=txt" > /dev/null || echo "推送失败"
             echo "::warning::体系自检异常 —— $MSG"
           else
-            echo "✅ 四项自检全部通过"
+            echo "✅ 五项自检全部通过（数据源/静默失败/流水线/参数契约/知识库上传）"
           fi
 
       - name: 上传自检报告到盘后量化文件夹
@@ -174,13 +193,14 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
         run: |
           for f in "outputs/数据源交叉验证_$(date +%Y-%m-%d).md" \
                    "outputs/静默失败审计_$(date +%Y-%m-%d).md" \
                    "outputs/param_contract_latest.md" \
-                   "outputs/归因_latest.md"; do
+                   "outputs/归因_latest.md" \
+                   "outputs/kb_health_latest.md"; do
             if [ -f "$f" ]; then
               python3 upload_ima.py --file "$f" --name "$(basename "$f")" || echo "上传失败(非致命): $f"
             fi
