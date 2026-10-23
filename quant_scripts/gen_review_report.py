@@ -232,11 +232,25 @@ def estimate_premarket_judgment(idx_rows, today=""):
     judgments = []
     chg = 0
     close = 0
+    chg_multi = None
+    chg_txt = ""
     if idx_rows:
         sh_rows = [r for r in idx_rows if r.get("symbol") == "sh000001"]
         if len(sh_rows) >= 2:
             chg = (float(sh_rows[-1]["last"]) - float(sh_rows[-2]["last"])) / float(sh_rows[-2]["last"]) * 100
             close = float(sh_rows[-1]["last"])
+        # ⭐2026-10-23 新增：上证/深成/创业板综合涨跌。
+        #   只看上证会误判——10-23 上证 +0.89% 被标"中性"，实际深成 +2.79%、创业板 +4.16%。
+        _parts = []
+        for _sym, _lb in (("sh000001", "上证"), ("sz399001", "深成"), ("sz399006", "创业板")):
+            _rs = [r for r in idx_rows if r.get("symbol") == _sym]
+            if len(_rs) >= 2:
+                _c = (float(_rs[-1]["last"]) - float(_rs[-2]["last"])) / float(_rs[-2]["last"]) * 100
+                _parts.append((_lb, _c))
+        if _parts:
+            chg_multi = sum(c for _, c in _parts) / len(_parts)
+            chg_txt = " / ".join("%s%+.2f%%" % (lb, c) for lb, c in _parts)
+    _base = chg_multi if chg_multi is not None else chg
     actual_desc = f"实际走势：{'下跌' if chg < 0 else '上涨' if chg > 1 else '震荡'}" if idx_rows else "⏳ 指数数据暂不可用"
 
     # ── 真实预判路径：读取盘前生成器导出的结构化JSON ──
@@ -246,21 +260,28 @@ def estimate_premarket_judgment(idx_rows, today=""):
         pre_ops = pm.get("operation", "")      # e.g. 仓位≤50%，可参与不追高
         pre_sectors = pm.get("sectors", "")    # e.g. AI应用/软件主线、半导体低吸
         pre_key = pm.get("key_levels", "")     # e.g. 支撑3800压力3850
-        # 大盘方向验证
-        if chg < -1:
-            res_dir = "❌ 预判错误（市场大跌，盘前偏乐观）"
-        elif chg < 0:
-            res_dir = "❌ 预判错误（市场下跌，盘前未提示风险）" if ("偏多" in pre_tone or "乐观" in pre_tone) else "✅ 基本正确"
-        elif chg < 1:
+        # 大盘方向验证（2026-10-23：改用综合涨跌 + 上涨方向也校验盘前基调，原实现只在下跌时判错）
+        _bull = ("多" in pre_tone) or ("乐观" in pre_tone)
+        _bear = ("防守" in pre_tone) or ("谨慎" in pre_tone) or ("空" in pre_tone)
+        if _base >= 1:
+            res_dir = "✅ 正确（市场上涨）" if _bull else ("⚠️ 盘前偏防守，市场上涨（错过反弹）" if _bear else "⏳ 中性（市场上涨）")
+        elif _base > -1:
             res_dir = "⏳ 中性（市场小幅震荡）"
         else:
-            res_dir = "✅ 正确（市场上涨）"
-        judgments.append({"item": "大盘方向", "pre": pre_tone or "未给出", "actual": f"{close} ({chg:+.2f}%)", "result": res_dir})
+            res_dir = "✅ 正确（防守/看空兑现）" if _bear else ("❌ 预判错误（市场大跌，盘前偏乐观）" if _bull else "❌ 预判错误（市场下跌，盘前未提示风险）")
+        judgments.append({"item": "大盘方向", "pre": pre_tone or "未给出",
+                          "actual": (chg_txt or f"{close} ({chg:+.2f}%)") + f"（综合 {_base:+.2f}%）",
+                          "result": res_dir})
         # 操作基调验证
         if pre_ops:
-            res_ops = "✅ 防守策略正确" if ("防守" in pre_ops and chg < 0) else \
-                      "❌ 偏激进（盘前建议参与但市场大跌）" if ("参与" in pre_ops and chg < -0.5) else \
-                      "⏳ 中性"
+            if "防守" in pre_ops and _base < 0:
+                res_ops = "✅ 防守策略正确"
+            elif "防守" in pre_ops and _base >= 1:
+                res_ops = "🟡 防守错过反弹（未受伤，但仓位偏低漏涨）"
+            elif ("参与" in pre_ops or "积极" in pre_ops) and _base < -0.5:
+                res_ops = "❌ 偏激进（盘前建议参与但市场大跌）"
+            else:
+                res_ops = "⏳ 中性"
             judgments.append({"item": "操作基调", "pre": pre_ops, "actual": actual_desc, "result": res_ops})
         # 板块方向验证（对比预判板块 vs 实际领涨）
         try:
@@ -271,12 +292,31 @@ def estimate_premarket_judgment(idx_rows, today=""):
             top_sectors = []
         if pre_sectors:
             hit = [s for s in top_sectors if any(k in pre_sectors for k in (s[:2], s[:3]))]
-            res_sec = "✅ 板块预判正确" if len(hit) >= 2 else "❌ 板块主线证伪" if top_sectors else "⏳ 板块数据缺失"
+            # 2026-10-23 修：原实现要求命中≥2 个才判对——盘前通常只给 3 个候选，命中 1 个即判"证伪"
+            #   （10-23 盘前"电机Ⅱ/半导体/股权转让"、实际领涨含半导体，仍被判 0 分）→ 补"部分命中"档
+            if len(hit) >= 2:
+                res_sec = "✅ 板块预判正确"
+            elif len(hit) == 1:
+                res_sec = "🟡 部分命中（%s）" % hit[0]
+            elif top_sectors:
+                res_sec = "❌ 板块主线证伪"
+            else:
+                res_sec = "⏳ 板块数据缺失"
             judgments.append({"item": "板块方向", "pre": pre_sectors, "actual": f"实际领涨: {'、'.join(top_sectors) or '数据缺失'}", "result": res_sec})
         # 关键位验证（支撑/压力）
         if pre_key:
-            hit_sup = "支撑" in pre_key and close >= 3800
-            res_key = "✅ 支撑位判断正确" if hit_sup else "⚠️ 关键位需观察"
+            # 2026-10-23 修：原实现硬编码 `close >= 3800`（与盘前关键位无关 → 只要收盘低于 3800 永远判"需观察"，
+            #   而盘前支撑其实是 3650）。改为解析 pre_key 里的支撑/压力数值逐项判定。
+            _sup = re.search(r"支撑\s*[:：]?\s*(\d+(?:\.\d+)?)", pre_key)
+            _res = re.search(r"压力\s*[:：]?\s*(\d+(?:\.\d+)?)", pre_key)
+            _lo = float(_sup.group(1)) if _sup else None
+            _hi = float(_res.group(1)) if _res else None
+            if _lo is not None:
+                res_key = "✅ 支撑位守住" if close >= _lo else "⚠️ 跌破支撑 %g" % _lo
+                if _hi is not None and close > _hi:
+                    res_key += "（且突破压力 %g）" % _hi
+            else:
+                res_key = "⚠️ 关键位需观察"
             judgments.append({"item": "关键位", "pre": pre_key, "actual": f"收 {close}", "result": res_key})
         return judgments
 
@@ -1185,19 +1225,30 @@ def gen_report(today_str):
             chg = (float(sh_rows[-1]["last"]) - float(sh_rows[-2]["last"])) / float(sh_rows[-2]["last"]) * 100
             close = float(sh_rows[-1]["last"])
             
-            if chg < -2:
+            # ⭐2026-10-23：改用「上证/深成/创业板综合涨跌」判明日基调。
+            #   原来只看上证 —— 10-23 上证 +0.89% 得出"反弹力度不足+防守"，
+            #   而深成 +2.79%、创业板 +4.16% 实际是成长股强势反弹，基调明显偏保守。
+            _mp = []
+            for _sym in ("sh000001", "sz399001", "sz399006"):
+                _rr = [r for r in idx_rows if r.get("symbol") == _sym]
+                if len(_rr) >= 2:
+                    _mp.append((float(_rr[-1]["last"]) - float(_rr[-2]["last"])) / float(_rr[-2]["last"]) * 100)
+            _mkt_chg = sum(_mp) / len(_mp) if _mp else chg
+            _lvl = int(close // 50 * 50) if close else 0   # 支撑位改为动态整数关口（原来硬编码 3800）
+            if _mkt_chg < -2:
                 outlook = "大跌后次日有技术性反弹需求，但在系统性风险未解除前不宜抄底"
                 tone = "⚪ 谨慎观望"
-            elif chg < -1:
-                outlook = "连续下跌但跌幅收窄，关注3800点支撑是否有效"
+            elif _mkt_chg < -1:
+                outlook = (f"连续下跌但跌幅收窄，关注{_lvl}点支撑是否有效" if _lvl
+                           else "连续下跌但跌幅收窄，关注前低支撑是否有效")
                 tone = "⚪ 谨慎观望"
-            elif chg < 0:
+            elif _mkt_chg < 0:
                 outlook = "弱势震荡格局延续，量能萎缩说明抛压减轻但买盘不足"
                 tone = "🟡 防守"
-            elif chg < 1:
+            elif _mkt_chg < 1:
                 outlook = "小幅企稳但反弹力度不足，需要放量确认"
                 tone = "🟡 防守"
-            elif chg < 2:
+            elif _mkt_chg < 2:
                 outlook = "反弹良好，关注次日能否放量延续"
                 tone = "🟢 偏乐观"
             else:
