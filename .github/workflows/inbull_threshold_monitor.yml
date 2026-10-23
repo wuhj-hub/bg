@@ -39,7 +39,7 @@ jobs:
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
         run: |
           python3 quant_scripts/inbull_threshold_monitor.py --source ths --workers 12
