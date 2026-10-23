@@ -52,8 +52,12 @@ CORE_HINTS = ["data_guard", "self_check", "market_width", "run_shuangxian", "bea
 # 刻意吞错误、不算风险的步骤（2026-10-12）：
 # trade_gate 守卫「判断是否交易日」——continue-on-error 仅为把 is_trade_day
 # 写入 $GITHUB_OUTPUT 供后续 job 的 if 判断，失败即视为非交易日、不影响数据，非静默失败风险。
-SAFE_STEP_HINTS = ["判断是否交易日"]
-SAFE_BODY_HINTS = ["trade_day_check.py"]
+# 2026-10-23：补白名单消除系统级误报 —— 「🧪 产物契约自检」步本身就是自检工具
+#   （run_and_verify.py：失败会自己输出 ::error:: 并写 silent_failures 日志），
+#   continue-on-error 是有意设计（自检失败不该拖红主链），不算静默失败。
+#   此前它把 15 个 workflow 的契约自检步全判为高危/中危，掩盖了真实问题。
+SAFE_STEP_HINTS = ["判断是否交易日", "产物契约自检"]
+SAFE_BODY_HINTS = ["trade_day_check.py", "run_and_verify.py"]
 
 
 def parse_workflow(path):
