@@ -200,7 +200,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -227,7 +227,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
         run: |
           python3 quant_scripts/dragon_leader.py --date "$(date +%Y%m%d)" --threshold 70 || echo "龙头战法池扫描失败(非致命)"
@@ -243,7 +243,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -272,7 +272,7 @@ jobs:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -290,7 +290,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -359,7 +359,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -422,7 +422,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -549,7 +549,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485234585035034
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -636,7 +636,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
         run: |
           # ── 四态胜率（资金行为：抢筹/进场/控盘/观望）2026-09-16 接入 ──
@@ -658,7 +658,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           GITHUB_TOKEN: ${{ github.token }}
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
@@ -694,7 +694,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -722,7 +722,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
           FETCH_CACHE: "1"
@@ -803,6 +803,34 @@ jobs:
             )
             MSG="🏥 体系自检报告 - $(date +%Y-%m-%d)\n\n健康评分: ${SCORE}/100 (${GRADE})\n市场状态: ${REGIME}\n问题摘要: ${ISSUES}"
             curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=🏥体系自检&content=${MSG}&template=txt" > /dev/null
+          fi
+
+      # ─── 2026-10-24：当日知识库上传核对（2026-10-23 kb_id 失效 → 全天报告没进库却全绿的教训）───
+      - name: 🩺 知识库上传健康检查（当日·核对报告是否真的进库）
+        if: always()
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          D=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          set +e
+          python3 quant_scripts/kb_health_check.py --date "$D" --no-auction --strict --out outputs > /tmp/kbq.log 2>&1
+          RC=$?
+          set -e
+          tail -25 /tmp/kbq.log
+          if [ "$RC" != "0" ]; then
+            MISS=$(python3 -c "import json;d=json.load(open('outputs/kb_health_latest.json'));print('/'.join(d.get('missing',[])[:6]))" 2>/dev/null || :)
+            echo "::warning::当日知识库上传缺失(${D})：${MISS}"
+            curl -s "https://pushplus.plus/send" \
+              -d "token=${PUSH_TOKEN}&title=⚠️当日报告未进知识库(${D})&content=${MISS}&template=txt" > /dev/null || echo "推送失败"
+          fi
+          if [ -f outputs/kb_health_latest.md ]; then
+            python3 git_api_commit.py --msg "chore: kb health ($D)" \
+              outputs/kb_health_latest.md outputs/kb_health_latest.json || echo "kb_health 产物提交失败(非致命)"
           fi
 
       # ─── 产物契约自检（2026-10-15 · 11.2/11.3：清单集中在 config/daily_artifacts.json）───
