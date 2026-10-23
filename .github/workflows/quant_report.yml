@@ -63,14 +63,59 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: 安装 Python 依赖（pandas+numpy+matplotlib）+ 中文字体
+      - name: 缓存 pip wheel
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-py312-v1
+
+      - name: 安装 Python 依赖（pandas+numpy+matplotlib+akshare）
+        run: pip install pandas numpy matplotlib akshare
+
+      # ⭐2026-10-23：中文字体改「直下 + 缓存」，替代 apt-get（实测 24.6min → 预期 <1min）
+      #   原方案 `apt-get update && apt-get install fonts-noto-cjk` 每次要刷 apt 索引 +
+      #   下载 130MB 全量 CJK 包（含日韩），是本 job 第 2 大耗时步。
+      #   现改为直下 8.3MB 的 Noto Sans SC 单字重 OTF 到 ~/.fonts，并用 actions/cache 复用。
+      - name: 缓存中文字体
+        id: fontcache
+        uses: actions/cache@v4
+        with:
+          path: ~/.fonts
+          key: fonts-noto-sc-v1
+
+      - name: 安装中文字体（Noto Sans SC · 免 apt）
         run: |
-          pip install pandas numpy matplotlib akshare
-          # ⭐2026-10-02: runner 默认只有 DejaVu 字体，matplotlib 画中文全部渲染成方块□
-          #   （2026-09-30 日志刷屏 "Glyph ... missing from font(s) DejaVu Sans"，
-          #    导致每日上传知识库的西湖广度净值曲线图中文不可读）
-          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk \
-            || echo "::warning::中文字体安装失败，图表中文可能缺字"
+          mkdir -p ~/.fonts
+          if [ ! -s ~/.fonts/NotoSansSC-Regular.otf ]; then
+            for U in \
+              https://raw.githubusercontent.com/googlefonts/noto-cjk/main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf \
+              https://raw.githubusercontent.com/googlefonts/noto-cjk/main/Sans/Variable/OTF/Subset/NotoSansSC-VF.otf ; do
+              echo "下载 $U"
+              if curl -sSL --retry 3 --max-time 120 -o ~/.fonts/NotoSansSC-Regular.otf "$U"; then
+                if [ -s ~/.fonts/NotoSansSC-Regular.otf ]; then echo "✅ 下载完成"; break; fi
+              fi
+              echo "::warning::字体源不可用，试下一个"
+            done
+          else
+            echo "✅ 命中缓存 ~/.fonts"
+          fi
+          ls -lh ~/.fonts/ || true
+          fc-cache -f > /dev/null 2>&1 || true
+          # 复制进 matplotlib 自带字体目录，规避 fontManager 缓存不刷新的老问题
+          python3 - <<'PYEOF'
+          import os, glob, shutil
+          import matplotlib
+          dst = os.path.join(matplotlib.get_data_path(), "fonts", "ttf")
+          for f in glob.glob(os.path.expanduser("~/.fonts/NotoSansSC-*.otf")):
+              shutil.copy(f, dst)
+          import matplotlib.font_manager as fm
+          names = sorted({f.name for f in fm.fontManager.ttflist if "Noto Sans SC" in f.name})
+          print("matplotlib 可见中文字体:", names or "无")
+          if not names:
+              print("::error::中文字体未注册成功，图表中文可能缺字（检查字体下载）")
+          else:
+              print("✅ 中文字体就绪")
+          PYEOF
 
       # ─── 数据源连通性预检 + 股池文件备份（2026-09-14 加固）───
       # 背景：9/14 盘后 job 全绿但数据全空（才哥战法「有效 0 只」，9/11-9/12 均 3051 只），
