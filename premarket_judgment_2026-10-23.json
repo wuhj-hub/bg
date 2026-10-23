@@ -1,0 +1,22 @@
+{
+  "tone": "防守",
+  "operation": "仓位≤20%，以防守为主，不开新仓（⚖️均衡市(+13)仓位不变）（🌡️env总闸≤20%）",
+  "sectors": "电机Ⅱ、半导体、股权转让",
+  "key_levels": "支撑3650、压力3968",
+  "fish_temp": "40/100",
+  "beast_score": "15.4/100",
+  "shuangxian": "—",
+  "style_score": 13,
+  "style_name": "均衡市",
+  "base_pos": 30,
+  "style_fix": 0,
+  "temp_fix": 0,
+  "final_pos": 20,
+  "pos_uncapped": 30,
+  "env_temp": 28.8,
+  "env_level": "冰点",
+  "env_cap": 20,
+  "env_degraded": false,
+  "data_fresh": "ok",
+  "date": "2026-10-23"
+}
