@@ -1,53 +1,34 @@
 {
- "date": "2026-10-22",
- "total": 30,
- "lianban_cnt": 9,
- "max_lb": 5,
- "shouban": 21,
+ "date": "2026-10-23",
+ "total": 46,
+ "lianban_cnt": 10,
+ "max_lb": 6,
+ "shouban": 36,
  "by_lb": {
-  "5": 2,
-  "3": 2,
-  "2": 5,
-  "1": 21
+  "6": 1,
+  "3": 1,
+  "2": 8,
+  "1": 36
  },
  "score": {
-  "score": 68,
-  "level": "活跃",
+  "score": 74,
+  "level": "亢奋",
   "parts": {
-   "涨停家数": 5,
-   "连板高度": 28,
-   "连板占比": 35
+   "涨停家数": 8,
+   "连板高度": 36,
+   "连板占比": 30
   }
  },
  "persistence": [],
  "alerts": [],
  "lianban_rows": [
   {
-   "code": "sz002724",
-   "name": "海洋王",
-   "price": "",
-   "chg": "",
-   "lianban": 5,
-   "ji_ji_ban": "5天5板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "照明设备Ⅲ",
-    "照明设备Ⅱ",
-    "家用电器",
-    "社保新进"
-   ]
-  },
-  {
    "code": "sh603278",
    "name": "大业股份",
    "price": "",
    "chg": "",
-   "lianban": 5,
-   "ji_ji_ban": "5天5板",
+   "lianban": 6,
+   "ji_ji_ban": "6天6板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -61,8 +42,8 @@
    ]
   },
   {
-   "code": "sz002076",
-   "name": "星光股份",
+   "code": "sh600838",
+   "name": "上海九百",
    "price": "",
    "chg": "",
    "lianban": 3,
@@ -73,31 +54,47 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "照明设备Ⅲ",
-    "照明设备Ⅱ",
-    "家用电器"
+    "QFII新进"
    ]
   },
   {
-   "code": "sh600293",
-   "name": "三峡新材",
+   "code": "sz002535",
+   "name": "林州重机",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "玻璃制造",
-    "建筑材料"
+    "机械设备",
+    "专用设备",
+    "QFII新进"
    ]
   },
   {
-   "code": "sh600202",
-   "name": "哈空调",
+   "code": "sz003021",
+   "name": "兆威机电",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "电力设备",
+    "基金增仓"
+   ]
+  },
+  {
+   "code": "sh603028",
+   "name": "赛福天",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -110,13 +107,63 @@
    "sectors": [
     "通用设备",
     "机械设备",
-    "制冷空调设备",
+    "金属制品"
+   ]
+  },
+  {
+   "code": "sh603089",
+   "name": "正裕工业",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "汽车零部件",
+    "汽车",
+    "底盘与发动机系统"
+   ]
+  },
+  {
+   "code": "sh603280",
+   "name": "南方路机",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "机械设备",
+    "工程机械整机",
+    "工程机械",
     "核能核电"
    ]
   },
   {
-   "code": "sh600838",
-   "name": "上海九百",
+   "code": "sh603528",
+   "name": "多伦科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh603728",
+   "name": "鸣志电器",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -127,12 +174,13 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "QFII新进"
+    "电力设备",
+    "基金增仓"
    ]
   },
   {
-   "code": "sh603138",
-   "name": "海量数据",
+   "code": "sh603933",
+   "name": "睿能科技",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -143,42 +191,9 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "基金减仓",
-    "QFII新进"
-   ]
-  },
-  {
-   "code": "sh601999",
-   "name": "出版传媒",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "基金减仓"
-   ]
-  },
-  {
-   "code": "sh603330",
-   "name": "天洋新材",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "塑料",
-    "其他塑料制品",
-    "基础化工"
+    "其他电子Ⅲ",
+    "其他电子Ⅱ",
+    "电子"
    ]
   }
  ],
