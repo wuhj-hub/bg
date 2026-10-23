@@ -21,6 +21,7 @@ import os
 import sys
 import json
 import argparse
+import re
 import hashlib
 import hmac
 import time
@@ -202,14 +203,64 @@ def rename_knowledge(kb_id, media_id, new_name):
     return send_ima("openapi/wiki/v1/rename_knowledge", json.dumps(body))
 
 
+# ─── 2026-10-23：kb_id 防呆 ───────────────────────────────────────────────
+# ima 平台自 2026-10-23 起强制 kb_id 使用新格式 ima_kb_XXXXXXXX（8 位字母数字），
+# 旧长 id（如 6kjd8jHp...=）一律返回 code=220004 "invalid or outdated knowledge_base_id"。
+# 若 IMA_KB_ID 仍是旧格式，这里按知识库名称自动解析为最新 id，避免全链路静默失败。
+LEGACY_KB_NAMES = {
+    "6kjd8jHpAyqf0xFVUo2xUWPaDAKapAWCw-Tki7V-aAs=": "报告",
+    "RgPmCvOW2CgN3I-HVGEYfmBS_W0mkiYzHRuTGHP8_6o=": "多维量化",
+    "OP9FrgEMXYPgBa77vSjRfolA5NXR6URQ_AbBJbzHBmM=": "股市杂集",
+    "CpESjqn_cL6Aln6efZUUestGYXTKs9zJUvuByCfU6ZA=": "吴华江的知识库",
+    "e0vvfp8ZHK7_i-Y4zJR_cETPvvnsSDVWKHjtutfazyU=": "谈股论今-投机分子大本营",
+}
+
+
+def _kb_list():
+    """列出账号下所有知识库 → [(kb_id, kb_name)]"""
+    out, cursor = [], ""
+    for _ in range(10):
+        body = {"query": "", "cursor": cursor, "limit": 20}
+        resp = send_ima("openapi/wiki/v1/search_knowledge_base", json.dumps(body))
+        d = resp.get("data") or {}
+        for it in (d.get("info_list") or []):
+            out.append((it.get("kb_id") or "", it.get("kb_name") or ""))
+        cursor = d.get("next_cursor") or ""
+        if not cursor:
+            break
+    return out
+
+
+def resolve_kb_id(raw):
+    """kb_id 防呆：非 ima_kb_XXXXXXXX 时，按 IMA_KB_NAME / 旧 id 映射 自动解析最新 id。"""
+    raw = (raw or "").strip()
+    if re.fullmatch(r"ima_kb_[A-Za-z0-9]{8}", raw):
+        return raw
+    want = (os.environ.get("IMA_KB_NAME") or "").strip() or LEGACY_KB_NAMES.get(raw, "")
+    if not want:
+        print(f"::warning::IMA_KB_ID 不是新格式且无法推断知识库名称（{raw[:16]}…），按原样尝试")
+        return raw
+    try:
+        for kid, name in _kb_list():
+            if name == want and kid.startswith("ima_kb_"):
+                print(f"::warning::IMA_KB_ID 为旧格式，已按名称「{want}」自动解析为 {kid}"
+                      f"（建议把 GitHub Secret IMA_KB_ID 更新为该值）")
+                return kid
+        print(f"::warning::未能按名称「{want}」解析到知识库 id，按原样尝试")
+    except Exception as e:
+        print(f"::warning::解析 kb_id 失败({e})，按原样尝试")
+    return raw
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", required=True)
     ap.add_argument("--name", default=None)
     a = ap.parse_args()
-    kb_id = os.environ.get("IMA_KB_ID")
-    if not kb_id:
+    _raw_kb = os.environ.get("IMA_KB_ID")
+    if not _raw_kb:
         raise RuntimeError("IMA_KB_ID not set")
+    kb_id = resolve_kb_id(_raw_kb)
     folder_id = os.environ.get("IMA_FOLDER_ID", "")
     fp = a.file
     filename = a.name or os.path.basename(fp)
@@ -278,4 +329,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as _e:  # 2026-10-23：失败打 ::error:: 注解，避免被 workflow 的 `|| echo` 完全吞掉
+        import traceback
+        traceback.print_exc()
+        print(f"::error::upload_ima 上传失败：{_e}")
+        raise
