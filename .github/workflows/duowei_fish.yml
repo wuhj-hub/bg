@@ -146,7 +146,7 @@ jobs:
           fi
           cp "$RPT" 鱼身报告_latest.md
           JSN=$(ls -t outputs/fish_body_enhanced_*.json 2>/dev/null | head -1)
-          [ -n "$JSN" ] && cp "$JSN" fish_body_latest.json
+          if [ -n "$JSN" ]; then cp "$JSN" fish_body_latest.json; fi
           python3 git_api_commit.py --msg "chore: 多维度鱼身报告 ($(date +%Y-%m-%d))" \
             鱼身报告_latest.md fish_body_latest.json || echo "⚠️ 产物提交失败（不阻断）"
 
