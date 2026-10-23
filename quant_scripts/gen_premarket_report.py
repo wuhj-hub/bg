@@ -698,6 +698,12 @@ def gen_report(today_str):
     except Exception as e:
         lines.append(f"- 一致性校验：计算失败({e})")
 
+    # ②.10 反弹质量三检查（2026-10-23 新增：防止「只看指数涨跌」误判反弹性质）
+    try:
+        lines.append(render_reversal_quality())
+    except Exception as _e:
+        lines.append("\n### ②.10 反弹质量检查\n\n> 生成失败(%s)\n" % _e)
+
     lines.append("\n## ③ 板块排行\n")
     board = get_board_data()
     if board:
@@ -916,6 +922,86 @@ def read_hot_emotion():
     return _ri_load(("hot_emotion_latest.json", "outputs/hot_emotion_latest.json", "../outputs/hot_emotion_latest.json",
               "/sandbox/workspace/github_bg/outputs/hot_emotion_latest.json",
               "/sandbox/workspace/skills/盘前市场报告/scripts/outputs/hot_emotion_latest.json"))
+
+
+def render_reversal_quality():
+    """②.10 🔎 反弹质量三检查（2026-10-23 新增）
+
+    动因：2026-10-23 盘前判「防守/不开新仓」，当日上证 +0.89%、创业板 +4.16% 普涨，
+    事后核对发现是「指数涨、广度没改善」的窄幅超跌反抽（中军涨停 0 家、创新低 505 家）。
+    本节点把「反弹质量」拆成 3 项可验证指标，避免以后只看指数涨跌下结论。
+
+    回测依据（上证指数 1990-2026，8748 个交易日）：
+      · 单日跌幅 ≤-1.2% / -1.5% / -2% 之后，T+1 胜率 55.4~55.8%（基线 52.6%），
+        但 T+3 / T+5 均值超额为负（-0.06 ~ -0.37pct）→ 抢反弹「赢面略高、赚得少」；
+      · 只有单日 ≤-3%（n=337）或「连 3 日累计 ≤-6%」（n=250）时，
+        T+5 / T+10 才有正超额（+0.34 ~ +1.45pct）。
+      → 结论：恐慌后抢反弹只适合小仓位试错，不是重仓信号；尾部越极端越有效。
+    """
+    L = ["\n### ②.10 🔎 反弹质量三检查（真反弹 vs 超跌反抽）\n"]
+    try:
+        xb = read_xihu_breadth() or {}
+        xh = _ri_load(("xihu_breadth_history.json", "outputs/xihu_breadth_history.json",
+                       "../outputs/xihu_breadth_history.json")) or {}
+        hh = _ri_load(("hot_emotion_history.json", "outputs/hot_emotion_history.json",
+                       "../outputs/hot_emotion_history.json")) or {}
+        if not isinstance(xh, dict):
+            xh = {}
+        if not isinstance(hh, dict):
+            hh = {}
+
+        def _avg(hist, key, n=5, exclude=1):
+            ks = sorted(k for k in hist if isinstance(hist.get(k), dict) and hist[k].get(key) is not None)
+            if exclude:
+                ks = ks[:-exclude]          # 排除最新一天（=昨日），用之前的做基准
+            vals = [float(hist[k][key]) for k in ks[-n:]]
+            return (sum(vals) / len(vals)) if vals else None
+
+        date = xb.get("date") or ""
+        zt = (hh.get(date) or {}).get("total")
+        zt_avg = _avg(hh, "total")
+        low = xb.get("new_low")
+        low_avg = _avg(xh, "new_low")
+        qsg = xb.get("qsg_pct")
+        qsg_avg = _avg(xh, "qsg_pct")
+
+        L.append("> 口径：昨日 vs 前 5 日均值。指数上涨但三项不改善 = 超跌反抽，不是趋势反转。")
+        L.append("> 注：涨停家数取 hot_emotion 口径（与市场宽度口径不同，看趋势不看绝对值）。")
+        L.append("")
+        L.append("| 检查项 | 昨日 | 前5日均值 | 变化 | 判定 |")
+        L.append("|---|---|---|---|---|")
+        improve = 0
+        for name, cur, avg, better in (("涨停家数", zt, zt_avg, "up"),
+                                       ("创新低家数（越少越好）", low, low_avg, "down"),
+                                       ("强势股占比 %", qsg, qsg_avg, "up")):
+            if cur is None or avg in (None, 0):
+                L.append("| %s | %s | %s | — | ⚪ 数据缺失 |" % (name, "—" if cur is None else cur, "—" if avg is None else round(avg, 1)))
+                continue
+            chg = (float(cur) - float(avg)) / abs(float(avg)) * 100
+            good = (chg >= 5) if better == "up" else (chg <= -5)
+            bad = (chg <= -5) if better == "up" else (chg >= 5)
+            if good:
+                improve += 1
+                tag = "🟢 改善"
+            elif bad:
+                tag = "🔴 恶化"
+            else:
+                tag = "🟡 持平"
+            L.append("| %s | %s | %s | %+.1f%% | %s |" % (name, cur, round(avg, 1), chg, tag))
+        L.append("")
+        if improve >= 2:
+            L.append("- **结论：🟢 结构在改善**（%d/3 项改善）→ 反弹具备延续基础，可按体系仓位参与。" % improve)
+        elif improve == 1:
+            L.append("- **结论：🟡 仅部分改善**（1/3）→ 反弹偏弱，等第二项确认再加大仓位。")
+        else:
+            L.append("- **结论：🔴 指数反弹但广度未改善**（0/3）→ 典型超跌反抽，不宜追高；"
+                     "若要做，只做低位放量、不追连板。")
+        L.append("- 📐 回测口径（上证 1990-2026）：单日跌 -1.2%~-2% 后次日胜率 55%~56%（基线 52.6%），"
+                 "但 T+5 超额为负；只有单日 ≤-3% 或连 3 日累计 ≤-6%，T+5/T+10 才有 +0.34~+1.45pct 正超额。"
+                 "→ 恐慌后抢反弹属小仓位试错，非重仓信号。")
+    except Exception as e:
+        L.append("> 生成失败(%s)" % e)
+    return "\n".join(L) + "\n"
 
 
 def read_env():
