@@ -200,7 +200,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -227,7 +227,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
         run: |
           python3 quant_scripts/dragon_leader.py --date "$(date +%Y%m%d)" --threshold 70 || echo "龙头战法池扫描失败(非致命)"
@@ -243,7 +243,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -272,7 +272,7 @@ jobs:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -290,7 +290,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -359,7 +359,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -422,7 +422,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -549,7 +549,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485234585035034
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -636,7 +636,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
         run: |
           # ── 四态胜率（资金行为：抢筹/进场/控盘/观望）2026-09-16 接入 ──
@@ -658,7 +658,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
           GITHUB_TOKEN: ${{ github.token }}
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
@@ -694,7 +694,7 @@ jobs:
         env:
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
         run: |
@@ -722,7 +722,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
           IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
-          IMA_KB_ID: ima_kb_b5qpEC7v   # 2026-10-23 新格式（旧 secrets 值为长 id，会 220004）
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}   # 2026-10-23 起 secret 已更新为新格式 ima_kb_b5qpEC7v
           IMA_FOLDER_ID: folder_7485264708529742
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
           FETCH_CACHE: "1"
