@@ -25,6 +25,11 @@ v0.2（2026-10-15，阶段 3）新增：
     kl = kline(codes, period="day", limit=250, use_cache=True)
     f  = asfund(["600519"], date="2026-10-14")
     raw = board(); raw2 = hotboard(8)
+v0.3（2026-10-23）新增外部源适配器（服务「抱团瓦解监控」）：
+- `ext_em_margin(codes, date)`  融资融券个股明细（东财 RPTA_WEB_RZRQ_GGMX）：融资余额、
+  占流通市值比、5/10 日融资净买入 → 拥挤度
+- `ext_em_report(codes, begin, end)`  个股研报列表（东财 reportapi）：评级调高/调低/首次/维持
+  + 当年·次年 EPS 预测 → 盈利上修广度
 详见知识库《第2层·取数层对账与设计草案_2026-10-14》。
 """
 import os
@@ -37,6 +42,7 @@ import tempfile
 import datetime
 import subprocess
 import urllib.request
+import urllib.parse
 
 _PERIOD_OK = {"day", "week", "month", "season", "year"}   # 2026-10-15 实测：本版仅支持这 5 个周期（m1 等已移除）
 KLINE_BATCH = 250        # 批量大小（250/批零丢失）
@@ -649,6 +655,178 @@ def ext_ths_kline(code, period="day", fq="hfq", timeout=40, retries=4):
             pass
         time.sleep(0.6 + 0.9 * i)
     return []
+
+
+# ══════════════════════════════════════════════════════════════════
+# 东财：融资融券拥挤度（datacenter）+ 研报评级/盈利预测（reportapi）
+#   2026-10-23 新增（阶段 4 · 外部多源适配器，服务「抱团瓦解监控」）
+#   ext_em_margin：个股融资余额 / 占流通市值比 / 5·10 日融资净买入 → 拥挤度
+#   ext_em_report：个股研报列表（调高/调低/首次/维持 + 当年·次年 EPS 预测）→ 盈利上修广度
+# ══════════════════════════════════════════════════════════════════
+EM_DC_URL = "https://datacenter-web.eastmoney.com/api/data/v1/get"
+EM_RPT_URL = "https://reportapi.eastmoney.com/report/list"
+EM_MARGIN_REPORT = "RPTA_WEB_RZRQ_GGMX"     # 东财两融个股明细报表（注意 RPTA_WEB_ 前缀，不是 RPT_）
+EM_HEADERS = {
+    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                   "(KHTML, like Gecko) Chrome/120 Safari/537.36"),
+    "Referer": "https://data.eastmoney.com/",
+}
+# ratingChange 语义 = 东财页面 data-bdcode 同值：0=调高 1=调低 2=首次 3=维持
+RATING_CHANGE_TEXT = {0: "调高", 1: "调低", 2: "首次", 3: "维持"}
+
+
+def _em_get(url, timeout=25, retries=3):
+    """东财接口通用 GET → dict；失败退避重试后返回 {}。"""
+    for i in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=EM_HEADERS)
+            return json.loads(urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "ignore"))
+        except Exception:
+            time.sleep(1.5 * (i + 1))
+    return {}
+
+
+def _bare(code):
+    """'sh600519' / '600519.SH' / 'sz300308' → '600519' / '300308'（东财 SCODE 口径）。"""
+    return str(code).strip().upper().replace("SH", "").replace("SZ", "").replace("BJ", "").replace(".", "").strip()
+
+
+def _margin_row(r):
+    return {
+        "date": (r.get("DATE") or "")[:10],
+        "code": r.get("SCODE"),
+        "name": r.get("SECNAME"),
+        "market": r.get("TRADE_MARKET"),
+        "margin_bal": r.get("RZYE"),        # 融资余额（元）
+        "short_bal": r.get("RQYE"),         # 融券余额（元）
+        "total_bal": r.get("RZRQYE"),       # 融资融券余额（元）
+        "bal_ratio": r.get("RZYEZB"),       # 融资余额 / 流通市值（%）
+        "buy": r.get("RZMRE"),              # 融资买入额
+        "net": r.get("RZJME"),              # 融资净买入
+        "net5": r.get("RZJME5D"),
+        "net10": r.get("RZJME10D"),
+        "short_net": r.get("RQJMG"),
+        "close": r.get("SPJ"),
+        "pct": r.get("ZDF"),
+        "mktcap": r.get("SZ"),              # 流通市值（元）
+    }
+
+
+def ext_em_margin(codes=None, date=None, page_size=200, timeout=25, retries=3):
+    """东财融资融券个股明细 → 拥挤度数据。
+
+    codes=None → 最新披露交易日的全市场 list[row]（单页，page_size≤500，全市场约 4900 只需翻页）
+    codes=[...] → {code: row}，每只取最新一条（按 date 倒序）
+    date        → 'YYYY-MM-DD'，限定某披露日
+
+    row：date/code/name/market/margin_bal(融资余额元)/short_bal/total_bal/
+         bal_ratio(融资余额占流通市值%)/buy/net(融资净买入)/net5/net10/short_net/close/pct/mktcap
+
+    ⚠️ 两融数据 T+1 披露：最新 row 的 date 通常比今天早 1 个交易日（盘中/早间更明显）。
+    实测 2026-10-23：中际旭创 300308 → date=2026-10-21 融资余额 256.58 亿、占流通市值 3.57%、
+    5 日融资净买入 −28.46 亿、10 日 −65.95 亿。
+    """
+    flt = []
+    if codes:
+        lst = ",".join('"%s"' % _bare(c) for c in codes)
+        flt.append("(SCODE in (%s))" % lst)
+    if date:
+        flt.append("(DATE='%s')" % date)
+    url = ("%s?reportName=%s&columns=ALL&source=WEB&client=WEB"
+           "&sortColumns=date&sortTypes=-1&pageNumber=1&pageSize=%d"
+           % (EM_DC_URL, EM_MARGIN_REPORT, int(page_size)))
+    if flt:
+        url += "&filter=" + urllib.parse.quote("".join(flt), safe="")
+    j = _em_get(url, timeout=timeout, retries=retries)
+    rows = [_margin_row(r) for r in ((j.get("result") or {}).get("data") or [])]
+    if not codes:
+        return rows
+    out = {}
+    for r in rows:                                   # 已按 date 倒序 → 首条即最新
+        c = r.get("code")
+        if c and c not in out:
+            out[c] = r
+    return out
+
+
+def _report_row(r):
+    def _f(v):
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+    rc = r.get("ratingChange")
+    return {
+        "date": (r.get("publishDate") or "")[:10],
+        "code": r.get("stockCode"),
+        "name": r.get("stockName"),
+        "org": r.get("orgSName"),
+        "rating": r.get("sRatingName"),
+        "last_rating": r.get("lastEmRatingName"),
+        "rating_change": rc,
+        "rating_change_text": RATING_CHANGE_TEXT.get(rc, "?" if rc is not None else ""),
+        "eps_this": _f(r.get("predictThisYearEps")),
+        "eps_next": _f(r.get("predictNextYearEps")),
+        "eps_next2": _f(r.get("predictNextTwoYearEps")),
+        "pe_this": _f(r.get("predictThisYearPe")),
+        "target_price": _f(r.get("indvAimPriceT") or r.get("indvAimPriceL")),
+        "title": r.get("title"),
+    }
+
+
+def ext_em_report(codes=None, begin=None, end=None, page=1, page_size=100,
+                  qtype=0, timeout=25, retries=3, pause=0.15):
+    """东财个股研报列表 → {"hits", "total_page", "page", "data":[row]}。
+
+    codes=None → 全市场（单页）；codes=[...] → 逐只请求后合并（每只 1 次调用，内部 0.15s 节流）
+    begin/end   → 'YYYY-MM-DD'，默认最近 30 天
+    qtype       → 0=个股研报（默认）｜1=行业｜2=策略｜3=宏观｜4=晨会
+
+    row：date/code/name/org/rating/last_rating/rating_change(0调高 1调低 2首次 3维持)/
+         rating_change_text/eps_this/eps_next/eps_next2/pe_this/target_price/title
+
+    ⚠️ page_size 上限实测 100（传 200 也只回 100）；hits 为区间内总条数，可据此翻页。
+    用法（盈利上修广度）：拉同一批股票近 60~90 日研报 → 按 (code, org) 取相邻两条比较
+    eps_next（或 eps_this）→ 上修/下修家数；再叠加 rating_change 的调高/调低计数。
+    """
+    if not end:
+        end = _today_bj()
+    if not begin:
+        begin = (datetime.datetime.strptime(end, "%Y-%m-%d") - datetime.timedelta(days=30)).strftime("%Y-%m-%d")
+    base = {
+        "industryCode": "*", "pageSize": int(min(page_size, 100)), "industry": "*",
+        "rating": "", "ratingChange": "", "beginTime": begin, "endTime": end,
+        "pageNo": int(page), "qType": int(qtype), "code": "*", "rcode": "",
+        "p": int(page), "pageNum": int(page),
+    }
+
+    def _one(code=None):
+        q = dict(base)
+        if code:
+            q["code"] = _bare(code)
+        return _em_get(EM_RPT_URL + "?" + urllib.parse.urlencode(q), timeout=timeout, retries=retries)
+
+    if not codes:
+        j = _one()
+        return {"hits": j.get("hits", 0), "total_page": j.get("TotalPage", 0),
+                "page": int(page), "data": [_report_row(r) for r in (j.get("data") or [])]}
+    rows, hits = [], 0
+    for c in codes:
+        j = _one(c)
+        hits += (j.get("hits") or 0)
+        rows.extend(_report_row(r) for r in (j.get("data") or []))
+        time.sleep(pause)
+    return {"hits": hits, "total_page": 0, "page": 1, "data": rows}
+
+
+def margin(codes=None, **kw):
+    """别名：融资融券明细（见 ext_em_margin）。"""
+    return ext_em_margin(codes, **kw)
+
+
+def report_list(codes=None, **kw):
+    """别名：研报列表（见 ext_em_report）。"""
+    return ext_em_report(codes, **kw)
 
 
 def aggregate_monthly(bars):
