@@ -5,6 +5,32 @@
 
 ---
 
+## v2.65 (2026-10-23)
+
+### 修复：ima 平台强制 kb_id 新格式 → 全链路上传知识库静默失败
+
+**根因**：ima 平台自 2026-10-23 起只接受 `ima_kb_XXXXXXXX`（8 位字母数字）格式的 kb_id，
+旧长 id 一律返回 `code=220004 invalid or outdated knowledge_base_id`。CI 里 24 处仍引用
+`${{ secrets.IMA_KB_ID }}`（secret 内为旧长 id `6kjd8jHp...=`）→ 当日**所有上传知识库步骤全部失败**；
+每个调用都用 `|| echo "xxx上传失败"` 吞错，run 结论仍为 success，故长期未被发现。
+
+**证据**（run 39929204026 日志）：`220004` 出现 15 次；KB 侧「报告/复盘报告」最新停在 10-21、
+「报告/全盘量化」当日 0 份（仅人工补传 3 份反转报告）；而 `jingjia_track.yml`（已硬编码
+`ima_kb_b5qpEC7v`）当日「报告/竞价」4 份上传成功 —— 对照组印证是 kb_id 来源差异。
+
+**修复**
+- 11 个 workflow 共 **24 处** `${{ secrets.IMA_KB_ID }}` → 硬编码 `ima_kb_b5qpEC7v`（均指向「报告」库）：
+  `quant_report`(12)、`quant_scan`(3)、`premarket_report`、`selfcheck_daily`、`guard_selfcheck`、
+  `inbull_scan`、`inbull_threshold_monitor`、`pool_winrate_biweekly`、`wangzhe_track`、`yao_gu_pool`、`probe_search`。
+- `upload_ima.py` 新增 `resolve_kb_id()` 防呆：kb_id 非新格式时，按 `IMA_KB_NAME` / 旧 id→名称映射
+  自动调 `search_knowledge_base` 解析最新 id，并打 `::warning::`；另在入口加 `::error::` 注解，
+  避免失败被 `|| echo` 完全吞掉。
+
+**待用户操作**：GitHub 仓库 → Settings → Secrets and variables → Actions → `IMA_KB_ID` 更新为
+`ima_kb_b5qpEC7v`（之后可把 24 处硬编码回退为引用 secret）。
+
+---
+
 ## v2.64 (2026-10-23)
 
 ### 反转数值：取消窗口扩展到周/月线 · 撤销创业板入池
