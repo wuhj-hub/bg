@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  actions: write        # 2026-10-23：内联触发 bt_cycle 需要
 
 concurrency:
   group: evidence-review
@@ -103,4 +104,26 @@ jobs:
             curl -s "https://www.pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=${TITLE}&content=${CONTENT}&template=txt" || echo "推送失败"
           else
             echo "PUSH_TOKEN 未配置，跳过推送"
+          fi
+
+      # ─── 2026-10-23：内联触发「回测周期（月度定期回归）」───
+      # 背景：bt_cycle 原先只靠 cron-job.org 发 repository_dispatch[bt-cycle-run]，
+      #   实测 2026-10-01 未触发（仓库里没有任何 回测周期_*.md / bt_cycle_latest.json 产物，
+      #   唯一一条 run 还是 2026-09-24 的 push 空 run）→ 属静默断链。
+      # 改为在本月度链路内直接 workflow_dispatch，不再依赖外部 cron 配置。
+      - name: 触发月度回测周期（bt_cycle）
+        if: always()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          code=$(curl -s -o /tmp/resp.txt -w "%{http_code}" -X POST \
+            -H "Authorization: token ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/bt_cycle.yml/dispatches" \
+            -d '{"ref":"main"}')
+          echo "bt_cycle dispatch http=${code}"
+          if [ "${code}" != "204" ]; then
+            echo "::error::触发 bt_cycle 失败(http=${code})"
+            cat /tmp/resp.txt || true
           fi
