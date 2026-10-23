@@ -46,7 +46,19 @@ jobs:
 
       # 情绪温度计预测力回测（全主板日K重建涨停；120 交易日 ≈ 半年）
       - name: 运行回测（120 交易日）
-        run: python3 quant_scripts/jinji_emotion_backtest.py --days 120 || true
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          # 2026-10-23：原 `--days 120 || true` 会吞掉失败 —— 2026-10-01 那次 run 全绿，
+          # 但产物至今停在 09-27（脚本实际没成功，提交步因无产物而静默跳过）。
+          # 现捕获 rc：失败即 ::error:: + PushPlus 告警，并让步变红（月度任务失败必须可见）。
+          RC=0
+          python3 quant_scripts/jinji_emotion_backtest.py --days 120 || RC=$?
+          if [ "$RC" != "0" ]; then
+            echo "::error::情绪温度计回测失败(rc=$RC)，本月无回测产物"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️情绪温度计回测失败&content=jinji_emotion_backtest 失败 rc=${RC}，本月无回测产物&template=txt" > /dev/null || echo "推送失败"
+            exit 1
+          fi
 
       - name: 提交报告
         if: always()
