@@ -1,5 +1,5 @@
 {
- "date": "2026-10-23",
+ "date": "2026-10-26",
  "writes": {
   "panhou_lianghua.csv": [
    "full_market_dualdim.py"
@@ -177,6 +177,15 @@
   "入牛阈值漂移_{var}.md": [
    "quant_scripts/inbull_threshold_monitor.py"
   ],
+  "kb_health_{var}.md": [
+   "quant_scripts/kb_health_check.py"
+  ],
+  "kb_health_latest.md": [
+   "quant_scripts/kb_health_check.py"
+  ],
+  "kb_health_latest.json": [
+   "quant_scripts/kb_health_check.py"
+  ],
   "rsv_strength_latest.json": [
    ".github/workflows/quant_scan.yml",
    "quant_scripts/rsv_strength.py"
@@ -300,6 +309,12 @@
   ],
   "yao_pool.txt": [
    "quant_scripts/yao_gu_pool.py"
+  ],
+  "拥挤度监控_{var}.md": [
+   "quant_scripts/crowding_watch.py"
+  ],
+  "拥挤度监控_{var}.json": [
+   "quant_scripts/crowding_watch.py"
   ],
   "wangzhe_breakout_pool.json": [
    "quant_scripts/wangzhe_breakout.py"
@@ -506,6 +521,14 @@
   ],
   "王者突破_{var}.md": [
    "quant_report.yml"
+  ],
+  "kb_health_latest.md": [
+   "quant_report.yml",
+   "selfcheck_daily.yml"
+  ],
+  "kb_health_latest.json": [
+   "quant_report.yml",
+   "selfcheck_daily.yml"
   ],
   "fish_body_latest.json": [
    "duowei_fish.yml",
@@ -738,6 +761,13 @@
   "hot_emotion_latest.json": [
    "gen_premarket_report.py"
   ],
+  "xihu_breadth_history.json": [
+   "gen_premarket_report.py",
+   "gen_review_report.py"
+  ],
+  "hot_emotion_history.json": [
+   "gen_premarket_report.py"
+  ],
   "env_latest.json": [
    "gen_premarket_report.py"
   ],
@@ -754,9 +784,6 @@
   ],
   "乖离低买_latest.json": [
    "gen_premarket_report.py"
-  ],
-  "xihu_breadth_history.json": [
-   "gen_review_report.py"
   ],
   "xihu_turns_latest.json": [
    "gen_review_report.py"
@@ -811,6 +838,8 @@
   "kline_{var}_{var}_{var}.json",
   "sw_l1_industry.json",
   "入牛阈值漂移_{var}.md",
+  "拥挤度监控_{var}.json",
+  "拥挤度监控_{var}.md",
   "权重提案_{var}.json"
  ],
  "ok": [
@@ -831,6 +860,9 @@
   "hot_emotion_{var}.md",
   "jingjia_auction.csv",
   "jingjia_signals.csv",
+  "kb_health_latest.json",
+  "kb_health_latest.md",
+  "kb_health_{var}.md",
   "liangxue_latest.json",
   "liangxue_minute_check_latest.json",
   "liangxue_month_join_latest.json",
@@ -942,8 +974,8 @@
  "dup_freshness": [
   {
    "name": "sector_component_em.json",
-   "root": "2026-10-22",
-   "outputs": "2026-10-22",
+   "root": "2026-10-23",
+   "outputs": "2026-10-23",
    "status": "同步"
   },
   {
