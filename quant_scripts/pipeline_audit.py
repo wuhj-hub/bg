@@ -13,7 +13,7 @@
   D. 脚本异常：quant_results 各子模块 stderr 含 Traceback → 预警（覆盖「假绿」）
 
 用法：
-  python3 pipeline_audit.py [--days 2] [--step-min 25] [--json outputs/pipeline_audit.json] [--push]
+  python3 pipeline_audit.py [--days 3] [--step-min 25] [--json outputs/pipeline_audit.json] [--push]
 """
 import os, re, sys, json, time, argparse, urllib.request, urllib.parse
 from datetime import datetime, timezone, timedelta
@@ -53,7 +53,7 @@ def api_commits(path, n=1):
 
 
 # ── A. run 状态 ───────────────────────────────────────────────
-def check_runs(days=2):
+def check_runs(days=3):
     since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
     d = api(f"actions/runs?per_page=100&created=%3E{urllib.parse.quote(since)}")
     bad, noise = [], []
@@ -69,6 +69,28 @@ def check_runs(days=2):
     # 真·超时取消（孤立、当天无成功）仍保留在 bad 中，不削弱原设计。
     ok_days = {(w.get("name"), (w.get("created_at") or "")[:10])
                for w in runs if w.get("conclusion") == "success"}
+
+    # ── 成规模取消检测（2026-10-26 新增）──────────────────────────
+    # 原判据②「同 workflow 当天有 success 即判噪音」存在致命盲区：
+    #   「上午成功几次、下午起 24 次全 cancelled」会被整体判为噪音而彻底隐形
+    #   （2026-10-23 实况：盘中监控 11:00~14:45 共 24 次 cancelled，但当天 09:00-09:30 有 success
+    #     → 全部被忽略；且这是**连续 4 小时**的失效，不是偶发并发取消）。
+    # 新增判据：同 workflow 同一天 cancelled ≥ 3 且 cancelled/(cancelled+success+...) > 50%
+    #   → 判「成规模取消」= 真问题，进 bad（每批次只记 1 条代表，其余标注同类已记录）。
+    _stat = {}
+    for w in runs:
+        _k = (w.get("name"), (w.get("created_at") or "")[:10])
+        _s = _stat.setdefault(_k, [0, 0])
+        if w.get("conclusion") == "cancelled":
+            _s[0] += 1
+        elif w.get("conclusion") in ("success", "failure", "timed_out"):
+            _s[1] += 1
+
+    def _mass_cancel(w):
+        cs, ok = _stat.get((w.get("name"), (w.get("created_at") or "")[:10]), (0, 0))
+        return cs >= 3 and cs / max(cs + ok, 1) > 0.5
+
+    _mass_done = set()
 
     def _near(w):
         try:
@@ -94,7 +116,16 @@ def check_runs(days=2):
                 "id": w["id"], "event": w.get("event")}
         if c == "cancelled":
             day = (w.get("created_at") or "")[:10]
-            if (w.get("name"), day) in ok_days or _near(w):
+            if _mass_cancel(w):
+                cs, ok = _stat.get((w.get("name"), day), (0, 0))
+                pct = cs * 100 // max(cs + ok, 1)
+                if (w.get("name"), day) in _mass_done:
+                    item["reason"] = f"成规模取消（同批次已记录 {cs} 次/{pct}%）"
+                    noise.append(item)
+                    continue
+                _mass_done.add((w.get("name"), day))
+                item["reason"] = f"成规模取消：当日 {cs} 次取消 / {ok} 次其它（取消占比 {pct}%）"
+            elif (w.get("name"), day) in ok_days or _near(w):
                 item["reason"] = "并发/重复触发取消"
                 noise.append(item)
                 continue
@@ -218,7 +249,7 @@ def check_script_errors():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--days", type=int, default=2)
+    ap.add_argument("--days", type=int, default=3)
     ap.add_argument("--step-min", type=int, default=25)
     ap.add_argument("--json", default="outputs/pipeline_audit.json")
     ap.add_argument("--push", action="store_true")
