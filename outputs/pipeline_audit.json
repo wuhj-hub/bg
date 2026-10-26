@@ -1,7 +1,7 @@
 {
- "date": "2026-10-27 06:04",
+ "date": "2026-10-27 07:02",
  "runs": {
-  "total": 94,
+  "total": 96,
   "bad": [],
   "noise": [
    {
@@ -109,8 +109,8 @@
   {
    "workflow": "artifact_audit.yml",
    "label": "产物入库审计",
-   "last_success": "2026-10-26",
-   "age": 1,
+   "last_success": "2026-10-27",
+   "age": 0,
    "tol": 1
   },
   {
