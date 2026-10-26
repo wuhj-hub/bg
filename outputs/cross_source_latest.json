@@ -76,11 +76,7 @@
     "close": 2638.23,
     "pct": -1.71
    },
-   "em": {
-    "name": "创业板指",
-    "close": 2638.23,
-    "pct": -1.71
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -102,7 +98,11 @@
     "close": 1349.98,
     "pct": 1.12
    },
-   "em": null,
+   "em": {
+    "name": "贵州茅台",
+    "close": 1349.98,
+    "pct": 1.12
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -124,7 +124,11 @@
     "close": 11.3,
     "pct": 0.89
    },
-   "em": null,
+   "em": {
+    "name": "平安银行",
+    "close": 11.3,
+    "pct": 0.89
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -146,7 +150,11 @@
     "close": 52.62,
     "pct": 1.66
    },
-   "em": null,
+   "em": {
+    "name": "中国平安",
+    "close": 52.62,
+    "pct": 1.66
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -168,7 +176,11 @@
     "close": 6.6,
     "pct": 0.76
    },
-   "em": null,
+   "em": {
+    "name": "浙大网新",
+    "close": 6.6,
+    "pct": 0.76
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -216,7 +228,11 @@
     "close": 5.03,
     "pct": 0.4
    },
-   "em": null,
+   "em": {
+    "name": "华能蒙电",
+    "close": 5.03,
+    "pct": 0.4
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   }
