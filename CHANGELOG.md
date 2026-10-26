@@ -5,6 +5,31 @@
 
 ---
 
+## v2.72 (2026-10-27)
+
+### 新增「应跑未跑」检测 —— 外部 cron 静默停摆的第一时间告警
+
+**背景**：13 个 workflow 的原生 cron 已停用，唯一触发源是外部 cron-job.org 的 `repository_dispatch`。
+外部配置一丢就**静默停摆且没有任何告警** —— bt_cycle 从上线起到 2026-10-23 查产物才发现**从未运行过**。
+原巡检只查「跑过的 run 有没有失败」，**不查「该跑却没跑」**。
+
+**方案**（选 B：单条缺失检测，不加原生 cron 双投）：
+- 曾评估「13 个 workflow 全部加原生 cron 做双保险」，否决 —— 现有外部 dispatch 已在跑，
+  加 cron 会变成每天跑两遍（quant_scan/quant_report 各 110min、重复推微信），
+  且原生 cron 本身不可靠（duowei_fish 实测 16:00 计划常延到 22:00~次日 02:00）。
+- 改为在 `pipeline_audit.py` 新增 `EXPECTED_RUNS` 清单（18 项）+ `check_expected_runs()`：
+  对每个 workflow 查「最近一次 success」，用 **`trading_days_since`（交易日计龄，长假不累计）**
+  与容忍窗口比较 —— 日更类 1 个交易日、双周 11、月度 25、季度 70。超窗即进 `issues` →
+  status=FAIL → selfcheck 的「异常告警到微信」推送（payload 已含 workflow 文件名，便于手动 dispatch 补跑）。
+- 刻意设计：日更类容忍 1 个交易日 —— 07:00 自检时当日主链尚未运行属正常，只有「连着两个交易日没跑」才报，避免每天误报。
+- 不纳入：market_regime / inbull_scan（主通道是 quant_report 内联，独立 workflow 仅手动兜底）、probe_*（手动调试工具）。
+
+**实测**（2026-10-27 05:57）：清单 18 项全部在窗口内 → `应跑未跑 0`、status PASS、无假阳性；
+18 项各自输出「最近成功日 + 交易日计龄 + 容忍值」明细存 `pipeline_audit.json` 的 `expected_runs` 字段。
+（注：本地首测因未装 `trade_day_check.py` 导致长假未扣除、误报 2 项月度超期；装上后归零，验证计龄逻辑正确。）
+
+---
+
 ## v2.71 (2026-10-27)
 
 ### 静默失败审计降噪（告警疲劳治理）
