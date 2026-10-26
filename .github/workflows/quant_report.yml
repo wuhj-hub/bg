@@ -503,6 +503,32 @@ jobs:
             curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️产物可信度异常&content=新鲜度/非空/字段完整率/样本率/静默失败审计发现异常,详见知识库报告&template=txt" > /dev/null || true
           fi
 
+      # ─── 2026-10-26：盘后链路末尾补跑 env（消除子分滞后一个交易日）───
+      # 背景：env_engine 原先只在 quant_scan 内跑（15:05~17:02 时段），而入牛时点(inbull)、
+      #      市场状态(market_regime) 等子分源在 quant_report 内才刷新 → env 的 inbull 子分
+      #      长期滞后 1 个交易日（2026-10-26 实测：env 里 inbull 用 10-23 的值）。
+      # 做法：在上游子分全部就绪后重算一次；write_out 按 data_date 去重（同日重跑=覆盖），
+      #      不会重复累积 env_history。失败则沿用 quant_scan 阶段的结果，不阻断链路。
+      - name: 🌡️ 环境唯一化引擎补跑（盘后链路末尾·消除子分滞后）
+        if: always()
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set +e
+          python3 quant_scripts/env_engine.py --outdir outputs
+          RC=$?
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::env 补跑失败(rc=$RC)，沿用 quant_scan 阶段结果"
+            exit 0
+          fi
+          python3 -c "import json;d=json.load(open('outputs/env_latest.json'));print('env:',d['data_date'],d['temp'],d['level'],'cap='+str(d['position_cap']),{k:v.get('date') for k,v in d['subs'].items()})" 2>/dev/null || true
+          python3 git_api_commit.py --msg "chore: env refresh ($(date +%Y-%m-%d))" \
+            outputs/env_latest.json outputs/env_history.json || echo "env 产物提交失败(非致命)"
+
       - name: 提交报告产物到仓库（供盘前报告引用）
         continue-on-error: true
         env:
