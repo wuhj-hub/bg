@@ -1,4 +1,4 @@
-# 🧭 体系自检 · 归因分析 · 2026-10-26 22:59
+# 🧭 体系自检 · 归因分析 · 2026-10-26 23:02
 
 > 输入：artifact_audit / pipeline_audit / silent_failure / param_contract / cross_source（缺者略）
 > **只建议、不自动改**；「疑似原因」为规则 + 跨信号推断，附**置信度**，请人工复核。
