@@ -50,7 +50,11 @@
     "close": 11534.38,
     "pct": -1.19
    },
-   "em": null,
+   "em": {
+    "name": "深证成指",
+    "close": 11534.38,
+    "pct": -1.19
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -72,7 +76,11 @@
     "close": 2638.23,
     "pct": -1.71
    },
-   "em": null,
+   "em": {
+    "name": "创业板指",
+    "close": 2638.23,
+    "pct": -1.71
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -182,7 +190,11 @@
     "close": 2.63,
     "pct": 0.77
    },
-   "em": null,
+   "em": {
+    "name": "国安股份",
+    "close": 2.63,
+    "pct": 0.77
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
