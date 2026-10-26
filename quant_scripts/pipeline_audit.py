@@ -269,6 +269,9 @@ def main():
     if runs.get("noise"):
         issues.append(f"⏹️ 并发/重复触发取消 {len(runs['noise'])} 个（已忽略，不计入异常）")
     if heavy:
+        # 2026-10-26：重步骤只作性能提示，不参与 status/退出码 ——
+        #   此前 heavy 也算 WARN → 只要有 >25min 的步骤（竞价统计 40.9min 每天都有）
+        #   自检就恒 rc=1、每天推「⚠️体系自检异常」到微信，形成告警疲劳、真异常被淹没。
         issues.append("⚠️ 重步骤：" + "、".join(f"{h['workflow']}/{h['step']} {h['minutes']}min" for h in heavy[:5]))
     if stale:
         issues.append("⚠️ 产物停更：" + "、".join(f"{s['path']}({s['status']})" for s in stale[:5]))
@@ -279,7 +282,7 @@ def main():
            "runs": runs, "heavy_steps": heavy, "stale_products": stale,
            "freshness_skipped": freshness_skipped,
            "script_errors": scripterr, "issues": issues,
-           "status": "FAIL" if (runs["bad"] or scripterr) else ("WARN" if (heavy or stale) else "PASS")}
+           "status": "FAIL" if (runs["bad"] or scripterr) else ("WARN" if stale else "PASS")}
     os.makedirs(os.path.dirname(a.json) or ".", exist_ok=True)
     json.dump(rep, open(a.json, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
