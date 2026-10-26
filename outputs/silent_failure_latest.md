@@ -1,8 +1,8 @@
 # 🔍 体系自检元审计 · 2026-10-26
 
-> 扫描 23 个 workflow ｜ 风险项 **133** ｜ 🔴高危 **0**
+> 扫描 23 个 workflow ｜ 风险项 **131** ｜ 🔴高危 **0**
 
-## 🟡中危·吞错误（120）
+## 🟡中危·吞错误（118）
 
 - artifact_audit.yml :: 运行产物入库审计 (L62) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true
 - artifact_audit.yml :: 提交审计报告 (L84) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || true
@@ -29,8 +29,6 @@
 - inbull_scan.yml :: 入牛时点扫描 + 上传知识库 + 推送 + 提交 (L47) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
 - inbull_threshold_monitor.yml :: 安装依赖（pandas + westock CLI 免npx 备用） (L31) — 命中 || true
 - inbull_threshold_monitor.yml :: 季度复算 + 漂移对比 + 上传知识库 + 推送 + 提交 (L35) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- intraday_monitor.yml :: 开盘八法强形态扫描+突破监控 (L119) — 命中 continue-on-error: true
-- intraday_monitor.yml :: 开盘八法异常告警 (L132) — 命中 continue-on-error: true, || echo（吞错误）
 - jingjia_track.yml :: 上传竞价报告/快报到知识库「报告/竞价」 (L97) — 命中 continue-on-error: true, || echo（吞错误）
 - market_regime.yml :: 提交判定结果到仓库 (L68) — 命中 continue-on-error: true, set +e, || true
 - pool_winrate_biweekly.yml :: 安装依赖 + 全局 westock（免 npx 加速） (L66) — 命中 || echo（吞错误）
@@ -154,7 +152,7 @@
 | guard_selfcheck.yml | 3 | — |
 | inbull_scan.yml | 3 | — |
 | inbull_threshold_monitor.yml | 2 | — |
-| intraday_monitor.yml | 3 | — |
+| intraday_monitor.yml | 1 | — |
 | jingjia_track.yml | 1 | — |
 | market_regime.yml | 2 | — |
 | pool_winrate_biweekly.yml | 3 | — |
