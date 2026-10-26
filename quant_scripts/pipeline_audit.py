@@ -277,16 +277,23 @@ def check_expected_runs():
                 detail.append({"workflow": wf, "label": label, "last_success": None,
                                "last_run": None, "age": None, "tol": tol})
             continue
-        ts = (rs[0].get("created_at") or "")[:19]
+        # ⚠️ 必须保留完整时间戳（含末尾 Z）再转 tz —— 2026-10-27 踩坑：
+        #   先 [:19] 截断会丢掉时区，naive datetime 被当 UTC 解析，
+        #   跨零点触发的 workflow（北京 06:05 = UTC 前一天 22:05，如 artifact_audit）
+        #   日期会提前一天 → 交易日计龄多算 1，实测误报「已 2 个交易日（容忍 1）」。
+        raw = rs[0].get("created_at") or ""
         try:
-            dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
         except Exception:
             continue
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        day = dt.astimezone(BJT).strftime("%Y-%m-%d")
         age = trading_days_since(dt)
-        detail.append({"workflow": wf, "label": label, "last_success": ts[:10],
+        detail.append({"workflow": wf, "label": label, "last_success": day,
                        "age": age, "tol": tol})
         if age > tol:
-            issues.append(f"⏰ 超期未运行：{label}（{wf}）最近成功 {ts[:10]}，"
+            issues.append(f"⏰ 超期未运行：{label}（{wf}）最近成功 {day}，"
                           f"已 {age} 个交易日（容忍 {tol}）→ 检查外部 dispatch")
     return issues, detail
 
