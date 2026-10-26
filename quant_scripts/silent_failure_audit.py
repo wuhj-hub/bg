@@ -120,6 +120,32 @@ def audit_workflow(path):
         # 受控捕获识别（2026-09-18）：步骤内已含「失败→推送告警」链路（pushplus / --alert）
         # → 吞错误是设计意图（防阻断+主动告警），不算高危静默失败
         alerted = bool(re.search(r"pushplus\.plus/send|--alert", body))
+        # 2026-10-27 降噪：受控捕获再降一档 → 🟢信息级（不计入风险项）
+        #   判据=步骤内已有「失败对人可见」的通道：
+        #     · pushplus.plus/send / --alert：失败直接推微信
+        #     · ::error::：GitHub UI 上会把该步标红 + Actions 摘要可见（不是 success）
+        #   注意：**不**把「推送/告警类步骤自身」豁免 —— 告警通道被吞恰恰是最危险的
+        #   （没人知道出问题），这类仍按中危计。
+        # 2026-10-27 降噪②：预热 / 依赖安装 / 环境 Setup 类前置步骤 —— 它们失败了，
+        #   下游取数/扫描步必然显性失败或产物为空（artifact_audit 能查到），不构成"静默"。
+        #   注意判据要窄：只认明确的"预热/安装依赖/Setup"，**不**认裸"缓存"——
+        #   如「生成沪深主板清单（失败回退仓库缓存）」是关键输入步，必须保持中危。
+        if any(k in st["name"] for k in ("预热", "安装依赖", "安装 westock", "安装 Python",
+                                        "Setup", "设置 Python", "设置 Node")):
+            issues.append({
+                "level": "🟢信息·非关键前置",
+                "step": f"{st['name']} (L{st['line']})",
+                "detail": f"命中 {', '.join(sorted(set(hits)))}；前置步骤失败会在下游取数/扫描步显性暴露",
+            })
+            continue
+        if alerted or bool(re.search(r"::error::", body)):
+            issues.append({
+                "level": "🟢信息·受控捕获",
+                "step": f"{st['name']} (L{st['line']})",
+                "detail": f"命中 {', '.join(sorted(set(hits)))}；但步骤内已有告警通道"
+                          f"（{'pushplus/--alert' if alerted else '::error::'}），失败对人可见",
+            })
+            continue
         core = any(h in body for h in CORE_HINTS) and critical and not alerted
         issues.append({
             "level": "🔴高危·静默失败" if core else "🟡中危·吞错误",
@@ -176,25 +202,35 @@ def main():
             "以下关键产物未出现在任何 workflow 提交列表：" + ", ".join(never))
 
     high = sum(len(v) for k, v in all_issues.items() if "高危" in k)
+    info = sum(len(v) for k, v in all_issues.items() if "信息" in k)
+    total = sum(len(v) for v in all_issues.values())
+    risk = total - info
 
     L = [f"# 🔍 体系自检元审计 · {date}", "",
-         f"> 扫描 {len(files)} 个 workflow ｜ 风险项 **{sum(len(v) for v in all_issues.values())}** ｜ 🔴高危 **{high}**", ""]
+         f"> 扫描 {len(files)} 个 workflow ｜ 风险项 **{risk}** ｜ 🔴高危 **{high}** ｜ "
+         f"🟢受控捕获 **{info}**（已有告警通道，不计入风险项）", "",
+         "> 口径：本审计扫的是**写法层面**「失败会被吞且无法被人看到」的风险面，不是运行日志。",
+         "> 是否真的发生过静默失败，由 `artifact_audit`（产物三方对账）/ `pipeline_audit`（run 状态）",
+         "> / `kb_health_check`（KB 反查）+ 各 workflow 产物契约自检四道**事后**校验兜底。", ""]
     for lvl in sorted(all_issues, key=lambda x: ("高危" not in x, "中危" not in x)):
         L += [f"## {lvl}（{len(all_issues[lvl])}）", ""] + [f"- {x}" for x in all_issues[lvl]] + [""]
     if not all_issues:
         L += ["## ✅ 未发现静默失败与调度死链", ""]
 
     # 明细表
-    L += ["## 各 workflow 静默失败热点", "", "| workflow | 风险数 | 高危 |", "|---|---|---|"]
+    L += ["## 各 workflow 静默失败热点", "", "| workflow | 风险数 | 高危 | 受控捕获 |", "|---|---|---|---|"]
     for name in sorted(per_wf, key=lambda n: -len([i for i in per_wf[n] if "高危" in i["level"]])):
         hi = len([i for i in per_wf[name] if "高危" in i["level"]])
-        L.append(f"| {name} | {len(per_wf[name])} | {hi if hi else '—'} |")
+        inf = len([i for i in per_wf[name] if "信息" in i["level"]])
+        rk = len(per_wf[name]) - inf
+        L.append(f"| {name} | {rk} | {hi if hi else '—'} | {inf if inf else '—'} |")
     L.append("")
     md = "\n".join(L)
 
     os.makedirs(a.out, exist_ok=True)
     open(os.path.join(a.out, f"静默失败审计_{date}.md"), "w", encoding="utf-8").write(md)
     json.dump({"date": date, "workflows": len(files), "high_risk": high,
+               "risk_total": risk, "info_controlled": info,
                "issues": all_issues, "per_workflow": per_wf},
               open(os.path.join(a.out, "silent_failure_audit.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
