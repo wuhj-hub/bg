@@ -94,7 +94,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}   # 查 run/job/step 需 API
         run: |
           set +e
-          python3 quant_scripts/pipeline_audit.py --days 2 --step-min 25 \
+          python3 quant_scripts/pipeline_audit.py --days 3 --step-min 25 \
             --json outputs/pipeline_audit.json > /tmp/pipe.log 2>&1
           RC=$?
           set -e
