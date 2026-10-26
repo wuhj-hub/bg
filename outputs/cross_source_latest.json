@@ -11,23 +11,23 @@
    "name": "上证指数",
    "westock": {
     "date": "2026-10-26",
-    "close": 3683.92,
-    "pct": -0.18
+    "close": 3697.52,
+    "pct": 0.19
    },
    "sina": {
     "name": "上证指数",
-    "close": 3683.918,
-    "pct": -0.18
+    "close": 3697.52,
+    "pct": 0.19
    },
    "tx": {
     "name": "上证指数",
-    "close": 3683.92,
-    "pct": -0.18
+    "close": 3697.52,
+    "pct": 0.19
    },
    "em": {
     "name": "上证指数",
-    "close": 3683.92,
-    "pct": -0.18
+    "close": 3697.52,
+    "pct": 0.19
    },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
@@ -37,23 +37,23 @@
    "name": "深证成指",
    "westock": {
     "date": "2026-10-26",
-    "close": 11551.72,
-    "pct": -1.05
+    "close": 11534.38,
+    "pct": -1.19
    },
    "sina": {
     "name": "深证成指",
-    "close": 11551.721,
-    "pct": -1.05
+    "close": 11534.379,
+    "pct": -1.19
    },
    "tx": {
     "name": "深证成指",
-    "close": 11551.72,
-    "pct": -1.05
+    "close": 11534.38,
+    "pct": -1.19
    },
    "em": {
     "name": "深证成指",
-    "close": 11551.72,
-    "pct": -1.05
+    "close": 11534.38,
+    "pct": -1.19
    },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
@@ -63,23 +63,23 @@
    "name": "创业板指",
    "westock": {
     "date": "2026-10-26",
-    "close": 2639.85,
-    "pct": -1.65
+    "close": 2638.23,
+    "pct": -1.71
    },
    "sina": {
     "name": "创业板指",
-    "close": 2639.85,
-    "pct": -1.65
+    "close": 2638.231,
+    "pct": -1.71
    },
    "tx": {
     "name": "创业板指",
-    "close": 2639.85,
-    "pct": -1.65
+    "close": 2638.23,
+    "pct": -1.71
    },
    "em": {
     "name": "创业板指",
-    "close": 2639.85,
-    "pct": -1.65
+    "close": 2638.23,
+    "pct": -1.71
    },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
@@ -89,24 +89,20 @@
    "name": "贵州茅台",
    "westock": {
     "date": "2026-10-26",
-    "close": 1336.78,
-    "pct": 0.13
+    "close": 1349.98,
+    "pct": 1.12
    },
    "sina": {
     "name": "贵州茅台",
-    "close": 1336.78,
-    "pct": 0.13
+    "close": 1349.98,
+    "pct": 1.12
    },
    "tx": {
     "name": "贵州茅台",
-    "close": 1336.78,
-    "pct": 0.13
+    "close": 1349.98,
+    "pct": 1.12
    },
-   "em": {
-    "name": "贵州茅台",
-    "close": 1336.78,
-    "pct": 0.13
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -115,23 +111,23 @@
    "name": "平安银行",
    "westock": {
     "date": "2026-10-26",
-    "close": 11.19,
-    "pct": -0.09
+    "close": 11.3,
+    "pct": 0.89
    },
    "sina": {
     "name": "平安银行",
-    "close": 11.19,
-    "pct": -0.09
+    "close": 11.3,
+    "pct": 0.89
    },
    "tx": {
     "name": "平安银行",
-    "close": 11.19,
-    "pct": -0.09
+    "close": 11.3,
+    "pct": 0.89
    },
    "em": {
     "name": "平安银行",
-    "close": 11.19,
-    "pct": -0.09
+    "close": 11.3,
+    "pct": 0.89
    },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
@@ -141,23 +137,23 @@
    "name": "中国平安",
    "westock": {
     "date": "2026-10-26",
-    "close": 51.77,
-    "pct": 0.02
+    "close": 52.62,
+    "pct": 1.66
    },
    "sina": {
     "name": "中国平安",
-    "close": 51.77,
-    "pct": 0.02
+    "close": 52.62,
+    "pct": 1.66
    },
    "tx": {
     "name": "中国平安",
-    "close": 51.77,
-    "pct": 0.02
+    "close": 52.62,
+    "pct": 1.66
    },
    "em": {
     "name": "中国平安",
-    "close": 51.77,
-    "pct": 0.02
+    "close": 52.62,
+    "pct": 1.66
    },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
@@ -167,24 +163,20 @@
    "name": "浙大网新",
    "westock": {
     "date": "2026-10-26",
-    "close": 6.69,
-    "pct": 2.14
+    "close": 6.6,
+    "pct": 0.76
    },
    "sina": {
     "name": "浙大网新",
-    "close": 6.69,
-    "pct": 2.14
+    "close": 6.6,
+    "pct": 0.76
    },
    "tx": {
     "name": "浙大网新",
-    "close": 6.69,
-    "pct": 2.14
+    "close": 6.6,
+    "pct": 0.76
    },
-   "em": {
-    "name": "浙大网新",
-    "close": 6.69,
-    "pct": 2.14
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -219,24 +211,20 @@
    "name": "华能蒙电",
    "westock": {
     "date": "2026-10-26",
-    "close": 5.08,
-    "pct": 1.4
+    "close": 5.03,
+    "pct": 0.4
    },
    "sina": {
     "name": "华能蒙电",
-    "close": 5.08,
-    "pct": 1.4
+    "close": 5.03,
+    "pct": 0.4
    },
    "tx": {
     "name": "华能蒙电",
-    "close": 5.08,
-    "pct": 1.4
+    "close": 5.03,
+    "pct": 0.4
    },
-   "em": {
-    "name": "华能蒙电",
-    "close": 5.08,
-    "pct": 1.4
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   }
