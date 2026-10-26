@@ -1,111 +1,50 @@
 {
- "date": "2026-10-26 12:21",
+ "date": "2026-10-26 22:59",
  "runs": {
-  "total": 90,
-  "bad": [
-   {
-    "name": "盘中监控",
-    "conclusion": "cancelled",
-    "created": "2026-10-23T06:45",
-    "id": 39913426063,
-    "event": "repository_dispatch",
-    "reason": "成规模取消：当日 10 次取消 / 1 次其它（取消占比 90%）"
-   }
-  ],
+  "total": 93,
+  "bad": [],
   "noise": [
    {
-    "name": "盘中监控",
+    "name": "体系自检（数据源真实性 + 静默失败）",
     "conclusion": "cancelled",
-    "created": "2026-10-23T06:30",
-    "id": 39911886822,
+    "created": "2026-10-26T14:58",
+    "id": 40344643690,
     "event": "repository_dispatch",
-    "reason": "成规模取消（同批次已记录 10 次/90%）"
+    "reason": "并发/重复触发取消"
    },
    {
-    "name": "盘中监控",
+    "name": "体系自检（数据源真实性 + 静默失败）",
     "conclusion": "cancelled",
-    "created": "2026-10-23T06:15",
-    "id": 39910368232,
+    "created": "2026-10-26T14:58",
+    "id": 40344640887,
     "event": "repository_dispatch",
-    "reason": "成规模取消（同批次已记录 10 次/90%）"
-   },
-   {
-    "name": "盘中监控",
-    "conclusion": "cancelled",
-    "created": "2026-10-23T06:00",
-    "id": 39908924082,
-    "event": "repository_dispatch",
-    "reason": "成规模取消（同批次已记录 10 次/90%）"
-   },
-   {
-    "name": "盘中监控",
-    "conclusion": "cancelled",
-    "created": "2026-10-23T05:45",
-    "id": 39907504824,
-    "event": "repository_dispatch",
-    "reason": "成规模取消（同批次已记录 10 次/90%）"
-   },
-   {
-    "name": "盘中监控",
-    "conclusion": "cancelled",
-    "created": "2026-10-23T05:30",
-    "id": 39906121069,
-    "event": "repository_dispatch",
-    "reason": "成规模取消（同批次已记录 10 次/90%）"
-   },
-   {
-    "name": "盘中监控",
-    "conclusion": "cancelled",
-    "created": "2026-10-23T05:15",
-    "id": 39904725685,
-    "event": "repository_dispatch",
-    "reason": "成规模取消（同批次已记录 10 次/90%）"
-   },
-   {
-    "name": "盘中监控",
-    "conclusion": "cancelled",
-    "created": "2026-10-23T05:00",
-    "id": 39903373188,
-    "event": "repository_dispatch",
-    "reason": "成规模取消（同批次已记录 10 次/90%）"
-   },
-   {
-    "name": "盘中监控",
-    "conclusion": "cancelled",
-    "created": "2026-10-23T04:45",
-    "id": 39901995844,
-    "event": "repository_dispatch",
-    "reason": "成规模取消（同批次已记录 10 次/90%）"
-   },
-   {
-    "name": "盘中监控",
-    "conclusion": "cancelled",
-    "created": "2026-10-23T04:30",
-    "id": 39900673269,
-    "event": "repository_dispatch",
-    "reason": "成规模取消（同批次已记录 10 次/90%）"
+    "reason": "并发/重复触发取消"
    }
   ]
  },
  "heavy_steps": [
   {
+   "workflow": "竞价统计·逐日跟踪",
+   "step": "完整统计（采集竞价 + 逐日跟踪 + 收益回填 + 报告）",
+   "minutes": 33.6
+  },
+  {
    "workflow": "盘后报告生成",
    "step": "一统天下建仓区股池扫描+跟踪（多周期共振）",
-   "minutes": 38.8
+   "minutes": 40.6
   },
   {
    "workflow": "全盘量化扫描",
    "step": "一统天下多周期扫描（建仓区+月线反转+RSV50三线强度）",
-   "minutes": 33.7
+   "minutes": 33.2
   }
  ],
  "stale_products": [],
  "freshness_skipped": false,
  "script_errors": [],
  "issues": [
-  "❌ run 异常 1 个（盘中监控:cancelled）",
-  "⏹️ 并发/重复触发取消 9 个（已忽略，不计入异常）",
-  "⚠️ 重步骤：盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 38.8min、全盘量化扫描/一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） 33.7min"
+  "⏹️ 并发/重复触发取消 2 个（已忽略，不计入异常）",
+  "⚠️ 重步骤：竞价统计·逐日跟踪/完整统计（采集竞价 + 逐日跟踪 + 收益回填 + 报告） 33.6min、盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 40.6min、全盘量化扫描/一统天下多周期扫描（建仓区+月线反转+RSV50三线强度） 33.2min"
  ],
- "status": "FAIL"
+ "status": "PASS"
 }
