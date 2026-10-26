@@ -163,13 +163,18 @@ _SAFETY_RE = re.compile(r"安全评分[:：]\s*(\d+(?:\.\d+)?)\s*/\s*100")
 
 def safety_score_info():
     """猛兽大盘安全评分 {raw,date,src}；找不到返回 None。
-    优先 quant_results_latest.json 的 beast.stdout；回退最新 premarket_judgment_*.json 的 beast_score。"""
+    优先 quant_results 系列（按 data 日期取最新，避免被仓库根旧副本劫持）；回退最新 premarket_judgment_*.json 的 beast_score。"""
     cands, seen = [], set()
     for base in (os.getcwd(), ROOT, os.path.join(ROOT, "outputs"), os.path.join(os.getcwd(), "outputs")):
         p = os.path.join(base, "quant_results_latest.json")
         if os.path.isfile(p):
             cands.append(p)
         cands += sorted(glob.glob(os.path.join(base, "quant_results_2*.json")), reverse=True)
+    # 2026-10-26 修：**按数据日期取最新**，不再「按路径顺序取首个」。
+    # 根因——仓库根的 quant_results_latest.json 是上一个交易日提交的旧版，outputs/ 下才是
+    # 本次刚生成的；按路径顺序会命中旧副本（实测 10-26 当日 index_trend 拿到 10-23 的 27.5
+    # 而非当日 20.4，导致 env 温度/仓位总闸滞后一个交易日）。
+    best = None
     for p in cands:
         if p in seen:
             continue
@@ -179,10 +184,16 @@ def safety_score_info():
                 d = json.load(f)
             txt = (d.get("beast") or {}).get("stdout", "") or ""
             m = _SAFETY_RE.search(txt)
-            if m:
-                return {"raw": float(m.group(1)), "date": _norm_date(d.get("date")), "src": "beast_safety"}
+            if not m:
+                continue
+            cand = {"raw": float(m.group(1)), "date": _norm_date(d.get("date")),
+                    "src": "beast_safety"}
+            if best is None or (cand["date"] or "") > (best["date"] or ""):
+                best = cand
         except Exception:
             continue
+    if best:
+        return best
     cands = []
     for base in (os.getcwd(), ROOT, os.path.join(ROOT, "outputs")):
         cands += glob.glob(os.path.join(base, "premarket_judgment_*.json"))
