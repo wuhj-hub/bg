@@ -102,7 +102,11 @@
     "close": 1349.98,
     "pct": 1.12
    },
-   "em": null,
+   "em": {
+    "name": "贵州茅台",
+    "close": 1349.98,
+    "pct": 1.12
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -176,7 +180,11 @@
     "close": 6.6,
     "pct": 0.76
    },
-   "em": null,
+   "em": {
+    "name": "浙大网新",
+    "close": 6.6,
+    "pct": 0.76
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -198,11 +206,7 @@
     "close": 2.63,
     "pct": 0.77
    },
-   "em": {
-    "name": "国安股份",
-    "close": 2.63,
-    "pct": 0.77
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
