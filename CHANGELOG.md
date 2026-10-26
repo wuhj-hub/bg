@@ -5,6 +5,48 @@
 
 ---
 
+## v2.69 (2026-10-26)
+
+### 自检体系三处修复（消灭盲区 + 消灭告警疲劳）
+
+1. **巡检窗口 2 天 → 3 天**（`pipeline_audit.py` 默认值 + `selfcheck_daily.yml` 传参）
+   - 盲区：`check_runs(days=2)` 在周一早上 07:00 只覆盖周六 07:00 之后，
+     **上周五的全天故障永远看不见**（2026-10-23 盘中监控 24/24 cancelled，10-26 自检却报 `bad: []`）。
+   - 实测对比（2026-10-26 12:20 窗口）：`days=2` → `bad=0 noise=0`；`days=3` → `bad=1 noise=9`。
+
+2. **新增「成规模取消」判据**（`pipeline_audit.check_runs`）
+   - 盲区：原判据「同 workflow 当天有 success 即视为并发噪音」导致
+     **「上午成功几次、下午连续 4 小时全 cancelled」被整体忽略**——这正是 10-23 的实况。
+   - 新判据：同 workflow 同一天 `cancelled ≥ 3` 且 `cancelled/(cancelled+其它) > 50%`
+     → 判「成规模取消」= 真问题，进 `bad`（每批次只记 1 条代表，其余标注「同批次已记录」，避免刷屏）。
+   - 实测：`bad = 盘中监控 cancelled 2026-10-23T06:45 — 成规模取消：当日 10 次取消 / 1 次其它（占比 90%）`，
+     另 9 条归入 noise；`status` 由 PASS 变 **FAIL**（该异常本应被发现）。
+
+3. **重步骤降级为性能提示，不再拖垮 `status`/退出码**
+   - 原逻辑 `return 0 if status=="PASS" else 1`，而 heavy 也参与 status → 只要有一个 >25min 的步骤
+     （竞价统计 40.9min 几乎每天都有）自检就恒 `rc=1` → **每天推「⚠️体系自检异常」到微信**，
+     形成告警疲劳、真异常被淹没。
+   - 改为 `WARN` 仅由「产物停更（stale）」触发；heavy 只在 `issues`/日志里提示。
+
+### 附：多副本检查复核结论（无需改动）
+
+- 用 **git blob 哈希**（而非 commit 时间）全仓复核：仓库根 154 个 blob × `outputs/` 390 个 blob，
+  同名文件仅 **2 个**（`sector_component_em.json`、`xihu_breadth_history.json`）且**内容完全一致**。
+- 结论：2026-10-14 的「双副本治理」已清理干净，`artifact_audit` 报「陈旧副本 0」是**正确**的。
+  此前若用 `commits?path=` 判断会误判——**删除提交也会出现在该文件的历史里**，读到的"最后更新时间"
+  实为删除时间。判别副本是否存在必须看 `contents` / `git/trees`，不能看 commit 时间。
+- 「缓存条目按 run_number 累积」（`wangzhe-pushed-*` 每日约 24 条）经评估**不修**：
+  单条 250B、总计 <30KB，远低于 10GB 上限；改成固定 key 反而会因 GitHub cache 同 key 不可覆盖
+  而丢失去重状态、导致重复推送。属"看起来杂乱"而非缺陷。
+
+### 验证
+
+- 本地对拍 `check_runs(2)` vs `check_runs(3)`：0 → 1 个真异常。
+- 手动 dispatch 体系自检 run **#35**：6 项自检全 success、3.2min；
+  `pipeline_audit_latest.json` → `status=FAIL`、`bad=1`（即 10-23 成规模取消）、`stale_products=[]`。
+
+---
+
 ## v2.68 (2026-10-26)
 
 ### 停用「开盘八法」（实证无效）
