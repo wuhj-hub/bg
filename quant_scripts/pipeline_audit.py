@@ -35,6 +35,38 @@ FRESH = {
 }
 
 
+# ── 期望运行清单（2026-10-27 新增：应跑未跑检测）─────────────────────
+# 背景：多数 workflow 的原生 cron 已停用，唯一触发源是外部 cron-job.org 的
+#   repository_dispatch。外部配置一丢就「静默停摆」，而且**不会有任何告警**
+#   （bt_cycle 从上线起到 2026-10-23 查产物才发现从未运行过）。
+# 口径：只看「最近一次 success」的**交易日计龄**（trading_days_since，长假不累计），
+#   超过容忍窗口即报。日更类容忍 1 个交易日 —— 07:00 自检时当日主链尚未运行属正常，
+#   只有「连着两个交易日没跑」才报，避免每天误报。
+# 不纳入：market_regime / inbull_scan（主通道是 quant_report 内联，独立 workflow 仅手动兜底）、
+#         probe_*（手动调试工具）。
+EXPECTED_RUNS = [
+    # (workflow 文件名, 展示名, 容忍交易日, 仅交易日检查)
+    ("quant_scan.yml", "全盘量化扫描", 1, True),
+    ("quant_report.yml", "盘后报告生成", 1, True),
+    ("premarket_report.yml", "盘前市场报告", 1, True),
+    ("intraday_monitor.yml", "盘中监控", 1, True),
+    ("wangzhe_track.yml", "涨停型王者跟踪", 1, True),
+    ("beast_pool.yml", "猛兽突破池扫描", 1, True),
+    ("yao_gu_pool.yml", "妖股池扫描", 1, True),
+    ("jingjia_track.yml", "竞价统计·逐日跟踪", 1, True),
+    ("selfcheck_daily.yml", "体系自检", 1, True),
+    ("artifact_audit.yml", "产物入库审计", 1, True),
+    ("guard_selfcheck.yml", "guard备份自检", 1, True),
+    ("duowei_fish.yml", "多维度·鱼身报告更新", 1, True),
+    ("pool_winrate_biweekly.yml", "股池胜率总览（双周）", 11, False),
+    ("weight_learn.yml", "仲裁权重自学习（月度）", 25, False),
+    ("emotion_backtest_monthly.yml", "情绪温度计回测（月度）", 25, False),
+    ("bt_cycle.yml", "回测周期（月度）", 25, False),
+    ("evidence_review.yml", "evidence月度复核提醒", 25, False),
+    ("inbull_threshold_monitor.yml", "入牛阈值漂移监控（季度）", 70, False),
+]
+
+
 def api(path):
     url = f"https://api.github.com/repos/{REPO}/{path}"
     req = urllib.request.Request(url, headers={
@@ -220,6 +252,45 @@ def check_freshness():
     return stale
 
 
+# ── C2. 应跑未跑（外部 cron 静默停摆）──────────────────────────────
+def check_expected_runs():
+    """清单里每个 workflow 的「最近一次 success」是否在容忍窗口内。
+    返回 (issues, detail)。"""
+    issues, detail = [], []
+    today_trading = is_trading_today()
+    for wf, label, tol, trading_only in EXPECTED_RUNS:
+        if trading_only and not today_trading:
+            continue
+        d = api(f"actions/workflows/{urllib.parse.quote(wf)}/runs?per_page=1&status=success")
+        rs = (d or {}).get("workflow_runs") or []
+        if not rs:
+            allr = api(f"actions/workflows/{urllib.parse.quote(wf)}/runs?per_page=1")
+            ever = (allr or {}).get("workflow_runs") or []
+            if ever:
+                e0 = ever[0]
+                last = (e0.get("created_at") or "")[:10]
+                issues.append(f"🚨 从无成功：{label}（{wf}）最近一次={last} {e0.get('conclusion')}")
+                detail.append({"workflow": wf, "label": label, "last_success": None,
+                               "last_run": last, "age": None, "tol": tol})
+            else:
+                issues.append(f"🚨 从未运行：{label}（{wf}）—— 检查 cron-job.org 是否登记该 dispatch")
+                detail.append({"workflow": wf, "label": label, "last_success": None,
+                               "last_run": None, "age": None, "tol": tol})
+            continue
+        ts = (rs[0].get("created_at") or "")[:19]
+        try:
+            dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        except Exception:
+            continue
+        age = trading_days_since(dt)
+        detail.append({"workflow": wf, "label": label, "last_success": ts[:10],
+                       "age": age, "tol": tol})
+        if age > tol:
+            issues.append(f"⏰ 超期未运行：{label}（{wf}）最近成功 {ts[:10]}，"
+                          f"已 {age} 个交易日（容忍 {tol}）→ 检查外部 dispatch")
+    return issues, detail
+
+
 # ── D. 脚本异常（假绿）────────────────────────────────────────
 def check_script_errors():
     errs = []
@@ -261,6 +332,7 @@ def main():
     freshness_skipped = stale_raw is None
     stale = stale_raw or []
     scripterr = check_script_errors()
+    expected, expected_detail = check_expected_runs()
 
     issues = []
     if runs["bad"]:
@@ -277,12 +349,14 @@ def main():
         issues.append("⚠️ 产物停更：" + "、".join(f"{s['path']}({s['status']})" for s in stale[:5]))
     if scripterr:
         issues.append("❌ 脚本异常（假绿）：" + "、".join(f"{e['module']} {e['error'][:60]}" for e in scripterr))
+    if expected:
+        issues.append(f"🚨 应跑未跑 {len(expected)} 项：" + "；".join(x[:90] for x in expected[:4]))
 
     rep = {"date": datetime.now(BJT).strftime("%Y-%m-%d %H:%M"),
            "runs": runs, "heavy_steps": heavy, "stale_products": stale,
            "freshness_skipped": freshness_skipped,
-           "script_errors": scripterr, "issues": issues,
-           "status": "FAIL" if (runs["bad"] or scripterr) else ("WARN" if stale else "PASS")}
+           "script_errors": scripterr, "expected_runs": expected_detail, "issues": issues,
+           "status": "FAIL" if (runs["bad"] or scripterr or expected) else ("WARN" if stale else "PASS")}
     os.makedirs(os.path.dirname(a.json) or ".", exist_ok=True)
     json.dump(rep, open(a.json, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
@@ -305,6 +379,10 @@ def main():
     print(f"脚本异常: {len(scripterr)}")
     for e in scripterr:
         print(f"   ❌ {e['module']}: {e['error']}")
+    print(f"应跑未跑: {len(expected)}  (清单 {len(expected_detail)} 项)"
+          + ("  ⏭️ 休市日仅查非日更类" if not is_trading_today() else ""))
+    for x in expected:
+        print(f"   {x}")
 
     if a.push and issues:
         tk = os.environ.get("PUSH_TOKEN", "")
