@@ -91,14 +91,47 @@ jobs:
 
       # ─── 第二步：动态生成鱼身股票池（不固定股池）───
       - name: 动态生成鱼身股票池（近20日日均成交额排名前300）
-        run: python3 quant_scripts/gen_fish_pool.py
-      - name: 校验股票池
+        # 2026-10-26 加固：10-21 该步卡死 87min（全市场批量取数受限流）→ 拖到 job timeout
+        #   被 cancelled，整条链路白跑。改：step 级 timeout + 失败重试一次 + 不阻断
+        #   （下一步校验时回退仓库缓存的股票池，宁可沿用旧池也不要整条链路失败）。
+        continue-on-error: true
+        timeout-minutes: 28
         run: |
-          if [ ! -s quant_scripts/stock_pool.txt ]; then echo "❌ 股票池为空"; exit 1; fi
-          echo "股票池标的数: $(grep -vc '^#' quant_scripts/stock_pool.txt)"
+          set +e
+          python3 quant_scripts/gen_fish_pool.py
+          RC=$?
+          if [ "$RC" != "0" ]; then
+            echo "::warning::gen_fish_pool 失败(rc=$RC)，60s 后重试一次"
+            sleep 60
+            python3 quant_scripts/gen_fish_pool.py
+            RC=$?
+          fi
+          set -e
+          if [ "$RC" != "0" ]; then
+            echo "::warning::gen_fish_pool 重试后仍失败(rc=$RC)，交由下一步回退仓库缓存池"
+          fi
+      - name: 校验股票池
+        # 2026-10-26 加固：池异常（空/笔数过少）时**跳过当日扫描并告警**，而不是整条链路失败。
+        #   注：quant_scripts/stock_pool.txt 每日动态生成、不入库，故无法从 git 回退旧池。
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set +e
+          N=$(grep -vc '^#' quant_scripts/stock_pool.txt 2>/dev/null)
+          set -e
+          N=${N:-0}
+          if [ "$N" -lt 50 ]; then
+            echo "::warning::股票池异常（有效标的 ${N} < 50）→ 跳过当日鱼身扫描，不阻断链路"
+            echo "SKIP_FISH=1" >> "$GITHUB_ENV"
+            curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️多维度鱼身：股票池生成异常&content=gen_fish_pool 失败/超时，当日池仅 ${N} 只（<50），已跳过扫描。请手动 dispatch 补跑&template=txt" > /dev/null || true
+            exit 0
+          fi
+          echo "股票池标的数: $N"
 
       # ─── 第三步：运行鱼身扫描（生成 JSON + Markdown 报告）───
       - name: 鱼身交易系统扫描（动态股票池）
+        if: env.SKIP_FISH != '1'
+        timeout-minutes: 30
         run: python3 quant_scripts/fish_body_enhanced.py --pool quant_scripts/stock_pool.txt --cold-report
 
       # ─── 第四步：上传鱼身报告到「多维量化 → 多维度」文件夹 ───
@@ -123,8 +156,16 @@ jobs:
             exit 0
           fi
           echo "待上传报告: $MD"
-          python3 upload_ima.py --file "$MD" --name "鱼身报告_$(date +%Y-%m-%d)"
-          RC=$?
+          # 2026-10-26 加固：10-22 该步单次失败直接把 job 拖红（报告已生成却没进库）
+          #   → 改为最多 3 次重试（同名第二/三次会被 IMA_SKIP_DUP 判定为已存在即成功）
+          RC=1
+          for i in 1 2 3; do
+            python3 upload_ima.py --file "$MD" --name "鱼身报告_$(date +%Y-%m-%d)"
+            RC=$?
+            if [ "$RC" = "0" ]; then echo "✅ 上传成功（第 $i 次）"; break; fi
+            echo "::warning::上传失败（第 $i 次, rc=$RC），20s 后重试"
+            sleep 20
+          done
           set -e
           if [ "$RC" != "0" ]; then
             echo "::error::上传「多维度」文件夹失败(rc=$RC)"
