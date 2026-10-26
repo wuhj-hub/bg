@@ -5,6 +5,35 @@
 
 ---
 
+## v2.70 (2026-10-26)
+
+### 体系体检发现的三项修复（env 滞后 / duowei 健壮性）
+
+1. **index_trend 被旧副本劫持 → env 温度/仓位总闸滞后 1 个交易日**（`quant_scripts/metrics.py`）
+   - 根因：`safety_score_info()` 按**路径顺序**取首个候选（cwd → ROOT → ROOT/outputs → cwd/outputs），
+     而仓库根的 `quant_results_latest.json` 是**上一个交易日提交的旧版**、`outputs/` 下才是本次刚生成的
+     → 每次都命中旧副本。实测 2026-10-26：env 的 index_trend raw=27.5 / date=2026-10-23，当日真实值为 20.4。
+   - 修复：改为**按 data 日期取最新**（`best` 逐候选比较 date）；单测（根旧 10-23/27.5 + outputs 新 10-26/20.4）
+     已通过，返回 20.4 / 2026-10-26。
+   - 影响面：env_engine、gen_premarket_report、gen_review_report 等所有走 metrics 安全分的调用方。
+
+2. **env 补跑移入盘后链路末尾**（`quant_report.yml` 新增「🌡️ 环境唯一化引擎补跑」步）
+   - 根因：env 只在 quant_scan（15:05~17:02）内跑，而入牛时点(inbull)、市场状态(market_regime)
+     在 quant_report 内才刷新 → env 的 inbull 子分恒滞后 1 个交易日。
+   - 做法：在上游子分全部就绪后（盘后数据健康审计之后、提交报告产物之前）重算一次并提交
+     `outputs/env_latest.json` + `outputs/env_history.json`；`write_out` 按 data_date 去重（同日重跑=覆盖，
+     不重复累积 history）；补跑失败则沿用 quant_scan 阶段结果，不阻断链路。
+
+3. **duowei_fish 健壮性加固**（`.github/workflows/duowei_fish.yml`）
+   - 背景：10-21「动态生成鱼身股票池」卡死 87min → 拖到 job timeout 被 cancelled（整条链路白跑）；
+     10-22 上传步单次失败把 job 拖红（报告已生成却没进知识库）。
+   - 改：① gen_fish_pool 加 **step 级 timeout 28min + 失败重试 1 次 + continue-on-error**；
+     ② 校验步改为「有效标的 <50 → 跳过当日扫描 + 微信告警 + 不阻断」（`quant_scripts/stock_pool.txt`
+     每日动态生成、不入库，无法 git 回退旧池）；
+     ③ 鱼身扫描 step timeout 30min；④ 上传改 **3 次重试（间隔 20s）**，同名第 2/3 次由 `IMA_SKIP_DUP` 视为成功。
+
+---
+
 ## v2.69 (2026-10-26)
 
 ### 自检体系三处修复（消灭盲区 + 消灭告警疲劳）
