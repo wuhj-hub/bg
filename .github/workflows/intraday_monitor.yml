@@ -40,10 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     # ⚠️ 2026-09-15：原 15min 不够——开盘八法"补算扫描"实测耗时 649s(11min)+ 盘中监控 3.5min
     #    会正好撞上超时被 cancelled（首次补算当日尤其明显）。补算每日只发生一次，之后走监控(快)。
-    # 2026-10-23：30 → 45min。实测漏单日补算可超 27min，30min 会让**整个 job**被 cancelled
-    #    （连带已成功的盘中监控产出与状态保存）。现由「开盘八法」step 级 15min 超时兜底，
-    #    job 层只留宽裕余量给前面各步。
-    timeout-minutes: 45
+    # 2026-10-26：45 → 20min。开盘八法停用后，本 job 只剩「盘中监控」一步（实测 1.5~3.1min）
+    #    + 检出/缓存/依赖各步，20min 已足够宽裕。
+    timeout-minutes: 20
     
     steps:
       - name: 检出代码
@@ -62,16 +61,7 @@ jobs:
         id: d
         run: echo "today=$(TZ=Asia/Shanghai date +%Y%m%d)" >> $GITHUB_OUTPUT
 
-      # 缓存「当日开盘强形态池」（2026-09-15 新增）
-      # 背景：强形态池此前不落库，每次触发都要重新补算（实测 649s）——按 28 次/日触发将浪费约 5 小时 runner。
-      #       按日缓存后，每天只有首次触发做补算，其余走轻量监控。
-      - name: 缓存当日开盘强形态池
-        uses: actions/cache@v4
-        with:
-          path: |
-            outputs/开盘强形态_*.json
-            outputs/开盘突破已推送_*.json
-          key: kaipan8-pool-${{ steps.d.outputs.today }}
+      # 🔕 2026-10-26：原「缓存当日开盘强形态池」步骤已随开盘八法一并移除（见下方停用说明）。
 
       - name: 设置 Node.js（westock npx 依赖）
         uses: actions/setup-node@v4
@@ -115,24 +105,21 @@ jobs:
           path: outputs/wangzhe_pushed.json
           key: wangzhe-pushed-${{ steps.d.outputs.today }}-${{ github.run_number }}
 
-      # ─── 开盘八法：9:45扫描强形态 + 盘中突破监控（auto分阶段）───
-      - name: 开盘八法强形态扫描+突破监控
-        id: kp8
-        continue-on-error: true
-        # 2026-10-23：新增 step 级超时。此前只靠 job 级 30min 兜底 —— 一旦当日「补算」超 30min，
-        #   整个 job（含已成功的盘中监控产出）被 cancelled，且下次触发又从头补算 → 全天 24 次全废
-        #   （2026-10-23 实况：11:00~14:45 每 15min 一次，24/24 cancelled）。
-        #   现超时只失败本步，continue-on-error 保证 job 继续、其它产物照常提交。
-        timeout-minutes: 15
-        env:
-          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
-        run: |
-          python3 quant_scripts/kaipan_8.py --auto
+      # ─────────────────────────────────────────────────────────────
+      # 🔕 开盘八法（kaipan_8.py --auto）已于 2026-10-26 停用并移除
+      # 实证结论（31 个交易日 / 3,051 只 / 91,349 条记录，样本 2026-09-03~10-23）：
+      #   ① 形态强度与实际收益不单调：Spearman ρ=+0.144（p=0.73，n=8 种形态）；
+      #      最强的三高盘 T+1 超额 −0.039%（倒数第二），强度 0 的多空胶着反而 +0.126%（p<0.001）。
+      #   ② 强形态（强度≥3）T+1/T+3/T+5 超额 +0.003%/−0.028%/−0.055%（p=0.90/0.50/0.31）全部不显著；
+      #      T+0 仅 +0.059%，低于双边成本（12~16bp）。
+      #   ③ 实盘候选池（yao/caige/yitong 共 1,341 只）内更差且显著为负：
+      #      T+1 超额 −0.094%（p=0.014），三高盘 T+1 −0.240%（p=0.0004），叠双标尺 −0.282%。
+      #   ④ 量能标尺 vol_ratio 在 9:45 时点恒等于 16.000（全样本标准差 0、P60 通过率 100%）＝死代码；
+      #      按真实运行时刻（09:50）才有区分度，但当量的是「后段缩量」，与放量确认语义相反，叠加后 T+1 超额 0.003%→−0.205%。
+      #   ⑤ 突破 9:45 高点买入 T+0 超额仅 +0.030%（中位 −0.041%），不如 9:45 直接买入的 +0.059%。
+      # 每次运行需全量补算 ~15.2min（当日缓存 key 从未写入，实测 total_count=0），
+      # 每天 24 次 ≈ 6 小时 runner，且产出 581 只/日「强形态」却无可交易边际。
+      # 脚本 quant_scripts/kaipan_8.py 保留归档，不再由任何 workflow 调用。
+      # 回测报告：/sandbox/workspace/kp8_eval/report.md（结论可复现）
+      # ─────────────────────────────────────────────────────────────
 
-      - name: 开盘八法异常告警
-        if: always() && steps.kp8.outcome == 'failure'
-        continue-on-error: true
-        env:
-          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
-        run: |
-          curl -s "https://pushplus.plus/send" -d "token=${PUSH_TOKEN}&title=⚠️开盘八法未完成&content=kaipan_8.py --auto 超时或失败（多为 cron 早盘漏单导致补算超时），本次仅缺开盘八法产物，盘中监控其余部分正常&template=txt" > /dev/null || echo "推送失败"
