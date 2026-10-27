@@ -1,15 +1,47 @@
 {
- "date": "2026-10-27 07:02",
+ "date": "2026-10-28 07:02",
  "counts": {
-  "red": 0,
+  "red": 1,
   "orange": 0,
-  "yellow": 3
+  "yellow": 5
  },
  "items": [
   {
+   "sev": "🔴",
+   "phen": "run 失败：全盘量化扫描",
+   "evidence": "2026-10-27T07:05 → failure",
+   "cause": "该 workflow 执行失败（根因见其失败步日志）",
+   "advice": "打开该 run 的失败步日志；若与某产物停更同时出现，则很可能是同一根因",
+   "conf": "中"
+  },
+  {
+   "sev": "🟡",
+   "phen": "产物停更：quant_results_latest.json",
+   "evidence": "停更2个交易日(自然1天)",
+   "cause": "疑为①：**同期存在 run 异常**（详见上表），很可能是上游失败导致下游产物未更新",
+   "advice": "看该产物 producer 的最近 run 状态；确认是否休市；核对路径/文件名",
+   "conf": "中高"
+  },
+  {
+   "sev": "🟡",
+   "phen": "产物停更：outputs/market_width_latest.json",
+   "evidence": "停更2个交易日(自然1天)",
+   "cause": "疑为①：**同期存在 run 异常**（详见上表），很可能是上游失败导致下游产物未更新",
+   "advice": "看该产物 producer 的最近 run 状态；确认是否休市；核对路径/文件名",
+   "conf": "中高"
+  },
+  {
+   "sev": "🟡",
+   "phen": "产物停更：hot_emotion_latest.json",
+   "evidence": "停更2个交易日(自然1天)",
+   "cause": "疑为①：**同期存在 run 异常**（详见上表），很可能是上游失败导致下游产物未更新",
+   "advice": "看该产物 producer 的最近 run 状态；确认是否休市；核对路径/文件名",
+   "conf": "中高"
+  },
+  {
    "sev": "🟡",
    "phen": "重步骤：竞价统计·逐日跟踪/完整统计（采集竞价 + 逐日跟踪 + 收益回填 + 报告）",
-   "evidence": "33.6min",
+   "evidence": "33.0min",
    "cause": "取数调用次数多 / 未走 fetch 免 npx / 全市场逐只",
    "advice": "迁移到 fetch 层（减少调用次数）或增大批量（性能问题，非正确性）",
    "conf": "低"
@@ -17,15 +49,7 @@
   {
    "sev": "🟡",
    "phen": "重步骤：盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振）",
-   "evidence": "40.6min",
-   "cause": "取数调用次数多 / 未走 fetch 免 npx / 全市场逐只",
-   "advice": "迁移到 fetch 层（减少调用次数）或增大批量（性能问题，非正确性）",
-   "conf": "低"
-  },
-  {
-   "sev": "🟡",
-   "phen": "重步骤：全盘量化扫描/一统天下多周期扫描（建仓区+月线反转+RSV50三线强度）",
-   "evidence": "33.2min",
+   "evidence": "50.4min",
    "cause": "取数调用次数多 / 未走 fetch 免 npx / 全市场逐只",
    "advice": "迁移到 fetch 层（减少调用次数）或增大批量（性能问题，非正确性）",
    "conf": "低"
