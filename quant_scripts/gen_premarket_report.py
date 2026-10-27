@@ -95,6 +95,8 @@ def parse_quant_temps(quant):
             bs = float(m.group(1))
     # 双弦
     tl = sx.get("temperature") if isinstance(sx, dict) else None
+    # 注：双弦脚本不产出 air_count（结构里只有 stdout/stderr/pool_*），故此处恒 None；
+    # 报告展示改用 calc_zengxingzhi 的 8 大指数月线口径（2026-10-27）。
     sx_air = sx.get("air_count") if isinstance(sx, dict) else None
     if tl is None:
         m = re.search(r"温度[:：]\s*(\d+)/100", str(sx.get("stdout", "")))
@@ -392,8 +394,17 @@ def get_index_monthly():
             results[name] = rows
     return results
 
+_ZX_CACHE = None
+
 def calc_zengxingzhi():
-    """曾星智+双弦双体系市场定性：8大指数月线 → MA60/MA120/半年涨跌/振幅 → 定性表"""
+    """曾星智+双弦双体系市场定性：8大指数月线 → MA60/MA120/半年涨跌/振幅 → 定性表
+
+    2026-10-27：模块级缓存。该函数要抓 8 个指数月线，现被“三系统信号快照”与
+    “双体系定性”两处调用，缓存后只取数一次。
+    """
+    global _ZX_CACHE
+    if _ZX_CACHE is not None:
+        return _ZX_CACHE
     codes = {"sh000001":"上证指数","sz399106":"深证综指","sh000016":"上证50","sh000300":"沪深300",
              "sz399101":"中小综指","sh000688":"科创50","sz399006":"创业板指","sh000905":"中证500"}
     data = {}
@@ -426,7 +437,8 @@ def calc_zengxingzhi():
         zx_emoji = "🔴看空" if zx == "看空" else "🟡震荡" if zx == "震荡" else "🟢看多"
         lines.append(f"| {name} | {ma60:.0f} | {ma120:.0f} | {cur:.2f} | {half_chg:+.1f}% | {zx_emoji} | {sx} | {amp:.0f}%{amp_txt} |")
     qual = "🐻 熊市结构" if bear >= 6 else "🐂 牛市结构" if bull >= 6 else "🟡 震荡结构"
-    return "\n".join(lines), qual, bear, bull
+    _ZX_CACHE = ("\n".join(lines), qual, bear, bull)
+    return _ZX_CACHE
 
 def read_limitup_panel():
     """读热板作战面板（涨停概念排行_latest.json），失败返回None"""
@@ -538,11 +550,22 @@ def gen_report(today_str):
     # ②.5 三系统信号快照（引用昨日盘后量化）
     lines.append("\n### 三系统信号快照（{0}盘后）\n".format(yesterday))
     ft_v, bs, tl, sx_air = parse_quant_temps(quant)
+    # 2026-10-27 修复：双弦脚本 run_shuangxian.py 从不产出 air_count（sx_air 恒 None），
+    # 报告中“空头 x/8”的唯一真实来源＝calc_zengxingzhi 的 8 大指数月线口径，故提前计算并复用缓存。
+    zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
     lines.append("| 系统 | 信号 |")
     lines.append("|:----|:----|")
     lines.append(f"| 🌡️ 鱼身温度 | {ft_v}/100" if ft_v is not None else "| 🌡️ 鱼身温度 | ⏳ 待量化运行 |")
     lines.append(f"| 🛡️ 猛兽安全评分 | {bs}/100" if bs is not None else "| 🛡️ 猛兽安全评分 | ⏳ 待量化运行 |")
-    lines.append(f"| 🧭 双弦 | 温度{tl}/100·空头{sx_air}/8" if tl is not None else f"| 🧭 双弦 | 空头{sx_air}/8" if sx_air is not None else "| 🧭 双弦 | ⏳ 待量化运行 |")
+    _air = zx_bear if zx_bear is not None else sx_air
+    if tl is not None and _air is not None:
+        lines.append(f"| 🧭 双弦 | 温度{tl}/100·空头{_air}/8 |")
+    elif tl is not None:
+        lines.append(f"| 🧭 双弦 | 温度{tl}/100 |")
+    elif _air is not None:
+        lines.append(f"| 🧭 双弦 | 空头{_air}/8 |")
+    else:
+        lines.append("| 🧭 双弦 | ⏳ 待量化运行 |")
     # 🌡️ env 环境温度（第1层环境唯一化：5子分→1温度→仓位总闸，2026-10-03）
     env = read_env()
     if env and env.get("temp") is not None:
@@ -593,7 +616,6 @@ def gen_report(today_str):
         lines.append(f"| 🔥 热点情绪 | **{sc.get('score','—')}/100 {sc.get('level','')}** {he_icon} 涨停{he.get('total','—')} · 连板{he.get('lianban_cnt','—')} · 最高{he.get('max_lb','—')}板（{he_date}） |")
     
     # ②.5.1 曾星智+双弦双体系市场定性（8大指数月线）
-    zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
     if zx_table:
         lines.append("\n### 双弦+曾星智双体系市场定性\n")
         lines.append(f"**双弦体系**（快弦MA20≈1月均/慢弦MA60≈3月均）：空头 {zx_bear}/8、多头 {zx_bull}/8 → {zx_qual}\n")
