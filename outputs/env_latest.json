@@ -1,16 +1,16 @@
 {
  "data_date": "2026-10-26",
- "run_date": "2026-10-26",
- "temp": 35.2,
+ "run_date": "2026-10-27",
+ "temp": 33.1,
  "level": "偏冷",
  "position_cap": 30,
  "subs": {
   "index_trend": {
-   "raw": 27.5,
-   "score": 27.5,
+   "raw": 20.4,
+   "score": 20.4,
    "w": 0.28,
    "src": "beast_safety",
-   "date": "2026-10-23"
+   "date": "2026-10-26"
   },
   "emotion": {
    "raw": 45.0,
@@ -41,17 +41,17 @@
    "date": "2026-10-26"
   },
   "inbull": {
-   "raw": 5.24,
-   "score": 17.5,
+   "raw": 4.91,
+   "score": 16.4,
    "w": 0.09,
    "src": "inbull_scan",
-   "date": "2026-10-23"
+   "date": "2026-10-27"
   }
  },
  "style": {
-  "score": 57,
-  "label": "情绪市",
-  "icon": "🔥"
+  "score": 23,
+  "label": "均衡市",
+  "icon": "⚖️"
  },
  "phase": {
   "label": "中性",
@@ -59,9 +59,9 @@
   "date": "2026-10-26"
  },
  "divergence": {
-  "index_vs_emotion": -17.5,
+  "index_vs_emotion": -24.6,
   "breadth_vs_width": -62.3,
-  "structure_vs_inbull": -6.6
+  "structure_vs_inbull": -5.5
  },
  "degraded": false,
  "missing": [],
