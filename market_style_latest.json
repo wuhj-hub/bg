@@ -1,24 +1,24 @@
 {
- "date": "2026-10-26",
- "data_date": "2026-10-26",
+ "date": "2026-10-27",
+ "data_date": "2026-10-27",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 23,
+ "score": 5,
  "score_detail": {
-  "size_style": -5,
+  "size_style": -25,
   "limitup_structure": 21,
-  "volume_structure": 0,
-  "sector_fund": 7
+  "volume_structure": 8,
+  "sector_fund": 1
  },
  "size_style": {
-  "hs300_5d": -1.7,
-  "hs300_10d": -4.3,
-  "zz1000_5d": -1.01,
-  "zz1000_10d": -5.56,
-  "rel_5d": 0.69,
-  "rel_10d": -1.26,
-  "rel_20d": -4.79,
-  "zz500_5d": -1.29
+  "hs300_5d": -2.47,
+  "hs300_10d": -5.29,
+  "zz1000_5d": -5.02,
+  "zz1000_10d": -8.49,
+  "rel_5d": -2.55,
+  "rel_10d": -3.2,
+  "rel_20d": -6.45,
+  "zz500_5d": -4.82
  },
  "limitup_structure": {
   "limitup": 47,
@@ -32,45 +32,46 @@
   "lianban": 14
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.694,
-  "small_big_ratio_5d": 0.706
+  "small_big_ratio_now": 0.766,
+  "small_big_ratio_5d": 0.693,
+  "vol_shift": "资金流向中小盘"
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "昨日连板",
-    "zdf": "7.50",
-    "main_net5d": -36.1,
-    "retail_net": 0.4,
-    "tag": "游资型"
+    "name": "一般零售",
+    "zdf": "0.17",
+    "main_net5d": 0.4,
+    "retail_net": -2.4,
+    "tag": "机构型"
    },
    {
     "name": "半导体",
-    "zdf": "-3.55",
-    "main_net5d": 23.5,
-    "retail_net": 51.1,
-    "tag": "混合"
+    "zdf": "-4.54",
+    "main_net5d": -32.1,
+    "retail_net": 74.2,
+    "tag": "游资型"
    },
    {
     "name": "汽车零部件",
-    "zdf": "-0.50",
-    "main_net5d": -2.7,
-    "retail_net": -9.8,
-    "tag": "游资型"
+    "zdf": "-1.10",
+    "main_net5d": 10.0,
+    "retail_net": 0.4,
+    "tag": "混合"
    },
    {
-    "name": "元件",
-    "zdf": "-6.79",
-    "main_net5d": -86.0,
-    "retail_net": 65.2,
-    "tag": "游资型"
-   },
-   {
-    "name": "白酒Ⅱ",
-    "zdf": "1.59",
-    "main_net5d": 5.8,
-    "retail_net": -1.8,
+    "name": "电机Ⅱ",
+    "zdf": "0.52",
+    "main_net5d": 10.3,
+    "retail_net": -6.8,
     "tag": "机构型"
+   },
+   {
+    "name": "银行",
+    "zdf": "1.23",
+    "main_net5d": -35.7,
+    "retail_net": -7.5,
+    "tag": "游资型"
    }
   ]
  },
