@@ -109,6 +109,15 @@ def build_judgment(idx_rows, sectors, quant):
     A3风格轴硬接线（2026-08-10）：仓位=基准(三系统) + 风格分修正(±10%) + 温度修正(沸点-10%)，clamp 10%~70%"""
     ft_v, bs, tl, sx_air = parse_quant_temps(quant)
     ft_v2 = ft_v
+    # 2026-10-27：双弦空头数接入真实口径（8 大指数月线，与报告展示同源；calc_zengxingzhi 有模块缓存）。
+    # 数据不足（有效指数 < 6）时保持 None，不拿 0 假装中性。
+    if sx_air is None:
+        try:
+            _zt, _zq, _zb, _zu, _zn = calc_zengxingzhi()
+            if _zn >= 6:
+                sx_air = _zb
+        except Exception:
+            sx_air = None
     # 基准仓位（三系统综合）
     bearish = 0
     if sx_air is not None and sx_air >= 5:
@@ -399,8 +408,9 @@ _ZX_CACHE = None
 def calc_zengxingzhi():
     """曾星智+双弦双体系市场定性：8大指数月线 → MA60/MA120/半年涨跌/振幅 → 定性表
 
-    2026-10-27：模块级缓存。该函数要抓 8 个指数月线，现被“三系统信号快照”与
-    “双体系定性”两处调用，缓存后只取数一次。
+    2026-10-27：模块级缓存。该函数要抓 8 个指数月线，现被“三系统信号快照”“双体系定性”
+    与“build_judgment 仓位判定”三处调用，缓存后只取数一次。
+    返回 (table, qual, bear, bull, n_valid)；n_valid=有效指数数（<6 时调用方应按“数据缺失”处理）。
     """
     global _ZX_CACHE
     if _ZX_CACHE is not None:
@@ -418,10 +428,12 @@ def calc_zengxingzhi():
                 pass
     lines = []
     bear = bull = 0
+    n_valid = 0
     for code, name in codes.items():
         rows = sorted(data.get(code, []))
         if len(rows) < 6:
             continue
+        n_valid += 1
         closes = [r[1] for r in rows]
         ma60 = sum(closes[-3:]) / 3
         ma120 = sum(closes[-6:]) / 6
@@ -437,7 +449,7 @@ def calc_zengxingzhi():
         zx_emoji = "🔴看空" if zx == "看空" else "🟡震荡" if zx == "震荡" else "🟢看多"
         lines.append(f"| {name} | {ma60:.0f} | {ma120:.0f} | {cur:.2f} | {half_chg:+.1f}% | {zx_emoji} | {sx} | {amp:.0f}%{amp_txt} |")
     qual = "🐻 熊市结构" if bear >= 6 else "🐂 牛市结构" if bull >= 6 else "🟡 震荡结构"
-    _ZX_CACHE = ("\n".join(lines), qual, bear, bull)
+    _ZX_CACHE = ("\n".join(lines), qual, bear, bull, n_valid)
     return _ZX_CACHE
 
 def read_limitup_panel():
@@ -552,12 +564,13 @@ def gen_report(today_str):
     ft_v, bs, tl, sx_air = parse_quant_temps(quant)
     # 2026-10-27 修复：双弦脚本 run_shuangxian.py 从不产出 air_count（sx_air 恒 None），
     # 报告中“空头 x/8”的唯一真实来源＝calc_zengxingzhi 的 8 大指数月线口径，故提前计算并复用缓存。
-    zx_table, zx_qual, zx_bear, zx_bull = calc_zengxingzhi()
+    zx_table, zx_qual, zx_bear, zx_bull, zx_nvalid = calc_zengxingzhi()
     lines.append("| 系统 | 信号 |")
     lines.append("|:----|:----|")
     lines.append(f"| 🌡️ 鱼身温度 | {ft_v}/100" if ft_v is not None else "| 🌡️ 鱼身温度 | ⏳ 待量化运行 |")
     lines.append(f"| 🛡️ 猛兽安全评分 | {bs}/100" if bs is not None else "| 🛡️ 猛兽安全评分 | ⏳ 待量化运行 |")
-    _air = zx_bear if zx_bear is not None else sx_air
+    # 有效指数不足 6 个时不展示空头数（避免“空头0/8”式误导），退回 sx_air 或“待量化”
+    _air = zx_bear if (zx_bear is not None and zx_nvalid >= 6) else sx_air
     if tl is not None and _air is not None:
         lines.append(f"| 🧭 双弦 | 温度{tl}/100·空头{_air}/8 |")
     elif tl is not None:
