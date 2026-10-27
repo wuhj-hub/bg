@@ -214,21 +214,21 @@
   "degraded": false
  },
  "2026-10-26": {
-  "temp": 35.2,
+  "temp": 33.1,
   "level": "偏冷",
   "position_cap": 30,
   "subs": {
-   "index_trend": 27.5,
+   "index_trend": 20.4,
    "emotion": 45.0,
    "width": 76.1,
    "breadth": 13.8,
    "structure": 10.9,
-   "inbull": 17.5
+   "inbull": 16.4
   },
   "divergence": {
-   "index_vs_emotion": -17.5,
+   "index_vs_emotion": -24.6,
    "breadth_vs_width": -62.3,
-   "structure_vs_inbull": -6.6
+   "structure_vs_inbull": -5.5
   },
   "degraded": false
  }
