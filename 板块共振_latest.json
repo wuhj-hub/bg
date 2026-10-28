@@ -1,23 +1,12 @@
 {
- "date": "2026-10-26",
+ "date": "2026-10-28",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 48,
+ "pool_size": 47,
  "resonance_boards": [
   {
-   "name": "油服工程",
-   "code": "pt01801962",
-   "zdf": 3.38,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "zdf": 1.59,
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "zdf": 3.75,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -28,79 +17,25 @@
  ],
  "grab_top": [
   {
-   "name": "油服工程",
-   "code": "pt01801962",
-   "value": 7
-  },
-  {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
+   "name": "汽车零部件",
+   "code": "pt01801093",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "汽车零部件概念",
-   "code": "pt02101330",
-   "value": 20.7
-  },
-  {
-   "name": "自动化设备",
-   "code": "pt01801078",
-   "value": 10.6
-  },
-  {
    "name": "汽车零部件",
    "code": "pt01801093",
-   "value": 10.0
-  },
-  {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "value": 5.8
-  },
-  {
-   "name": "油服工程",
-   "code": "pt01801962",
-   "value": 0.4
+   "value": 5.5
   }
  ],
  "absorption_top": [
   {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "value": 0.73
-  },
-  {
-   "name": "汽车零部件概念",
-   "code": "pt02101330",
-   "value": 0.51
-  },
-  {
-   "name": "自动化设备",
-   "code": "pt01801078",
-   "value": 0.48
-  },
-  {
    "name": "汽车零部件",
    "code": "pt01801093",
-   "value": 0.36
-  },
-  {
-   "name": "油服工程",
-   "code": "pt01801962",
-   "value": 0.31
+   "value": 0.18
   }
  ],
  "control_top": [],
- "zhongjun_candidates": [
-  {
-   "board": "油服工程",
-   "stock": "中海油服",
-   "code": "sh601808",
-   "zdf": "7.23",
-   "main1": -0.1,
-   "main5": 0.02
-  }
- ]
+ "zhongjun_candidates": []
 }
