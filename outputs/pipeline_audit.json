@@ -1,5 +1,5 @@
 {
- "date": "2026-10-28 07:02",
+ "date": "2026-10-29 07:02",
  "runs": {
   "total": 100,
   "bad": [
@@ -34,118 +34,94 @@
   {
    "workflow": "竞价统计·逐日跟踪",
    "step": "完整统计（采集竞价 + 逐日跟踪 + 收益回填 + 报告）",
-   "minutes": 33.0
-  },
-  {
-   "workflow": "盘后报告生成",
-   "step": "一统天下建仓区股池扫描+跟踪（多周期共振）",
-   "minutes": 50.4
+   "minutes": 36.4
   }
  ],
- "stale_products": [
-  {
-   "path": "quant_results_latest.json",
-   "status": "停更2个交易日(自然1天)",
-   "age": 2,
-   "max": 1
-  },
-  {
-   "path": "outputs/market_width_latest.json",
-   "status": "停更2个交易日(自然1天)",
-   "age": 2,
-   "max": 1
-  },
-  {
-   "path": "hot_emotion_latest.json",
-   "status": "停更2个交易日(自然1天)",
-   "age": 2,
-   "max": 1
-  }
- ],
+ "stale_products": [],
  "freshness_skipped": false,
  "script_errors": [],
  "expected_runs": [
   {
    "workflow": "quant_scan.yml",
    "label": "全盘量化扫描",
-   "last_success": "2026-10-26",
-   "age": 2,
+   "last_success": "2026-10-28",
+   "age": 1,
    "tol": 1
   },
   {
    "workflow": "quant_report.yml",
    "label": "盘后报告生成",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
   {
    "workflow": "premarket_report.yml",
    "label": "盘前市场报告",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
   {
    "workflow": "intraday_monitor.yml",
    "label": "盘中监控",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
   {
    "workflow": "wangzhe_track.yml",
    "label": "涨停型王者跟踪",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
   {
    "workflow": "beast_pool.yml",
    "label": "猛兽突破池扫描",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
   {
    "workflow": "yao_gu_pool.yml",
    "label": "妖股池扫描",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
   {
    "workflow": "jingjia_track.yml",
    "label": "竞价统计·逐日跟踪",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
   {
    "workflow": "selfcheck_daily.yml",
    "label": "体系自检",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
   {
    "workflow": "artifact_audit.yml",
    "label": "产物入库审计",
-   "last_success": "2026-10-28",
+   "last_success": "2026-10-29",
    "age": 0,
    "tol": 1
   },
   {
    "workflow": "guard_selfcheck.yml",
    "label": "guard备份自检",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
   {
    "workflow": "duowei_fish.yml",
    "label": "多维度·鱼身报告更新",
-   "last_success": "2026-10-27",
+   "last_success": "2026-10-28",
    "age": 1,
    "tol": 1
   },
@@ -153,51 +129,49 @@
    "workflow": "pool_winrate_biweekly.yml",
    "label": "股池胜率总览（双周）",
    "last_success": "2026-10-26",
-   "age": 2,
+   "age": 3,
    "tol": 11
   },
   {
    "workflow": "weight_learn.yml",
    "label": "仲裁权重自学习（月度）",
    "last_success": "2026-10-11",
-   "age": 13,
+   "age": 14,
    "tol": 25
   },
   {
    "workflow": "emotion_backtest_monthly.yml",
    "label": "情绪温度计回测（月度）",
    "last_success": "2026-10-01",
-   "age": 15,
+   "age": 16,
    "tol": 25
   },
   {
    "workflow": "bt_cycle.yml",
    "label": "回测周期（月度）",
    "last_success": "2026-10-23",
-   "age": 3,
+   "age": 4,
    "tol": 25
   },
   {
    "workflow": "evidence_review.yml",
    "label": "evidence月度复核提醒",
    "last_success": "2026-10-01",
-   "age": 15,
+   "age": 16,
    "tol": 25
   },
   {
    "workflow": "inbull_threshold_monitor.yml",
    "label": "入牛阈值漂移监控（季度）",
    "last_success": "2026-10-11",
-   "age": 13,
+   "age": 14,
    "tol": 70
   }
  ],
  "issues": [
   "❌ run 异常 1 个（全盘量化扫描:failure）",
   "⏹️ 并发/重复触发取消 2 个（已忽略，不计入异常）",
-  "⚠️ 重步骤：竞价统计·逐日跟踪/完整统计（采集竞价 + 逐日跟踪 + 收益回填 + 报告） 33.0min、盘后报告生成/一统天下建仓区股池扫描+跟踪（多周期共振） 50.4min",
-  "⚠️ 产物停更：quant_results_latest.json(停更2个交易日(自然1天))、outputs/market_width_latest.json(停更2个交易日(自然1天))、hot_emotion_latest.json(停更2个交易日(自然1天))",
-  "🚨 应跑未跑 1 项：⏰ 超期未运行：全盘量化扫描（quant_scan.yml）最近成功 2026-10-26，已 2 个交易日（容忍 1）→ 检查外部 dispatch"
+  "⚠️ 重步骤：竞价统计·逐日跟踪/完整统计（采集竞价 + 逐日跟踪 + 收益回填 + 报告） 36.4min"
  ],
  "status": "FAIL"
 }
