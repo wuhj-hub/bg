@@ -1,10 +1,43 @@
 {
   "market_temp": {
-    "temp": 50,
+    "temp": 45,
     "level": "中性",
     "idx": "3681.47"
   },
   "signals": [
+    {
+      "code": "sz001979",
+      "name": "招商蛇口",
+      "pattern": "MACD空中加油",
+      "raw_score": 100,
+      "final_score": 81,
+      "multi_score": 86,
+      "resonance": "共振向下",
+      "price": 7.92,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.18)>=DEA(0.15)金叉",
+        "MACD柱0.060刚翻红加油成功",
+        "收盘7.92>MA57.79",
+        "MA20>MA60多头排列",
+        "KDJ_J=66未超买"
+      ],
+      "stop_loss": "7.40",
+      "target": "9.11",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
     {
       "code": "sh601939",
       "name": "建设银行",
@@ -35,6 +68,39 @@
       "month_trend": "多头",
       "month_gate": "PASS",
       "month_reversal": "平台突破(12月新高)",
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz002027",
+      "name": "分众传媒",
+      "pattern": "MACD空中加油",
+      "raw_score": 100,
+      "final_score": 74,
+      "multi_score": 54,
+      "resonance": "共振向下",
+      "price": 5.18,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.08)>=DEA(0.07)金叉",
+        "MACD柱0.020刚翻红加油成功",
+        "收盘5.18>MA55.12",
+        "MA20>MA60多头排列",
+        "KDJ_J=53未超买"
+      ],
+      "stop_loss": "4.86",
+      "target": "5.96",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
       "rsg_dev": null,
       "rsg_strong": false
     },
@@ -82,7 +148,7 @@
       "price": 34.85,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.62)>=DEA(0.56)金叉",
+        "DIF(0.62)>=DEA(0.57)金叉",
         "MACD柱0.110刚翻红加油成功",
         "收盘34.85>MA534.56",
         "MA20>MA60多头排列",
@@ -102,39 +168,6 @@
       "month_gate": "WARN",
       "month_reversal": null,
       "rsg_dev": 287.3,
-      "rsg_strong": true
-    },
-    {
-      "code": "sh601985",
-      "name": "中国核电",
-      "pattern": "MACD空中加油",
-      "raw_score": 100,
-      "final_score": 72,
-      "multi_score": 43,
-      "resonance": "共振向下",
-      "price": 9.66,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.15)>=DEA(0.13)金叉",
-        "MACD柱0.040刚翻红加油成功",
-        "收盘9.66>MA59.48",
-        "MA20>MA60多头排列",
-        "KDJ_J=69未超买"
-      ],
-      "stop_loss": "9.01",
-      "target": "11.11",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "平台突破(12月新高)",
-      "rsg_dev": 301.2,
       "rsg_strong": true
     },
     {
@@ -192,6 +225,56 @@
       "resonance_detail": {
         "index": "大盘向下",
         "stock": "个股弱势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sz001979",
+      "name": "招商蛇口",
+      "pattern": "箱体突破",
+      "raw_score": 80,
+      "final_score": 64,
+      "multi_score": 86,
+      "resonance": "共振向下",
+      "price": 7.92,
+      "reasons": [
+        "MA20(7.58)>MA60(7.24)",
+        "MACD金叉(DIF=0.18)",
+        "KDJ向上(J=66)",
+        "收盘7.92>MA57.79",
+        "突破验证通过：量1.8倍/回踩守住/位置-11%"
+      ],
+      "stop_loss": "7.24",
+      "target": "9.11",
+      "mode": 3,
+      "tag": "有效突破",
+      "breakout": {
+        "valid": true,
+        "reason": "量1.8倍/回踩守住/位置-11%",
+        "checks": {
+          "volume": true,
+          "pullback": true,
+          "position": true,
+          "pullback_state": "hold"
+        },
+        "box": {
+          "top": 7.82,
+          "bottom": 6.45,
+          "height": 21.2,
+          "break_date": "2026-10-26",
+          "vol_ratio": 1.82,
+          "pos_dev": -11.1
+        }
+      },
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
         "resonance": "共振向下",
         "score": 20
       },
@@ -348,6 +431,38 @@
       "rsg_strong": true
     },
     {
+      "code": "sz001979",
+      "name": "招商蛇口",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 60,
+      "multi_score": 86,
+      "resonance": "共振向下",
+      "price": 7.92,
+      "reasons": [
+        "MA20(7.58)>MA60(7.24)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离3.3%)",
+        "收盘7.92>MA57.79",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "7.20",
+      "target": "8.87",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
       "code": "sh600699",
       "name": "均胜电子",
       "pattern": "均线回踩支撑",
@@ -389,13 +504,13 @@
       "resonance": "共振向下",
       "price": 11.77,
       "reasons": [
-        "MA20(11.34)>MA60(10.87)多头",
+        "MA20(11.33)>MA60(10.87)多头",
         "MACD在0轴上方",
         "在MA10附近(偏离1.8%)",
         "收盘11.77>MA511.62",
         "站在布林中轨上方"
       ],
-      "stop_loss": "10.77",
+      "stop_loss": "10.76",
       "target": "13.18",
       "mode": 2,
       "tag": "",
@@ -410,56 +525,6 @@
       "month_reversal": "平台突破(12月新高)",
       "rsg_dev": null,
       "rsg_strong": false
-    },
-    {
-      "code": "sh601985",
-      "name": "中国核电",
-      "pattern": "箱体突破",
-      "raw_score": 80,
-      "final_score": 58,
-      "multi_score": 43,
-      "resonance": "共振向下",
-      "price": 9.66,
-      "reasons": [
-        "MA20(9.27)>MA60(9.02)",
-        "MACD金叉(DIF=0.15)",
-        "KDJ向上(J=69)",
-        "收盘9.66>MA59.48",
-        "突破验证通过：量1.5倍/回踩待确认/位置-2%"
-      ],
-      "stop_loss": "8.82",
-      "target": "11.11",
-      "mode": 3,
-      "tag": "突破待回踩确认",
-      "breakout": {
-        "valid": true,
-        "reason": "量1.5倍/回踩待确认/位置-2%",
-        "checks": {
-          "volume": true,
-          "pullback": true,
-          "position": true,
-          "pullback_state": "pending"
-        },
-        "box": {
-          "top": 9.55,
-          "bottom": 8.69,
-          "height": 9.9,
-          "break_date": "2026-10-28",
-          "vol_ratio": 1.54,
-          "pos_dev": -1.8
-        }
-      },
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "平台突破(12月新高)",
-      "rsg_dev": 301.2,
-      "rsg_strong": true
     },
     {
       "code": "sz003006",
@@ -492,6 +557,38 @@
       "month_reversal": null,
       "rsg_dev": 473.3,
       "rsg_strong": true
+    },
+    {
+      "code": "sz002027",
+      "name": "分众传媒",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 56,
+      "multi_score": 54,
+      "resonance": "共振向下",
+      "price": 5.18,
+      "reasons": [
+        "MA20(5.01)>MA60(4.98)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离0.4%)",
+        "收盘5.18>MA55.12",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "4.76",
+      "target": "5.80",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股中性",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
     },
     {
       "code": "sh601328",
