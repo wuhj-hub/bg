@@ -295,6 +295,12 @@ def main():
         for k, v in fetch_kline_gap([s for s in syms if s not in day_map], "day", 250).items():
             if len(v) > 40 and k not in day_map:
                 day_map[k] = v
+    cov = len(day_map) / max(1, len(syms))
+    print(f"[INFO] 日线取数覆盖 {len(day_map)}/{len(syms)}（{cov*100:.1f}%），累计耗时 {elapsed_min():.1f}min", flush=True)
+    if cov < 0.80:
+        print(f"[WARN] 日线覆盖率 {cov*100:.1f}% < 80%——westock 可能在高负载下降级（退市票约 7.6%，"
+              f"正常应 ≥90%），本轮候选数会偏少（2026-10-28 实测盘后高峰曾跌到 30-62%）", flush=True)
+
     cand = []  # (code, name, entry_date, guaili_flag)
     for code, name in pool:
         bars = day_map.get(code)
