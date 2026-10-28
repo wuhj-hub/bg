@@ -247,8 +247,14 @@ def _fetch_kline_raw(codes, period, limit, fq):
         if missing:
             for sub in chunks(missing, GAP_BATCH):
                 result.update(_fetch(sub))
-            for c in [c for c in missing if c not in result][:GAP_PERSTOCK_CAP]:
-                result.update(_fetch([c]))
+            # ⭐2026-10-28 提速（消除放大器）：逐只兜底改为「缺口 ≤5 时才做，最多 GAP_PERSTOCK_CAP 只」。
+            # 原逻辑每批固定逐只 10 次；全市场约 7.6% 退市票本就无数据 → 13 批 = 130+ 次纯空转 CLI，
+            # 且一旦 westock 抖动，每次空转还要 3×timeout 重试 → 单批可膨胀到 300s+。
+            # 这正是 2026-10-27「一统天下多周期」步骤把 quant_scan job 拖死（产物停更到 10-26）的放大器。
+            rest = [c for c in missing if c not in result]
+            if 0 < len(rest) <= 5:
+                for c in rest[:GAP_PERSTOCK_CAP]:
+                    result.update(_fetch([c]))
     return result
 
 
