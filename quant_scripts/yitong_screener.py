@@ -30,7 +30,7 @@ WORKERS = 8   # 大batch后总调用数骤减，保留并发以重叠网络；�
 # 背景：CI 常态 33min；10-27 因取数抖动挂到 >60min 把整个 quant_scan job 拖死，
 #       后续「上传三系统/上传报告/env/契约自检/提交扫描产物」6 步全未执行 → 次日盘前读到 10-26 旧数据。
 # 策略：任何阶段超预算即跳过（降级输出并标注），保证金天一定产出股池。
-BUDGET_MIN = float(os.environ.get("YITONG_BUDGET_MIN", "25"))
+BUDGET_MIN = float(os.environ.get("YITONG_BUDGET_MIN", "28"))   # 沙箱全市场实测 24min（Step1 11 + Step3 12），留 4min 余量
 _T0 = time.time()
 
 
