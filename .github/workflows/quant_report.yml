@@ -35,7 +35,9 @@ jobs:
         run: python3 quant_scripts/trade_day_check.py --github-output
   report:
     needs: trade_gate
-    if: needs.trade_gate.outputs.ok == '1'
+    # 2026-10-28：增加上游结论判断——10-27 上游 scan 失败但本 job 仍 success(读的是10-26产物)，
+    # 产出「基于旧数据的复盘报告」形成假绿，掩盖了产物停更。上游非 success 时不再跑（已由 quant_scan 失败告警通知）。
+    if: needs.trade_gate.outputs.ok == '1' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     timeout-minutes: 240  # ⚠️2026-09-25: 原180min，实测134min余量仅26%（9/23曾撞180被杀）→提至240min降风险
     env:
