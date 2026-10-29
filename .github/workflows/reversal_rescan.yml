@@ -1,0 +1,68 @@
+name: 反转数值重算（日/周/月）
+
+on:
+  # 手动重算：改口径/想立刻出当天结果时用
+  workflow_dispatch: {}
+  repository_dispatch:
+    types: [reversal-rescan-run]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reversal-rescan
+  cancel-in-progress: false
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  rescan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 安装依赖
+        run: |
+          pip install -q pandas
+          npm i -g westock-data-skillhub@1.0.3 || true
+
+      - name: 反转数值三周期重算 + 上传知识库 + 推送 + 提交
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          set +e
+          D=$(date +%Y-%m-%d)
+          for tf in day week month; do
+            echo "=== 反转数值 $tf ==="
+            python3 quant_scripts/reversal_daily_screener.py --tf $tf --max-price 10 --pool-file all_mainboard.csv --push
+            RC=$?
+            if [ "$RC" != "0" ]; then echo "::warning::反转数值 $tf 失败(rc=$RC)"; fi
+          done
+          for f in "outputs/反转数值日线信号_$D.md" "outputs/反转数值周线跟踪_$D.md" "outputs/反转数值月线跟踪_$D.md"; do
+            if [ -f "$f" ]; then
+              python3 upload_ima.py --file "$f" --name "$(basename "$f")" || echo "::warning::上传失败 $f"
+            fi
+          done
+          python3 git_api_commit.py --msg "chore: 反转数值重算 $D" \
+            data/reversal_pool_day.json data/reversal_pool_week.json data/reversal_pool_month.json \
+            data/reversal_perf_day.csv data/reversal_perf_week.csv data/reversal_perf_month.csv \
+            "outputs/反转数值日线信号_$D.md" "outputs/反转数值周线跟踪_$D.md" "outputs/反转数值月线跟踪_$D.md" \
+            || echo "::warning::产物提交失败"
+
+      - name: 产物校验
+        if: always()
+        continue-on-error: true
+        run: |
+          D=$(date +%Y-%m-%d)
+          for f in "outputs/反转数值日线信号_$D.md" "outputs/反转数值周线跟踪_$D.md" "outputs/反转数值月线跟踪_$D.md"; do
+            if [ -s "$f" ]; then echo "OK $f ($(wc -c < "$f") bytes)"; else echo "::error::缺失 $f"; fi
+          done
