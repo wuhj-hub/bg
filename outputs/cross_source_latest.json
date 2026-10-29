@@ -1,5 +1,5 @@
 {
- "date": "2026-10-29",
+ "date": "2026-10-30",
  "threshold": 0.5,
  "total": 9,
  "ok": 9,
@@ -10,24 +10,24 @@
    "code": "sh000001",
    "name": "上证指数",
    "westock": {
-    "date": "2026-10-28",
-    "close": 3681.47,
-    "pct": 0.91
+    "date": "2026-10-29",
+    "close": 3651.43,
+    "pct": -0.82
    },
    "sina": {
     "name": "上证指数",
-    "close": 3681.469,
-    "pct": 0.91
+    "close": 3651.434,
+    "pct": -0.82
    },
    "tx": {
     "name": "上证指数",
-    "close": 3681.47,
-    "pct": 0.91
+    "close": 3651.43,
+    "pct": -0.82
    },
    "em": {
     "name": "上证指数",
-    "close": 3681.47,
-    "pct": 0.91
+    "close": 3651.43,
+    "pct": -0.82
    },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
@@ -36,24 +36,24 @@
    "code": "sz399001",
    "name": "深证成指",
    "westock": {
-    "date": "2026-10-28",
-    "close": 11473.18,
-    "pct": 2.02
+    "date": "2026-10-29",
+    "close": 11138.2,
+    "pct": -2.92
    },
    "sina": {
     "name": "深证成指",
-    "close": 11473.181,
-    "pct": 2.02
+    "close": 11138.198,
+    "pct": -2.92
    },
    "tx": {
     "name": "深证成指",
-    "close": 11473.18,
-    "pct": 2.02
+    "close": 11138.2,
+    "pct": -2.92
    },
    "em": {
     "name": "深证成指",
-    "close": 11473.18,
-    "pct": 2.02
+    "close": 11138.2,
+    "pct": -2.92
    },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
@@ -62,25 +62,21 @@
    "code": "sz399006",
    "name": "创业板指",
    "westock": {
-    "date": "2026-10-28",
-    "close": 2634.76,
-    "pct": 3.4
+    "date": "2026-10-29",
+    "close": 2517.59,
+    "pct": -4.45
    },
    "sina": {
     "name": "创业板指",
-    "close": 2634.76,
-    "pct": 3.4
+    "close": 2517.588,
+    "pct": -4.45
    },
    "tx": {
     "name": "创业板指",
-    "close": 2634.76,
-    "pct": 3.4
+    "close": 2517.59,
+    "pct": -4.45
    },
-   "em": {
-    "name": "创业板指",
-    "close": 2634.76,
-    "pct": 3.4
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -88,24 +84,24 @@
    "code": "sh600519",
    "name": "贵州茅台",
    "westock": {
-    "date": "2026-10-28",
-    "close": 1330.75,
-    "pct": -1.85
+    "date": "2026-10-29",
+    "close": 1354.0,
+    "pct": 1.75
    },
    "sina": {
     "name": "贵州茅台",
-    "close": 1330.75,
-    "pct": -1.85
+    "close": 1354.0,
+    "pct": 1.75
    },
    "tx": {
     "name": "贵州茅台",
-    "close": 1330.75,
-    "pct": -1.85
+    "close": 1354.0,
+    "pct": 1.75
    },
    "em": {
     "name": "贵州茅台",
-    "close": 1330.75,
-    "pct": -1.85
+    "close": 1354.0,
+    "pct": 1.75
    },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
@@ -114,21 +110,25 @@
    "code": "sz000001",
    "name": "平安银行",
    "westock": {
-    "date": "2026-10-28",
-    "close": 11.31,
-    "pct": -1.39
+    "date": "2026-10-29",
+    "close": 11.54,
+    "pct": 2.03
    },
    "sina": {
     "name": "平安银行",
-    "close": 11.31,
-    "pct": -1.39
+    "close": 11.54,
+    "pct": 2.03
    },
    "tx": {
     "name": "平安银行",
-    "close": 11.31,
-    "pct": -1.39
+    "close": 11.54,
+    "pct": 2.03
    },
-   "em": null,
+   "em": {
+    "name": "平安银行",
+    "close": 11.54,
+    "pct": 2.03
+   },
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -136,25 +136,21 @@
    "code": "sh601318",
    "name": "中国平安",
    "westock": {
-    "date": "2026-10-28",
-    "close": 52.31,
-    "pct": -0.57
+    "date": "2026-10-29",
+    "close": 53.2,
+    "pct": 1.7
    },
    "sina": {
     "name": "中国平安",
-    "close": 52.31,
-    "pct": -0.57
+    "close": 53.2,
+    "pct": 1.7
    },
    "tx": {
     "name": "中国平安",
-    "close": 52.31,
-    "pct": -0.57
+    "close": 53.2,
+    "pct": 1.7
    },
-   "em": {
-    "name": "中国平安",
-    "close": 52.31,
-    "pct": -0.57
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -162,25 +158,21 @@
    "code": "sh600797",
    "name": "浙大网新",
    "westock": {
-    "date": "2026-10-28",
-    "close": 6.39,
-    "pct": -0.31
+    "date": "2026-10-29",
+    "close": 6.17,
+    "pct": -3.44
    },
    "sina": {
     "name": "浙大网新",
-    "close": 6.39,
-    "pct": -0.31
+    "close": 6.17,
+    "pct": -3.44
    },
    "tx": {
     "name": "浙大网新",
-    "close": 6.39,
-    "pct": -0.31
+    "close": 6.17,
+    "pct": -3.44
    },
-   "em": {
-    "name": "浙大网新",
-    "close": 6.39,
-    "pct": -0.31
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -188,25 +180,21 @@
    "code": "sz000839",
    "name": "国安股份",
    "westock": {
-    "date": "2026-10-28",
-    "close": 2.57,
-    "pct": 0.39
+    "date": "2026-10-29",
+    "close": 2.47,
+    "pct": -3.89
    },
    "sina": {
     "name": "国安股份",
-    "close": 2.57,
-    "pct": 0.39
+    "close": 2.47,
+    "pct": -3.89
    },
    "tx": {
     "name": "国安股份",
-    "close": 2.57,
-    "pct": 0.39
+    "close": 2.47,
+    "pct": -3.89
    },
-   "em": {
-    "name": "国安股份",
-    "close": 2.57,
-    "pct": 0.39
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   },
@@ -214,25 +202,21 @@
    "code": "sh600863",
    "name": "华能蒙电",
    "westock": {
-    "date": "2026-10-28",
-    "close": 5.13,
-    "pct": 3.64
+    "date": "2026-10-29",
+    "close": 5.27,
+    "pct": 2.73
    },
    "sina": {
     "name": "华能蒙电",
-    "close": 5.13,
-    "pct": 3.64
+    "close": 5.27,
+    "pct": 2.73
    },
    "tx": {
     "name": "华能蒙电",
-    "close": 5.13,
-    "pct": 3.64
+    "close": 5.27,
+    "pct": 2.73
    },
-   "em": {
-    "name": "华能蒙电",
-    "close": 5.13,
-    "pct": 3.64
-   },
+   "em": null,
    "price_diff_pct": 0.0,
    "pct_diff": 0.0
   }
