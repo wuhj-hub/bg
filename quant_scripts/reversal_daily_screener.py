@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7.7）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7.8）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -34,6 +34,10 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v7.8·2026-10-29】改2 按「DIF/DEA 是否在水上」拆两块（日/周/月统一，仅分类展示，不改判定）：
+     **改2·水上回调** = 已死叉（MACD<0）但最新 K 线 DIF>0 且 DEA>0（水上死叉，强势回调）；
+     **改2·水下回调** = 最新 K 线 DIF≤0 或 DEA≤0（真水下回调）。
+     报告各节子表由 2 组变 3 组（改1 / 改2·水上 / 改2·水下），并新增「DIF/DEA」列。
   · 【v7.7·2026-10-29】用户选「信号严、跟踪稳」：改1 **入池**用 ★（AA AND MACD 上升）、
      **存续**只用 AA（MACD>0 AND MACD>2×0.618×BL_DEEP）——避免红柱缩量一天就被踢出、
      次日又重入池导致 first_date 重置、胜率统计失真。移除原因：跌破突破2倍值 / MACD 已下水。
@@ -224,6 +228,10 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bi
             "valid": ((macd[i] > 0 and macd[i] > 2 * K * bl) if m_low > 0 else (deep <= line)),
             "star": ((macd[i] > 0 and macd[i] > 2 * K * bl and macd[i] > macd[i - 1]) if m_low > 0 else None),
             "macd_now": round(macd[i], 2),
+            # 2026-10-29 v7.8：改2 再按「DIF/DEA 是否在水上」细分（最新 K 线口径，仅分类不改判定）
+            "dif_now": round(dif[i], 2), "dea_now": round(dea[i], 2),
+            "sub": ("改1" if m_low > 0 else
+                    ("改2·水上" if (dif[i] > 0 and dea[i] > 0) else "改2·水下")),
             "big_yang": big_yang, "by_date": (rows[by_idx][0] if by_idx is not None else ""),
             "by_gain": round(by_gain * 100, 1),
             "gap": i - tp_bar, "last_date": rows[-1][0], "last_close": round(closes[-1], 2)}
@@ -369,7 +377,7 @@ def main():
                 removed.append({**cur, "code": code, "name": name, "reason": "超过跟踪期"})
                 tracked.pop(code, None)
             else:
-                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "angle", "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")})
+                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "angle", "sub", "dif_now", "dea_now", "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")})
                 cur["name"] = name
                 kept.append(cur)
         else:
@@ -459,7 +467,7 @@ def main():
                   f"{MAXGAP[tf]} 根约束） ｜ 现价 < {a.max_price:g}元" if nowin else
                   f"新信号窗口：改1 {win} 根 / 改2 {win2} 根（{lbl}） ｜ 现价 < {a.max_price:g}元")),
          (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
-          else f"> 口径：突破2倍反转数值后分两角度——**改1（保持强势）**：突破后 MACD 未下水；**入池**需 ★ = AA（MACD>0 且 MACD>2×0.618×死叉以来最深绿柱）且 MACD 上升，**入池后只要 AA 仍成立即继续跟踪**（当日红柱缩量不踢出，跌破突破2倍值才移出）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
+          else f"> 口径：突破2倍反转数值后分两角度——**改1（保持强势）**：突破后 MACD 未下水；**入池**需 ★ = AA（MACD>0 且 MACD>2×0.618×死叉以来最深绿柱）且 MACD 上升，**入池后只要 AA 仍成立即继续跟踪**（当日红柱缩量不踢出，跌破突破2倍值才移出）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱），再按最新 K 线 DIF/DEA 位置分 **改2·水上回调**（DIF>0 且 DEA>0）与 **改2·水下回调**（DIF≤0 或 DEA≤0）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
          (f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**（改1 存续不要求当日 MACD 上升）；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；**不限新信号窗口**（结构有效即入池）" if nowin else
           f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；存量观察区限「距突破≤{wmax}根」"), "",
          (f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
@@ -474,10 +482,10 @@ def main():
             return
         cols = ["代码", "名称"] + (["入池日"] if with_first else []) + \
                ["最新日期", "最新价"] + (["角度"] if with_angle else []) + \
-               ["突破日", "突破段阳线", "突破2倍值", "回调深(MACD)", "不破线(改1=2倍/改2=1倍)", "距突破"] + \
+               ["突破日", "突破段阳线", "突破2倍值", "回调深(MACD)", "DIF/DEA", "不破线(改1=2倍/改2=1倍)", "距突破"] + \
                ([reason_label] if with_reason else [])
         L.append("| " + " | ".join(cols) + " |")
-        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "突破段阳线", reason_label) else "--:" for c in cols) + "|")
+        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "突破段阳线", "DIF/DEA", reason_label) else "--:" for c in cols) + "|")
         for s in rows:
             cells = [s["code"], s["name"]]
             if with_first:
@@ -488,6 +496,8 @@ def main():
                      [s.get("tp_date", ""), _by,
                       f"{float(s.get('tp_val', 0)):+.2f}",
                       (f"{float(s.get('macd_now', 0)):+.2f}" if s.get("angle") == "改1" else f"{float(s.get('pullback', 0)):.2f}"),
+                      (f"{float(s.get('dif_now')):+.2f}/{float(s.get('dea_now')):+.2f}"
+                       if s.get("dif_now") is not None and s.get("dea_now") is not None else "—"),
                       f"{_line_signed(s):+.2f}", s.get("gap", "")]
             if with_reason:
                 cells.append(s.get("reason", ""))
@@ -495,7 +505,16 @@ def main():
         L.append("")
 
     ANG_LABEL = (("改1", "🅰️ 改1 · 保持强势（突破后 MACD 未下水）"),
-                 ("改2", "🅱️ 改2 · 死叉回调（水下反转数值线上方）"))
+                 ("改2·水上", "🅱️ 改2·水上回调（已死叉，但 DIF/DEA 均在 0 轴上方）"),
+                 ("改2·水下", "🅲 改2·水下回调（DIF 或 DEA 已到 0 轴下方）"),
+                 ("改2·待定", "🅱️ 改2 · 待定（旧池数据，下次运行自动补标注）"))
+
+    def _sub(s):
+        """子角度：改1 / 改2·水上 / 改2·水下；旧池无 sub 字段时回退为「改2·待定」"""
+        v = s.get("sub")
+        if v in ("改1", "改2·水上", "改2·水下"):
+            return v
+        return {"改1": "改1", "改2": "改2·待定"}.get(s.get("angle") or "", "其他")
 
     def tbl_group(rows, with_reason=False, with_first=False, reason_label="移除原因"):
         """按角度归类渲染：改1 / 改2 各一张子表；组内保持传入顺序。空组不显示"""
@@ -504,23 +523,26 @@ def main():
             L.append("")
             return
         for ang, lab in ANG_LABEL:
-            sub = [s for s in rows if s.get("angle") == ang]
+            sub = [s for s in rows if _sub(s) == ang]
             if not sub:
                 continue
             L.append(f"### {lab} · {len(sub)} 只")
             L.append("")
             tbl(sub, with_reason=with_reason, with_first=with_first,
                 reason_label=reason_label, with_angle=False)
-        other = [s for s in rows if s.get("angle") not in ("改1", "改2")]
+        other = [s for s in rows if _sub(s) not in ("改1", "改2·水上", "改2·水下", "改2·待定")]
         if other:
             L.append(f"### 其他角度 · {len(other)} 只")
             L.append("")
             tbl(other, with_reason=with_reason, with_first=with_first, reason_label=reason_label)
 
     _all = added + kept + watch        # 全表口径（新增 + 在池 + 存量观察；移除的不计）
-    _a1 = sum(1 for s in _all if s.get("angle") == "改1")
-    _a2 = sum(1 for s in _all if s.get("angle") == "改2")
-    L.append(f"> 🧭 角度分布（新增+在池+观察）：**改1 保持强势 {_a1} 只** ｜ **改2 死叉回调 {_a2} 只**")
+    _a1 = sum(1 for s in _all if _sub(s) == "改1")
+    _u2 = sum(1 for s in _all if _sub(s) == "改2·水上")
+    _d2 = sum(1 for s in _all if _sub(s) == "改2·水下")
+    _t2 = _u2 + _d2
+    L.append(f"> 🧭 角度分布（新增+在池+观察）：**改1 保持强势 {_a1} 只** ｜ "
+             f"**改2 死叉回调 {_t2} 只**（水上 **{_u2}** / 水下 **{_d2}**）")
     L.append("")
 
     L.append(f"## 🆕 本次新增（{len(added)}）")
@@ -548,7 +570,7 @@ def main():
     open(fp, "w", encoding="utf-8").write("\n".join(L))
     print(f"✅ [{tf}] 新增{len(added)} 在池{len(kept)} 移除{len(removed)} 观察{len(watch)} 池内{len(tracked)} | 报告: {fp} | 池: {pool_fp}")
     for s in added[:12]:
-        print(f"   + [{s.get('angle','')}] {s['code']} {s['name']} 价{s['last_close']} 突破{s['tp_date']} MACD{s.get('macd_now',0):+.2f} vs 线{_line_signed(s):+.2f}")
+        print(f"   + [{_sub(s)}] {s['code']} {s['name']} 价{s['last_close']} 突破{s['tp_date']} MACD{s.get('macd_now',0):+.2f} vs 线{_line_signed(s):+.2f}")
     for s in removed[:8]:
         print(f"   - {s['code']} {s['name']} [{s['reason']}]")
 
@@ -561,14 +583,14 @@ def main():
                  f"- 本次：🆕新增 **{len(added)}** ｜ 📌在池 **{len(kept)}** ｜ 🗑️移除 **{len(removed)}**",
                  f"- 池内合计：**{len(tracked)}** 只（现价<{a.max_price:g}元）",
                  f"- 📊 入池后胜率：{perf_line}"]
-            P.append(f"- 🧭 角度：改1 **{_a1}** ｜ 改2 **{_a2}**（新增+在池+观察）")
+            P.append(f"- 🧭 角度：改1 **{_a1}** ｜ 改2·水上 **{_u2}** ｜ 改2·水下 **{_d2}**（新增+在池+观察）")
             if watch:
                 P.append(f"- 📎 存量结构观察：**{len(watch)}** 只（超窗口/超价，未入池）")
             if added:
                 P += ["", f"### 🆕 新增（{len(added)}）"]
                 for s in sorted(added, key=lambda x: x["gap"])[:12]:
                     _by = f"｜阳线{s.get('by_date','')} +{s.get('by_gain',0):.1f}%" if s.get('by_date') else ""
-                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{s.get('angle','')}｜突破{s['tp_date']}{_by}｜MACD{s.get('macd_now',0):+.2f}/线{_line_signed(s):+.2f}")
+                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{_sub(s)}｜突破{s['tp_date']}{_by}｜MACD{s.get('macd_now',0):+.2f}/线{_line_signed(s):+.2f}")
                 if len(added) > 12:
                     P.append(f"- …等共 {len(added)} 只（完整见知识库报告）")
             if removed:
