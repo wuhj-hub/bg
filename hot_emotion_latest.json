@@ -1,32 +1,50 @@
 {
- "date": "2026-10-28",
- "total": 8,
- "lianban_cnt": 1,
- "max_lb": 3,
- "shouban": 7,
+ "date": "2026-10-29",
+ "total": 38,
+ "lianban_cnt": 10,
+ "max_lb": 4,
+ "shouban": 28,
  "by_lb": {
-  "3": 1,
-  "1": 7
+  "4": 2,
+  "3": 2,
+  "2": 6,
+  "1": 28
  },
  "score": {
-  "score": 28,
-  "level": "低迷",
+  "score": 58,
+  "level": "活跃",
   "parts": {
-   "涨停家数": 2,
-   "连板高度": 10,
-   "连板占比": 16
+   "涨停家数": 5,
+   "连板高度": 18,
+   "连板占比": 35
   }
  },
  "persistence": [],
  "alerts": [],
  "lianban_rows": [
   {
+   "code": "sz001219",
+   "name": "青岛食品",
+   "price": "",
+   "chg": "",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "食品饮料"
+   ]
+  },
+  {
    "code": "sz002708",
    "name": "光洋股份",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -37,6 +55,147 @@
     "汽车",
     "底盘与发动机系统",
     "飞行汽车(eVTOL)"
+   ]
+  },
+  {
+   "code": "sh600715",
+   "name": "文投控股",
+   "price": "",
+   "chg": "",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "信托重仓"
+   ]
+  },
+  {
+   "code": "sh601956",
+   "name": "东贝集团",
+   "price": "",
+   "chg": "",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "家电零部件Ⅲ",
+    "家电零部件Ⅱ",
+    "家用电器",
+    "基金减仓"
+   ]
+  },
+  {
+   "code": "sz002172",
+   "name": "澳洋健康",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "医疗服务",
+    "医药生物"
+   ]
+  },
+  {
+   "code": "sz002526",
+   "name": "山东矿机",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "机械设备",
+    "专用设备"
+   ]
+  },
+  {
+   "code": "sz002862",
+   "name": "实丰文化",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "QFII新进",
+    "基金增仓"
+   ]
+  },
+  {
+   "code": "sz002943",
+   "name": "宇晶股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "通用设备",
+    "机械设备",
+    "机床工具",
+    "基金增仓"
+   ]
+  },
+  {
+   "code": "sh603006",
+   "name": "联明股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "汽车零部件",
+    "汽车",
+    "其他汽车零部件"
+   ]
+  },
+  {
+   "code": "sh603131",
+   "name": "上海沪工",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "通用设备",
+    "其他通用设备",
+    "机械设备"
    ]
   }
  ],
