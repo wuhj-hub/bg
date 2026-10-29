@@ -1,5 +1,5 @@
 {
- "date": "2026-10-29",
+ "date": "2026-10-30",
  "writes": {
   "信号仲裁_latest.json": [
    ".github/workflows/quant_report.yml",
@@ -96,6 +96,7 @@
    "quant_scripts/jinji_emotion_backtest.py",
    "quant_scripts/limitup_concept_rank.py",
    "quant_scripts/market_regime.py",
+   "quant_scripts/month_screen.py",
    "quant_scripts/wangzhe_breakout.py",
    "quant_scripts/yitong_guaili_screener.py",
    "skills_backup/板块个股入牛时点/scripts/scan_inbull.py"
@@ -196,6 +197,12 @@
   ],
   "yao_pool.txt": [
    "quant_scripts/yao_gu_pool.py"
+  ],
+  "月线选股_{var}.md": [
+   "quant_scripts/month_screen.py"
+  ],
+  "month_screen_latest.json": [
+   "quant_scripts/month_screen.py"
   ],
   "quant_results_latest.json": [
    ".github/workflows/quant_scan.yml",
@@ -519,22 +526,28 @@
    "quant_scan.yml"
   ],
   "reversal_pool_day.json": [
-   "quant_report.yml"
+   "quant_report.yml",
+   "reversal_rescan.yml"
   ],
   "reversal_pool_week.json": [
-   "quant_report.yml"
+   "quant_report.yml",
+   "reversal_rescan.yml"
   ],
   "reversal_pool_month.json": [
-   "quant_report.yml"
+   "quant_report.yml",
+   "reversal_rescan.yml"
   ],
   "reversal_perf_day.csv": [
-   "quant_report.yml"
+   "quant_report.yml",
+   "reversal_rescan.yml"
   ],
   "reversal_perf_week.csv": [
-   "quant_report.yml"
+   "quant_report.yml",
+   "reversal_rescan.yml"
   ],
   "reversal_perf_month.csv": [
-   "quant_report.yml"
+   "quant_report.yml",
+   "reversal_rescan.yml"
   ],
   "xihu_turns_latest.json": [
    "quant_report.yml"
@@ -577,6 +590,9 @@
   "sector_component_em.json": [
    "probe_em.yml",
    "quant_scan.yml"
+  ],
+  "month_screen_latest.json": [
+   "month_screen.yml"
   ],
   "鱼身报告_latest.md": [
    "duowei_fish.yml",
@@ -708,6 +724,15 @@
   ],
   "caige_articles": [
    "wangzhe_track.yml(via wangzhe_commit.py)"
+  ],
+  "反转数值日线信号_$d.md": [
+   "reversal_rescan.yml"
+  ],
+  "反转数值周线跟踪_$d.md": [
+   "reversal_rescan.yml"
+  ],
+  "反转数值月线跟踪_$d.md": [
+   "reversal_rescan.yml"
   ],
   "妖股池_{var}.md": [
    "yao_gu_pool.yml"
@@ -842,6 +867,7 @@
   "入牛阈值漂移_{var}.md",
   "拥挤度监控_{var}.json",
   "拥挤度监控_{var}.md",
+  "月线选股_{var}.md",
   "权重提案_{var}.json"
  ],
  "ok": [
@@ -873,6 +899,7 @@
   "market_regime_latest.md",
   "market_width_latest.json",
   "mode_aggregate_latest.json",
+  "month_screen_latest.json",
   "monthly_macd_latest.json",
   "panhou_lianghua.csv",
   "param_contract_latest.json",
@@ -962,6 +989,9 @@
   "一统天下建仓区股池_latest.json",
   "一统天下建仓区股池_latest.md",
   "入牛时点扫描_{var}.md",
+  "反转数值周线跟踪_$d.md",
+  "反转数值日线信号_$d.md",
+  "反转数值月线跟踪_$d.md",
   "四态胜率_{var}.md",
   "四维共振_latest.json",
   "复盘报告_{var}.md",
@@ -976,8 +1006,8 @@
  "dup_freshness": [
   {
    "name": "sector_component_em.json",
-   "root": "2026-10-28",
-   "outputs": "2026-10-28",
+   "root": "2026-10-29",
+   "outputs": "2026-10-29",
    "status": "同步"
   },
   {
