@@ -1,12 +1,12 @@
-# 🔍 体系自检元审计 · 2026-10-29
+# 🔍 体系自检元审计 · 2026-10-30
 
-> 扫描 24 个 workflow ｜ 风险项 **90** ｜ 🔴高危 **0** ｜ 🟢受控捕获 **47**（已有告警通道，不计入风险项）
+> 扫描 25 个 workflow ｜ 风险项 **92** ｜ 🔴高危 **0** ｜ 🟢受控捕获 **49**（已有告警通道，不计入风险项）
 
 > 口径：本审计扫的是**写法层面**「失败会被吞且无法被人看到」的风险面，不是运行日志。
 > 是否真的发生过静默失败，由 `artifact_audit`（产物三方对账）/ `pipeline_audit`（run 状态）
 > / `kb_health_check`（KB 反查）+ 各 workflow 产物契约自检四道**事后**校验兜底。
 
-## 🟡中危·吞错误（77）
+## 🟡中危·吞错误（78）
 
 - artifact_audit.yml :: 提交审计报告 (L84) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || true
 - beast_pool.yml :: 准备候选池 (L71) — 命中 2>/dev/null（屏蔽 stderr）, || true
@@ -67,6 +67,7 @@
 - quant_scan.yml :: 分时强度分析（信号股分时MACD） (L315) — 命中 continue-on-error: true
 - quant_scan.yml :: 板块资金共振（本地复算·无外部依赖） (L320) — 命中 continue-on-error: true
 - quant_scan.yml :: 四维共振评分（政策/资金/筹码/关联方四维证据链） (L351) — 命中 continue-on-error: true
+- reversal_rescan.yml :: 反转数值三周期重算 + 上传知识库 + 推送 + 提交 (L33) — 命中 set +e, || echo（吞错误）
 - selfcheck_daily.yml :: ① 数据源交叉验证（westock × 东财 × 腾讯） (L66) — 命中 continue-on-error: true, set +e
 - selfcheck_daily.yml :: ② 静默失败元审计（扫 workflow 自身的假绿风险） (L78) — 命中 continue-on-error: true, set +e
 - selfcheck_daily.yml :: ③ 流水线自愈巡检（run状态/步骤耗时/产物新鲜度/脚本异常） (L90) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e
@@ -86,7 +87,7 @@
 - yao_gu_pool.yml :: 准备主板清单 (L73) — 命中 || echo（吞错误）
 - yao_gu_pool.yml :: 上传知识库（报告·全盘量化） (L89) — 命中 continue-on-error: true, || echo（吞错误）
 
-## 🟡中危·依赖外部 cron（13）
+## 🟡中危·依赖外部 cron（14）
 
 - artifact_audit.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - beast_pool.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
@@ -97,12 +98,13 @@
 - intraday_monitor.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - market_regime.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - premarket_report.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
+- reversal_rescan.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - selfcheck_daily.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - wangzhe_track.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - weight_learn.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - yao_gu_pool.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 
-## 🟢信息·受控捕获（35）
+## 🟢信息·受控捕获（36）
 
 - artifact_audit.yml :: 运行产物入库审计 (L62) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 - beast_pool.yml :: 提交产物 (L87) — 命中 set +e, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
@@ -137,10 +139,11 @@
 - quant_scan.yml :: 提交扫描产物到仓库（供盘前引用/报告workflow读取） (L467) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, set +e, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 - quant_scan.yml :: 关键扫描产物检查（缺失即告警） (L524) — 命中 continue-on-error: true, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 - quant_scan.yml :: 扫描链路失败告警（job 级兜底） (L551) — 命中 continue-on-error: true, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
+- reversal_rescan.yml :: 产物校验 (L61) — 命中 continue-on-error: true；但步骤内已有告警通道（::error::），失败对人可见
 - selfcheck_daily.yml :: 异常告警到微信 (L168) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 - yao_gu_pool.yml :: 提交产物 (L105) — 命中 set +e, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 
-## 🟢信息·非关键前置（12）
+## 🟢信息·非关键前置（13）
 
 - beast_pool.yml :: 预热 westock 数据包 (L66) — 命中 || true；前置步骤失败会在下游取数/扫描步显性暴露
 - duowei_fish.yml :: 预热westock数据包 (L85) — 命中 continue-on-error: true, || true；前置步骤失败会在下游取数/扫描步显性暴露
@@ -149,6 +152,7 @@
 - inbull_threshold_monitor.yml :: 安装依赖（pandas + westock CLI 免npx 备用） (L31) — 命中 || true；前置步骤失败会在下游取数/扫描步显性暴露
 - pool_winrate_biweekly.yml :: 安装依赖 + 全局 westock（免 npx 加速） (L66) — 命中 || echo（吞错误）；前置步骤失败会在下游取数/扫描步显性暴露
 - quant_scan.yml :: 预热westock数据包 (L96) — 命中 set +e, || true；前置步骤失败会在下游取数/扫描步显性暴露
+- reversal_rescan.yml :: 安装依赖 (L28) — 命中 || true；前置步骤失败会在下游取数/扫描步显性暴露
 - selfcheck_daily.yml :: 预热 westock 数据包（避免首个 kl 调用冷启动失败） (L61) — 命中 || echo（吞错误）；前置步骤失败会在下游取数/扫描步显性暴露
 - wangzhe_track.yml :: 安装 westock 取数 CLI（免 npx） (L63) — 命中 continue-on-error: true；前置步骤失败会在下游取数/扫描步显性暴露
 - weight_learn.yml :: 预热 westock 数据包 (L57) — 命中 continue-on-error: true, || echo（吞错误）；前置步骤失败会在下游取数/扫描步显性暴露
@@ -179,6 +183,7 @@
 | probe_search.yml | 0 | — | — |
 | quant_report.yml | 20 | — | 11 |
 | quant_scan.yml | 17 | — | 10 |
+| reversal_rescan.yml | 2 | — | 2 |
 | selfcheck_daily.yml | 9 | — | 2 |
 | wangzhe_track.yml | 4 | — | 1 |
 | weight_learn.yml | 6 | — | 1 |
