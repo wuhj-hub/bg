@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7.5）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7.6）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
   S1 突破2倍反转数值 : MACD > 2×0.618×BL_DEEP（BL_DEEP=死叉以来最深绿柱）且 MACD 上升
-  S2 回踩不破线（分角度，2026-10-29 起）:
-     改1（突破后未下水）：自突破以来 MACD 最低值 m_low ≥ 2×0.618×BL_DEEP（突破2倍值，即突破后不下来）
+  S2 回踩不破线（分角度，2026-10-29 v7.6 起，日/周/月统一）:
+     改1（突破后未下水）= 原指标 AA + ★ 条件：
+         AA := MACD>0 AND MACD > 2×0.618×ABS(LLV(MACD,SCB))（BL_DEEP=死叉以来最深绿柱）
+         成立 = AA AND MACD>REF(MACD,1)（当下仍在突破2倍值之上、且红柱未缩）
      改2（突破后死叉下水）：回调深 = |LLV(MACD, 突破以来)| ≤ 0.618 × HHV(MACD, 金叉以来)
   信号 = S1 已发生 且 S2 成立 且 死叉之后（SCB>0 且 JCB>SCB）；现价 < 上限（默认10元）
   【2026-10-17 新增】突破段中大阳线：突破日所属「金叉」→「突破日」整段内，须出现至少一根
@@ -30,6 +32,9 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v7.6·2026-10-29】改1 判定对齐原指标 AA + ★：**MACD>0 AND MACD>2×0.618×ABS(LLV(MACD,SCB))
+     AND MACD>REF(MACD,1)**——用「当前 MACD」而非「突破以来最低值」，并要求红柱仍在放大；
+     报告「回调深」列对改1 改显示「MACD 现值」，便于与「不破线(=突破2倍值)」直接对照。
   · 【v7.5·2026-10-29】用户口径：**改1（保持强势）判定改为「自突破以来 MACD 最低值 ≥ 突破2倍值」**
      （m_low ≥ 2×0.618×死叉以来最深绿柱，即「突破后不下来」、不跌回突破位）；日/周/月三周期统一。
      原口径「回踩幅度 < 0.618×金叉以来最高红柱」废止。报告「不破线」列对改1 显示突破2倍值、
@@ -204,11 +209,14 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bi
             "red_high": round(red_high, 2), "pullback": round(deep, 2),
             "line": round(line, 2), "m_low": round(m_low, 2),
             "angle": ("改1" if m_low > 0 else "改2"),
-            # 2026-10-29 用户口径（日/周/月统一）：
-            #   改1（保持强势）= 突破后未下水，且自突破以来 MACD 最低值 **不低于突破2倍值**
-            #                   （m_low ≥ 2×0.618×死叉以来最深绿柱，即「突破后不下来 / 不跌回突破位」）
+            # 2026-10-29 用户口径 v7.6（日/周/月统一，对齐原指标 AA + ★ 条件）：
+            #   改1（保持强势）= AA 且 MACD 上升
+            #       AA := MACD>0 AND MACD > 2×0.618×ABS(LLV(MACD,SCB))（当前值仍在突破2倍值之上）
+            #       即「突破后不下来、当下仍在突破位上方且红柱未缩」
             #   改2（死叉回调）= 回调至水下、且 MACD 不低于 −0.618×金叉以来最高红柱（不变）
-            "valid": (m_low >= 2 * K * bl) if m_low > 0 else (deep <= line),
+            "valid": ((macd[i] > 0 and macd[i] > 2 * K * bl and macd[i] > macd[i - 1]) if m_low > 0
+                      else (deep <= line)),
+            "macd_now": round(macd[i], 2),
             "big_yang": big_yang, "by_date": (rows[by_idx][0] if by_idx is not None else ""),
             "by_gain": round(by_gain * 100, 1),
             "gap": i - tp_bar, "last_date": rows[-1][0], "last_close": round(closes[-1], 2)}
@@ -337,7 +345,12 @@ def main():
                 removed.append({**cur, "code": code, "name": name, "reason": "结构失效（无突破）"})
                 tracked.pop(code, None)
             elif not st["valid"]:
-                _rs = "跌破突破2倍值" if st.get("angle") == "改1" else "跌破1倍反转数值"
+                if st.get("angle") == "改1":
+                    _mn, _tp = float(st.get("macd_now") or 0), float(st.get("tp_val") or 0)
+                    _rs = ("MACD 已下水" if _mn <= 0 else
+                           "跌破突破2倍值" if _mn <= _tp else "红柱缩量（MACD 未升）")
+                else:
+                    _rs = "跌破1倍反转数值"
                 removed.append({**cur, "code": code, "name": name, "reason": _rs})
                 tracked.pop(code, None)
             elif only2 and st["angle"] != "改2":
@@ -438,7 +451,7 @@ def main():
                   f"{MAXGAP[tf]} 根约束） ｜ 现价 < {a.max_price:g}元" if nowin else
                   f"新信号窗口：改1 {win} 根 / 改2 {win2} 根（{lbl}） ｜ 现价 < {a.max_price:g}元")),
          (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
-          else f"> 口径：突破2倍反转数值后分两角度——**改1（保持强势）**：突破后 MACD 未下水，且自突破以来最低值 **不低于突破2倍值**（2×0.618×死叉以来最深绿柱，即突破后不下来）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
+          else f"> 口径：突破2倍反转数值后分两角度——**改1（保持强势）**：突破后 MACD 未下水，且 **AA（MACD>0 且 MACD>2×0.618×死叉以来最深绿柱）+ MACD 上升**，即当下仍在突破2倍值之上、红柱未缩；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
          (f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；**不限新信号窗口**（结构有效即入池）" if nowin else
           f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；存量观察区限「距突破≤{wmax}根」"), "",
          (f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
@@ -453,7 +466,7 @@ def main():
             return
         cols = ["代码", "名称"] + (["入池日"] if with_first else []) + \
                ["最新日期", "最新价"] + (["角度"] if with_angle else []) + \
-               ["突破日", "突破段阳线", "突破2倍值", "回调深", "不破线(改1=2倍/改2=1倍)", "距突破"] + \
+               ["突破日", "突破段阳线", "突破2倍值", "回调深(MACD)", "不破线(改1=2倍/改2=1倍)", "距突破"] + \
                ([reason_label] if with_reason else [])
         L.append("| " + " | ".join(cols) + " |")
         L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "突破段阳线", reason_label) else "--:" for c in cols) + "|")
@@ -465,7 +478,8 @@ def main():
             cells += [s.get("last_date", ""), s.get("last_close", "")] + \
                      ([s.get("angle", "")] if with_angle else []) + \
                      [s.get("tp_date", ""), _by,
-                      f"{float(s.get('tp_val', 0)):+.2f}", f"{float(s.get('pullback', 0)):.2f}",
+                      f"{float(s.get('tp_val', 0)):+.2f}",
+                      (f"{float(s.get('macd_now', 0)):+.2f}" if s.get("angle") == "改1" else f"{float(s.get('pullback', 0)):.2f}"),
                       f"{_line_signed(s):+.2f}", s.get("gap", "")]
             if with_reason:
                 cells.append(s.get("reason", ""))
@@ -526,7 +540,7 @@ def main():
     open(fp, "w", encoding="utf-8").write("\n".join(L))
     print(f"✅ [{tf}] 新增{len(added)} 在池{len(kept)} 移除{len(removed)} 观察{len(watch)} 池内{len(tracked)} | 报告: {fp} | 池: {pool_fp}")
     for s in added[:12]:
-        print(f"   + [{s.get('angle','')}] {s['code']} {s['name']} 价{s['last_close']} 突破{s['tp_date']} 最低{s.get('m_low',0):+.2f} vs 线{_line_signed(s):+.2f}")
+        print(f"   + [{s.get('angle','')}] {s['code']} {s['name']} 价{s['last_close']} 突破{s['tp_date']} MACD{s.get('macd_now',0):+.2f} vs 线{_line_signed(s):+.2f}")
     for s in removed[:8]:
         print(f"   - {s['code']} {s['name']} [{s['reason']}]")
 
@@ -546,7 +560,7 @@ def main():
                 P += ["", f"### 🆕 新增（{len(added)}）"]
                 for s in sorted(added, key=lambda x: x["gap"])[:12]:
                     _by = f"｜阳线{s.get('by_date','')} +{s.get('by_gain',0):.1f}%" if s.get('by_date') else ""
-                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{s.get('angle','')}｜突破{s['tp_date']}{_by}｜最低{s.get('m_low',0):+.2f}/线{_line_signed(s):+.2f}")
+                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{s.get('angle','')}｜突破{s['tp_date']}{_by}｜MACD{s.get('macd_now',0):+.2f}/线{_line_signed(s):+.2f}")
                 if len(added) > 12:
                     P.append(f"- …等共 {len(added)} 只（完整见知识库报告）")
             if removed:
