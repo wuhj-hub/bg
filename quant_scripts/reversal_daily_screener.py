@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.0）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.1）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -34,6 +34,9 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v8.1·2026-10-29】池内缺失单只补取：全市场批量偶发丢股（实测 ~6%、池内约 5%），
+     导致在池标的当天缺席报告且「在池 N」与「池内合计」不一致；现对池内缺失代码逐只补取（上限60）。
+     另修：在池条目 update 键补上 macd_now（此前漏更新，「回调深(MACD)」对改1 会显示入池当天旧值）。
   · 【v8.0·2026-10-29】金叉标记升级为「状态 + 事件」双轨：
      状态 = jc_gap/dif_above（当前是否金叉中）；事件 = gc_mark（入池后首次金叉日期，一旦写入
      永久保留，金叉后再死叉也不清除）。「金叉」列显示 🔔今日金叉 / ✅MM-DD(+N) /
@@ -338,6 +341,20 @@ def main():
 
     rows_map = fetch_batch([c for c, n in pool], period, limit)
     print(f"  数据就绪: {len(rows_map)}/{len(pool)}只")
+    # ── v8.1（2026-10-29）：全市场批量偶发丢股（实测 ~6%，池内约 5%）→ 对「池内缺失」单只补取，
+    #    避免在池标的因取数抖动当天缺席报告（口径仍为全市场，只是池内逐只兜底，上限 60 只）──
+    try:
+        _tk = json.load(open(os.path.join(POOL_DIR, f"reversal_pool_{tf}.json"), encoding="utf-8")).get("items", {})
+    except Exception:
+        _tk = {}
+    _miss = [c for c in _tk if c not in rows_map][:60]
+    if _miss:
+        print(f"  池内缺失 {len(_miss)} 只，单只补取…")
+        for _c in _miss:
+            _one = fetch_batch([_c], period, limit)
+            if _one.get(_c):
+                rows_map[_c] = _one[_c]
+        print(f"  补取后数据就绪: {len(rows_map)}/{len(pool)}只（池内覆盖 {len([c for c in _tk if c in rows_map])}/{len(_tk)}）")
     name_of = dict(pool)
     today = datetime.now().strftime("%Y-%m-%d")
 
@@ -390,7 +407,7 @@ def main():
                 removed.append({**cur, "code": code, "name": name, "reason": "超过跟踪期"})
                 tracked.pop(code, None)
             else:
-                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "angle", "sub", "dif_now", "dea_now", "jc_gap", "jc_date", "dif_above", "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")})
+                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "macd_now", "angle", "sub", "dif_now", "dea_now", "jc_gap", "jc_date", "dif_above", "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")})
                 cur["name"] = name
                 # v8.0：入池后发生过金叉 → 永久标记（事件型，金叉后再死叉也不清除）
                 _jd, _fd = (st.get("jc_date") or ""), (cur.get("first_date") or "")
