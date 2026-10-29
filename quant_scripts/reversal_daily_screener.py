@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7.6）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7.7）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
   S1 突破2倍反转数值 : MACD > 2×0.618×BL_DEEP（BL_DEEP=死叉以来最深绿柱）且 MACD 上升
-  S2 回踩不破线（分角度，2026-10-29 v7.6 起，日/周/月统一）:
-     改1（突破后未下水）= 原指标 AA + ★ 条件：
-         AA := MACD>0 AND MACD > 2×0.618×ABS(LLV(MACD,SCB))（BL_DEEP=死叉以来最深绿柱）
-         成立 = AA AND MACD>REF(MACD,1)（当下仍在突破2倍值之上、且红柱未缩）
+  S2 回踩不破线（分角度，2026-10-29 v7.7 起，日/周/月统一；用户选「信号严、跟踪稳」）:
+     改1（突破后未下水）= 原指标 AA + ★：
+         AA   := MACD>0 AND MACD > 2×0.618×ABS(LLV(MACD,SCB))（BL_DEEP=死叉以来最深绿柱）
+         ★    := AA AND MACD>REF(MACD,1)          ——【入池条件】当下在突破2倍值之上且红柱放大
+         存续  := AA                              ——入池后只要仍在突破位上方即继续跟踪，
+                                                     当日红柱缩量不踢出；跌破突破2倍值才移出
      改2（突破后死叉下水）：回调深 = |LLV(MACD, 突破以来)| ≤ 0.618 × HHV(MACD, 金叉以来)
   信号 = S1 已发生 且 S2 成立 且 死叉之后（SCB>0 且 JCB>SCB）；现价 < 上限（默认10元）
   【2026-10-17 新增】突破段中大阳线：突破日所属「金叉」→「突破日」整段内，须出现至少一根
@@ -32,6 +34,9 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v7.7·2026-10-29】用户选「信号严、跟踪稳」：改1 **入池**用 ★（AA AND MACD 上升）、
+     **存续**只用 AA（MACD>0 AND MACD>2×0.618×BL_DEEP）——避免红柱缩量一天就被踢出、
+     次日又重入池导致 first_date 重置、胜率统计失真。移除原因：跌破突破2倍值 / MACD 已下水。
   · 【v7.6·2026-10-29】改1 判定对齐原指标 AA + ★：**MACD>0 AND MACD>2×0.618×ABS(LLV(MACD,SCB))
      AND MACD>REF(MACD,1)**——用「当前 MACD」而非「突破以来最低值」，并要求红柱仍在放大；
      报告「回调深」列对改1 改显示「MACD 现值」，便于与「不破线(=突破2倍值)」直接对照。
@@ -214,8 +219,10 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bi
             #       AA := MACD>0 AND MACD > 2×0.618×ABS(LLV(MACD,SCB))（当前值仍在突破2倍值之上）
             #       即「突破后不下来、当下仍在突破位上方且红柱未缩」
             #   改2（死叉回调）= 回调至水下、且 MACD 不低于 −0.618×金叉以来最高红柱（不变）
-            "valid": ((macd[i] > 0 and macd[i] > 2 * K * bl and macd[i] > macd[i - 1]) if m_low > 0
-                      else (deep <= line)),
+            #   改1 存续（valid）只需 AA：MACD>0 且 MACD>2×0.618×BL_DEEP（当日红柱缩量不踢出）
+            #   改1 入池（star）需 ★：AA 且 MACD>REF(MACD,1)
+            "valid": ((macd[i] > 0 and macd[i] > 2 * K * bl) if m_low > 0 else (deep <= line)),
+            "star": ((macd[i] > 0 and macd[i] > 2 * K * bl and macd[i] > macd[i - 1]) if m_low > 0 else None),
             "macd_now": round(macd[i], 2),
             "big_yang": big_yang, "by_date": (rows[by_idx][0] if by_idx is not None else ""),
             "by_gain": round(by_gain * 100, 1),
@@ -347,8 +354,7 @@ def main():
             elif not st["valid"]:
                 if st.get("angle") == "改1":
                     _mn, _tp = float(st.get("macd_now") or 0), float(st.get("tp_val") or 0)
-                    _rs = ("MACD 已下水" if _mn <= 0 else
-                           "跌破突破2倍值" if _mn <= _tp else "红柱缩量（MACD 未升）")
+                    _rs = ("MACD 已下水" if _mn <= 0 else "跌破突破2倍值")
                 else:
                     _rs = "跌破1倍反转数值"
                 removed.append({**cur, "code": code, "name": name, "reason": _rs})
@@ -369,7 +375,8 @@ def main():
         else:
             # 新信号：突破2倍后回调不破1倍
             #   三周期统一（v4）：须在「新信号窗口」内（gap ≤ win）、须有突破段中大阳线、改1/改2 都收
-            ok_new = (bool(st) and st["valid"] and st["last_close"] < a.max_price
+            _entry_ok = (st.get("star") if st.get("angle") == "改1" else st["valid"]) if st else False
+            ok_new = (bool(st) and _entry_ok and st["last_close"] < a.max_price
                       and (not req_bigyang or st.get("big_yang"))
                       and (not only2 or st["angle"] == "改2")
                       and (st["gap"] <= MAXGAP[tf] if nowin else st["gap"] <= (win2 if st["angle"] == "改2" else win)))
@@ -377,7 +384,8 @@ def main():
                 item = {"code": code, "name": name, "first_date": today, **st}
                 tracked[code] = item
                 added.append(item)
-            elif (not nowin and bool(st) and st["valid"] and st.get("big_yang") and st["gap"] <= wmax
+            elif (not nowin and bool(st) and (st.get("star") if st.get("angle") == "改1" else st["valid"])
+                  and st.get("big_yang") and st["gap"] <= wmax
                   and st["last_close"] < a.max_price):   # 价格门槛与入池一致
                 # 📎 存量结构观察：形态仍成立，仅因「超新信号窗口 / 现价超上限」未入池；不入池、不计胜率
                 _why = []
@@ -451,8 +459,8 @@ def main():
                   f"{MAXGAP[tf]} 根约束） ｜ 现价 < {a.max_price:g}元" if nowin else
                   f"新信号窗口：改1 {win} 根 / 改2 {win2} 根（{lbl}） ｜ 现价 < {a.max_price:g}元")),
          (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
-          else f"> 口径：突破2倍反转数值后分两角度——**改1（保持强势）**：突破后 MACD 未下水，且 **AA（MACD>0 且 MACD>2×0.618×死叉以来最深绿柱）+ MACD 上升**，即当下仍在突破2倍值之上、红柱未缩；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
-         (f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；**不限新信号窗口**（结构有效即入池）" if nowin else
+          else f"> 口径：突破2倍反转数值后分两角度——**改1（保持强势）**：突破后 MACD 未下水；**入池**需 ★ = AA（MACD>0 且 MACD>2×0.618×死叉以来最深绿柱）且 MACD 上升，**入池后只要 AA 仍成立即继续跟踪**（当日红柱缩量不踢出，跌破突破2倍值才移出）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
+         (f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**（改1 存续不要求当日 MACD 上升）；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；**不限新信号窗口**（结构有效即入池）" if nowin else
           f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；存量观察区限「距突破≤{wmax}根」"), "",
          (f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
           f"观察 {len(watch)} ｜ 池内合计 {len(tracked)}**" if watch else
