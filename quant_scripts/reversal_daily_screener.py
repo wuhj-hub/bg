@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v7.8）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.0）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -34,6 +34,15 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v8.0·2026-10-29】金叉标记升级为「状态 + 事件」双轨：
+     状态 = jc_gap/dif_above（当前是否金叉中）；事件 = gc_mark（入池后首次金叉日期，一旦写入
+     永久保留，金叉后再死叉也不清除）。「金叉」列显示 🔔今日金叉 / ✅MM-DD(+N) /
+     ⚠️MM-DD金叉→回死叉 / —；⭐ = 入池后金叉过。小节额外统计「入池后曾金叉但已回死叉」。
+  · 【v7.9·2026-10-29】池内改2 增加「金叉标记」（日/周/月统一，仅标记不改判定）：
+     jc_gap = 距最近一次金叉（DIF 上穿 DEA）的根数，0=今日金叉；dif_above = 当前 DIF>DEA。
+     表格新增「金叉」列（🔔今日金叉 / ✅金叉MM-DD(+N) / —死叉中），并新增小节
+     「🔔 改2 金叉标记」把当前处于金叉状态的改2 单列（入池后金叉额外标 ⭐），
+     推送摘要同步提示。金叉后若再死叉则回到「—」，历史金叉日期保留在 jc_date。
   · 【v7.8·2026-10-29】改2 按「DIF/DEA 是否在水上」拆两块（日/周/月统一，仅分类展示，不改判定）：
      **改2·水上回调** = 已死叉（MACD<0）但最新 K 线 DIF>0 且 DEA>0（水上死叉，强势回调）；
      **改2·水下回调** = 最新 K 线 DIF≤0 或 DEA≤0（真水下回调）。
@@ -230,6 +239,10 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bi
             "macd_now": round(macd[i], 2),
             # 2026-10-29 v7.8：改2 再按「DIF/DEA 是否在水上」细分（最新 K 线口径，仅分类不改判定）
             "dif_now": round(dif[i], 2), "dea_now": round(dea[i], 2),
+            # 2026-10-29 v7.9：金叉标记（lj = 最近一次金叉索引；JCB[i] = 距最近金叉根数）
+            "jc_gap": (None if JCB[i] is None else int(JCB[i])),
+            "jc_date": (rows[lj][0] if lj is not None else ""),
+            "dif_above": bool(dif[i] > dea[i]),
             "sub": ("改1" if m_low > 0 else
                     ("改2·水上" if (dif[i] > 0 and dea[i] > 0) else "改2·水下")),
             "big_yang": big_yang, "by_date": (rows[by_idx][0] if by_idx is not None else ""),
@@ -377,8 +390,12 @@ def main():
                 removed.append({**cur, "code": code, "name": name, "reason": "超过跟踪期"})
                 tracked.pop(code, None)
             else:
-                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "angle", "sub", "dif_now", "dea_now", "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")})
+                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "angle", "sub", "dif_now", "dea_now", "jc_gap", "jc_date", "dif_above", "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")})
                 cur["name"] = name
+                # v8.0：入池后发生过金叉 → 永久标记（事件型，金叉后再死叉也不清除）
+                _jd, _fd = (st.get("jc_date") or ""), (cur.get("first_date") or "")
+                if _jd and _fd and _jd >= _fd:
+                    cur["gc_mark"] = min([x for x in ((cur.get("gc_mark") or ""), _jd) if x])
                 kept.append(cur)
         else:
             # 新信号：突破2倍后回调不破1倍
@@ -390,6 +407,9 @@ def main():
                       and (st["gap"] <= MAXGAP[tf] if nowin else st["gap"] <= (win2 if st["angle"] == "改2" else win)))
             if ok_new:
                 item = {"code": code, "name": name, "first_date": today, **st}
+                # v8.0：入池当日即金叉（jc_date == 入池日）→ 直接计入事件标记
+                _jd0 = st.get("jc_date") or ""
+                item["gc_mark"] = _jd0 if (_jd0 and _jd0 >= today) else ""
                 tracked[code] = item
                 added.append(item)
             elif (not nowin and bool(st) and (st.get("star") if st.get("angle") == "改1" else st["valid"])
@@ -482,10 +502,10 @@ def main():
             return
         cols = ["代码", "名称"] + (["入池日"] if with_first else []) + \
                ["最新日期", "最新价"] + (["角度"] if with_angle else []) + \
-               ["突破日", "突破段阳线", "突破2倍值", "回调深(MACD)", "DIF/DEA", "不破线(改1=2倍/改2=1倍)", "距突破"] + \
+               ["突破日", "突破段阳线", "突破2倍值", "回调深(MACD)", "DIF/DEA", "金叉", "不破线(改1=2倍/改2=1倍)", "距突破"] + \
                ([reason_label] if with_reason else [])
         L.append("| " + " | ".join(cols) + " |")
-        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "突破段阳线", "DIF/DEA", reason_label) else "--:" for c in cols) + "|")
+        L.append("|" + "|".join(":--" if c in ("代码", "名称", "入池日", "最新日期", "角度", "突破日", "突破段阳线", "DIF/DEA", "金叉", reason_label) else "--:" for c in cols) + "|")
         for s in rows:
             cells = [s["code"], s["name"]]
             if with_first:
@@ -498,6 +518,7 @@ def main():
                       (f"{float(s.get('macd_now', 0)):+.2f}" if s.get("angle") == "改1" else f"{float(s.get('pullback', 0)):.2f}"),
                       (f"{float(s.get('dif_now')):+.2f}/{float(s.get('dea_now')):+.2f}"
                        if s.get("dif_now") is not None and s.get("dea_now") is not None else "—"),
+                      _gc(s),
                       f"{_line_signed(s):+.2f}", s.get("gap", "")]
             if with_reason:
                 cells.append(s.get("reason", ""))
@@ -515,6 +536,25 @@ def main():
         if v in ("改1", "改2·水上", "改2·水下"):
             return v
         return {"改1": "改1", "改2": "改2·待定"}.get(s.get("angle") or "", "其他")
+
+    def _gc(s):
+        """金叉标记（状态+事件双轨）：
+        🔔今日金叉 / ✅MM-DD(+N根)  = 当前 DIF>DEA（金叉中）
+        ⚠️MM-DD金叉→回死叉        = 入池后曾金叉、当前已再死叉
+        —                          = 入池以来未金叉
+        ⭐ = 入池日之后发生过金叉"""
+        jd = s.get("jc_date") or ""
+        if s.get("dif_above"):
+            star = "⭐" if s.get("gc_mark") else ""
+            g = s.get("jc_gap")
+            if g == 0:
+                return "🔔今日金叉" + star
+            if g is not None:
+                return f"✅{jd[5:]}(+{g}){star}"
+            return "✅金叉中" + star
+        if s.get("gc_mark"):
+            return f"⚠️{(s.get('gc_mark') or '')[5:]}金叉→回死叉"
+        return "—"
 
     def tbl_group(rows, with_reason=False, with_first=False, reason_label="移除原因"):
         """按角度归类渲染：改1 / 改2 各一张子表；组内保持传入顺序。空组不显示"""
@@ -551,6 +591,21 @@ def main():
     L.append(f"## 📌 在池跟踪（{len(kept)}）")
     L.append("")
     tbl_group(sorted(kept, key=lambda x: x["gap"]))
+    # ── 🔔 改2 金叉标记：池内（含本次新增）当前处于金叉状态的改2 ──
+    _gc_rows = [s for s in (added + kept) if s.get("angle") == "改2" and s.get("dif_above")]
+    if _gc_rows:
+        _today_n = sum(1 for s in _gc_rows if s.get("jc_gap") == 0)
+        _lost = [s for s in (added + kept) if s.get("angle") == "改2"
+                 and not s.get("dif_above") and s.get("gc_mark")]
+        L.append(f"## 🔔 改2 金叉标记（{len(_gc_rows)}）")
+        L.append("")
+        L.append(f"> 池内改2 中**当前已金叉**（DIF 上穿 DEA）的标的——改2 回调结束、转强的确认信号；"
+                 f"其中 🔔**今日金叉 {_today_n} 只**，⭐ = 金叉发生在入池日之后（跟踪期内新触发）。"
+                 + (f"另有 **{len(_lost)} 只入池后曾金叉、现已再死叉**（⚠️ 金叉失败）："
+                    + "、".join(f"{s['name']}({(s.get('gc_mark') or '')[5:]})" for s in _lost) if _lost else ""))
+        L.append("")
+        tbl_group(sorted(_gc_rows, key=lambda x: (x.get("jc_gap") is None, x.get("jc_gap") or 999)),
+                  with_first=True)
     L.append(f"## 🗑️ 本次移除（{len(removed)}）")
     L.append("")
     tbl_group(sorted(removed, key=lambda x: x.get("pullback", 0), reverse=True), with_reason=True, with_first=True)
@@ -586,6 +641,12 @@ def main():
             P.append(f"- 🧭 角度：改1 **{_a1}** ｜ 改2·水上 **{_u2}** ｜ 改2·水下 **{_d2}**（新增+在池+观察）")
             if watch:
                 P.append(f"- 📎 存量结构观察：**{len(watch)}** 只（超窗口/超价，未入池）")
+            if _gc_rows:
+                _tn = sum(1 for s in _gc_rows if s.get("jc_gap") == 0)
+                _ln = sum(1 for s in (added + kept) if s.get("angle") == "改2"
+                         and not s.get("dif_above") and s.get("gc_mark"))
+                P.append(f"- 🔔 改2 金叉：**{len(_gc_rows)}** 只（今日金叉 {_tn}）"
+                         + (f" ｜ ⚠️金叉后回死叉 {_ln} 只" if _ln else ""))
             if added:
                 P += ["", f"### 🆕 新增（{len(added)}）"]
                 for s in sorted(added, key=lambda x: x["gap"])[:12]:
@@ -593,6 +654,11 @@ def main():
                     P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{_sub(s)}｜突破{s['tp_date']}{_by}｜MACD{s.get('macd_now',0):+.2f}/线{_line_signed(s):+.2f}")
                 if len(added) > 12:
                     P.append(f"- …等共 {len(added)} 只（完整见知识库报告）")
+            if _gc_rows:
+                P += ["", f"### 🔔 改2 金叉（{len(_gc_rows)}）"]
+                for s in sorted(_gc_rows, key=lambda x: (x.get("jc_gap") is None, x.get("jc_gap") or 999))[:10]:
+                    P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{_sub(s)}｜{_gc(s)}"
+                             f"｜MACD{s.get('macd_now',0):+.2f}/线{_line_signed(s):+.2f}")
             if removed:
                 P += ["", f"### 🗑️ 移除（{len(removed)}）"]
                 for s in removed[:8]:
