@@ -1,7 +1,7 @@
 {
  "data_date": "2026-10-29",
  "run_date": "2026-10-29",
- "temp": 28.7,
+ "temp": 28.6,
  "level": "冰点",
  "position_cap": 20,
  "subs": {
@@ -41,11 +41,11 @@
    "date": "2026-10-29"
   },
   "inbull": {
-   "raw": 5.2,
-   "score": 17.3,
+   "raw": 4.98,
+   "score": 16.6,
    "w": 0.09,
    "src": "inbull_scan",
-   "date": "2026-10-28"
+   "date": "2026-10-29"
   }
  },
  "style": {
@@ -61,7 +61,7 @@
  "divergence": {
   "index_vs_emotion": -41.7,
   "breadth_vs_width": -28.6,
-  "structure_vs_inbull": -8.3
+  "structure_vs_inbull": -7.6
  },
  "degraded": false,
  "missing": [],
