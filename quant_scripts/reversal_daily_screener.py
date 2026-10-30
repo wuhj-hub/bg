@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.3）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.4）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -34,6 +34,11 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v8.4·2026-10-30】修「BL_DEEP 阈值塌缩」：突破门槛 = 2×0.618×死叉以来最深绿柱，若本轮死叉
+     只有 1~2 根（金叉死叉一日游），最深绿柱趋近 0 → 门槛塌成 0.04 级别，导致「今天 MACD 刚转正
+     就算已突破」，把深跌后的水下反抽误判成「改1 保持强势」（实例 000410 沈阳机床）。
+     修法：死叉段 < --bl-min-scb（默认3）根时，改用最近 --bl-lookback 根（默认 day60/week20/month12）
+     内最深绿柱作为 BL_DEEP。实测池内 56 只仅 2 只改判（000410、000701），均属误判纠正。
   · 【v8.3·2026-10-30】移出项补齐「当时的形态」：removed 记录合并当前 eval 状态（sub/angle/DIF/DEA/
      金叉/回调深等），修掉旧池条目在移除表里显示「改2·待定」+ 空 DIF/DEA + 回调深为旧值的问题。
   · 【v8.2·2026-10-30】改2 信号「消失」分两类，第二类标注：
@@ -185,7 +190,8 @@ def fetch_batch(codes, period="day", limit=250):
     return out
 
 
-def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bigyang_lookback=0):
+def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bigyang_lookback=0,
+               bl_min_scb=3, bl_lookback=0):
     """对一只股票评估当前状态: 是否'突破2倍后回调不破1倍'，且突破段含中大阳线
     返回 dict(tp_date,tp_val,red_high,pullback,line,valid,big_yang,by_date,by_gain,gap,last_date,last_close) 或 None"""
     if len(rows) < min_bars:
@@ -204,15 +210,21 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bi
         if SC[i]: ls = i
         JCB[i] = None if lj is None else i - lj
         SCB[i] = None if ls is None else i - ls
+    def _bl(idx):
+        """v8.4：死叉以来最深绿柱；死叉段过短（<bl_min_scb 根）时阈值会塌缩（金叉死叉一日游），
+        改用最近 bl_lookback 根内最深绿柱"""
+        scb = int(SCB[idx])
+        st = idx - scb if scb >= max(1, int(bl_min_scb)) else max(0, idx - max(1, int(bl_lookback or 60)))
+        return abs(min(macd[st:idx + 1]))
     i = n - 1
     if SCB[i] is None or JCB[i] is None:
         return None
-    bl = abs(min(macd[max(0, i - int(SCB[i])):i + 1]))
+    bl = _bl(i)          # v8.4：阈值塌缩保护
     tp_bar = None
     for kk in range(max(1, n - lookback_tp), n):
         if SCB[kk] is None:
             continue
-        b2 = abs(min(macd[max(0, kk - int(SCB[kk])):kk + 1]))
+        b2 = _bl(kk)     # v8.4：阈值塌缩保护
         if macd[kk] > 2 * K * b2 and macd[kk] > macd[kk - 1]:
             tp_bar = kk
     if tp_bar is None:
@@ -314,6 +326,10 @@ def main():
     ap.add_argument("--bigyang-lookback", type=int, default=0,
                     help="大阳线区间取「突破日前N根」；默认 day=0(金叉→突破) / week=6 / month=6")
     ap.add_argument("--max-price", type=float, default=10.0)
+    ap.add_argument("--bl-min-scb", type=int, default=3,
+                    help="死叉段最短根数；不足则 BL_DEEP 改用 --bl-lookback 窗口内最深绿柱（v8.4 防阈值塌缩）")
+    ap.add_argument("--bl-lookback", type=int, default=0,
+                    help="死叉段过短时的回退窗口根数；默认 day=60 / week=20 / month=12")
     ap.add_argument("--big-yang-pct", type=float, default=5.0,
                     help="突破段「中大阳线」涨幅阈值(%)，三周期均生效（默认5.0）")
     ap.add_argument("--use-window", action="store_true",
@@ -342,6 +358,8 @@ def main():
     # 最少K线根数：月线 westock 硬上限仅 61 根（--limit 更大也无用），故门槛必须低于 61，
     # 否则月线永远返回 None（v3 时期月线实际从未产出过信号）。40 个月≈3.3 年，EMA26 已预热。
     MIN_BARS = {"day": 80, "week": 60, "month": 40}
+    BLMIN = max(1, a.bl_min_scb)
+    BLLOOK = a.bl_lookback or {"day": 60, "week": 20, "month": 12}[tf]
 
     pool = load_pool(a.pool, a.pool_file)
     if not pool:
@@ -396,7 +414,8 @@ def main():
         if not rows:
             continue
         st = eval_state(rows, big_yang_pct=(a.big_yang_pct / 100.0 if req_bigyang else 0.0),
-                        min_bars=MIN_BARS[tf], bigyang_lookback=bylb)
+                        min_bars=MIN_BARS[tf], bigyang_lookback=bylb,
+                        bl_min_scb=BLMIN, bl_lookback=BLLOOK)
         cur = tracked.get(code)
         # 数据时效（>15天视为停牌/退市）
         if st:
@@ -544,7 +563,7 @@ def main():
                   f"{MAXGAP[tf]} 根约束） ｜ 现价 < {a.max_price:g}元" if nowin else
                   f"新信号窗口：改1 {win} 根 / 改2 {win2} 根（{lbl}） ｜ 现价 < {a.max_price:g}元")),
          (f"> 口径：突破2倍反转数值 → 回调不破1倍反转数值；**仅保留「改2」**——突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱）；纳入不看突破窗口（当前结构构成改2即纳入）" if only2
-          else f"> 口径：突破2倍反转数值后分两角度——**改1（保持强势）**：突破后 MACD 未下水；**入池**需 ★ = AA（MACD>0 且 MACD>2×0.618×死叉以来最深绿柱）且 MACD 上升，**入池后只要 AA 仍成立即继续跟踪**（当日红柱缩量不踢出，跌破突破2倍值才移出）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱），再按最新 K 线 DIF/DEA 位置分 **改2·水上回调**（DIF>0 且 DEA>0）与 **改2·水下回调**（DIF≤0 或 DEA≤0）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
+          else f"> 口径：突破2倍反转数值后分两角度——**改1（保持强势）**：突破后 MACD 未下水；**入池**需 ★ = AA（MACD>0 且 MACD>2×0.618×死叉以来最深绿柱）且 MACD 上升，**入池后只要 AA 仍成立即继续跟踪**（当日红柱缩量不踢出，跌破突破2倍值才移出）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱），再按最新 K 线 DIF/DEA 位置分 **改2·水上回调**（DIF>0 且 DEA>0）与 **改2·水下回调**（DIF≤0 或 DEA≤0）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**；**突破2倍值**内的「死叉以来最深绿柱」若本轮死叉不足 {BLMIN} 根，改用最近 {BLLOOK} 根内最深绿柱（防阈值塌缩）"),
          (f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**（改1 存续不要求当日 MACD 上升）；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；**不限新信号窗口**（结构有效即入池）" if nowin else
           f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；存量观察区限「距突破≤{wmax}根」"), "",
          ((f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
