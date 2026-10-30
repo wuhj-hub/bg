@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.4）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.6）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -34,6 +34,12 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v8.5·2026-10-30】修「line（水下1倍线）塌缩」：改2 的「0.618×金叉以来最高红柱」原用 JCB（最近一次
+     金叉）——若突破之后又金叉（回调结束当天），JCB 归零 → line 塌缩成当日柱值，把「水上深调后刚
+     转正」的票误判成跌破线（实例 华能蒙电 600863 2026-10-30：line 实为 1.34，旧算成 0.20 →
+     valid=False 出池）。改取**突破日所处上涨段**（突破日前最近一次金叉→突破日）的最高红柱。
+     另新增「🔥🔥 重点信号」区块：改2·水上 + MACD 转正（gc_up）**置顶单独展示**（用户 2026-10-30 要求：
+     「像华能蒙电这样由改2水上 MACD 转正的需显著表示」），表格「金叉」列同步显示 🔥水上转正，推送置顶。
   · 【v8.4·2026-10-30】修「BL_DEEP 阈值塌缩」：突破门槛 = 2×0.618×死叉以来最深绿柱，若本轮死叉
      只有 1~2 根（金叉死叉一日游），最深绿柱趋近 0 → 门槛塌成 0.04 级别，导致「今天 MACD 刚转正
      就算已突破」，把深跌后的水下反抽误判成「改1 保持强势」（实例 000410 沈阳机床）。
@@ -233,7 +239,15 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bi
     red_high = max(seg)
     m_low = min(seg)                      # 自突破以来 MACD 最低值（可为负）
     deep = abs(m_low)
-    line = K * max(macd[max(0, i - int(JCB[i])):i + 1])
+    # v8.5：line 的「金叉以来最高红柱」取**突破日所处上涨段**（突破日前最近一次金叉 → 突破日）。
+    #   原用 JCB（最近一次金叉）——突破之后若又金叉（回调结束当天），JCB 归零 → line 塌缩成当日柱值，
+    #   会把「水上深调后刚转正」的票误判为跌破线（华能蒙电 2026-10-30：应为 1.34，旧算 0.20）
+    _lj_pre = 0
+    for _k in range(tp_bar, -1, -1):
+        if JC[_k]:
+            _lj_pre = _k
+            break
+    line = K * max(macd[_lj_pre:tp_bar + 1])
     # ── 需求(2026-10-17)：突破段须出现「中大阳线」（涨幅>=big_yang_pct，涨停板自然满足）──
     #    范围 = 突破日所属「金叉」→「突破日」整段（对应底部反转的启动过程）；by_* 记录涨幅最大的那根阳线
     if bigyang_lookback and int(bigyang_lookback) > 0:
@@ -615,21 +629,24 @@ def main():
         return {"改1": "改1", "改2": "改2·待定"}.get(s.get("angle") or "", "其他")
 
     def _gc(s):
-        """金叉标记（状态+事件双轨）：
+        """金叉标记（状态+事件双轨，🔥=改2·水上+MACD转正）：
         🔔今日金叉 / ✅MM-DD(+N根)  = 当前 DIF>DEA（金叉中）
         ⚠️MM-DD金叉→回死叉        = 入池后曾金叉、当前已再死叉
         —                          = 入池以来未金叉
         ⭐ = 入池日之后发生过金叉"""
         jd = s.get("jc_date") or ""
         up = bool(s.get("gc_up"))
+        hot = bool(up and s.get("sub") == "改2·水上")     # v8.6 重点：水上回调 + 柱转正
         if s.get("dif_above"):
             star = "⭐" if s.get("gc_mark") else ""
             g = s.get("jc_gap")
             if g == 0:
-                return ("🚀今日金叉转正" if up else "🔔今日金叉") + star
+                return ("🔥水上转正" if hot else ("🚀今日金叉转正" if up else "🔔今日金叉")) + star
             if g is not None:
+                if hot:
+                    return f"🔥水上转正(+{g})" + star
                 return (f"🚀{jd[5:]}转正(+{g})" if up else f"✅{jd[5:]}(+{g})") + star
-            return ("🚀金叉转正" if up else "✅金叉中") + star
+            return ("🔥水上转正" if hot else ("🚀金叉转正" if up else "✅金叉中")) + star
         if s.get("gc_mark"):
             return f"⚠️{(s.get('gc_mark') or '')[5:]}金叉→回死叉"
         return "—"
@@ -659,6 +676,19 @@ def main():
     _u2 = sum(1 for s in _all if _sub(s) == "改2·水上")
     _d2 = sum(1 for s in _all if _sub(s) == "改2·水下")
     _t2 = _u2 + _d2
+    # ── 🔥🔥 v8.6 重点信号：改2·水上 + MACD 转正（置顶） ──
+    _hot = [s for s in (added + kept) if s.get("sub") == "改2·水上" and s.get("gc_up")]
+    if _hot:
+        _hot_s = sorted(_hot, key=lambda x: (x.get("jc_gap") is None, x.get("jc_gap") or 999))
+        _hot_today = sum(1 for s in _hot_s if s.get("jc_gap") == 0)
+        L.append("")
+        L.append(f"## 🔥🔥 重点信号 · 改2·水上 转正（{len(_hot_s)}）")
+        L.append("")
+        L.append(f"> **水上死叉回调 → MACD 柱重新翻红**：DIF/DEA 全程在 0 轴上方（强势区回调），"
+                 f"未破水下 1 倍线，回调结束当天转正——改2 里最强的一类，优先级最高。"
+                 f"本期 🔥今日转正 **{_hot_today}** 只。")
+        L.append("")
+        tbl(_hot_s, with_first=True, with_angle=False)
     L.append(f"> 🧭 角度分布（新增+在池+观察）：**改1 保持强势 {_a1} 只** ｜ "
              f"**改2 死叉回调 {_t2} 只**（水上 **{_u2}** / 水下 **{_d2}**）")
     L.append("")
@@ -732,6 +762,12 @@ def main():
             if watch:
                 P.append(f"- 📎 存量结构观察：**{len(watch)}** 只（超窗口/超价，未入池）")
             if _gc_rows:
+                if _hot:
+                    P += ["", f"### 🔥🔥 重点：改2·水上 转正（{len(_hot)}）"]
+                    for s in sorted(_hot, key=lambda x: (x.get("jc_gap") is None, x.get("jc_gap") or 999))[:8]:
+                        P.append(f"- {s['code'][2:]} {s['name']} {s.get('last_close','')}｜突破{s.get('tp_date','')}"
+                                 f"｜回调{s.get('pullback','')}/线{s.get('line','')}"
+                                 f"｜DIF{s.get('dif_now','')}/DEA{s.get('dea_now','')}")
                 if upgraded:
                     P.append(f"- 🚀 改2 转强：**{len(upgraded)}** 只（转改1 "
                              f"{sum(1 for u in upgraded if u.get('up_kind') == '二次突破转改1')} / "
