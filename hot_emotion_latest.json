@@ -1,22 +1,22 @@
 {
- "date": "2026-10-29",
- "total": 38,
- "lianban_cnt": 10,
- "max_lb": 4,
- "shouban": 28,
+ "date": "2026-10-30",
+ "total": 42,
+ "lianban_cnt": 9,
+ "max_lb": 5,
+ "shouban": 33,
  "by_lb": {
-  "4": 2,
+  "5": 1,
   "3": 2,
   "2": 6,
-  "1": 28
+  "1": 33
  },
  "score": {
-  "score": 58,
+  "score": 66,
   "level": "活跃",
   "parts": {
-   "涨停家数": 5,
-   "连板高度": 18,
-   "连板占比": 35
+   "涨停家数": 8,
+   "连板高度": 28,
+   "连板占比": 30
   }
  },
  "persistence": [],
@@ -27,8 +27,8 @@
    "name": "青岛食品",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -39,66 +39,12 @@
    ]
   },
   {
-   "code": "sz002708",
-   "name": "光洋股份",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "汽车零部件",
-    "汽车",
-    "底盘与发动机系统",
-    "飞行汽车(eVTOL)"
-   ]
-  },
-  {
-   "code": "sh600715",
-   "name": "文投控股",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "信托重仓"
-   ]
-  },
-  {
-   "code": "sh601956",
-   "name": "东贝集团",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "家电零部件Ⅲ",
-    "家电零部件Ⅱ",
-    "家用电器",
-    "基金减仓"
-   ]
-  },
-  {
    "code": "sz002172",
    "name": "澳洋健康",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -110,83 +56,12 @@
    ]
   },
   {
-   "code": "sz002526",
-   "name": "山东矿机",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "机械设备",
-    "专用设备"
-   ]
-  },
-  {
-   "code": "sz002862",
-   "name": "实丰文化",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "QFII新进",
-    "基金增仓"
-   ]
-  },
-  {
-   "code": "sz002943",
-   "name": "宇晶股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "机床工具",
-    "基金增仓"
-   ]
-  },
-  {
-   "code": "sh603006",
-   "name": "联明股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "汽车零部件",
-    "汽车",
-    "其他汽车零部件"
-   ]
-  },
-  {
    "code": "sh603131",
    "name": "上海沪工",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -196,6 +71,107 @@
     "通用设备",
     "其他通用设备",
     "机械设备"
+   ]
+  },
+  {
+   "code": "sz002086",
+   "name": "东方海洋",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他农产品加工",
+    "农产品加工"
+   ]
+  },
+  {
+   "code": "sz002275",
+   "name": "桂林三金",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "医药生物"
+   ]
+  },
+  {
+   "code": "sz003032",
+   "name": "传智教育",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "社会服务"
+   ]
+  },
+  {
+   "code": "sh600261",
+   "name": "阳光照明",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "照明设备Ⅲ",
+    "照明设备Ⅱ",
+    "家用电器"
+   ]
+  },
+  {
+   "code": "sh603703",
+   "name": "盛洋科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "电子",
+    "光学光电子",
+    "私募重仓"
+   ]
+  },
+  {
+   "code": "sh605338",
+   "name": "巴比食品",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "食品饮料"
    ]
   }
  ],
