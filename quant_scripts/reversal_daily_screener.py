@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.1）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.2）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -34,6 +34,13 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v8.2·2026-10-30】改2 信号「消失」分两类，第二类标注：
+     ① **跌破 1 倍反转数值** → 本次移除（失败，原逻辑）
+     ② **形成金叉且 MACD 转正**（gc_up = DIF>DEA 且 MACD>0）→ 「🚀 改2 转强标注」，
+        不再是笼统删除。再分两种去向：
+        · 已二次突破 → 角度自动转改1，仍在池按改1 跟踪（池条目标 upgrade_from=改2）
+        · 转正但未二次突破 → 已出池，进转强名单观察（perf 结算原因记「金叉转正」）
+     「金叉」列同步：🚀今日金叉转正 / 🚀MM-DD转正(+N) / ✅金叉未转正 / ⚠️金叉后回死叉。
   · 【v8.1·2026-10-29】池内缺失单只补取：全市场批量偶发丢股（实测 ~6%、池内约 5%），
      导致在池标的当天缺席报告且「在池 N」与「池内合计」不一致；现对池内缺失代码逐只补取（上限60）。
      另修：在池条目 update 键补上 macd_now（此前漏更新，「回调深(MACD)」对改1 会显示入池当天旧值）。
@@ -246,6 +253,8 @@ def eval_state(rows, lookback_tp=120, big_yang_pct=BIG_YANG_PCT, min_bars=80, bi
             "jc_gap": (None if JCB[i] is None else int(JCB[i])),
             "jc_date": (rows[lj][0] if lj is not None else ""),
             "dif_above": bool(dif[i] > dea[i]),
+            # v8.2：金叉且 MACD 转正（改2 结束的第二种方式——转强）
+            "gc_up": bool(dif[i] > dea[i] and macd[i] > 0),
             "sub": ("改1" if m_low > 0 else
                     ("改2·水上" if (dif[i] > 0 and dea[i] > 0) else "改2·水下")),
             "big_yang": big_yang, "by_date": (rows[by_idx][0] if by_idx is not None else ""),
@@ -366,7 +375,11 @@ def main():
     except Exception:
         tracked = {}
 
+    _UPD_KEYS = ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "macd_now",
+                 "angle", "sub", "dif_now", "dea_now", "jc_gap", "jc_date", "dif_above", "gc_up",
+                 "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")
     added, removed, kept, watch = [], [], [], []
+    upgraded = []          # v8.2：改2 结束的第二种方式——金叉+MACD 转正（转强标注）
     for code, name in pool:
         rows = rows_map.get(code)
         if not rows:
@@ -400,6 +413,13 @@ def main():
             elif only2 and st["angle"] != "改2":
                 removed.append({**cur, "code": code, "name": name, "reason": "已非改2"})
                 tracked.pop(code, None)
+            elif cur.get("angle") == "改2" and st.get("angle") == "改2" and st.get("gc_up"):
+                # v8.2 改2 结束·第二种：形成金叉且 MACD 转正（尚未二次突破）→ 出池、转强标注
+                _it = {**cur, **{k: st[k] for k in _UPD_KEYS}, "code": code, "name": name}
+                _it["upgrade_date"] = st.get("last_date") or today
+                _it["up_kind"] = "转正未二次突破"
+                upgraded.append(_it)
+                tracked.pop(code, None)
             elif st["last_close"] >= a.max_price:
                 removed.append({**cur, "code": code, "name": name, "reason": "现价≥上限"})
                 tracked.pop(code, None)
@@ -407,8 +427,14 @@ def main():
                 removed.append({**cur, "code": code, "name": name, "reason": "超过跟踪期"})
                 tracked.pop(code, None)
             else:
-                cur.update({k: st[k] for k in ("tp_date", "tp_val", "red_high", "pullback", "line", "m_low", "macd_now", "angle", "sub", "dif_now", "dea_now", "jc_gap", "jc_date", "dif_above", "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")})
+                _prev_ang = cur.get("angle")
+                cur.update({k: st[k] for k in _UPD_KEYS})
                 cur["name"] = name
+                # v8.2：改2 → 改1（金叉后二次突破）→ 转强标注，仍留在池内按改1 跟踪
+                if cur.get("upgrade_from") != "改2" and _prev_ang == "改2" and st.get("angle") == "改1":
+                    cur["upgrade_from"] = "改2"
+                    cur["upgrade_date"] = st.get("last_date") or ""
+                    upgraded.append({**cur, "code": code, "name": name, "up_kind": "二次突破转改1"})
                 # v8.0：入池后发生过金叉 → 永久标记（事件型，金叉后再死叉也不清除）
                 _jd, _fd = (st.get("jc_date") or ""), (cur.get("first_date") or "")
                 if _jd and _fd and _jd >= _fd:
@@ -481,6 +507,9 @@ def main():
         _upd(it["code"], it["name"], it["first_date"], rows_map.get(it["code"]))
     for it in removed:
         _upd(it["code"], it["name"], it.get("first_date", ""), rows_map.get(it["code"]), it.get("reason", ""))
+    # v8.2：转强出池（转正未二次突破）按「金叉转正」结算
+    for it in [u for u in upgraded if u.get("up_kind") == "转正未二次突破"]:
+        _upd(it["code"], it["name"], it.get("first_date", ""), rows_map.get(it["code"]), "金叉转正")
     with open(perf_fp, "w", encoding="utf-8") as f:
         f.write("code,name,tf,first_date,entry,r5,r10,r20,exit_date,exit_reason,ret_exit\n")
         for k in sorted(perf, key=lambda x: x[1]):
@@ -507,9 +536,10 @@ def main():
           else f"> 口径：突破2倍反转数值后分两角度——**改1（保持强势）**：突破后 MACD 未下水；**入池**需 ★ = AA（MACD>0 且 MACD>2×0.618×死叉以来最深绿柱）且 MACD 上升，**入池后只要 AA 仍成立即继续跟踪**（当日红柱缩量不踢出，跌破突破2倍值才移出）；**改2（死叉回调）**：突破后死叉下水、但不破水下反转数值线（−0.618×金叉以来最高红柱），再按最新 K 线 DIF/DEA 位置分 **改2·水上回调**（DIF>0 且 DEA>0）与 **改2·水下回调**（DIF≤0 或 DEA≤0）；**突破段须出现涨幅≥{a.big_yang_pct:g}% 的中大阳线（涨停板自然满足），区间={_by_desc}**"),
          (f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**（改1 存续不要求当日 MACD 上升）；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；**不限新信号窗口**（结构有效即入池）" if nowin else
           f"> 跟踪规则：并入池后持续跟踪，**改1 跌破突破2倍值 / 改2 跌破1倍反转数值 即删除**；另设「现价≥上限」「超跟踪期({MAXGAP[tf]}根)」移出；存量观察区限「距突破≤{wmax}根」"), "",
-         (f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
-          f"观察 {len(watch)} ｜ 池内合计 {len(tracked)}**" if watch else
-          f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**"),
+         ((f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ "
+           f"观察 {len(watch)} ｜ 池内合计 {len(tracked)}**" if watch else
+           f"**本期：新增 {len(added)} ｜ 在池 {len(kept)} ｜ 移除 {len(removed)} ｜ 池内合计 {len(tracked)}**")
+          + (f" ｜ 🚀改2转强 {len(upgraded)}" if upgraded else "")),
          f"> 📊 入池后历史胜率：{perf_line} ｜ 出池结算（跌破等）：{_agg(10, True)[0]} / 均值 {_agg(10, True)[1]}（n={_agg(10, True)[2]}）", ""]
 
     def tbl(rows, with_reason=False, with_first=False, reason_label="移除原因", with_angle=True):
@@ -561,14 +591,15 @@ def main():
         —                          = 入池以来未金叉
         ⭐ = 入池日之后发生过金叉"""
         jd = s.get("jc_date") or ""
+        up = bool(s.get("gc_up"))
         if s.get("dif_above"):
             star = "⭐" if s.get("gc_mark") else ""
             g = s.get("jc_gap")
             if g == 0:
-                return "🔔今日金叉" + star
+                return ("🚀今日金叉转正" if up else "🔔今日金叉") + star
             if g is not None:
-                return f"✅{jd[5:]}(+{g}){star}"
-            return "✅金叉中" + star
+                return (f"🚀{jd[5:]}转正(+{g})" if up else f"✅{jd[5:]}(+{g})") + star
+            return ("🚀金叉转正" if up else "✅金叉中") + star
         if s.get("gc_mark"):
             return f"⚠️{(s.get('gc_mark') or '')[5:]}金叉→回死叉"
         return "—"
@@ -608,6 +639,18 @@ def main():
     L.append(f"## 📌 在池跟踪（{len(kept)}）")
     L.append("")
     tbl_group(sorted(kept, key=lambda x: x["gap"]))
+    # ── 🚀 v8.2：改2 信号消失的第二种方式——金叉 + MACD 转正（转强标注）──
+    if upgraded:
+        _k1 = [u for u in upgraded if u.get("up_kind") == "二次突破转改1"]
+        _k2 = [u for u in upgraded if u.get("up_kind") == "转正未二次突破"]
+        L.append(f"## 🚀 改2 转强标注（{len(upgraded)}）")
+        L.append("")
+        L.append(f"> 改2 信号**消失**有两种：①**跌破 1 倍反转数值** → 见「本次移除」（失败）；"
+                 f"②**形成金叉且 MACD 转正** → 本节（成功转强）。本期："
+                 f"已二次突破·转改1 **{len(_k1)}** 只（仍在池，按改1 跟踪）"
+                 f" ｜ 转正但未二次突破 **{len(_k2)}** 只（出池，留名单观察）。")
+        L.append("")
+        tbl_group(sorted(upgraded, key=lambda x: x.get("upgrade_date") or "", reverse=True), with_first=True)
     # ── 🔔 改2 金叉标记：池内（含本次新增）当前处于金叉状态的改2 ──
     _gc_rows = [s for s in (added + kept) if s.get("angle") == "改2" and s.get("dif_above")]
     if _gc_rows:
@@ -659,6 +702,10 @@ def main():
             if watch:
                 P.append(f"- 📎 存量结构观察：**{len(watch)}** 只（超窗口/超价，未入池）")
             if _gc_rows:
+                if upgraded:
+                    P.append(f"- 🚀 改2 转强：**{len(upgraded)}** 只（转改1 "
+                             f"{sum(1 for u in upgraded if u.get('up_kind') == '二次突破转改1')} / "
+                             f"转正未突破 {sum(1 for u in upgraded if u.get('up_kind') == '转正未二次突破')}）")
                 _tn = sum(1 for s in _gc_rows if s.get("jc_gap") == 0)
                 _ln = sum(1 for s in (added + kept) if s.get("angle") == "改2"
                          and not s.get("dif_above") and s.get("gc_mark"))
@@ -671,6 +718,11 @@ def main():
                     P.append(f"- {s['code'][2:]} {s['name']} {s['last_close']}｜{_sub(s)}｜突破{s['tp_date']}{_by}｜MACD{s.get('macd_now',0):+.2f}/线{_line_signed(s):+.2f}")
                 if len(added) > 12:
                     P.append(f"- …等共 {len(added)} 只（完整见知识库报告）")
+            if upgraded:
+                P += ["", f"### 🚀 改2 转强（{len(upgraded)}）"]
+                for u in upgraded[:10]:
+                    P.append(f"- {u['code'][2:]} {u['name']} {u.get('last_close','')}｜{u.get('up_kind','')}"
+                             f"｜入池{u.get('first_date','')}｜转强{u.get('upgrade_date','')}")
             if _gc_rows:
                 P += ["", f"### 🔔 改2 金叉（{len(_gc_rows)}）"]
                 for s in sorted(_gc_rows, key=lambda x: (x.get("jc_gap") is None, x.get("jc_gap") or 999))[:10]:
