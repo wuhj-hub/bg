@@ -1,68 +1,75 @@
 {
- "date": "2026-10-29",
- "data_date": "2026-10-29",
+ "date": "2026-10-30",
+ "data_date": "2026-10-30",
  "style": "均衡市",
  "icon": "⚖️",
- "score": 2,
+ "score": -3,
  "score_detail": {
-  "size_style": -17,
-  "limitup_structure": 9,
+  "size_style": -25,
+  "limitup_structure": 13,
   "volume_structure": 0,
-  "sector_fund": 10
+  "sector_fund": 9
  },
  "size_style": {
-  "hs300_5d": 0.14,
-  "hs300_10d": -2.98,
-  "zz1000_5d": -3.03,
-  "zz1000_10d": -4.49,
-  "rel_5d": -3.17,
-  "rel_10d": -1.51,
-  "rel_20d": -7.12,
-  "zz500_5d": -3.03
+  "hs300_5d": -2.92,
+  "hs300_10d": -4.44,
+  "zz1000_5d": -8.51,
+  "zz1000_10d": -7.79,
+  "rel_5d": -5.59,
+  "rel_10d": -3.35,
+  "rel_20d": -8.39,
+  "zz500_5d": -8.05
  },
  "limitup_structure": {
-  "limitup": 38,
-  "strong": 71,
-  "width_score": 48.4,
+  "limitup": 42,
+  "strong": 78,
+  "width_score": 49.6,
   "level": "结构分化（涨少跌多·资金抱团）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 2.3,
-  "zhaban_rate": 53.7,
-  "lianban": 10
+  "strong_ratio": 2.6,
+  "zhaban_rate": 51.2,
+  "lianban": 9
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.779,
-  "small_big_ratio_5d": 0.718
+  "small_big_ratio_now": 0.741,
+  "small_big_ratio_5d": 0.739
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "航天装备Ⅱ",
-    "zdf": "6.84",
-    "main_net5d": -0.2,
-    "retail_net": -10.0,
-    "tag": "游资型"
-   },
-   {
-    "name": "昨日连板",
-    "zdf": "5.21",
-    "main_net5d": -40.4,
-    "retail_net": -0.5,
-    "tag": "游资型"
+    "name": "白酒Ⅱ",
+    "zdf": "3.77",
+    "main_net5d": 6.2,
+    "retail_net": -24.5,
+    "tag": "机构型"
    },
    {
     "name": "半导体",
-    "zdf": "-5.13",
-    "main_net5d": -39.6,
-    "retail_net": 136.6,
+    "zdf": "-5.32",
+    "main_net5d": -124.7,
+    "retail_net": 55.6,
     "tag": "游资型"
    },
    {
-    "name": "通信设备",
-    "zdf": "-8.94",
-    "main_net5d": -78.4,
-    "retail_net": 108.5,
+    "name": "酒店餐饮",
+    "zdf": "4.30",
+    "main_net5d": -0.5,
+    "retail_net": -1.0,
+    "tag": "游资型"
+   },
+   {
+    "name": "银行",
+    "zdf": "0.51",
+    "main_net5d": -13.1,
+    "retail_net": 1.2,
+    "tag": "游资型"
+   },
+   {
+    "name": "元件",
+    "zdf": "-6.21",
+    "main_net5d": -166.6,
+    "retail_net": 12.0,
     "tag": "游资型"
    }
   ]
@@ -70,18 +77,13 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 12,
-   "欧马模式": 3
+   "堆量模式": 15
   },
   "leaders": {
-   "堆量模式": 8,
-   "欧马模式": 2
+   "堆量模式": 10
   },
   "pullbacks": {},
-  "gpoints": {
-   "欧马模式": 2,
-   "堆量模式": 1
-  },
+  "gpoints": {},
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
