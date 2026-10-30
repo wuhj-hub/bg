@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.2）
+"""反转数值 · 日线/周线/月线信号跟踪轮动器（reversal_daily_screener.py · v8.3）
 =====================================================================
 口径（《反转数值MACD指标_优化版_代码》改①）：
   反转数值 = 0.618 × |MACD|
@@ -34,6 +34,8 @@
      （超新信号窗口）的标的单列展示，**不入池、不计胜率**，仅作形态跟踪
   · 【v7.2·2026-10-18】观察区同样要求「现价 < --max-price」——全表（新增/在池/移除/观察）
      价格门槛统一，不再把超价标的混进观察区
+  · 【v8.3·2026-10-30】移出项补齐「当时的形态」：removed 记录合并当前 eval 状态（sub/angle/DIF/DEA/
+     金叉/回调深等），修掉旧池条目在移除表里显示「改2·待定」+ 空 DIF/DEA + 回调深为旧值的问题。
   · 【v8.2·2026-10-30】改2 信号「消失」分两类，第二类标注：
      ① **跌破 1 倍反转数值** → 本次移除（失败，原逻辑）
      ② **形成金叉且 MACD 转正**（gc_up = DIF>DEA 且 MACD>0）→ 「🚀 改2 转强标注」，
@@ -380,6 +382,15 @@ def main():
                  "big_yang", "by_date", "by_gain", "gap", "last_close", "last_date")
     added, removed, kept, watch = [], [], [], []
     upgraded = []          # v8.2：改2 结束的第二种方式——金叉+MACD 转正（转强标注）
+
+    def _mv(cur, st, code, name, reason):
+        """v8.3：移出/转强记录 = 池内旧记录 + **当前形态**（sub/angle/DIF/DEA/金叉等），
+        避免旧池条目缺字段时在报告里显示「改2·待定」、空 DIF/DEA 与陈旧回调深"""
+        base = {**cur}
+        if st:
+            base.update({k: st[k] for k in _UPD_KEYS})
+        base.update({"code": code, "name": name, "reason": reason})
+        return base
     for code, name in pool:
         rows = rows_map.get(code)
         if not rows:
@@ -392,7 +403,7 @@ def main():
             try:
                 if (datetime.now() - datetime.strptime(st["last_date"], "%Y-%m-%d")).days > 15:
                     if cur:
-                        removed.append({**cur, "code": code, "name": name, "reason": "数据停更"})
+                        removed.append(_mv(cur, st, code, name, "数据停更"))
                         tracked.pop(code, None)
                     continue
             except Exception:
@@ -400,7 +411,7 @@ def main():
         if cur:
             # 已有跟踪 → 判定去留
             if not st:
-                removed.append({**cur, "code": code, "name": name, "reason": "结构失效（无突破）"})
+                removed.append(_mv(cur, st, code, name, "结构失效（无突破）"))
                 tracked.pop(code, None)
             elif not st["valid"]:
                 if st.get("angle") == "改1":
@@ -408,10 +419,10 @@ def main():
                     _rs = ("MACD 已下水" if _mn <= 0 else "跌破突破2倍值")
                 else:
                     _rs = "跌破1倍反转数值"
-                removed.append({**cur, "code": code, "name": name, "reason": _rs})
+                removed.append(_mv(cur, st, code, name, _rs))
                 tracked.pop(code, None)
             elif only2 and st["angle"] != "改2":
-                removed.append({**cur, "code": code, "name": name, "reason": "已非改2"})
+                removed.append(_mv(cur, st, code, name, "已非改2"))
                 tracked.pop(code, None)
             elif cur.get("angle") == "改2" and st.get("angle") == "改2" and st.get("gc_up"):
                 # v8.2 改2 结束·第二种：形成金叉且 MACD 转正（尚未二次突破）→ 出池、转强标注
@@ -421,10 +432,10 @@ def main():
                 upgraded.append(_it)
                 tracked.pop(code, None)
             elif st["last_close"] >= a.max_price:
-                removed.append({**cur, "code": code, "name": name, "reason": "现价≥上限"})
+                removed.append(_mv(cur, st, code, name, "现价≥上限"))
                 tracked.pop(code, None)
             elif st["gap"] > MAXGAP[tf]:
-                removed.append({**cur, "code": code, "name": name, "reason": "超过跟踪期"})
+                removed.append(_mv(cur, st, code, name, "超过跟踪期"))
                 tracked.pop(code, None)
             else:
                 _prev_ang = cur.get("angle")
