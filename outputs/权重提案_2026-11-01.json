@@ -1,0 +1,271 @@
+{
+  "date": "2026-11-01",
+  "log_source": "outputs/仲裁信号日志.csv",
+  "log_rows": 1390,
+  "window": "2026-08-11~2026-10-30",
+  "min_days": 3,
+  "bench": "sh000001",
+  "rule": "winrate>=60%&n>=10 → +1 ; winrate<=40%&n>=10 → -1 ; 其余 hold",
+  "proposals": [
+    {
+      "signal_source": "四维高置信",
+      "n": 1073,
+      "winrate": 0.107,
+      "posterior_winrate": 0.107,
+      "prior_winrate": null,
+      "avg_ret": -15.037,
+      "avg_excess": -10.68,
+      "weight_current": 3,
+      "weight_suggested": 2,
+      "action": "-1",
+      "config_keys": [
+        "四维高置信"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "四维弱共振",
+      "n": 82,
+      "winrate": 0.268,
+      "posterior_winrate": 0.268,
+      "prior_winrate": null,
+      "avg_ret": -7.471,
+      "avg_excess": -2.31,
+      "weight_current": 1,
+      "weight_suggested": 0,
+      "action": "-1",
+      "config_keys": [
+        "四维弱共振"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "四维否决",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": -3,
+      "weight_suggested": -3,
+      "action": "hold",
+      "config_keys": [
+        "四维否决"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "鱼身空中加油",
+      "n": 90,
+      "winrate": 0.189,
+      "posterior_winrate": 0.241,
+      "prior_winrate": 0.477,
+      "avg_ret": -13.685,
+      "avg_excess": -8.183,
+      "weight_current": 2,
+      "weight_suggested": 1,
+      "action": "-1",
+      "config_keys": [
+        "鱼身空中加油"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "猛兽Setup60",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": 3,
+      "weight_suggested": 3,
+      "action": "hold",
+      "config_keys": [
+        "猛兽Setup60"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "猛兽Setup50",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": 1,
+      "weight_suggested": 1,
+      "action": "hold",
+      "config_keys": [
+        "猛兽Setup50"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "猛兽Setup40",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": 0,
+      "weight_suggested": 0,
+      "action": "hold",
+      "config_keys": [
+        "猛兽Setup40"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "猛兽RS_D",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": 1,
+      "weight_suggested": 1,
+      "action": "hold",
+      "config_keys": [
+        "猛兽RS_D"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "猛兽G点",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": 1,
+      "weight_suggested": 1,
+      "action": "hold",
+      "config_keys": [
+        "猛兽G点"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "双弦共振",
+      "n": 543,
+      "winrate": 0.094,
+      "posterior_winrate": 0.094,
+      "prior_winrate": null,
+      "avg_ret": -15.279,
+      "avg_excess": -9.637,
+      "weight_current": 1,
+      "weight_suggested": 0,
+      "action": "-1",
+      "config_keys": [
+        "双弦共振"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "乾坤A级",
+      "n": 118,
+      "winrate": 0.288,
+      "posterior_winrate": 0.288,
+      "prior_winrate": null,
+      "avg_ret": -2.878,
+      "avg_excess": 2.361,
+      "weight_current": 2,
+      "weight_suggested": 2,
+      "action": "hold",
+      "config_keys": [
+        "乾坤A级"
+      ],
+      "note": ""
+    },
+    {
+      "signal_source": "武威精选",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": 2,
+      "weight_suggested": 2,
+      "action": "hold",
+      "config_keys": [],
+      "note": "该信号源暂无外置配置键"
+    },
+    {
+      "signal_source": "反转数值",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": 1,
+      "weight_suggested": 1,
+      "action": "hold",
+      "config_keys": [],
+      "note": "该信号源暂无外置配置键"
+    },
+    {
+      "signal_source": "123/2B",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": null,
+      "weight_suggested": null,
+      "action": "hold",
+      "config_keys": [],
+      "note": "该信号源暂无外置配置键"
+    },
+    {
+      "signal_source": "RSV-launch",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": null,
+      "weight_suggested": null,
+      "action": "hold",
+      "config_keys": [],
+      "note": "该信号源暂无外置配置键"
+    },
+    {
+      "signal_source": "RSV-hold",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": null,
+      "weight_suggested": null,
+      "action": "hold",
+      "config_keys": [],
+      "note": "该信号源暂无外置配置键"
+    },
+    {
+      "signal_source": "RSV-exit",
+      "n": 0,
+      "winrate": null,
+      "posterior_winrate": null,
+      "prior_winrate": null,
+      "avg_ret": null,
+      "avg_excess": null,
+      "weight_current": null,
+      "weight_suggested": null,
+      "action": "hold",
+      "config_keys": [],
+      "note": "该信号源暂无外置配置键"
+    }
+  ]
+}
