@@ -1,7 +1,7 @@
-# 🔍 产物入库审计 · 2026-11-02
+# 🔍 产物入库审计 · 2026-11-03
 
-> 扫描 93 个产出路径 / 116 个提交路径 / 31 个消费读取路径
-> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **10** ｜ ✅ 已提交 **83** ｜ ❔ 提交但未见生成 46 ｜ 🧬 陈旧副本 **0**
+> 扫描 97 个产出路径 / 116 个提交路径 / 31 个消费读取路径
+> 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **14** ｜ ✅ 已提交 **83** ｜ ❔ 提交但未见生成 46 ｜ 🧬 陈旧副本 **0**
 
 ## 🟡 写而未提交（其余，多为研究/一次性产物）
 
@@ -12,11 +12,15 @@
 | `em_industry.json` | quant_scripts/inbull_scan.py |
 | `kline_{var}_{var}_{var}.json` | quant_scripts/fetch.py |
 | `sw_l1_industry.json` | quant_scripts/inbull_scan.py |
+| `ww_period_{var}_auto.csv` | quant_scripts/wuwei_scan_month.py |
+| `ww_period_{var}_full.csv` | quant_scripts/wuwei_scan_month.py, quant_scripts/wuwei_v21_filter.py |
+| `ww_period_{var}_v21.csv` | quant_scripts/wuwei_v21_filter.py |
+| `ww_period_{var}_v21.md` | quant_scripts/wuwei_v21_filter.py |
 | `入牛阈值漂移_{var}.md` | quant_scripts/inbull_threshold_monitor.py |
 | `拥挤度监控_{var}.json` | quant_scripts/crowding_watch.py |
 | `拥挤度监控_{var}.md` | quant_scripts/crowding_watch.py |
-| `月线选股_{var}.md` | quant_scripts/month_screen.py |
 | `权重提案_{var}.json` | quant_scripts/learn_weights.py |
+| `衔接_{var}.md` | quant_scripts/month_screen.py |
 
 ## ✅ 已提交
 
@@ -77,5 +81,5 @@
 
 | 产物 | 根日期 | outputs日期 | 判定 |
 |---|---|---|---|
-| `sector_component_em.json` | 2026-10-30 | 2026-10-30 | 同步 |
+| `sector_component_em.json` | 2026-11-02 | 2026-11-02 | 同步 |
 | `xihu_breadth_history.json` | 2024-06-11 | 2024-06-11 | 同步 |
