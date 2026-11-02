@@ -85,22 +85,30 @@ jobs:
           IMA_OVERWRITE: '1'
         run: |
           python3 quant_scripts/month_screen.py --push
-          F=$(ls -t outputs/衔接_*.md 2>/dev/null | head -1)
-          if [ -n "$F" ]; then
-            echo "报告: $F"
-            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "::warning::衔接月线上传知识库失败"
-          else
-            echo "::error::未生成衔接月线报告"; exit 1
-          fi
+          CM=$(date +%Y-%m)
+          PM=$(date -d "$(date +%Y-%m-01) -1 month" +%Y-%m 2>/dev/null || date -v-1m +%Y-%m)
+          OK=""
+          for M in "$PM" "$CM"; do
+            F="outputs/衔接_${M}.md"
+            if [ -f "$F" ]; then
+              echo "报告: $F ($(wc -c < "$F") bytes)"
+              python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "::warning::$F 上传知识库失败"
+              OK="$OK $F"
+            fi
+          done
+          if [ -z "$OK" ]; then echo "::error::未生成衔接月线报告"; exit 1; fi
           python3 git_api_commit.py --msg "chore: 衔接月线扫描 $(date +%Y-%m)" \
-            "$F" outputs/month_screen_latest.json || echo "::warning::衔接月线产物提交失败"
+            $OK outputs/month_screen_latest.json || echo "::warning::衔接月线产物提交失败"
 
       - name: 产物校验
         if: always()
         continue-on-error: true
         run: |
-          F=$(ls -t outputs/衔接_*.md 2>/dev/null | head -1)
-          if [ -z "$F" ] || [ ! -s "$F" ]; then
-            echo "::error::衔接月线报告缺失或为空"; exit 1
+          N=$(ls -1 outputs/衔接_*.md 2>/dev/null | wc -l)
+          if [ "$N" -eq 0 ]; then
+            echo "::error::衔接月线报告缺失"; exit 1
           fi
-          echo "产物 OK: $F ($(wc -c < "$F") bytes)"
+          for F in outputs/衔接_*.md; do
+            [ -s "$F" ] || { echo "::error::$F 为空"; exit 1; }
+            echo "产物 OK: $F ($(wc -c < "$F") bytes)"
+          done
