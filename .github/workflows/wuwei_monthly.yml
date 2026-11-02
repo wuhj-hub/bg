@@ -81,6 +81,8 @@ jobs:
       IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
       IMA_KB_ID: ima_kb_fBvz4Y3t
       IMA_FOLDER_ID: folder_7484032975660724
+      IMA_OVERWRITE: '1'          # 修 bug 重跑同月时覆盖知识库旧版（否则默认同名跳过，人看的是旧报告）
+      WUWEI_SOURCE: day           # 取数口径：day=日线聚合月线(默认, 快4~5倍) / month=月线接口直取
     steps:
       - uses: actions/checkout@v4
 
@@ -106,8 +108,10 @@ jobs:
       - name: Step1 G1 全市场月线初筛
         run: |
           echo "目标月份: $PERIOD"
-          python3 quant_scripts/wuwei_scan_month.py --full --period "$PERIOD" --list all_mainboard.csv
+          python3 quant_scripts/wuwei_scan_month.py --full --period "$PERIOD" --list all_mainboard.csv \
+            --cache-out "outputs/ww_period_${PERIOD}_ml.json"
           test -f "outputs/ww_period_${PERIOD}_full.csv" || { echo "::error::G1 未产出"; exit 1; }
+          echo "G1 信号数: $(($(wc -l < "outputs/ww_period_${PERIOD}_full.csv") - 1))"
 
       - name: Step2 v2.1 质量过滤 + 六维评分
         run: |
