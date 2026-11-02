@@ -1,5 +1,5 @@
 {
- "date": "2026-11-02",
+ "date": "2026-11-03",
  "writes": {
   "信号仲裁_latest.json": [
    ".github/workflows/quant_report.yml",
@@ -137,6 +137,13 @@
   "王者突破_{var}.md": [
    "quant_scripts/wangzhe_breakout.py"
   ],
+  "ww_period_{var}_auto.csv": [
+   "quant_scripts/wuwei_scan_month.py"
+  ],
+  "ww_period_{var}_full.csv": [
+   "quant_scripts/wuwei_scan_month.py",
+   "quant_scripts/wuwei_v21_filter.py"
+  ],
   "premarket_judgment_.json": [
    "quant_scripts/env_compare.py",
    "quant_scripts/env_engine.py",
@@ -195,10 +202,16 @@
   "attrib_latest.json": [
    "quant_scripts/attrib.py"
   ],
+  "ww_period_{var}_v21.csv": [
+   "quant_scripts/wuwei_v21_filter.py"
+  ],
+  "ww_period_{var}_v21.md": [
+   "quant_scripts/wuwei_v21_filter.py"
+  ],
   "yao_pool.txt": [
    "quant_scripts/yao_gu_pool.py"
   ],
-  "月线选股_{var}.md": [
+  "衔接_{var}.md": [
    "quant_scripts/month_screen.py"
   ],
   "month_screen_latest.json": [
@@ -864,11 +877,15 @@
   "em_industry.json",
   "kline_{var}_{var}_{var}.json",
   "sw_l1_industry.json",
+  "ww_period_{var}_auto.csv",
+  "ww_period_{var}_full.csv",
+  "ww_period_{var}_v21.csv",
+  "ww_period_{var}_v21.md",
   "入牛阈值漂移_{var}.md",
   "拥挤度监控_{var}.json",
   "拥挤度监控_{var}.md",
-  "月线选股_{var}.md",
-  "权重提案_{var}.json"
+  "权重提案_{var}.json",
+  "衔接_{var}.md"
  ],
  "ok": [
   "123_2b_latest.json",
@@ -1006,8 +1023,8 @@
  "dup_freshness": [
   {
    "name": "sector_component_em.json",
-   "root": "2026-10-30",
-   "outputs": "2026-10-30",
+   "root": "2026-11-02",
+   "outputs": "2026-11-02",
    "status": "同步"
   },
   {
