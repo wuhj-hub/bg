@@ -110,6 +110,39 @@ def fetch_klines(codes, cache_file=None):
     return cache
 
 
+# ---------------- 时效判断（退市/长期停牌过滤 + 月线完整性） ----------------
+STALE_DAYS = int(os.environ.get('MS_STALE_DAYS', '45'))
+_REF_DATE = None
+
+
+def days_since(dstr, ref=None):
+    """dstr='YYYY-MM-DD' 距参考日（默认今天）的天数；解析失败返回 99999"""
+    from datetime import date as _d
+    try:
+        y, m, d = (int(x) for x in dstr.split('-'))
+        ref = ref or _d.today()
+        return (ref - _d(y, m, d)).days
+    except Exception:
+        return 99999
+
+
+def month_complete(bar_date, today=None):
+    """最新月线 bar 所属月是否已经走完（≈ 今天是否过了该月最后一个工作日）"""
+    import calendar
+    from datetime import date as _d, timedelta as _td
+    today = today or _d.today()
+    try:
+        by, bm = int(bar_date[:4]), int(bar_date[5:7])
+    except Exception:
+        return True
+    if (by, bm) != (today.year, today.month):
+        return True
+    last = today.replace(day=calendar.monthrange(today.year, today.month)[1])
+    while last.weekday() > 4:
+        last -= _td(days=1)
+    return today >= last
+
+
 # ---------------- 指标计算 ----------------
 def hv_true(mask, N, t):
     if t < 0:
@@ -275,10 +308,13 @@ def tbl2(lst):
     return h + '\n'.join(rows) + '\n'
 
 
-def render(res, scanned, skipped, bar_date, cur_month_open=True):
+def render(res, scanned, skipped, bar_date, cur_month_open=True, stale=0):
     s1, s2 = res[0]['指标1'], res[0]['指标2']
+    ym = bar_date[:7]
+    stat = ("月线已走完" if not cur_month_open else "月线未走完")
     md = [f"# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）\n",
-          f"**数据日期**：{bar_date}　**有效标的**：{scanned} 只（剔除 {skipped} 只：非主板/ST/停牌退市/数据不足）\n",
+          f"**最新月线**：{ym}（{stat}，末根 {bar_date}）　**有效标的**：{scanned} 只"
+          f"（剔除 {skipped} 只数据不足/非主板/ST，另剔除 {stale} 只退市或长期停牌）\n",
           "**数据口径**：腾讯前复权月线（含成交量，单只最长 302 根）；名称与 ST 状态取实时行情快照\n"]
     if cur_month_open:
         md.append("\n> ⚠️ 当月月线尚未走完，下列「本月信号」为月内成立状态，需月末收盘确认。\n")
@@ -303,7 +339,8 @@ def render(res, scanned, skipped, bar_date, cur_month_open=True):
 - CROSS(A,B)：A 当根 > B 且上一根 A ≤ B；COUNT/EXIST 窗口含当根；HHVBARS 取窗口内最近一次为真的距离（窗口内无则视作 0，被 `>0` 过滤）
 - 起爆量 = REF(VM5, HHVBARS(VM5,560))/2；560 月超过 A 股全部历史，实际取该股全部可得月线（最长 302 根）中最大 5 月均量的一半
 - 前复权对分红累计大的老股早期会出现负价，EMA 从最后一个非正价之后起算（规避），最近 10 根的均线不受影响
-- 剔除规则：创业板 300/301、科创板 688/689、北交所、ST/*ST（按实时简称判定）
+- 剔除规则：创业板 300/301、科创板 688/689、北交所、ST/*ST（按实时简称判定）；
+  最新月线距今天 > 45 天视为退市/长期停牌并剔除（避免历史退市股按其末根K线误入信号）
 """)
     return '\n'.join(md)
 
@@ -345,10 +382,13 @@ def main():
     cache = fetch_klines(codes, a.cache)
     res = {k: {'指标1': [], '指标2': []} for k in range(a.months)}
     scanned = 0; skipped = 0; bar_dates = {}
+    stale = 0
     for code in codes:
         rows = cache.get(code) or []
         if not rows:
             skipped += 1; continue
+        if days_since(rows[-1][0]) > STALE_DAYS:   # 退市/长期停牌：最新月线过旧
+            stale += 1; continue
         try:
             x = compute(rows)
         except Exception:
@@ -373,9 +413,9 @@ def main():
         print(f'[error] 有效标的仅 {scanned}/{len(codes)}，数据源异常，终止'); return 1
     bar_date = max(bar_dates, key=bar_dates.get) if bar_dates else a.date
     ym = bar_date[:7]
-    # 当月未走完判断：最新 bar 日期不是月末最后交易日（用"日期年月 == 今天年月 且 今天 < 月末"近似）
-    cur_open = (bar_date[:7] == a.date[:7])
-    md = render(res, scanned, skipped, bar_date, cur_open)
+    # 当月是否已走完：最新 bar 属本月 **且** 今天还没到本月最后一个工作日 → 未走完
+    cur_open = not month_complete(bar_date)
+    md = render(res, scanned, skipped, bar_date, cur_open, stale=stale)
 
     os.makedirs(a.outdir, exist_ok=True)
     p_md = os.path.join(a.outdir, f'衔接_{ym}.md')
