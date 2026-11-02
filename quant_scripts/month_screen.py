@@ -308,12 +308,18 @@ def tbl2(lst):
     return h + '\n'.join(rows) + '\n'
 
 
-def render(res, scanned, skipped, bar_date, cur_month_open=True, stale=0):
+def render(res, scanned, skipped, bar_date, cur_month_open=True, stale=0, label=None):
     s1, s2 = res[0]['指标1'], res[0]['指标2']
     ym = bar_date[:7]
     stat = ("月线已走完" if not cur_month_open else "月线未走完")
-    md = [f"# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）\n",
-          f"**最新月线**：{ym}（{stat}，末根 {bar_date}）　**有效标的**：{scanned} 只"
+    if label:
+        info = f"**数据截止**：{label} 月线（完整）"
+        title = f"# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）· {label} 完整版\n"
+    else:
+        info = f"**最新月线**：{ym}（{stat}，末根 {bar_date}）"
+        title = "# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）\n"
+    md = [title,
+          f"{info}　**有效标的**：{scanned} 只"
           f"（剔除 {skipped} 只数据不足/非主板/ST，另剔除 {stale} 只退市或长期停牌）\n",
           "**数据口径**：腾讯前复权月线（含成交量，单只最长 302 根）；名称与 ST 状态取实时行情快照\n"]
     if cur_month_open:
@@ -423,18 +429,40 @@ def main():
     # 当月未走完时，额外落一份「上月完整版」：
     # 月初补跑产出的文件名是本月（当月已有bar），若只写本月文件，gate 检查的
     # outputs/衔接_{上月}.md 永远不存在 → 月初前5个交易日天天重跑（死循环）。
-    if cur_open and len(res) > 1:
+    if cur_open:
         prev_ym = (time.strftime('%Y-%m', time.localtime(
             time.mktime(time.strptime(bar_date[:10], '%Y-%m-%d')) - 86400 * 28)))
-        res_prev = {0: res[1]}
-        if 2 in res:
-            res_prev[1] = res[2]
-        md_prev = render(res_prev, scanned, skipped, bar_date, False, stale=stale)
-        md_prev = md_prev.replace('# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）',
-                                  f'# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）· {prev_ym} 完整版', 1)
+        # 用「剔除当月未完成 bar」的数据重算上月，避免半个当月的成交量污染
+        # 起爆量(VM5全历史最大值)与均线，导致上月信号与真实值不符
+        res_prev = {0: [], 1: []}
+        cur_m = bar_date[:7]
+        for code in codes:
+            rows = cache.get(code) or []
+            if not rows or days_since(rows[-1][0]) > STALE_DAYS:
+                continue
+            rows_prev = rows[:-1] if rows[-1][0][:7] == cur_m else rows
+            if len(rows_prev) < 25:
+                continue
+            try:
+                xp = compute(rows_prev)
+            except Exception:
+                continue
+            if xp is None:
+                continue
+            t = xp['n'] - 1
+            if t < 20:
+                continue
+            r = eval_at(xp, t)
+            r['code'] = code
+            r['name'] = snap.get(code, {}).get('name', '')
+            if r['XG1']:
+                res_prev[0].append(r)
+            if r['A5']:
+                res_prev[1].append(r)
+        md_prev = render(res_prev, scanned, skipped, bar_date, False, stale=stale, label=prev_ym)
         p_prev = os.path.join(a.outdir, f'衔接_{prev_ym}.md')
         open(p_prev, 'w').write(md_prev)
-        print(f'[out] {p_prev}（上月完整版）')
+        print(f'[out] {p_prev}（{prev_ym} 完整版：指标1={len(res_prev[0])} 指标2={len(res_prev[1])}）')
 
     payload = {'bar_date': bar_date, 'scanned': scanned, 'skipped': skipped,
                '指标1': {str(k): res[k]['指标1'] for k in res},
