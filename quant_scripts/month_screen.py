@@ -420,6 +420,22 @@ def main():
     os.makedirs(a.outdir, exist_ok=True)
     p_md = os.path.join(a.outdir, f'衔接_{ym}.md')
     open(p_md, 'w').write(md)
+    # 当月未走完时，额外落一份「上月完整版」：
+    # 月初补跑产出的文件名是本月（当月已有bar），若只写本月文件，gate 检查的
+    # outputs/衔接_{上月}.md 永远不存在 → 月初前5个交易日天天重跑（死循环）。
+    if cur_open and len(res) > 1:
+        prev_ym = (time.strftime('%Y-%m', time.localtime(
+            time.mktime(time.strptime(bar_date[:10], '%Y-%m-%d')) - 86400 * 28)))
+        res_prev = {0: res[1]}
+        if 2 in res:
+            res_prev[1] = res[2]
+        md_prev = render(res_prev, scanned, skipped, bar_date, False, stale=stale)
+        md_prev = md_prev.replace('# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）',
+                                  f'# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）· {prev_ym} 完整版', 1)
+        p_prev = os.path.join(a.outdir, f'衔接_{prev_ym}.md')
+        open(p_prev, 'w').write(md_prev)
+        print(f'[out] {p_prev}（上月完整版）')
+
     payload = {'bar_date': bar_date, 'scanned': scanned, 'skipped': skipped,
                '指标1': {str(k): res[k]['指标1'] for k in res},
                '指标2': {str(k): res[k]['指标2'] for k in res}}
