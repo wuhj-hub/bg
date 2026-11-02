@@ -155,12 +155,15 @@ def score(sig_type, support, shrink_max, fst):
     return total, (s_signal, s_support, s_shrink, s_fin, s_market, s_price)
 
 
-def decide(sig_type, support, fst, total):
-    """一票否决 + 仓位决策（依据 v2.1 决策规则）"""
+def decide(sig_type, support, fst, total, close=None, max_price=None):
+    """一票否决 + 仓位决策（依据 v2.1 决策规则）。
+    判定顺序：亏损 → 浅支撑 → 股价超上限 → 重仓/轻仓"""
     if fst == "亏损":
         return "否决", "亏损股(一票否决)"
     if support < 0.05:
         return "否决", "浅支撑<5%(一票否决)"
+    if max_price and close is not None and close >= max_price:
+        return "超价", f"股价{close:.2f}≥{max_price:g}元(超出范围)"
     if sig_type == "双阴" and support >= 0.05 and fst == "盈利" and total >= 75:
         return "重仓", "双阴+深支撑+盈利+评分≥75 ★"
     if sig_type == "一阴" and support >= 0.05:
@@ -173,6 +176,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--period", required=True, help="月份 YYYYMM")
     ap.add_argument("--input", default=None, help="G1 结果 CSV（默认 ww_period_{PERIOD}_full.csv）")
+    ap.add_argument("--max-price", type=float, default=10.0,
+                    help="股价上限（目标月收盘，≥该值归「超价」不入池；0=不过滤）")
     a = ap.parse_args()
     period = a.period
     inp = a.input or os.path.join(OUT, f"ww_period_{period}_full.csv")
@@ -220,7 +225,7 @@ def main():
             ratios.append(k3["vol"] / k2["vol"])
             ratios.append(k4r["vol"] / k2["vol"])
         shrink_max = max(ratios) if ratios else 1.0
-        return code, name, res, support, shrink_max
+        return code, name, res, support, shrink_max, float(k4r["close"])
 
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex:
@@ -235,13 +240,13 @@ def main():
 
     # 评分 + 决策
     out_rows = []
-    for code, name, res, support, shrink_max in results:
+    for code, name, res, support, shrink_max, close in results:
         npv, ed = fin.get(code, ("", ""))
         fst = status_of(npv)
         total, _ = score(res, support, shrink_max, fst)
-        decision, reason = decide(res, support, fst, total)
+        decision, reason = decide(res, support, fst, total, close, a.max_price)
         out_rows.append({
-            "code": code, "name": name, "signal": res,
+            "code": code, "name": name, "signal": res, "close": round(close, 2),
             "support_pct": round(support * 100, 2),
             "shrink_max_pct": round(shrink_max * 100, 1),
             "finance": fst, "net_profit": npv, "report_end": ed,
@@ -252,10 +257,10 @@ def main():
     csv_path = os.path.join(OUT, f"ww_period_{period}_v21.csv")
     with open(csv_path, "w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["code", "name", "signal", "support_pct", "shrink_max_pct",
+        w.writerow(["code", "name", "signal", "close", "support_pct", "shrink_max_pct",
                     "finance", "net_profit", "report_end", "score", "decision", "reason"])
         for r in out_rows:
-            w.writerow([r["code"], r["name"], r["signal"], r["support_pct"], r["shrink_max_pct"],
+            w.writerow([r["code"], r["name"], r["signal"], r["close"], r["support_pct"], r["shrink_max_pct"],
                         r["finance"], r["net_profit"], r["report_end"], r["score"], r["decision"], r["reason"]])
 
     # 汇总
@@ -263,6 +268,7 @@ def main():
     n_light = sum(1 for r in out_rows if r["decision"] == "轻仓")
     n_obs = sum(1 for r in out_rows if r["decision"] == "轻仓/观望")
     n_veto = sum(1 for r in out_rows if r["decision"] == "否决")
+    n_over = sum(1 for r in out_rows if r["decision"] == "超价")
     n_profit = sum(1 for r in out_rows if r["finance"] == "盈利")
     n_loss = sum(1 for r in out_rows if r["finance"] == "亏损")
     n_nodata = sum(1 for r in out_rows if r["finance"] == "无数据")
@@ -272,29 +278,39 @@ def main():
     with open(md_path, "w", encoding="utf-8") as f:
         f.write(f"# 武威 v2.1 质量过滤 · 精选池（{period}）\n\n")
         f.write(f"- 输入：G1 全市场月线扫描 **{len(g1)}** 只 → 月线有效 **{len(results)}** 只\n")
-        f.write("- 规则：六维评分 + 一票否决（浅支撑<5% / 亏损股放弃），详见《武威评分标准_v2.1_回测校准版》\n")
+        f.write(f"- 规则：六维评分 + 一票否决（浅支撑<5% / 亏损股放弃），详见《武威评分标准_v2.1_回测校准版》\n")
+        f.write(f"- 股价上限：{'不限' if not a.max_price else f'< {a.max_price:g} 元'}（按 {period} 月末收盘价）\n")
         f.write("- 配套 SOP：《武威实战SOP_G1初筛_v2.1过滤_MA20止盈》\n\n")
         f.write("## 一、总体统计\n\n")
         f.write(f"- 重仓（★ 双阴+深支撑+盈利+评分≥75）：**{n_heavy}**\n")
         f.write(f"- 轻仓（一阴深支撑 / 未达重仓）：**{n_light}**\n")
         f.write(f"- 轻仓/观望：**{n_obs}**\n")
         f.write(f"- 否决（浅支撑 / 亏损）：**{n_veto}**\n")
+        f.write(f"- 超价（股价≥{a.max_price:g}元，不入池）：**{n_over}**\n" if a.max_price else "")
         f.write(f"- 基本面：盈利 {n_profit} / 亏损 {n_loss} / 无数据 {n_nodata}\n\n")
         f.write("## 二、重仓精选池（★）\n\n")
-        f.write("| 代码 | 名称 | 信号 | 支撑% | 缩量max% | 基本面 | 评分 | 报告期 |\n|---|---|---|---|---|---|---|---|\n")
+        f.write("| 代码 | 名称 | 信号 | 收盘 | 支撑% | 缩量max% | 基本面 | 评分 | 报告期 |\n|---|---|---|---|---|---|---|---|---|\n")
         for r in sorted([x for x in out_rows if x["decision"] == "重仓"], key=lambda x: -x["score"]):
-            f.write(f"| {r['code']} | {r['name']} | {r['signal']} | {r['support_pct']} | {r['shrink_max_pct']} | {r['finance']} | {r['score']} | {r['report_end']} |\n")
+            f.write(f"| {r['code']} | {r['name']} | {r['signal']} | {r['close']} | {r['support_pct']} | {r['shrink_max_pct']} | {r['finance']} | {r['score']} | {r['report_end']} |\n")
         f.write("\n## 三、轻仓 / 观望池\n\n")
-        f.write("| 代码 | 名称 | 信号 | 支撑% | 缩量max% | 基本面 | 评分 | 决策 | 原因 |\n|---|---|---|---|---|---|---|---|---|\n")
+        f.write("| 代码 | 名称 | 信号 | 收盘 | 支撑% | 缩量max% | 基本面 | 评分 | 决策 | 原因 |\n|---|---|---|---|---|---|---|---|---|---|\n")
         for r in sorted([x for x in out_rows if x["decision"] in ("轻仓", "轻仓/观望")], key=lambda x: -x["score"]):
-            f.write(f"| {r['code']} | {r['name']} | {r['signal']} | {r['support_pct']} | {r['shrink_max_pct']} | {r['finance']} | {r['score']} | {r['decision']} | {r['reason']} |\n")
+            f.write(f"| {r['code']} | {r['name']} | {r['signal']} | {r['close']} | {r['support_pct']} | {r['shrink_max_pct']} | {r['finance']} | {r['score']} | {r['decision']} | {r['reason']} |\n")
         f.write("\n## 四、否决池（浅支撑 / 亏损）\n\n")
-        f.write("| 代码 | 名称 | 信号 | 支撑% | 基本面 | 原因 |\n|---|---|---|---|---|---|\n")
+        f.write("| 代码 | 名称 | 信号 | 收盘 | 支撑% | 基本面 | 原因 |\n|---|---|---|---|---|---|---|\n")
         for r in [x for x in out_rows if x["decision"] == "否决"]:
-            f.write(f"| {r['code']} | {r['name']} | {r['signal']} | {r['support_pct']} | {r['finance']} | {r['reason']} |\n")
+            f.write(f"| {r['code']} | {r['name']} | {r['signal']} | {r['close']} | {r['support_pct']} | {r['finance']} | {r['reason']} |\n")
+
+        over = sorted([x for x in out_rows if x["decision"] == "超价"], key=lambda x: (x["signal"] != "双阴", -x["score"]))
+        if over:
+            f.write(f"\n## 五、股价超限（≥{a.max_price:g}元，不入池）\n\n")
+            f.write("| 代码 | 名称 | 信号 | 收盘 | 支撑% | 缩量max% | 基本面 | 评分 |\n|---|---|---|---|---|---|---|---|\n")
+            for r in over:
+                f.write(f"| {r['code']} | {r['name']} | {r['signal']} | {r['close']} | {r['support_pct']} | {r['shrink_max_pct']} | {r['finance']} | {r['score']} |\n")
+            f.write(f"\n> 这 {len(over)} 只形态/评分均达标，仅因股价超 {a.max_price:g} 元未入池，可作放宽价格上限时的备选。\n")
         f.write("\n> 本精选池为量化历史规律总结，非投资建议；实战需结合实时行情、大盘温度计动态调整，并严格按 SOP 执行 MA20 止盈与硬止损。\n")
 
-    print(f"[v21] done -> {csv_path} + {md_path}  (重仓{n_heavy}/轻仓{n_light}/观望{n_obs}/否决{n_veto})", file=sys.stderr)
+    print(f"[v21] done -> {csv_path} + {md_path}  (重仓{n_heavy}/轻仓{n_light}/观望{n_obs}/否决{n_veto}/超价{n_over})", file=sys.stderr)
 
 
 if __name__ == "__main__":
