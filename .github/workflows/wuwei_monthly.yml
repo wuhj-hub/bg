@@ -83,6 +83,7 @@ jobs:
       IMA_FOLDER_ID: folder_7484032975660724
       IMA_OVERWRITE: '1'          # 修 bug 重跑同月时覆盖知识库旧版（否则默认同名跳过，人看的是旧报告）
       WUWEI_SOURCE: day           # 取数口径：day=日线聚合月线(默认, 快4~5倍) / month=月线接口直取
+      WUWEI_MAX_PRICE: '10'       # 股价上限（目标月收盘 ≥该值归「超价」，不入池；0=不过滤）
     steps:
       - uses: actions/checkout@v4
 
@@ -115,7 +116,8 @@ jobs:
 
       - name: Step2 v2.1 质量过滤 + 六维评分
         run: |
-          python3 quant_scripts/wuwei_v21_filter.py --period "$PERIOD" --input "outputs/ww_period_${PERIOD}_full.csv"
+          python3 quant_scripts/wuwei_v21_filter.py --period "$PERIOD" --input "outputs/ww_period_${PERIOD}_full.csv" \
+            --max-price "${WUWEI_MAX_PRICE:-10}"
           test -f "outputs/ww_period_${PERIOD}_v21.md" || { echo "::error::v2.1 未产出"; exit 1; }
           head -20 "outputs/ww_period_${PERIOD}_v21.md"
 
