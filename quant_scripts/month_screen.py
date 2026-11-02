@@ -434,7 +434,7 @@ def main():
             time.mktime(time.strptime(bar_date[:10], '%Y-%m-%d')) - 86400 * 28)))
         # 用「剔除当月未完成 bar」的数据重算上月，避免半个当月的成交量污染
         # 起爆量(VM5全历史最大值)与均线，导致上月信号与真实值不符
-        res_prev = {0: [], 1: []}
+        res_prev = {0: {'指标1': [], '指标2': []}}
         cur_m = bar_date[:7]
         for code in codes:
             rows = cache.get(code) or []
@@ -456,13 +456,13 @@ def main():
             r['code'] = code
             r['name'] = snap.get(code, {}).get('name', '')
             if r['XG1']:
-                res_prev[0].append(r)
+                res_prev[0]['指标1'].append(r)
             if r['A5']:
-                res_prev[1].append(r)
+                res_prev[0]['指标2'].append(r)
         md_prev = render(res_prev, scanned, skipped, bar_date, False, stale=stale, label=prev_ym)
         p_prev = os.path.join(a.outdir, f'衔接_{prev_ym}.md')
         open(p_prev, 'w').write(md_prev)
-        print(f'[out] {p_prev}（{prev_ym} 完整版：指标1={len(res_prev[0])} 指标2={len(res_prev[1])}）')
+        print(f"[out] {p_prev}（{prev_ym} 完整版：指标1={len(res_prev[0]['指标1'])} 指标2={len(res_prev[0]['指标2'])}）")
 
     payload = {'bar_date': bar_date, 'scanned': scanned, 'skipped': skipped,
                '指标1': {str(k): res[k]['指标1'] for k in res},
