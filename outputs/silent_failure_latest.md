@@ -1,12 +1,12 @@
-# 🔍 体系自检元审计 · 2026-11-02
+# 🔍 体系自检元审计 · 2026-11-03
 
-> 扫描 25 个 workflow ｜ 风险项 **92** ｜ 🔴高危 **0** ｜ 🟢受控捕获 **49**（已有告警通道，不计入风险项）
+> 扫描 26 个 workflow ｜ 风险项 **94** ｜ 🔴高危 **0** ｜ 🟢受控捕获 **50**（已有告警通道，不计入风险项）
 
 > 口径：本审计扫的是**写法层面**「失败会被吞且无法被人看到」的风险面，不是运行日志。
 > 是否真的发生过静默失败，由 `artifact_audit`（产物三方对账）/ `pipeline_audit`（run 状态）
 > / `kb_health_check`（KB 反查）+ 各 workflow 产物契约自检四道**事后**校验兜底。
 
-## 🟡中危·吞错误（78）
+## 🟡中危·吞错误（80）
 
 - artifact_audit.yml :: 提交审计报告 (L84) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || true
 - beast_pool.yml :: 准备候选池 (L71) — 命中 2>/dev/null（屏蔽 stderr）, || true
@@ -84,6 +84,8 @@
 - weight_learn.yml :: ② 权重改进回验（到期项） (L98) — 命中 continue-on-error: true
 - weight_learn.yml :: 推送回验报告 (L109) — 命中 continue-on-error: true, || echo（吞错误）
 - weight_learn.yml :: 提交提案 + 回验产物 + 台账 (L119) — 命中 set +e
+- wuwei_monthly.yml :: 上传精选池到「武威」知识库 (L124) — 命中 continue-on-error: true, || echo（吞错误）
+- wuwei_monthly.yml :: 提交产物 (L133) — 命中 continue-on-error: true, || echo（吞错误）
 - yao_gu_pool.yml :: 准备主板清单 (L73) — 命中 || echo（吞错误）
 - yao_gu_pool.yml :: 上传知识库（报告·全盘量化） (L89) — 命中 continue-on-error: true, || echo（吞错误）
 
@@ -104,7 +106,7 @@
 - weight_learn.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 - yao_gu_pool.yml :: on: 段 — 原生 cron 已停用，仅靠外部 cron-job.org dispatch → 外部配置丢失即静默停摆
 
-## 🟢信息·受控捕获（36）
+## 🟢信息·受控捕获（37）
 
 - artifact_audit.yml :: 运行产物入库审计 (L62) — 命中 2>/dev/null（屏蔽 stderr）, set +e, || echo（吞错误）, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 - beast_pool.yml :: 提交产物 (L87) — 命中 set +e, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
@@ -115,8 +117,8 @@
 - evidence_review.yml :: PushPlus 推送复核提醒（含待复核/过期统计） (L90) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 - evidence_review.yml :: 触发月度回测周期（bt_cycle） (L114) — 命中 continue-on-error: true, || true；但步骤内已有告警通道（::error::），失败对人可见
 - market_regime.yml :: 提交判定结果到仓库 (L68) — 命中 continue-on-error: true, set +e, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
-- month_screen.yml :: 月线选股扫描 + 上传知识库 + 提交产物 (L77) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）；但步骤内已有告警通道（::error::），失败对人可见
-- month_screen.yml :: 产物校验 (L98) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true；但步骤内已有告警通道（::error::），失败对人可见
+- month_screen.yml :: 衔接月线扫描 + 上传知识库 + 提交产物 (L77) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）；但步骤内已有告警通道（::error::），失败对人可见
+- month_screen.yml :: 产物校验 (L103) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true；但步骤内已有告警通道（::error::），失败对人可见
 - premarket_report.yml :: 生成盘前市场报告 (L74) — 命中 || echo（吞错误）；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 - premarket_report.yml :: 提交盘前预判到仓库（供复盘报告真实验证） (L87) — 命中 continue-on-error: true, set +e, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 - quant_report.yml :: 安装中文字体（Noto Sans SC · 免 apt） (L88) — 命中 || true；但步骤内已有告警通道（::error::），失败对人可见
@@ -141,6 +143,7 @@
 - quant_scan.yml :: 扫描链路失败告警（job 级兜底） (L551) — 命中 continue-on-error: true, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 - reversal_rescan.yml :: 产物校验 (L61) — 命中 continue-on-error: true；但步骤内已有告警通道（::error::），失败对人可见
 - selfcheck_daily.yml :: 异常告警到微信 (L168) — 命中 2>/dev/null（屏蔽 stderr）, || echo（吞错误）；但步骤内已有告警通道（pushplus/--alert），失败对人可见
+- wuwei_monthly.yml :: 产物校验 (L145) — 命中 continue-on-error: true；但步骤内已有告警通道（::error::），失败对人可见
 - yao_gu_pool.yml :: 提交产物 (L105) — 命中 set +e, || true；但步骤内已有告警通道（pushplus/--alert），失败对人可见
 
 ## 🟢信息·非关键前置（13）
@@ -187,4 +190,5 @@
 | selfcheck_daily.yml | 9 | — | 2 |
 | wangzhe_track.yml | 4 | — | 1 |
 | weight_learn.yml | 6 | — | 1 |
+| wuwei_monthly.yml | 2 | — | 1 |
 | yao_gu_pool.yml | 3 | — | 3 |
