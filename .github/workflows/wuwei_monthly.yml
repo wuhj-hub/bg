@@ -1,0 +1,145 @@
+name: 武威月线G1·月初扫描（G1初筛→v2.1过滤）
+
+on:
+  # 手动触发（可指定月份）
+  workflow_dispatch:
+    inputs:
+      period:
+        description: '指定月份 YYYYMM（留空=上月）'
+        required: false
+        default: ''
+  # 每交易日 16:00（北京）检查：是否本月首个交易日 → 是则跑上月；本月前5个交易日内缺报告则补跑
+  schedule:
+    - cron: '0 8 * * 1-5'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wuwei-monthly
+  cancel-in-progress: false
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    outputs:
+      run: ${{ steps.g.outputs.run }}
+      period: ${{ steps.g.outputs.period }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 判定「本月首个交易日」并计算目标月份
+        id: g
+        env:
+          FORCE_RUN: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+          FORCE_PERIOD: ${{ github.event.inputs.period }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import os, glob, sys
+          from datetime import date, timedelta
+          sys.path.insert(0, 'quant_scripts')
+          from trade_day_check import judge
+          today = date.today()
+          is_td = judge(today)[0]
+          d, first_td, n_td = today.replace(day=1), None, 0
+          while d.month == today.month:
+              if judge(d)[0]:
+                  first_td = first_td or d
+                  if d <= today:
+                      n_td += 1
+              d += timedelta(days=1)
+          prev = (today.replace(day=1) - timedelta(days=1)).strftime('%Y%m')
+          run = 0
+          if is_td:
+              if today == first_td:
+                  run = 1
+              elif n_td <= 5 and not glob.glob(f'outputs/ww_period_{prev}_v21.md'):
+                  run = 1          # 月初前5个交易日内缺上月报告 → 补跑
+          p = os.environ.get('FORCE_PERIOD') or ''
+          if os.environ.get('FORCE_RUN') == '1':
+              run = 1
+              p = p or prev
+          print(f"run={run}")
+          print(f"period={p or prev}")
+          print(f"note=today={today} is_trade_day={is_td} first_td={first_td} n_td={n_td}")
+          PY
+
+  scan:
+    needs: gate
+    if: needs.gate.outputs.run == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      PERIOD: ${{ needs.gate.outputs.period }}
+      IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+      IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+      IMA_KB_ID: ima_kb_fBvz4Y3t
+      IMA_FOLDER_ID: folder_7484032975660724
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 安装依赖（pandas/numpy）
+        run: pip install -q pandas numpy
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 安装 westock 数据源（全局，免 npx 启动开销）
+        run: npm i -g westock-data-skillhub@1.0.3
+
+      - name: 生成 / 刷新主板清单
+        run: python3 gen_mainboard.py
+
+      - name: Step1 G1 全市场月线初筛
+        run: |
+          echo "目标月份: $PERIOD"
+          python3 quant_scripts/wuwei_scan_month.py --full --period "$PERIOD" --list all_mainboard.csv
+          test -f "outputs/ww_period_${PERIOD}_full.csv" || { echo "::error::G1 未产出"; exit 1; }
+
+      - name: Step2 v2.1 质量过滤 + 六维评分
+        run: |
+          python3 quant_scripts/wuwei_v21_filter.py --period "$PERIOD" --input "outputs/ww_period_${PERIOD}_full.csv"
+          test -f "outputs/ww_period_${PERIOD}_v21.md" || { echo "::error::v2.1 未产出"; exit 1; }
+          head -20 "outputs/ww_period_${PERIOD}_v21.md"
+
+      - name: 上传精选池到「武威」知识库
+        continue-on-error: true
+        run: |
+          for f in "outputs/ww_period_${PERIOD}_v21.md" "outputs/ww_period_${PERIOD}_v21.csv" "outputs/ww_period_${PERIOD}_full.csv"; do
+            if [ -f "$f" ]; then
+              python3 upload_ima.py --file "$f" --name "$(basename "$f")" || echo "::warning::$f 上传失败"
+            fi
+          done
+
+      - name: 提交产物
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          FILES="outputs/ww_period_${PERIOD}_v21.md outputs/ww_period_${PERIOD}_v21.csv outputs/ww_period_${PERIOD}_full.csv"
+          OK=""
+          for f in $FILES; do [ -f "$f" ] && OK="$OK $f"; done
+          if [ -n "$OK" ]; then
+            python3 git_api_commit.py --msg "chore: 武威月线精选池 ${PERIOD}" $OK || echo "::warning::产物提交失败"
+          fi
+
+      - name: 产物校验
+        if: always()
+        continue-on-error: true
+        run: |
+          F="outputs/ww_period_${PERIOD}_v21.md"
+          if [ ! -s "$F" ]; then echo "::error::精选池报告缺失或为空"; exit 1; fi
+          echo "产物 OK: $F ($(wc -c < "$F") bytes)"
