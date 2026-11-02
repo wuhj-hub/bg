@@ -449,7 +449,8 @@ def main():
                 continue
             nm = snap.get(code, {}).get('name', '')
             for k in range(a.months):
-                t2 = t - k
+                # res 的 k=0 是本月(未走完)、k=1 是上月=xp 的 t、k=2 是前月=t-1
+                t2 = t - max(0, k - 1)
                 if t2 < 20:
                     continue
                 r = eval_at(xp, t2)
