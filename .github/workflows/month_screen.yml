@@ -1,4 +1,4 @@
-name: 月线选股扫描（指标1/指标2）
+name: 衔接月线扫描（指标1/指标2）
 
 on:
   # 手动触发（随时可跑，强制无视月末判断）
@@ -55,7 +55,7 @@ jobs:
                   run = 1
               elif today == first_td:
                   prev = (today.replace(day=1) - timedelta(days=1)).strftime('%Y-%m')
-                  if not glob.glob(f'outputs/月线选股_{prev}.md'):
+                  if not (glob.glob(f'outputs/衔接_{prev}.md') or glob.glob(f'outputs/月线选股_{prev}.md')):
                       run = 1
           if os.environ.get('FORCE_RUN') == '1':
               run = 1
@@ -74,7 +74,7 @@ jobs:
           python-version: '3.12'
       - name: 安装依赖
         run: pip install -q pandas numpy
-      - name: 月线选股扫描 + 上传知识库 + 提交产物
+      - name: 衔接月线扫描 + 上传知识库 + 提交产物
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
@@ -85,22 +85,22 @@ jobs:
           IMA_OVERWRITE: '1'
         run: |
           python3 quant_scripts/month_screen.py --push
-          F=$(ls -t outputs/月线选股_*.md 2>/dev/null | head -1)
+          F=$(ls -t outputs/衔接_*.md 2>/dev/null | head -1)
           if [ -n "$F" ]; then
             echo "报告: $F"
-            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "::warning::月线选股上传知识库失败"
+            python3 upload_ima.py --file "$F" --name "$(basename "$F")" || echo "::warning::衔接月线上传知识库失败"
           else
-            echo "::error::未生成月线选股报告"; exit 1
+            echo "::error::未生成衔接月线报告"; exit 1
           fi
-          python3 git_api_commit.py --msg "chore: 月线选股扫描 $(date +%Y-%m)" \
-            "$F" outputs/month_screen_latest.json || echo "::warning::月线选股产物提交失败"
+          python3 git_api_commit.py --msg "chore: 衔接月线扫描 $(date +%Y-%m)" \
+            "$F" outputs/month_screen_latest.json || echo "::warning::衔接月线产物提交失败"
 
       - name: 产物校验
         if: always()
         continue-on-error: true
         run: |
-          F=$(ls -t outputs/月线选股_*.md 2>/dev/null | head -1)
+          F=$(ls -t outputs/衔接_*.md 2>/dev/null | head -1)
           if [ -z "$F" ] || [ ! -s "$F" ]; then
-            echo "::error::月线选股报告缺失或为空"; exit 1
+            echo "::error::衔接月线报告缺失或为空"; exit 1
           fi
           echo "产物 OK: $F ($(wc -c < "$F") bytes)"
