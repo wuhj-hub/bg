@@ -13,7 +13,7 @@
 依赖 : npx westock-data-skillhub@1.0.3 (kline + finance)
 用法 : python3 wuwei_v21_filter.py --period 202606
 """
-import os, csv, sys, importlib.util, concurrent.futures
+import os, csv, sys, time, importlib.util, concurrent.futures
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 # 仓库内运行：默认产出到 <仓库根>/outputs；可用 WUWEI_OUT 覆盖
@@ -40,26 +40,76 @@ def cli(cmd, retry=3):
     return ""
 
 
+EASTMONEY_FIN = "https://datacenter-web.eastmoney.com/api/data/v1/get"
+FIN_BATCH = 50
+
+
+def _em_finance(batch6):
+    """东财业绩报表（含季报）：一次 <=50 只，返回 {code6: (net_profit_str, report_date)}，取最新报告期"""
+    import urllib.request, urllib.parse, json as _json
+    flt = "(SECURITY_CODE in (" + ",".join(f'"{c}"' for c in batch6) + "))"
+    params = {"reportName": "RPT_LICO_FN_CPD",
+              "columns": "SECURITY_CODE,REPORTDATE,PARENT_NETPROFIT",
+              "filter": flt, "pageNumber": "1", "pageSize": "500",
+              "sortColumns": "REPORTDATE", "sortTypes": "-1",
+              "source": "WEB", "client": "WEB"}
+    u = EASTMONEY_FIN + "?" + urllib.parse.urlencode(params)
+    req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0",
+                                             "Referer": "https://data.eastmoney.com/"})
+    d = _json.loads(urllib.request.urlopen(req, timeout=30).read().decode())
+    rows = ((d.get("result") or {}).get("data") or [])
+    out = {}
+    for r in rows:
+        sc = (r.get("SECURITY_CODE") or "").strip()
+        rd = (r.get("REPORTDATE") or "")[:10]
+        npv = r.get("PARENT_NETPROFIT")
+        if not sc or not rd:
+            continue
+        if sc not in out or rd > out[sc][1]:
+            out[sc] = ("" if npv is None else str(npv), rd)
+    return out
+
+
 def fetch_finance(codes):
-    """批量拉利润表(lrb)，返回 {code:(net_profit_str, enddate)}。复用 run_filter.py 逻辑。"""
+    """批量取最新报告期归母净利润 → {code:(net_profit_str, enddate)}。东财优先，westock 兜底。"""
     fin = {}
     if not codes:
         return fin
-    for i in range(0, len(codes), 10):
-        batch = codes[i:i + 10]
-        out = cli(f"finance {','.join(batch)} --type lrb --num 1")
-        lines = [l for l in out.splitlines() if l.strip().startswith("|")]
-        if len(lines) >= 2:
-            hdr = [h.strip() for h in lines[0].strip().strip("|").split("|")]
-            if all(c in hdr for c in ("SecuCode", "NPParentCompanyOwners", "EndDate")):
-                sci, npi, edi = hdr.index("SecuCode"), hdr.index("NPParentCompanyOwners"), hdr.index("EndDate")
-                for l in lines[2:]:
-                    cols = [x.strip() for x in l.strip().strip("|").split("|")]
-                    if len(cols) > max(sci, npi, edi):
-                        code, npv, ed = cols[sci], cols[npi], cols[edi]
-                        if code in set(codes):
-                            fin[code] = (npv, ed)
-        print(f"[finance] batch {i} ({len(batch)}) done", file=sys.stderr)
+    code6 = [(c[2:] if c[:2] in ("sh", "sz") else c) for c in codes]
+    for i in range(0, len(code6), FIN_BATCH):
+        batch = code6[i:i + FIN_BATCH]
+        got = {}
+        for attempt in range(2):
+            try:
+                got = _em_finance(batch)
+                if got:
+                    break
+            except Exception as e:
+                print(f"[finance] 东财批次 {i} 失败({attempt+1}): {e}", file=sys.stderr)
+                time.sleep(2)
+        for c6, v in got.items():
+            pre = "sh" if c6.startswith("6") else "sz"
+            fin[pre + c6] = v
+        print(f"[finance] batch {i} ({len(batch)}) 命中 {len(got)}", file=sys.stderr)
+
+    # westock 兜底（东财取不到的）
+    miss = [c for c in codes if c not in fin]
+    if miss:
+        print(f"[finance] 东财缺 {len(miss)} 只 → westock 兜底", file=sys.stderr)
+        for i in range(0, len(miss), 10):
+            batch = miss[i:i + 10]
+            out = cli(f"finance {','.join(batch)} --type lrb --num 12")
+            lines = [l for l in out.splitlines() if l.strip().startswith("|")]
+            if len(lines) >= 2:
+                hdr = [h.strip() for h in lines[0].strip().strip("|").split("|")]
+                if all(x in hdr for x in ("SecuCode", "NPParentCompanyOwners", "EndDate")):
+                    sci, npi, edi = hdr.index("SecuCode"), hdr.index("NPParentCompanyOwners"), hdr.index("EndDate")
+                    for l in lines[2:]:
+                        cols = [x.strip() for x in l.strip().strip("|").split("|")]
+                        if len(cols) > max(sci, npi, edi):
+                            code, npv, ed = cols[sci], cols[npi], cols[edi]
+                            if code in batch and (code not in fin or ed > fin[code][1]):
+                                fin[code] = (npv, ed)
     return fin
 
 
@@ -141,10 +191,17 @@ def main():
                 g1.append((code, name))
     print(f"[v21] G1 候选 {len(g1)} 只, period={period}", file=sys.stderr)
 
-    # 并行取月线 + 算支撑深度/缩量max + 重算信号
+    # 月线批量取数（一次取全，避免逐只 200+ 次调用）
+    ml, ml_fail = wsm.get_many([c for c, _ in g1], os.environ.get("WUWEI_SOURCE", "day"))
+    if ml_fail:
+        print(f"[v21] 月线取数失败 {len(ml_fail)} 只: {','.join(ml_fail[:20])}", file=sys.stderr)
+
+    # 算支撑深度/缩量max + 重算信号（纯计算，不再取数）
     def worker(item):
         code, name = item
-        recs = wsm.get_monthly(code, 24)
+        recs = ml.get(code) or []
+        if wsm.is_stale(recs, month_end):
+            return None
         res = wsm.signal(recs, month_end)
         if res == "无":
             return None
@@ -166,7 +223,7 @@ def main():
         return code, name, res, support, shrink_max
 
     results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as ex:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex:
         for r in ex.map(worker, g1):
             if r:
                 results.append(r)
