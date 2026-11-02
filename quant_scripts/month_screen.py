@@ -421,20 +421,15 @@ def main():
     ym = bar_date[:7]
     # 当月是否已走完：最新 bar 属本月 **且** 今天还没到本月最后一个工作日 → 未走完
     cur_open = not month_complete(bar_date)
-    md = render(res, scanned, skipped, bar_date, cur_open, stale=stale)
-
-    os.makedirs(a.outdir, exist_ok=True)
-    p_md = os.path.join(a.outdir, f'衔接_{ym}.md')
-    open(p_md, 'w').write(md)
-    # 当月未走完时，额外落一份「上月完整版」：
-    # 月初补跑产出的文件名是本月（当月已有bar），若只写本月文件，gate 检查的
-    # outputs/衔接_{上月}.md 永远不存在 → 月初前5个交易日天天重跑（死循环）。
+    # 当月未走完时，先用「剔除当月未完成 bar」的数据重算上月：
+    # 半个当月的成交量会污染 VM5 起爆量门槛（全历史最大值），使历史月份信号失真
+    res_prev = None
+    prev_ym = None
     if cur_open:
         prev_ym = (time.strftime('%Y-%m', time.localtime(
             time.mktime(time.strptime(bar_date[:10], '%Y-%m-%d')) - 86400 * 28)))
-        # 用「剔除当月未完成 bar」的数据重算上月，避免半个当月的成交量污染
-        # 起爆量(VM5全历史最大值)与均线，导致上月信号与真实值不符
         res_prev = {0: {'指标1': [], '指标2': []}}
+        extra = {}
         cur_m = bar_date[:7]
         for code in codes:
             rows = cache.get(code) or []
@@ -452,13 +447,29 @@ def main():
             t = xp['n'] - 1
             if t < 20:
                 continue
-            r = eval_at(xp, t)
-            r['code'] = code
-            r['name'] = snap.get(code, {}).get('name', '')
-            if r['XG1']:
-                res_prev[0]['指标1'].append(r)
-            if r['A5']:
-                res_prev[0]['指标2'].append(r)
+            nm = snap.get(code, {}).get('name', '')
+            for k in range(a.months):
+                t2 = t - k
+                if t2 < 20:
+                    continue
+                r = eval_at(xp, t2)
+                r['code'] = code
+                r['name'] = nm
+                tgt = res_prev[0] if k == 0 else extra.setdefault(k, {'指标1': [], '指标2': []})
+                if r['XG1']:
+                    tgt['指标1'].append(r)
+                if r['A5']:
+                    tgt['指标2'].append(r)
+        # 对照区（上月/前月）一律用干净数据，与独立完整版一致
+        for k, v in extra.items():
+            res[k] = v
+
+    md = render(res, scanned, skipped, bar_date, cur_open, stale=stale)
+
+    os.makedirs(a.outdir, exist_ok=True)
+    p_md = os.path.join(a.outdir, f'衔接_{ym}.md')
+    open(p_md, 'w').write(md)
+    if res_prev is not None:
         md_prev = render(res_prev, scanned, skipped, bar_date, False, stale=stale, label=prev_ym)
         p_prev = os.path.join(a.outdir, f'衔接_{prev_ym}.md')
         open(p_prev, 'w').write(md_prev)
