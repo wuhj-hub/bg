@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""月线选股扫描（指标1 XG / 指标2 A5）
+"""衔接 · 月线扫描（指标1 XG / 指标2 A5）
 
 范围：沪深主板非 ST（剔除创业板 300/301、科创板 688/689、北交所、ST/*ST）
 数据：腾讯前复权月线（newfqkline，单只最长 302 根 / 2001 至今，含成交量）
-产物：outputs/月线选股_{YYYY-MM}.md、outputs/month_screen_latest.json
+产物：outputs/衔接_{YYYY-MM}.md、outputs/month_screen_latest.json
 
 用法：
   python3 quant_scripts/month_screen.py --date 2026-10-28 --push
@@ -277,7 +277,7 @@ def tbl2(lst):
 
 def render(res, scanned, skipped, bar_date, cur_month_open=True):
     s1, s2 = res[0]['指标1'], res[0]['指标2']
-    md = [f"# 月线选股扫描 · 指标1 / 指标2（沪深主板非ST）\n",
+    md = [f"# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）\n",
           f"**数据日期**：{bar_date}　**有效标的**：{scanned} 只（剔除 {skipped} 只：非主板/ST/停牌退市/数据不足）\n",
           "**数据口径**：腾讯前复权月线（含成交量，单只最长 302 根）；名称与 ST 状态取实时行情快照\n"]
     if cur_month_open:
@@ -378,7 +378,7 @@ def main():
     md = render(res, scanned, skipped, bar_date, cur_open)
 
     os.makedirs(a.outdir, exist_ok=True)
-    p_md = os.path.join(a.outdir, f'月线选股_{ym}.md')
+    p_md = os.path.join(a.outdir, f'衔接_{ym}.md')
     open(p_md, 'w').write(md)
     payload = {'bar_date': bar_date, 'scanned': scanned, 'skipped': skipped,
                '指标1': {str(k): res[k]['指标1'] for k in res},
@@ -389,7 +389,7 @@ def main():
     if a.push and not a.no_push:
         lines = [f"- **指标1（XG）** {len(res[0]['指标1'])} 只：" + ('、'.join(f"{r['name']}({r['close']:.2f})" for r in sorted(res[0]['指标1'], key=lambda z: -z['close'])) or '无'),
                  f"- **指标2（A5）** {len(res[0]['指标2'])} 只：" + ('、'.join(f"{r['name']}({r['close']:.2f})" for r in sorted(res[0]['指标2'], key=lambda z: -z['close'])) or '无')]
-        push(f"📐 月线选股 {ym} ｜ 指标1 {len(res[0]['指标1'])} · 指标2 {len(res[0]['指标2'])}",
+        push(f"📐 衔接月线 {ym} ｜ 指标1 {len(res[0]['指标1'])} · 指标2 {len(res[0]['指标2'])}",
              f"**沪深主板非ST · 数据截至 {bar_date}**\n\n" + '\n'.join(lines) + "\n\n> 详见知识库「报告/全盘量化」")
     return 0
 
