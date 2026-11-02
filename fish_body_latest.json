@@ -1,6 +1,6 @@
 {
   "market_temp": {
-    "temp": 50,
+    "temp": 45,
     "level": "中性",
     "idx": "3638.03"
   },
@@ -17,7 +17,7 @@
       "reasons": [
         "DIF/DEA在0轴上方",
         "DIF(0.25)>=DEA(0.19)金叉",
-        "MACD柱0.120刚翻红加油成功",
+        "MACD柱0.110刚翻红加油成功",
         "收盘23.54>MA523.36",
         "MA20>MA60多头排列",
         "KDJ_J=61未超买"
@@ -137,38 +137,6 @@
       "rsg_strong": true
     },
     {
-      "code": "sh601728",
-      "name": "中国电信",
-      "pattern": "MACD空中加油",
-      "raw_score": 95,
-      "final_score": 73,
-      "multi_score": 69,
-      "resonance": "共振向下",
-      "price": 7.04,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.18)>=DEA(0.16)金叉",
-        "MACD柱0.040刚翻红加油成功",
-        "收盘7.04>MA56.97",
-        "MA20>MA60多头排列"
-      ],
-      "stop_loss": "6.62",
-      "target": "8.10",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
       "code": "sz000001",
       "name": "平安银行",
       "pattern": "MACD空中加油",
@@ -198,39 +166,6 @@
       "month_gate": "PASS",
       "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": 304.4,
-      "rsg_strong": true
-    },
-    {
-      "code": "sh601816",
-      "name": "京沪高铁",
-      "pattern": "MACD空中加油",
-      "raw_score": 100,
-      "final_score": 72,
-      "multi_score": 44,
-      "resonance": "共振向下",
-      "price": 5.22,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.09)>=DEA(0.09)金叉",
-        "MACD柱0.010刚翻红加油成功",
-        "收盘5.22>MA55.19",
-        "MA20>MA60多头排列",
-        "KDJ_J=74未超买"
-      ],
-      "stop_loss": "4.93",
-      "target": "6.00",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "均线金叉(MA6上穿MA12)",
-      "rsg_dev": 301.1,
       "rsg_strong": true
     },
     {
@@ -266,6 +201,39 @@
       "rsg_strong": false
     },
     {
+      "code": "sz000700",
+      "name": "模塑科技",
+      "pattern": "MACD空中加油",
+      "raw_score": 85,
+      "final_score": 68,
+      "multi_score": 83,
+      "resonance": "共振向下",
+      "price": 13.82,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.58)>=DEA(0.27)金叉",
+        "MACD柱0.62>0但已走高",
+        "收盘13.82>MA513.75",
+        "MA20>MA60多头排列",
+        "KDJ_J=81未超买"
+      ],
+      "stop_loss": "13.06",
+      "target": "15.89",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘向下",
+        "stock": "个股强势",
+        "resonance": "共振向下",
+        "score": 20
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": 364.7,
+      "rsg_strong": true
+    },
+    {
       "code": "sz002354",
       "name": "天娱数科",
       "pattern": "MACD空中加油",
@@ -295,39 +263,6 @@
       "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": 376.7,
       "rsg_strong": true
-    },
-    {
-      "code": "sz002164",
-      "name": "宁波东力",
-      "pattern": "MACD空中加油",
-      "raw_score": 85,
-      "final_score": 65,
-      "multi_score": 65,
-      "resonance": "共振向下",
-      "price": 18.34,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(1.64)>=DEA(1.34)金叉",
-        "MACD柱0.59>0但已走高",
-        "收盘18.34>MA517.52",
-        "MA20>MA60多头排列",
-        "KDJ_J=75未超买"
-      ],
-      "stop_loss": "16.64",
-      "target": "21.09",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "均线金叉(MA6上穿MA12)",
-      "rsg_dev": null,
-      "rsg_strong": false
     },
     {
       "code": "sh600519",
@@ -485,7 +420,7 @@
       "resonance": "共振向下",
       "price": 5.9,
       "reasons": [
-        "MA20(5.49)>MA60(5.28)",
+        "MA20(5.49)>MA60(5.27)",
         "MACD金叉(DIF=0.12)",
         "KDJ向上(J=109)",
         "收盘5.9>MA55.68",
@@ -567,7 +502,7 @@
       "resonance": "共振向下",
       "price": 23.54,
       "reasons": [
-        "MA20(22.94)>MA60(22.93)多头",
+        "MA20(22.94)>MA60(22.92)多头",
         "MACD在0轴上方",
         "在MA10附近(偏离0.9%)",
         "收盘23.54>MA523.36",
@@ -576,37 +511,6 @@
       "stop_loss": "21.79",
       "target": "26.36",
       "mode": 2,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sh603179",
-      "name": "新泉股份",
-      "pattern": "MACD空中加油",
-      "raw_score": 75,
-      "final_score": 59,
-      "multi_score": 76,
-      "resonance": "共振向下",
-      "price": 45.0,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(1.17)>=DEA(0.16)金叉",
-        "MACD柱2.02>0但已走高",
-        "收盘45.0>MA542.89"
-      ],
-      "stop_loss": "40.75",
-      "target": "51.75",
-      "mode": 1,
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
@@ -733,38 +637,6 @@
       "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": 348.9,
       "rsg_strong": true
-    },
-    {
-      "code": "sh601728",
-      "name": "中国电信",
-      "pattern": "均线回踩支撑",
-      "raw_score": 75,
-      "final_score": 58,
-      "multi_score": 69,
-      "resonance": "共振向下",
-      "price": 7.04,
-      "reasons": [
-        "MA20(6.73)>MA60(6.40)多头",
-        "MACD在0轴上方",
-        "在MA10附近(偏离2.2%)",
-        "收盘7.04>MA56.97",
-        "站在布林中轨上方"
-      ],
-      "stop_loss": "6.39",
-      "target": "7.88",
-      "mode": 2,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": null,
-      "rsg_strong": false
     },
     {
       "code": "sh600036",
@@ -987,38 +859,6 @@
       "month_gate": "PASS",
       "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": 348.9,
-      "rsg_strong": true
-    },
-    {
-      "code": "sh605488",
-      "name": "福莱新材",
-      "pattern": "MACD空中加油",
-      "raw_score": 75,
-      "final_score": 55,
-      "multi_score": 51,
-      "resonance": "共振向下",
-      "price": 45.24,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(4.69)>=DEA(2.96)金叉",
-        "MACD柱3.44>0但已走高",
-        "MA20>MA60多头排列",
-        "KDJ_J=85未超买"
-      ],
-      "stop_loss": "44.17",
-      "target": "52.03",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 651.0,
       "rsg_strong": true
     }
   ]
