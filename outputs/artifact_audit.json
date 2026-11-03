@@ -1,5 +1,5 @@
 {
- "date": "2026-11-03",
+ "date": "2026-11-04",
  "writes": {
   "信号仲裁_latest.json": [
    ".github/workflows/quant_report.yml",
@@ -1023,8 +1023,8 @@
  "dup_freshness": [
   {
    "name": "sector_component_em.json",
-   "root": "2026-11-02",
-   "outputs": "2026-11-02",
+   "root": "2026-11-03",
+   "outputs": "2026-11-03",
    "status": "同步"
   },
   {
