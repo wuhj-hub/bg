@@ -1,68 +1,36 @@
 {
- "date": "2026-11-02",
- "total": 87,
+ "date": "2026-11-03",
+ "total": 28,
  "lianban_cnt": 10,
- "max_lb": 6,
- "shouban": 77,
+ "max_lb": 4,
+ "shouban": 18,
  "by_lb": {
-  "6": 1,
   "4": 1,
-  "3": 3,
-  "2": 5,
-  "1": 77
+  "3": 1,
+  "2": 8,
+  "1": 18
  },
  "score": {
-  "score": 68,
+  "score": 58,
   "level": "活跃",
   "parts": {
-   "涨停家数": 16,
-   "连板高度": 36,
-   "连板占比": 16
+   "涨停家数": 5,
+   "连板高度": 18,
+   "连板占比": 35
   }
  },
  "persistence": [],
- "alerts": [],
+ "alerts": [
+  "⚠️ 高度退潮：最高板从6板降至4板（昨2026-11-02）"
+ ],
  "lianban_rows": [
-  {
-   "code": "sz001219",
-   "name": "青岛食品",
-   "price": "",
-   "chg": "",
-   "lianban": 6,
-   "ji_ji_ban": "6天6板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "食品饮料"
-   ]
-  },
-  {
-   "code": "sz002172",
-   "name": "澳洋健康",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "医疗服务",
-    "医药生物"
-   ]
-  },
   {
    "code": "sz002086",
    "name": "东方海洋",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -74,97 +42,12 @@
    ]
   },
   {
-   "code": "sz002275",
-   "name": "桂林三金",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "医药生物"
-   ]
-  },
-  {
-   "code": "sh600261",
-   "name": "阳光照明",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "照明设备Ⅲ",
-    "照明设备Ⅱ",
-    "家用电器"
-   ]
-  },
-  {
-   "code": "sz000525",
-   "name": "红太阳",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "基础化工"
-   ]
-  },
-  {
-   "code": "sz000410",
-   "name": "沈阳机床",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "机床工具",
-    "私募新进"
-   ]
-  },
-  {
-   "code": "sz000417",
-   "name": "合百集团",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "首发经济"
-   ]
-  },
-  {
    "code": "sz000995",
    "name": "皇台酒业",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -178,8 +61,8 @@
    ]
   },
   {
-   "code": "sh600189",
-   "name": "泉阳泉",
+   "code": "sz000599",
+   "name": "青岛双星",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -190,10 +73,120 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "食品饮料",
-    "软饮料",
+    "汽车零部件",
+    "汽车",
+    "轮胎轮毂"
+   ]
+  },
+  {
+   "code": "sz002029",
+   "name": "七匹狼",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "服装家纺",
+    "社保新进"
+   ]
+  },
+  {
+   "code": "sz002058",
+   "name": "紫竹高科",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "电池",
+    "电池化学品",
+    "电力设备",
+    "基金减仓"
+   ]
+  },
+  {
+   "code": "sz002292",
+   "name": "奥飞娱乐",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
     "基金增仓"
    ]
+  },
+  {
+   "code": "sh601599",
+   "name": "浙文影业",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh600892",
+   "name": "大晟文化",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh603258",
+   "name": "电魂网络",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "基金增仓"
+   ]
+  },
+  {
+   "code": "sh605577",
+   "name": "龙版传媒",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
   }
  ],
  "leaders": {}
