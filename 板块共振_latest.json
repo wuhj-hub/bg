@@ -1,23 +1,12 @@
 {
- "date": "2026-11-03",
+ "date": "2026-11-04",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 53,
+ "pool_size": 50,
  "resonance_boards": [
   {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
-   "zdf": 2.86,
-   "strength": 8,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "电池",
-   "code": "pt01801737",
-   "zdf": 2.32,
+   "name": "医疗服务",
+   "code": "pt01801156",
+   "zdf": 7.83,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -28,7 +17,7 @@
   {
    "name": "光伏设备",
    "code": "pt01801735",
-   "zdf": 1.6,
+   "zdf": 5.28,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -37,11 +26,34 @@
    ]
   },
   {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "zdf": 2.35,
-   "strength": 5,
+   "name": "电池",
+   "code": "pt01801737",
+   "zdf": 2.87,
+   "strength": 7,
    "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "zdf": 2.41,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "航天装备Ⅱ",
+   "code": "pt01801741",
+   "zdf": 5.25,
+   "strength": 7,
+   "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -49,9 +61,14 @@
  ],
  "grab_top": [
   {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
-   "value": 8
+   "name": "医疗服务",
+   "code": "pt01801156",
+   "value": 7
+  },
+  {
+   "name": "光伏设备",
+   "code": "pt01801735",
+   "value": 7
   },
   {
    "name": "电池",
@@ -59,26 +76,36 @@
    "value": 7
   },
   {
-   "name": "光伏设备",
-   "code": "pt01801735",
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 7
+  },
+  {
+   "name": "航天装备Ⅱ",
+   "code": "pt01801741",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "value": 22.5
+   "name": "医疗服务",
+   "code": "pt01801156",
+   "value": 21.3
   },
   {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
-   "value": 16.2
+   "name": "航天装备Ⅱ",
+   "code": "pt01801741",
+   "value": 8.6
   },
   {
    "name": "光伏设备",
    "code": "pt01801735",
    "value": 4.6
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 3.2
   },
   {
    "name": "电池",
@@ -88,43 +115,31 @@
  ],
  "absorption_top": [
   {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
-   "value": 3.45
+   "name": "航天装备Ⅱ",
+   "code": "pt01801741",
+   "value": 1.89
   },
   {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "value": 1.91
+   "name": "医疗服务",
+   "code": "pt01801156",
+   "value": 1.21
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 0.33
   },
   {
    "name": "光伏设备",
    "code": "pt01801735",
-   "value": 0.36
+   "value": 0.32
   },
   {
    "name": "电池",
    "code": "pt01801737",
-   "value": 0.09
+   "value": 0.08
   }
  ],
  "control_top": [],
- "zhongjun_candidates": [
-  {
-   "board": "保险Ⅱ",
-   "stock": "中国太保",
-   "code": "sh601601",
-   "zdf": "4.03",
-   "main1": 0.17,
-   "main5": 2.24
-  },
-  {
-   "board": "白酒Ⅱ",
-   "stock": "皇台酒业",
-   "code": "sz000995",
-   "zdf": "10.00",
-   "main1": 0.17,
-   "main5": 2.22
-  }
- ]
+ "zhongjun_candidates": []
 }
