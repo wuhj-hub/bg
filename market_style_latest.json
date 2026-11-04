@@ -1,94 +1,97 @@
 {
- "date": "2026-11-03",
- "data_date": "2026-11-03",
+ "date": "2026-11-04",
+ "data_date": "2026-11-04",
  "style": "均衡市",
  "icon": "⚖️",
- "score": -3,
+ "score": 18,
  "score_detail": {
-  "size_style": -25,
-  "limitup_structure": 21,
-  "volume_structure": -8,
-  "sector_fund": 9
+  "size_style": -17,
+  "limitup_structure": 25,
+  "volume_structure": 0,
+  "sector_fund": 10
  },
  "size_style": {
-  "hs300_5d": -1.0,
-  "hs300_10d": -3.45,
-  "zz1000_5d": -3.2,
-  "zz1000_10d": -8.06,
-  "rel_5d": -2.2,
-  "rel_10d": -4.61,
-  "rel_20d": -7.33,
-  "zz500_5d": -2.83
+  "hs300_5d": 0.43,
+  "hs300_10d": -0.26,
+  "zz1000_5d": -1.01,
+  "zz1000_10d": -3.96,
+  "rel_5d": -1.44,
+  "rel_10d": -3.7,
+  "rel_20d": -4.9,
+  "small_pulse_1d": 4.67,
+  "zz500_5d": -0.28
  },
  "limitup_structure": {
-  "limitup": 48,
-  "strong": 89,
-  "width_score": 79.6,
-  "level": "🔥 结构性偏强（涨多跌少·赚钱效应强）",
+  "limitup": 98,
+  "strong": 369,
+  "width_score": 100,
+  "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 2.9,
-  "zhaban_rate": 50.0,
-  "lianban": 15
+  "strong_ratio": 12.1,
+  "zhaban_rate": 44.9,
+  "lianban": 12
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.567,
-  "small_big_ratio_5d": 0.748,
-  "vol_shift": "资金回流大盘"
+  "small_big_ratio_now": 0.677,
+  "small_big_ratio_5d": 0.703
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "白酒Ⅱ",
-    "zdf": "2.35",
-    "main_net5d": 22.5,
-    "retail_net": -2.5,
-    "tag": "机构型"
-   },
-   {
-    "name": "通信设备",
-    "zdf": "-8.37",
-    "main_net5d": -93.1,
-    "retail_net": 99.0,
-    "tag": "游资型"
-   },
-   {
-    "name": "电池",
-    "zdf": "2.32",
-    "main_net5d": -43.1,
-    "retail_net": -24.7,
-    "tag": "游资型"
-   },
-   {
     "name": "半导体",
-    "zdf": "-5.42",
-    "main_net5d": -153.7,
-    "retail_net": 133.8,
+    "zdf": "11.41",
+    "main_net5d": -213.4,
+    "retail_net": -194.0,
     "tag": "游资型"
    },
    {
-    "name": "昨日涨停",
-    "zdf": "1.22",
-    "main_net5d": -59.4,
-    "retail_net": 23.7,
+    "name": "元件",
+    "zdf": "9.14",
+    "main_net5d": -106.2,
+    "retail_net": -48.7,
+    "tag": "游资型"
+   },
+   {
+    "name": "白酒Ⅱ",
+    "zdf": "-2.05",
+    "main_net5d": 24.8,
+    "retail_net": 14.3,
+    "tag": "混合"
+   },
+   {
+    "name": "靶材",
+    "zdf": "13.29",
+    "main_net5d": -0.8,
+    "retail_net": -10.0,
+    "tag": "游资型"
+   },
+   {
+    "name": "贵金属",
+    "zdf": "10.06",
+    "main_net5d": -17.0,
+    "retail_net": -20.5,
     "tag": "游资型"
    }
   ]
  },
  "mode_cross": {
-  "dominant": "堆量模式",
+  "dominant": "欧马模式",
   "all": {
-   "堆量模式": 14,
-   "欧马模式": 1
+   "欧马模式": 8,
+   "堆量模式": 6
   },
   "leaders": {
-   "堆量模式": 10,
-   "欧马模式": 1
+   "欧马模式": 3,
+   "堆量模式": 3
   },
   "pullbacks": {},
-  "gpoints": {},
+  "gpoints": {
+   "欧马模式": 3,
+   "堆量模式": 1
+  },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
-  "total_scored": 15
+  "total_scored": 14
  },
  "advice": "多空风格混杂：三阶漏斗正常执行，大小盘均衡配置，单日脉冲后确认再追"
 }
