@@ -11,7 +11,7 @@
   两者同日成立 = 「王者突破」：量的证据 × 结构的证据（均线压缩后的第一次上穿）
 
 【纪律（跟踪池）】
-  入池：信号日收盘 = 实顶防守线；信号日开盘 = 实底止损线
+  入池：信号日收盘 = 实顶防守线；信号日开盘 = 实底止损线；且收盘价 < --max-price（默认 10 元）
   每日更新：close >= 实顶 → 强（不破顶）；实底 <= close < 实顶 → 观察；close < 实底 → **删除**
   文章口径：长期小阴小阳横盘不破实顶 = 走牛概率增加 → days>=5 且从未破顶 标 🔥
 
@@ -25,6 +25,8 @@
   --scan            扫描最新交易日信号 + 更新跟踪池 + 出报告（默认）
   --pool-file F     股票池（默认 all_mainboard.csv）
   --limit N         K线根数（默认 80，足够 MA15+5日量+20日振幅）
+  --max-price P     价格上限：只统计收盘价 < P 元（默认 10；0=不限）。新信号、单条件观察、
+                    在池跟踪统一适用；在池标的长到 P 元以上 → 移出（记「超出价格上限」，不计入胜率）
   --date YYYY-MM-DD 指定信号日（默认各股最新K线日）
   --push            推送摘要（PushPlus，env PUSH_TOKEN）
   --no-fetch        只用缓存/池文件，不取数（调试）
@@ -295,8 +297,11 @@ def read_env():
     return None
 
 
-def update_pool(sig, bars_map, target_date):
-    """更新池内状态；跌破实底 → 移除。返回 (still, removed_today)"""
+def update_pool(sig, bars_map, target_date, max_price=0.0):
+    """更新池内状态；跌破实底 → 移除；现价≥价格上限 → 移出（不计入「跌破实底」了结统计）。
+
+    返回 (still, removed_today)
+    """
     still, removed_today = {}, []
     for code, it in sig.items():
         bars = bars_map.get(code) or []
@@ -313,6 +318,12 @@ def update_pool(sig, bars_map, target_date):
         it["peak"] = max(it.get("peak") or 0, round(close, 2))
         it["max_gain"] = round((it["peak"] / it["sig_close"] - 1) * 100, 2) if it.get("sig_close") else 0
         it["dist_bottom"] = round((close / it["sig_open"] - 1) * 100, 2) if it.get("sig_open") else 0
+        if max_price and close >= max_price:
+            it.update(exit_date=last["date"], exit_price=round(close, 2),
+                      exit_reason="超出价格上限",
+                      ret=round((close / it["sig_close"] - 1) * 100, 2))
+            removed_today.append(it)
+            continue
         if close < it["sig_open"]:
             it.update(exit_date=last["date"], exit_price=round(close, 2),
                       exit_reason="跌破实底",
@@ -325,12 +336,14 @@ def update_pool(sig, bars_map, target_date):
     return still, removed_today
 
 
-def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit):
+def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit, max_price=0.0):
     L = []
     L.append(f"# 👑 王者突破选股 · {date}")
     L.append("")
     L.append("> 口径：**神龙摆尾尾部突破K**（涨幅≥3% + 收盘上穿 HHV(MA15,5) + CG≠FS）× **王者倍量柱**（量≥2×前5日均量 + 阳线）")
     L.append("> 防守：信号K **实顶=收盘**（强支撑）、**实底=开盘**（破则出局）。跟踪池每日更新，**跌破实底即删除**。")
+    if max_price:
+        L.append(f"> 范围：**只统计收盘价 < {max_price:g} 元**的标的（新信号、单条件观察、跟踪池统一适用；涨到上限以上即移出）")
     if temp is not None:
         tag = "🟢" if temp >= 55 else ("🟡" if temp >= 40 else "🔴")
         L.append(f"> 环境：鱼身温度 **{temp:.0f}** {tag}" + ("（低温，信号弱化，仅观察）" if temp < 40 else ""))
@@ -380,22 +393,26 @@ def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit
     L.append(f"## 三、今日删除（跌破实底，{len(removed_today)} 只）")
     if removed_today:
         L.append("")
-        L.append("| 代码 | 名称 | 信号日 | 跌破日 | 出场价 | 相对信号收盘% |")
-        L.append("|---|---|---|---|---|---|")
+        L.append("| 代码 | 名称 | 信号日 | 移出日 | 出场价 | 相对信号收盘% | 原因 |")
+        L.append("|---|---|---|---|---|---|---|")
         for x in removed_today:
-            L.append(f"| {x['code']} | {x['name']} | {x['signal_date']} | {x['exit_date']} | {x['exit_price']} | {x['ret']:+.2f} |")
+            L.append(f"| {x['code']} | {x['name']} | {x['signal_date']} | {x['exit_date']} | {x['exit_price']} | "
+                     f"{x['ret']:+.2f} | {x.get('exit_reason', '跌破实底')} |")
     else:
         L.append("")
         L.append("（无）")
     L.append("")
     L.append("## 四、池内已了结统计")
     if removed_all:
-        rets = [x.get("ret", 0) for x in removed_all if x.get("ret") is not None]
+        rets = [x.get("ret", 0) for x in removed_all
+                if x.get("ret") is not None and x.get("exit_reason") != "超出价格上限"]
         win = sum(1 for r in rets if r > 0)
         L.append("")
         L.append(f"- 累计了结 **{len(rets)}** 只，胜率 **{100*win/len(rets):.1f}%**，平均 **{sum(rets)/len(rets):+.2f}%**（跌破实底出场）")
         brk = sum(1 for x in removed_all if x.get("exit_reason") == "跌破实底")
-        L.append(f"- 其中跌破实底 {brk} 只；最长持有 {max([x.get('days',0) for x in removed_all] or [0])} 个交易日")
+        over = sum(1 for x in removed_all if x.get("exit_reason") == "超出价格上限")
+        L.append(f"- 其中跌破实底 {brk} 只、涨破价格上限移出 {over} 只（不计入以上胜率）；"
+                 f"最长持有 {max([x.get('days',0) for x in removed_all] or [0])} 个交易日")
     else:
         L.append("")
         L.append("（暂无）")
@@ -433,6 +450,8 @@ def main():
     ap.add_argument("--date", default="")
     ap.add_argument("--comp-th", type=float, default=0.03)
     ap.add_argument("--max-new", type=int, default=40)
+    ap.add_argument("--max-price", type=float, default=10.0,
+                    help="价格上限：只统计收盘价低于该值（默认 10 元；0=不限）")
     ap.add_argument("--push", action="store_true")
     ap.add_argument("--no-fetch", action="store_true")
     ap.add_argument("--with-month", action="store_true", default=True)
@@ -454,6 +473,15 @@ def main():
         log("预筛不可用 → 全市场取数")
     else:
         # 池内标的必须参与更新（即使今日涨幅不足3%）
+        if a.max_price and qmap:
+            n0 = len(cand)
+            keep = []
+            for c in cand:
+                px = (qmap.get(norm(c)) or {}).get("price")
+                if px is None or px <= 0 or px < a.max_price:
+                    keep.append(c)
+            cand = keep
+            log(f"价格预筛：涨幅≥3% {n0} 只 → 现价<{a.max_price:g} 元 {len(cand)} 只")
         targets = sorted(set(cand) | {c for c in sig if c in set(all_codes)})
         log(f"预筛：涨幅≥3% 的 {len(cand)} 只 + 池内 {len(sig)} 只 → 取数 {len(targets)} 只")
 
@@ -481,6 +509,8 @@ def main():
         s["code"], s["name"] = code, (name_map.get(code) or "").strip()
         if s["close"] < 3:
             continue
+        if a.max_price and s["close"] >= a.max_price:
+            continue
         news.append(s)
 
     # 月线长期力量：只对「王者突破」候选取（全量取太慢）
@@ -496,7 +526,7 @@ def main():
         log(f"月线完成 {len(mb_map)} 只")
 
     # 先更新旧池（用今日数据）
-    sig, removed_today = update_pool(sig, bars_map, target)
+    sig, removed_today = update_pool(sig, bars_map, target, a.max_price)
     removed_all.extend(removed_today)
 
     # 新信号入池：只收「王者突破」双确认（单条件仅列观察，不入池）
@@ -516,7 +546,7 @@ def main():
     save_pool(sig, removed_all)
     temp = read_env()
     md = build_report(target, news, sig, removed_today, removed_all, temp,
-                      dict(scanned=len(codes_names), covered=len(bars_map)), a.limit)
+                      dict(scanned=len(codes_names), covered=len(bars_map)), a.limit, a.max_price)
     os.makedirs(OUT, exist_ok=True)
     rp = os.path.join(OUT, f"王者突破_{target}.md")
     open(rp, "w", encoding="utf-8").write(md)
