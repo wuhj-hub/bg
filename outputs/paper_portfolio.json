@@ -22173,6 +22173,54 @@
       "entry": 27.74,
       "pool": "123ABC",
       "status": "open"
+    },
+    {
+      "code": "sh600248",
+      "name": "",
+      "entry_date": "2026-11-04",
+      "entry": 2.64,
+      "pool": "才哥",
+      "status": "open"
+    },
+    {
+      "code": "sh601366",
+      "name": "",
+      "entry_date": "2026-11-04",
+      "entry": 3.82,
+      "pool": "才哥",
+      "status": "open"
+    },
+    {
+      "code": "sh603777",
+      "name": "",
+      "entry_date": "2026-11-04",
+      "entry": 14.5,
+      "pool": "才哥",
+      "status": "open"
+    },
+    {
+      "code": "sz002088",
+      "name": "",
+      "entry_date": "2026-11-04",
+      "entry": 9.16,
+      "pool": "才哥",
+      "status": "open"
+    },
+    {
+      "code": "sh600358",
+      "name": "",
+      "entry_date": "2026-11-04",
+      "entry": 5.4,
+      "pool": "四维共振",
+      "status": "open"
+    },
+    {
+      "code": "sh603070",
+      "name": "",
+      "entry_date": "2026-11-04",
+      "entry": 10.38,
+      "pool": "RSV强度",
+      "status": "open"
     }
   ],
   "last_update": "2026-08-05 12:02"
