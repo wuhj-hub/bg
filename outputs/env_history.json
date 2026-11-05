@@ -347,7 +347,7 @@
   "degraded": false
  },
  "2026-11-05": {
-  "temp": 51.5,
+  "temp": 51.8,
   "level": "中性",
   "position_cap": 30,
   "subs": {
@@ -356,12 +356,12 @@
    "width": 100.0,
    "breadth": 30.0,
    "structure": 11.4,
-   "inbull": 17.0
+   "inbull": 20.3
   },
   "divergence": {
    "index_vs_emotion": -11.2,
    "breadth_vs_width": -70.0,
-   "structure_vs_inbull": -5.6
+   "structure_vs_inbull": -8.9
   },
   "degraded": false
  }
