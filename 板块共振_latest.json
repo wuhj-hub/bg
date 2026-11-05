@@ -1,12 +1,23 @@
 {
- "date": "2026-11-04",
+ "date": "2026-11-05",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 50,
+ "pool_size": 49,
  "resonance_boards": [
   {
-   "name": "医疗服务",
-   "code": "pt01801156",
-   "zdf": 7.83,
+   "name": "光伏设备",
+   "code": "pt01801735",
+   "zdf": 6.23,
+   "strength": 8,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
+   "zdf": 5.19,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -15,9 +26,20 @@
    ]
   },
   {
-   "name": "光伏设备",
-   "code": "pt01801735",
-   "zdf": 5.28,
+   "name": "广告营销",
+   "code": "pt01801765",
+   "zdf": 5.12,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "半导体",
+   "code": "pt01801081",
+   "zdf": 1.69,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -28,7 +50,7 @@
   {
    "name": "电池",
    "code": "pt01801737",
-   "zdf": 2.87,
+   "zdf": 4.43,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -39,7 +61,7 @@
   {
    "name": "游戏Ⅱ",
    "code": "pt01801764",
-   "zdf": 2.41,
+   "zdf": 2.11,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -48,12 +70,44 @@
    ]
   },
   {
-   "name": "航天装备Ⅱ",
-   "code": "pt01801741",
-   "zdf": 5.25,
+   "name": "电力设备",
+   "code": "pt01801730",
+   "zdf": 3.89,
    "strength": 7,
    "factors": [
     "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "风电设备",
+   "code": "pt01801736",
+   "zdf": 2.92,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "有色金属",
+   "code": "pt01801050",
+   "zdf": 2.09,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "医疗服务",
+   "code": "pt01801156",
+   "zdf": 3.69,
+   "strength": 5,
+   "factors": [
     "进场",
     "吸筹"
    ]
@@ -61,13 +115,23 @@
  ],
  "grab_top": [
   {
-   "name": "医疗服务",
-   "code": "pt01801156",
+   "name": "光伏设备",
+   "code": "pt01801735",
+   "value": 8
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
    "value": 7
   },
   {
-   "name": "光伏设备",
-   "code": "pt01801735",
+   "name": "广告营销",
+   "code": "pt01801765",
+   "value": 7
+  },
+  {
+   "name": "半导体",
+   "code": "pt01801081",
    "value": 7
   },
   {
@@ -81,65 +145,134 @@
    "value": 7
   },
   {
-   "name": "航天装备Ⅱ",
-   "code": "pt01801741",
+   "name": "电力设备",
+   "code": "pt01801730",
+   "value": 7
+  },
+  {
+   "name": "风电设备",
+   "code": "pt01801736",
+   "value": 7
+  },
+  {
+   "name": "有色金属",
+   "code": "pt01801050",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "医疗服务",
-   "code": "pt01801156",
-   "value": 21.3
-  },
-  {
-   "name": "航天装备Ⅱ",
-   "code": "pt01801741",
-   "value": 8.6
-  },
-  {
-   "name": "光伏设备",
-   "code": "pt01801735",
-   "value": 4.6
-  },
-  {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
-   "value": 3.2
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 105.6
   },
   {
    "name": "电池",
    "code": "pt01801737",
-   "value": 2.4
+   "value": 72.8
+  },
+  {
+   "name": "光伏设备",
+   "code": "pt01801735",
+   "value": 56.7
+  },
+  {
+   "name": "医疗服务",
+   "code": "pt01801156",
+   "value": 28.4
+  },
+  {
+   "name": "电力设备",
+   "code": "pt01801730",
+   "value": 27.3
+  },
+  {
+   "name": "有色金属",
+   "code": "pt01801050",
+   "value": 9.8
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 8.5
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 6.3
+  },
+  {
+   "name": "风电设备",
+   "code": "pt01801736",
+   "value": 3.9
+  },
+  {
+   "name": "广告营销",
+   "code": "pt01801765",
+   "value": 0.7
   }
  ],
  "absorption_top": [
   {
-   "name": "航天装备Ⅱ",
-   "code": "pt01801741",
-   "value": 1.89
-  },
-  {
-   "name": "医疗服务",
-   "code": "pt01801156",
-   "value": 1.21
-  },
-  {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
-   "value": 0.33
-  },
-  {
    "name": "光伏设备",
    "code": "pt01801735",
-   "value": 0.32
+   "value": 3.1
   },
   {
    "name": "电池",
    "code": "pt01801737",
+   "value": 2.12
+  },
+  {
+   "name": "医疗服务",
+   "code": "pt01801156",
+   "value": 1.5
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 1.07
+  },
+  {
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 0.79
+  },
+  {
+   "name": "风电设备",
+   "code": "pt01801736",
+   "value": 0.65
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 0.59
+  },
+  {
+   "name": "电力设备",
+   "code": "pt01801730",
+   "value": 0.32
+  },
+  {
+   "name": "有色金属",
+   "code": "pt01801050",
+   "value": 0.2
+  },
+  {
+   "name": "广告营销",
+   "code": "pt01801765",
    "value": 0.08
   }
  ],
  "control_top": [],
- "zhongjun_candidates": []
+ "zhongjun_candidates": [
+  {
+   "board": "贵金属",
+   "stock": "四川黄金",
+   "code": "sz001337",
+   "zdf": "9.55",
+   "main1": 1.23,
+   "main5": 0.36
+  }
+ ]
 }
