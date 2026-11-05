@@ -1,85 +1,34 @@
 {
- "date": "2026-11-04",
- "total": 103,
- "lianban_cnt": 12,
- "max_lb": 3,
- "shouban": 91,
+ "date": "2026-11-05",
+ "total": 46,
+ "lianban_cnt": 14,
+ "max_lb": 4,
+ "shouban": 32,
  "by_lb": {
-  "3": 6,
-  "2": 6,
-  "1": 91
+  "4": 2,
+  "3": 1,
+  "2": 11,
+  "1": 32
  },
  "score": {
-  "score": 46,
-  "level": "中性",
+  "score": 61,
+  "level": "活跃",
   "parts": {
-   "涨停家数": 20,
-   "连板高度": 10,
-   "连板占比": 16
+   "涨停家数": 8,
+   "连板高度": 18,
+   "连板占比": 35
   }
  },
  "persistence": [],
- "alerts": [
-  "⚠️ 高度退潮：最高板从4板降至3板（昨2026-11-03）"
- ],
+ "alerts": [],
  "lianban_rows": [
-  {
-   "code": "sz002058",
-   "name": "紫竹高科",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "电池",
-    "电池化学品",
-    "电力设备",
-    "基金减仓"
-   ]
-  },
   {
    "code": "sz002578",
    "name": "闽发铝业",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sz002827",
-   "name": "高争民爆",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "化学制品",
-    "基础化工"
-   ]
-  },
-  {
-   "code": "sh600892",
-   "name": "大晟文化",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -92,36 +41,8 @@
    "name": "浙文影业",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sh605577",
-   "name": "龙版传媒",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sz000679",
-   "name": "大连友谊",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -134,8 +55,8 @@
    "name": "鲁阳节能",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -148,8 +69,8 @@
    ]
   },
   {
-   "code": "sz002652",
-   "name": "扬子新材",
+   "code": "sz002081",
+   "name": "金螳螂",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -160,14 +81,15 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "建筑材料",
-    "其他建材Ⅲ",
-    "装修建材"
+    "装修装饰Ⅲ",
+    "装修装饰Ⅱ",
+    "建筑装饰",
+    "QFII新进"
    ]
   },
   {
-   "code": "sz002992",
-   "name": "宝明科技",
+   "code": "sz001337",
+   "name": "四川黄金",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -178,28 +100,121 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
+    "基金增仓"
+   ]
+  },
+  {
+   "code": "sz001360",
+   "name": "南矿集团",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "机械设备",
+    "专用设备"
+   ]
+  },
+  {
+   "code": "sz002529",
+   "name": "海源复材",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他专用设备",
+    "机械设备",
+    "专用设备"
+   ]
+  },
+  {
+   "code": "sz002388",
+   "name": "新亚制程",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他电子Ⅲ",
+    "其他电子Ⅱ",
+    "电子"
+   ]
+  },
+  {
+   "code": "sz003033",
+   "name": "征和工业",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "摩托车及其他",
+    "汽车",
+    "摩托车"
+   ]
+  },
+  {
+   "code": "sh600206",
+   "name": "有研新材",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "半导体材料",
+    "半导体",
     "电子",
-    "光学光电子",
+    "基金增仓"
+   ]
+  },
+  {
+   "code": "sh600641",
+   "name": "先导基电",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "半导体材料",
+    "半导体",
+    "电子",
     "基金减仓"
    ]
   },
   {
-   "code": "sh601123",
-   "name": "马矿股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sh603381",
-   "name": "永臻股份",
+   "code": "sh605488",
+   "name": "福莱新材",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -210,9 +225,45 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "光伏辅材",
-    "光伏设备",
-    "电力设备",
+    "膜材料",
+    "塑料",
+    "基础化工",
+    "基金减仓"
+   ]
+  },
+  {
+   "code": "sh603598",
+   "name": "引力传媒",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "私募重仓",
+    "社保新进"
+   ]
+  },
+  {
+   "code": "sh605287",
+   "name": "德才股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "装修装饰Ⅲ",
+    "装修装饰Ⅱ",
+    "建筑装饰",
     "私募重仓"
    ]
   }
