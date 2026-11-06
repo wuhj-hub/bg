@@ -22309,6 +22309,46 @@
       "entry": 7.92,
       "pool": "123ABC",
       "status": "open"
+    },
+    {
+      "code": "sh600278",
+      "name": "",
+      "entry_date": "2026-11-06",
+      "entry": 7.12,
+      "pool": "RSV强度",
+      "status": "open"
+    },
+    {
+      "code": "sh603087",
+      "name": "",
+      "entry_date": "2026-11-06",
+      "entry": 71.38,
+      "pool": "123ABC",
+      "status": "open"
+    },
+    {
+      "code": "sh605009",
+      "name": "",
+      "entry_date": "2026-11-06",
+      "entry": 23.26,
+      "pool": "123ABC",
+      "status": "open"
+    },
+    {
+      "code": "sz002099",
+      "name": "",
+      "entry_date": "2026-11-06",
+      "entry": 5.76,
+      "pool": "123ABC",
+      "status": "open"
+    },
+    {
+      "code": "sz002332",
+      "name": "",
+      "entry_date": "2026-11-06",
+      "entry": 8.98,
+      "pool": "123ABC",
+      "status": "open"
     }
   ],
   "last_update": "2026-08-05 12:02"
