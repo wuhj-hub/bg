@@ -366,7 +366,7 @@
   "degraded": false
  },
  "2026-11-06": {
-  "temp": 41.3,
+  "temp": 41.2,
   "level": "偏冷",
   "position_cap": 30,
   "subs": {
@@ -375,12 +375,12 @@
    "width": 41.0,
    "breadth": 29.8,
    "structure": 10.5,
-   "inbull": 20.3
+   "inbull": 19.4
   },
   "divergence": {
    "index_vs_emotion": -22.4,
    "breadth_vs_width": -11.2,
-   "structure_vs_inbull": -9.8
+   "structure_vs_inbull": -8.9
   },
   "degraded": false
  }
