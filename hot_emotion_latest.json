@@ -1,21 +1,22 @@
 {
- "date": "2026-11-05",
- "total": 46,
- "lianban_cnt": 14,
- "max_lb": 4,
- "shouban": 32,
+ "date": "2026-11-06",
+ "total": 23,
+ "lianban_cnt": 7,
+ "max_lb": 5,
+ "shouban": 16,
  "by_lb": {
-  "4": 2,
+  "5": 2,
+  "4": 1,
   "3": 1,
-  "2": 11,
-  "1": 32
+  "2": 3,
+  "1": 16
  },
  "score": {
-  "score": 61,
+  "score": 68,
   "level": "活跃",
   "parts": {
-   "涨停家数": 8,
-   "连板高度": 18,
+   "涨停家数": 5,
+   "连板高度": 28,
    "连板占比": 35
   }
  },
@@ -27,8 +28,8 @@
    "name": "闽发铝业",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -41,8 +42,8 @@
    "name": "浙文影业",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -55,8 +56,8 @@
    "name": "鲁阳节能",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -65,77 +66,8 @@
    "sectors": [
     "建筑材料",
     "耐火材料",
-    "装修建材"
-   ]
-  },
-  {
-   "code": "sz002081",
-   "name": "金螳螂",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "装修装饰Ⅲ",
-    "装修装饰Ⅱ",
-    "建筑装饰",
-    "QFII新进"
-   ]
-  },
-  {
-   "code": "sz001337",
-   "name": "四川黄金",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "基金增仓"
-   ]
-  },
-  {
-   "code": "sz001360",
-   "name": "南矿集团",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "机械设备",
-    "专用设备"
-   ]
-  },
-  {
-   "code": "sz002529",
-   "name": "海源复材",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "其他专用设备",
-    "机械设备",
-    "专用设备"
+    "装修建材",
+    "外资背景"
    ]
   },
   {
@@ -143,8 +75,8 @@
    "name": "新亚制程",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -153,49 +85,13 @@
    "sectors": [
     "其他电子Ⅲ",
     "其他电子Ⅱ",
-    "电子"
-   ]
-  },
-  {
-   "code": "sz003033",
-   "name": "征和工业",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "摩托车及其他",
-    "汽车",
-    "摩托车"
-   ]
-  },
-  {
-   "code": "sh600206",
-   "name": "有研新材",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "半导体材料",
-    "半导体",
     "电子",
-    "基金增仓"
+    "增持计划"
    ]
   },
   {
-   "code": "sh600641",
-   "name": "先导基电",
+   "code": "sz002086",
+   "name": "东方海洋",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -206,15 +102,14 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "半导体材料",
-    "半导体",
-    "电子",
-    "基金减仓"
+    "其他农产品加工",
+    "农产品加工",
+    "连续亏损"
    ]
   },
   {
-   "code": "sh605488",
-   "name": "福莱新材",
+   "code": "sh600261",
+   "name": "阳光照明",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -225,15 +120,14 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "膜材料",
-    "塑料",
-    "基础化工",
-    "基金减仓"
+    "照明设备Ⅲ",
+    "照明设备Ⅱ",
+    "家用电器"
    ]
   },
   {
-   "code": "sh603598",
-   "name": "引力传媒",
+   "code": "sh605339",
+   "name": "南侨食品",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -244,27 +138,7 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "私募重仓",
-    "社保新进"
-   ]
-  },
-  {
-   "code": "sh605287",
-   "name": "德才股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "装修装饰Ⅲ",
-    "装修装饰Ⅱ",
-    "建筑装饰",
-    "私募重仓"
+    "食品饮料"
    ]
   }
  ],
