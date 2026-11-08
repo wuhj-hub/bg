@@ -313,7 +313,9 @@ def update_pool(sig, bars_map, target_date, max_price=0.0):
         close = last["close"]
         it["last_date"] = last["date"]
         it["last_close"] = round(close, 2)
-        it["days"] = it.get("days", 0) + (1 if last["date"] != it.get("last_date_prev") else 0)
+        # 持有天数 / 不破顶天数：按信号日之后的K线逐根重算（断档补跑也能自愈）
+        since = [b for b in bars if b["date"] > it.get("signal_date", "")]
+        it["days"] = max(int(it.get("days") or 0), len(since))   # 只前进不倒退（K线窗口有限）
         it["last_date_prev"] = last["date"]
         it["peak"] = max(it.get("peak") or 0, round(close, 2))
         it["max_gain"] = round((it["peak"] / it["sig_close"] - 1) * 100, 2) if it.get("sig_close") else 0
@@ -331,7 +333,8 @@ def update_pool(sig, bars_map, target_date, max_price=0.0):
             removed_today.append(it)
             continue
         it["status"] = "强" if close >= it["sig_close"] else "观察"
-        it["hold_top_days"] = it.get("hold_top_days", 0) + (1 if close >= it["sig_close"] else 0)
+        it["hold_top_days"] = max(int(it.get("hold_top_days") or 0),
+                                  sum(1 for b in since if b["close"] >= it["sig_close"]))
         still[code] = it
     return still, removed_today
 
