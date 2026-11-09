@@ -394,12 +394,12 @@
    "width": 66.8,
    "breadth": 30.0,
    "structure": 11.1,
-   "inbull": 19.4
+   "inbull": 19.7
   },
   "divergence": {
    "index_vs_emotion": -10.9,
    "breadth_vs_width": -36.8,
-   "structure_vs_inbull": -8.3
+   "structure_vs_inbull": -8.6
   },
   "degraded": false
  }
