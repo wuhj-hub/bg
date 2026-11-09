@@ -1,23 +1,22 @@
 {
- "date": "2026-11-06",
- "total": 23,
- "lianban_cnt": 7,
- "max_lb": 5,
- "shouban": 16,
+ "date": "2026-11-09",
+ "total": 51,
+ "lianban_cnt": 10,
+ "max_lb": 6,
+ "shouban": 41,
  "by_lb": {
-  "5": 2,
-  "4": 1,
+  "6": 1,
   "3": 1,
-  "2": 3,
-  "1": 16
+  "2": 8,
+  "1": 41
  },
  "score": {
   "score": 68,
   "level": "活跃",
   "parts": {
-   "涨停家数": 5,
-   "连板高度": 28,
-   "连板占比": 35
+   "涨停家数": 8,
+   "连板高度": 36,
+   "连板占比": 24
   }
  },
  "persistence": [],
@@ -28,74 +27,22 @@
    "name": "闽发铝业",
    "price": "",
    "chg": "",
-   "lianban": 5,
-   "ji_ji_ban": "5天5板",
+   "lianban": 6,
+   "ji_ji_ban": "6天6板",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": []
-  },
-  {
-   "code": "sh601599",
-   "name": "浙文影业",
-   "price": "",
-   "chg": "",
-   "lianban": 5,
-   "ji_ji_ban": "5天5板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sz002088",
-   "name": "鲁阳节能",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "建筑材料",
-    "耐火材料",
-    "装修建材",
-    "外资背景"
-   ]
-  },
-  {
-   "code": "sz002388",
-   "name": "新亚制程",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "其他电子Ⅲ",
-    "其他电子Ⅱ",
-    "电子",
-    "增持计划"
-   ]
   },
   {
    "code": "sz002086",
    "name": "东方海洋",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -108,8 +55,8 @@
    ]
   },
   {
-   "code": "sh600261",
-   "name": "阳光照明",
+   "code": "sz000525",
+   "name": "红太阳",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -120,14 +67,12 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "照明设备Ⅲ",
-    "照明设备Ⅱ",
-    "家用电器"
+    "基础化工"
    ]
   },
   {
-   "code": "sh605339",
-   "name": "南侨食品",
+   "code": "sz001316",
+   "name": "润贝航科",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -138,7 +83,105 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "食品饮料"
+    "油品石化贸易",
+    "基金增仓",
+    "外资背景"
+   ]
+  },
+  {
+   "code": "sz002310",
+   "name": "东方新能",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sz002889",
+   "name": "东方嘉盛",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "物流",
+    "QFII新进"
+   ]
+  },
+  {
+   "code": "sh600278",
+   "name": "东方创业",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sh600327",
+   "name": "大东方",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "社区团购",
+    "私募新进"
+   ]
+  },
+  {
+   "code": "sh601188",
+   "name": "龙江交通",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "高速公路"
+   ]
+  },
+  {
+   "code": "sh603366",
+   "name": "日出东方",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "厨卫电器",
+    "卫浴电器",
+    "家用电器"
    ]
   }
  ],
