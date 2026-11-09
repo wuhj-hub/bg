@@ -1,12 +1,12 @@
 {
- "date": "2026-11-06",
+ "date": "2026-11-09",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 52,
+ "pool_size": 48,
  "resonance_boards": [
   {
-   "name": "种植业",
-   "code": "pt01801016",
-   "zdf": 1.29,
+   "name": "消费电子",
+   "code": "pt01801085",
+   "zdf": 1.93,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -15,9 +15,49 @@
    ]
   },
   {
-   "name": "通信服务",
-   "code": "pt01801223",
-   "zdf": 0.5,
+   "name": "半导体",
+   "code": "pt01801081",
+   "zdf": 0.17,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "一般零售",
+   "code": "pt01801203",
+   "zdf": 0.89,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
+   "zdf": 1.7,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "玻璃玻纤",
+   "code": "pt01801712",
+   "zdf": 0.97,
+   "strength": 5,
+   "factors": [
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "小金属",
+   "code": "pt01801054",
+   "zdf": 0.63,
    "strength": 5,
    "factors": [
     "进场",
@@ -27,44 +67,105 @@
  ],
  "grab_top": [
   {
-   "name": "种植业",
-   "code": "pt01801016",
+   "name": "消费电子",
+   "code": "pt01801085",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "种植业",
-   "code": "pt01801016",
-   "value": 2.0
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 112.2
   },
   {
-   "name": "通信服务",
-   "code": "pt01801223",
-   "value": 1.1
+   "name": "消费电子",
+   "code": "pt01801085",
+   "value": 33.4
+  },
+  {
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 24.3
+  },
+  {
+   "name": "小金属",
+   "code": "pt01801054",
+   "value": 16.5
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 13.9
+  },
+  {
+   "name": "一般零售",
+   "code": "pt01801203",
+   "value": 7.0
+  },
+  {
+   "name": "种植业",
+   "code": "pt01801016",
+   "value": 5.2
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 3.6
+  },
+  {
+   "name": "玻璃玻纤",
+   "code": "pt01801712",
+   "value": 0.4
   }
  ],
  "absorption_top": [
   {
-   "name": "种植业",
-   "code": "pt01801016",
-   "value": 0.76
+   "name": "贵金属",
+   "code": "pt01801053",
+   "value": 2.68
   },
   {
-   "name": "通信服务",
-   "code": "pt01801223",
-   "value": 0.15
+   "name": "种植业",
+   "code": "pt01801016",
+   "value": 1.7
+  },
+  {
+   "name": "小金属",
+   "code": "pt01801054",
+   "value": 1.26
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "value": 1.25
+  },
+  {
+   "name": "消费电子",
+   "code": "pt01801085",
+   "value": 1.11
+  },
+  {
+   "name": "一般零售",
+   "code": "pt01801203",
+   "value": 0.88
+  },
+  {
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 0.82
+  },
+  {
+   "name": "出版",
+   "code": "pt01801769",
+   "value": 0.43
+  },
+  {
+   "name": "玻璃玻纤",
+   "code": "pt01801712",
+   "value": 0.05
   }
  ],
  "control_top": [],
- "zhongjun_candidates": [
-  {
-   "board": "种植业",
-   "stock": "新赛股份",
-   "code": "sh600540",
-   "zdf": "10.10",
-   "main1": 0.74,
-   "main5": -0.18
-  }
- ]
+ "zhongjun_candidates": []
 }
