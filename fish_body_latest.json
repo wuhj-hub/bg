@@ -1,6 +1,6 @@
 {
   "market_temp": {
-    "temp": 70,
+    "temp": 65,
     "level": "中性偏多",
     "idx": "3663.72"
   },
@@ -34,6 +34,104 @@
       "month_trend": "纠缠",
       "month_gate": "WARN",
       "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sh600000",
+      "name": "浦发银行",
+      "pattern": "MACD空中加油",
+      "raw_score": 100,
+      "final_score": 79,
+      "multi_score": 59,
+      "resonance": "无共振",
+      "price": 10.2,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.19)>=DEA(0.17)金叉",
+        "MACD柱0.030刚翻红加油成功",
+        "收盘10.2>MA510.06",
+        "MA20>MA60多头排列",
+        "KDJ_J=85未超买"
+      ],
+      "stop_loss": "9.56",
+      "target": "11.73",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘震荡",
+        "stock": "个股中性",
+        "resonance": "无共振",
+        "score": 40
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": 249.4,
+      "rsg_strong": true
+    },
+    {
+      "code": "sh603119",
+      "name": "浙江荣泰",
+      "pattern": "MACD空中加油",
+      "raw_score": 85,
+      "final_score": 76,
+      "multi_score": 79,
+      "resonance": "部分共振",
+      "price": 65.45,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(3.22)>=DEA(2.17)金叉",
+        "MACD柱2.09>0但已走高",
+        "收盘65.45>MA562.42",
+        "MA20>MA60多头排列",
+        "KDJ_J=80未超买"
+      ],
+      "stop_loss": "59.30",
+      "target": "75.27",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘震荡",
+        "stock": "个股强势",
+        "resonance": "部分共振",
+        "score": 70
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sh601009",
+      "name": "南京银行",
+      "pattern": "MACD空中加油",
+      "raw_score": 95,
+      "final_score": 76,
+      "multi_score": 62,
+      "resonance": "无共振",
+      "price": 12.51,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.14)>=DEA(0.09)金叉",
+        "MACD柱0.110刚翻红加油成功",
+        "收盘12.51>MA512.29",
+        "MA20>MA60多头排列"
+      ],
+      "stop_loss": "11.68",
+      "target": "14.39",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘震荡",
+        "stock": "个股中性",
+        "resonance": "无共振",
+        "score": 40
+      },
+      "month_trend": "多头",
+      "month_gate": "PASS",
+      "month_reversal": "平台突破(12月新高)",
       "rsg_dev": null,
       "rsg_strong": false
     },
@@ -177,8 +275,8 @@
       "price": 30.6,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(1.74)>=DEA(1.44)金叉",
-        "MACD柱0.59>0但已走高",
+        "DIF(1.73)>=DEA(1.44)金叉",
+        "MACD柱0.60>0但已走高",
         "收盘30.6>MA528.06",
         "MA20>MA60多头排列"
       ],
@@ -195,38 +293,6 @@
       "month_trend": "纠缠",
       "month_gate": "PASS",
       "month_reversal": "平台突破(12月新高)",
-      "rsg_dev": null,
-      "rsg_strong": false
-    },
-    {
-      "code": "sh600926",
-      "name": "杭州银行",
-      "pattern": "MACD空中加油",
-      "raw_score": 95,
-      "final_score": 69,
-      "multi_score": 46,
-      "resonance": "共振向下",
-      "price": 17.33,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.09)>=DEA(0.06)金叉",
-        "MACD柱0.070刚翻红加油成功",
-        "收盘17.33>MA517.09",
-        "MA20>MA60多头排列"
-      ],
-      "stop_loss": "16.24",
-      "target": "19.93",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘震荡",
-        "stock": "个股弱势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": null,
       "rsg_strong": false
     },
@@ -435,7 +501,7 @@
       "price": 16.1,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.36)>=DEA(0.23)金叉",
+        "DIF(0.37)>=DEA(0.23)金叉",
         "MACD柱0.28>0但已走高",
         "收盘16.1>MA515.24",
         "MA20>MA60多头排列"
@@ -467,7 +533,7 @@
       "price": 16.1,
       "reasons": [
         "MA20(14.67)>MA60(13.61)",
-        "MACD金叉(DIF=0.36)",
+        "MACD金叉(DIF=0.37)",
         "KDJ向上(J=107)",
         "收盘16.1>MA515.24",
         "突破验证通过：量1.7倍/回踩守住/位置8%"
@@ -646,7 +712,7 @@
       "reasons": [
         "DIF/DEA在0轴上方",
         "DIF(0.22)>=DEA(0.08)金叉",
-        "MACD柱0.28>0但已走高",
+        "MACD柱0.29>0但已走高",
         "KDJ_J=66未超买"
       ],
       "stop_loss": "18.12",
@@ -794,23 +860,55 @@
       "rsg_strong": false
     },
     {
-      "code": "sz002724",
-      "name": "海洋王",
+      "code": "sz002352",
+      "name": "顺丰控股",
+      "pattern": "MACD空中加油",
+      "raw_score": 75,
+      "final_score": 60,
+      "multi_score": 60,
+      "resonance": "无共振",
+      "price": 33.82,
+      "reasons": [
+        "DIF/DEA在0轴上方",
+        "DIF(0.79)>=DEA(0.56)金叉",
+        "MACD柱0.45>0但已走高",
+        "MA20>MA60多头排列",
+        "KDJ_J=75未超买"
+      ],
+      "stop_loss": "32.48",
+      "target": "38.89",
+      "mode": 1,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘震荡",
+        "stock": "个股中性",
+        "resonance": "无共振",
+        "score": 40
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
+    },
+    {
+      "code": "sh601009",
+      "name": "南京银行",
       "pattern": "均线回踩支撑",
       "raw_score": 75,
-      "final_score": 59,
-      "multi_score": 57,
+      "final_score": 60,
+      "multi_score": 62,
       "resonance": "无共振",
-      "price": 13.18,
+      "price": 12.51,
       "reasons": [
-        "MA20(11.37)>MA60(8.32)多头",
+        "MA20(12.01)>MA60(11.88)多头",
         "MACD在0轴上方",
-        "在MA10附近(偏离2.0%)",
-        "收盘13.18>MA512.3",
+        "在MA10附近(偏离2.1%)",
+        "收盘12.51>MA512.29",
         "站在布林中轨上方"
       ],
-      "stop_loss": "10.80",
-      "target": "14.76",
+      "stop_loss": "11.41",
+      "target": "14.01",
       "mode": 2,
       "tag": "",
       "resonance_detail": {
@@ -821,9 +919,9 @@
       },
       "month_trend": "多头",
       "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": 1197.5,
-      "rsg_strong": true
+      "month_reversal": "平台突破(12月新高)",
+      "rsg_dev": null,
+      "rsg_strong": false
     },
     {
       "code": "sh600795",
@@ -856,6 +954,70 @@
       "month_reversal": "趋势确立(MA6上行)",
       "rsg_dev": 277.6,
       "rsg_strong": true
+    },
+    {
+      "code": "sh600000",
+      "name": "浦发银行",
+      "pattern": "均线回踩支撑",
+      "raw_score": 75,
+      "final_score": 59,
+      "multi_score": 59,
+      "resonance": "无共振",
+      "price": 10.2,
+      "reasons": [
+        "MA20(9.86)>MA60(9.43)多头",
+        "MACD在0轴上方",
+        "在MA10附近(偏离1.7%)",
+        "收盘10.2>MA510.06",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "9.37",
+      "target": "11.42",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘震荡",
+        "stock": "个股中性",
+        "resonance": "无共振",
+        "score": 40
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": 249.4,
+      "rsg_strong": true
+    },
+    {
+      "code": "sh603119",
+      "name": "浙江荣泰",
+      "pattern": "均线回踩支撑",
+      "raw_score": 65,
+      "final_score": 58,
+      "multi_score": 79,
+      "resonance": "部分共振",
+      "price": 65.45,
+      "reasons": [
+        "MA20(55.06)>MA60(53.07)多头",
+        "MACD在0轴上方",
+        "偏离MA10约8.4%",
+        "收盘65.45>MA562.42",
+        "站在布林中轨上方"
+      ],
+      "stop_loss": "52.31",
+      "target": "73.30",
+      "mode": 2,
+      "tag": "",
+      "resonance_detail": {
+        "index": "大盘震荡",
+        "stock": "个股强势",
+        "resonance": "部分共振",
+        "score": 70
+      },
+      "month_trend": "纠缠",
+      "month_gate": "WARN",
+      "month_reversal": null,
+      "rsg_dev": null,
+      "rsg_strong": false
     },
     {
       "code": "sh601318",
@@ -1057,7 +1219,7 @@
       "reasons": [
         "DIF/DEA在0轴上方",
         "DIF(4.30)>=DEA(2.92)金叉",
-        "MACD柱2.77>0但已走高",
+        "MACD柱2.76>0但已走高",
         "MA20>MA60多头排列"
       ],
       "stop_loss": "123.76",
