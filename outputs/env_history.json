@@ -402,5 +402,24 @@
    "structure_vs_inbull": -8.6
   },
   "degraded": false
+ },
+ "2026-11-10": {
+  "temp": 62.9,
+  "level": "偏暖",
+  "position_cap": 30,
+  "subs": {
+   "index_trend": 70.3,
+   "emotion": 88.0,
+   "width": 99.6,
+   "breadth": 30.0,
+   "structure": 12.2,
+   "inbull": 19.7
+  },
+  "divergence": {
+   "index_vs_emotion": -17.7,
+   "breadth_vs_width": -69.6,
+   "structure_vs_inbull": -7.5
+  },
+  "degraded": false
  }
 }
