@@ -1,82 +1,94 @@
 {
- "date": "2026-11-09",
- "data_date": "2026-11-09",
+ "date": "2026-11-10",
+ "data_date": "2026-11-10",
  "style": "情绪市",
  "icon": "🔥",
- "score": 31,
+ "score": 44,
  "score_detail": {
-  "size_style": 0,
-  "limitup_structure": 16,
+  "size_style": 12,
+  "limitup_structure": 33,
   "volume_structure": 8,
-  "sector_fund": 7
+  "sector_fund": -9
  },
  "size_style": {
-  "hs300_5d": 0.98,
-  "hs300_10d": -1.16,
-  "zz1000_5d": 2.69,
-  "zz1000_10d": -1.98,
-  "rel_5d": 1.72,
-  "rel_10d": -0.82,
-  "rel_20d": -2.02,
-  "zz500_5d": 2.58
+  "hs300_5d": 1.25,
+  "hs300_10d": 0.24,
+  "zz1000_5d": 5.76,
+  "zz1000_10d": 2.37,
+  "rel_5d": 4.5,
+  "rel_10d": 2.13,
+  "rel_20d": -1.25,
+  "zz500_5d": 5.04
  },
  "limitup_structure": {
-  "limitup": 51,
-  "strong": 122,
-  "width_score": 67.6,
-  "level": "结构性偏强（涨停潮·涨少跌多分化）",
+  "limitup": 84,
+  "strong": 201,
+  "width_score": 99.6,
+  "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 4.0,
-  "zhaban_rate": 58.5,
-  "lianban": 10
+  "strong_ratio": 6.6,
+  "zhaban_rate": 33.3,
+  "lianban": 19
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.754,
-  "small_big_ratio_5d": 0.658,
+  "small_big_ratio_now": 0.823,
+  "small_big_ratio_5d": 0.669,
   "vol_shift": "资金流向中小盘"
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "元件",
-    "zdf": "2.81",
-    "main_net5d": -126.3,
-    "retail_net": -37.8,
+    "name": "影视院线",
+    "zdf": "6.80",
+    "main_net5d": 2.7,
+    "retail_net": -14.7,
+    "tag": "机构型"
+   },
+   {
+    "name": "半导体",
+    "zdf": "1.58",
+    "main_net5d": 89.8,
+    "retail_net": -41.0,
+    "tag": "机构型"
+   },
+   {
+    "name": "传媒",
+    "zdf": "3.47",
+    "main_net5d": 7.3,
+    "retail_net": -47.7,
+    "tag": "机构型"
+   },
+   {
+    "name": "昨日涨停",
+    "zdf": "4.86",
+    "main_net5d": -43.2,
+    "retail_net": 14.4,
     "tag": "游资型"
    },
    {
     "name": "光伏设备",
-    "zdf": "-2.27",
-    "main_net5d": 55.4,
-    "retail_net": 10.4,
-    "tag": "混合"
-   },
-   {
-    "name": "通信设备",
-    "zdf": "1.67",
-    "main_net5d": -114.0,
-    "retail_net": -36.8,
-    "tag": "游资型"
+    "zdf": "1.07",
+    "main_net5d": 39.7,
+    "retail_net": -3.4,
+    "tag": "机构型"
    }
   ]
  },
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "欧马模式": 1,
-   "堆量模式": 14
-  },
-  "leaders": {
-   "欧马模式": 1,
-   "堆量模式": 10
-  },
-  "pullbacks": {
+   "堆量模式": 14,
    "欧马模式": 1
   },
-  "gpoints": {
-   "堆量模式": 1
+  "leaders": {
+   "堆量模式": 11,
+   "欧马模式": 1
   },
+  "pullbacks": {
+   "堆量模式": 2
+  },
+  "gpoints": {},
   "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
   "total_scored": 15
  },
