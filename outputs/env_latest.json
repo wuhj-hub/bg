@@ -1,7 +1,7 @@
 {
  "data_date": "2026-11-11",
  "run_date": "2026-11-11",
- "temp": 56.7,
+ "temp": 56.8,
  "level": "中性",
  "position_cap": 30,
  "subs": {
@@ -41,11 +41,11 @@
    "date": "2026-11-11"
   },
   "inbull": {
-   "raw": 6.41,
-   "score": 21.4,
+   "raw": 6.73,
+   "score": 22.4,
    "w": 0.09,
    "src": "inbull_scan",
-   "date": "2026-11-10"
+   "date": "2026-11-11"
   }
  },
  "style": {
@@ -61,7 +61,7 @@
  "divergence": {
   "index_vs_emotion": 6.0,
   "breadth_vs_width": -59.3,
-  "structure_vs_inbull": -8.9
+  "structure_vs_inbull": -9.9
  },
  "degraded": false,
  "missing": [],
