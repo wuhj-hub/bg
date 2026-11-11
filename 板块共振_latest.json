@@ -1,34 +1,12 @@
 {
- "date": "2026-11-10",
+ "date": "2026-11-11",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 45,
+ "pool_size": 49,
  "resonance_boards": [
-  {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "zdf": 6.8,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "航天装备Ⅱ",
-   "code": "pt01801741",
-   "zdf": 3.59,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
   {
    "name": "通信设备",
    "code": "pt01801102",
-   "zdf": 2.99,
+   "zdf": 9.99,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -37,9 +15,9 @@
    ]
   },
   {
-   "name": "传媒",
-   "code": "pt01801760",
-   "zdf": 3.47,
+   "name": "元件",
+   "code": "pt01801083",
+   "zdf": 7.4,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -48,53 +26,9 @@
    ]
   },
   {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
-   "zdf": 2.71,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "zdf": 3.35,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "通用设备",
-   "code": "pt01801072",
-   "zdf": 2.51,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "光学光电子",
-   "code": "pt01801084",
-   "zdf": 2.52,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "影视传媒",
-   "code": "pt02031356",
-   "zdf": 4.78,
+   "name": "玻璃玻纤",
+   "code": "pt01801712",
+   "zdf": 4.58,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -105,7 +39,128 @@
   {
    "name": "半导体",
    "code": "pt01801081",
-   "zdf": 1.58,
+   "zdf": 3.6,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "芯片概念",
+   "code": "pt02003891",
+   "zdf": 2.26,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "zdf": 1.86,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "燃气Ⅱ",
+   "code": "pt01801163",
+   "zdf": 1.72,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "通用设备",
+   "code": "pt01801072",
+   "zdf": 2.61,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "小金属",
+   "code": "pt01801054",
+   "zdf": 1.53,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "自动化设备",
+   "code": "pt01801078",
+   "zdf": 2.66,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "塑料",
+   "code": "pt01801036",
+   "zdf": 2.54,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "通信",
+   "code": "pt01801770",
+   "zdf": 7.99,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "PCB概念",
+   "code": "pt02101284",
+   "zdf": 3.38,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "机器人概念",
+   "code": "pt02003640",
+   "zdf": 1.76,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "游戏Ⅱ",
+   "code": "pt01801764",
+   "zdf": 0.76,
    "strength": 5,
    "factors": [
     "进场",
@@ -115,7 +170,7 @@
   {
    "name": "消费电子",
    "code": "pt01801085",
-   "zdf": 2.83,
+   "zdf": 1.53,
    "strength": 5,
    "factors": [
     "进场",
@@ -123,19 +178,9 @@
    ]
   },
   {
-   "name": "光伏设备",
-   "code": "pt01801735",
-   "zdf": 1.07,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "电池",
-   "code": "pt01801737",
-   "zdf": 0.69,
+   "name": "光学光电子",
+   "code": "pt01801084",
+   "zdf": 1.47,
    "strength": 5,
    "factors": [
     "进场",
@@ -145,33 +190,38 @@
  ],
  "grab_top": [
   {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "value": 7
-  },
-  {
-   "name": "航天装备Ⅱ",
-   "code": "pt01801741",
-   "value": 7
-  },
-  {
    "name": "通信设备",
    "code": "pt01801102",
    "value": 7
   },
   {
-   "name": "传媒",
-   "code": "pt01801760",
+   "name": "元件",
+   "code": "pt01801083",
    "value": 7
   },
   {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
+   "name": "玻璃玻纤",
+   "code": "pt01801712",
    "value": 7
   },
   {
-   "name": "广告营销",
-   "code": "pt01801765",
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 7
+  },
+  {
+   "name": "芯片概念",
+   "code": "pt02003891",
+   "value": 7
+  },
+  {
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "value": 7
+  },
+  {
+   "name": "燃气Ⅱ",
+   "code": "pt01801163",
    "value": 7
   },
   {
@@ -180,21 +230,36 @@
    "value": 7
   },
   {
-   "name": "光学光电子",
-   "code": "pt01801084",
+   "name": "小金属",
+   "code": "pt01801054",
    "value": 7
   },
   {
-   "name": "影视传媒",
-   "code": "pt02031356",
+   "name": "自动化设备",
+   "code": "pt01801078",
    "value": 7
   }
  ],
  "entry_top": [
   {
+   "name": "芯片概念",
+   "code": "pt02003891",
+   "value": 390.5
+  },
+  {
    "name": "半导体",
    "code": "pt01801081",
-   "value": 264.7
+   "value": 147.6
+  },
+  {
+   "name": "机器人概念",
+   "code": "pt02003640",
+   "value": 146.3
+  },
+  {
+   "name": "通信设备",
+   "code": "pt01801102",
+   "value": 97.0
   },
   {
    "name": "消费电子",
@@ -202,104 +267,98 @@
    "value": 80.4
   },
   {
-   "name": "通信设备",
-   "code": "pt01801102",
-   "value": 41.3
-  },
-  {
-   "name": "光伏设备",
-   "code": "pt01801735",
-   "value": 39.7
-  },
-  {
-   "name": "光学光电子",
-   "code": "pt01801084",
-   "value": 13.2
-  },
-  {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "value": 11.1
-  },
-  {
-   "name": "传媒",
-   "code": "pt01801760",
-   "value": 7.3
+   "name": "通信",
+   "code": "pt01801770",
+   "value": 46.6
   },
   {
    "name": "通用设备",
    "code": "pt01801072",
-   "value": 6.0
+   "value": 34.8
   },
   {
-   "name": "影视传媒",
-   "code": "pt02031356",
-   "value": 5.4
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "value": 32.1
   },
   {
-   "name": "电池",
-   "code": "pt01801737",
-   "value": 5.2
+   "name": "光学光电子",
+   "code": "pt01801084",
+   "value": 24.6
+  },
+  {
+   "name": "自动化设备",
+   "code": "pt01801078",
+   "value": 17.9
   }
  ],
  "absorption_top": [
   {
    "name": "消费电子",
    "code": "pt01801085",
-   "value": 2.62
-  },
-  {
-   "name": "半导体",
-   "code": "pt01801081",
-   "value": 1.97
-  },
-  {
-   "name": "光伏设备",
-   "code": "pt01801735",
-   "value": 1.63
-  },
-  {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "value": 1.02
-  },
-  {
-   "name": "光学光电子",
-   "code": "pt01801084",
-   "value": 0.72
+   "value": 2.53
   },
   {
    "name": "通信设备",
    "code": "pt01801102",
-   "value": 0.64
+   "value": 1.44
   },
   {
-   "name": "航天装备Ⅱ",
-   "code": "pt01801741",
-   "value": 0.52
+   "name": "光学光电子",
+   "code": "pt01801084",
+   "value": 1.3
   },
   {
-   "name": "游戏Ⅱ",
-   "code": "pt01801764",
-   "value": 0.41
+   "name": "半导体",
+   "code": "pt01801081",
+   "value": 1.08
   },
   {
-   "name": "影视院线",
-   "code": "pt01801766",
-   "value": 0.3
+   "name": "小金属",
+   "code": "pt01801054",
+   "value": 1.03
+  },
+  {
+   "name": "芯片概念",
+   "code": "pt02003891",
+   "value": 1.01
+  },
+  {
+   "name": "汽车零部件",
+   "code": "pt01801093",
+   "value": 0.99
   },
   {
    "name": "通用设备",
    "code": "pt01801072",
-   "value": 0.17
+   "value": 0.95
+  },
+  {
+   "name": "塑料",
+   "code": "pt01801036",
+   "value": 0.86
+  },
+  {
+   "name": "自动化设备",
+   "code": "pt01801078",
+   "value": 0.73
   }
  ],
  "control_top": [
   {
    "name": "贵金属",
    "code": "pt01801053",
-   "value": 3.19
+   "value": 3.21
   }
  ],
- "zhongjun_candidates": []
+ "zhongjun_candidates": [
+  {
+   "board": "玻璃玻纤",
+   "stock": "凯盛新能",
+   "code": "sh600876",
+   "zdf": "9.97",
+   "main1": 0.21,
+   "main5": -0.01
+  }
+ ]
 }
