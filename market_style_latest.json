@@ -1,76 +1,76 @@
 {
- "date": "2026-11-10",
- "data_date": "2026-11-10",
+ "date": "2026-11-11",
+ "data_date": "2026-11-11",
  "style": "情绪市",
  "icon": "🔥",
- "score": 44,
+ "score": 45,
  "score_detail": {
-  "size_style": 12,
+  "size_style": 15,
   "limitup_structure": 33,
-  "volume_structure": 8,
-  "sector_fund": -9
+  "volume_structure": 0,
+  "sector_fund": -3
  },
  "size_style": {
-  "hs300_5d": 1.25,
-  "hs300_10d": 0.24,
-  "zz1000_5d": 5.76,
-  "zz1000_10d": 2.37,
-  "rel_5d": 4.5,
-  "rel_10d": 2.13,
-  "rel_20d": -1.25,
-  "zz500_5d": 5.04
+  "hs300_5d": -0.62,
+  "hs300_10d": -0.2,
+  "zz1000_5d": 2.42,
+  "zz1000_10d": 1.39,
+  "rel_5d": 3.05,
+  "rel_10d": 1.59,
+  "rel_20d": -0.05,
+  "zz500_5d": 1.38,
+  "small_mid_diverg": "小盘独涨·中盘不跟"
  },
  "limitup_structure": {
-  "limitup": 84,
-  "strong": 201,
-  "width_score": 99.6,
-  "level": "🔥 强势（普涨格局）",
+  "limitup": 76,
+  "strong": 191,
+  "width_score": 89.1,
+  "level": "🔥 结构性偏强（涨多跌少·赚钱效应强）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 6.6,
-  "zhaban_rate": 33.3,
+  "strong_ratio": 6.3,
+  "zhaban_rate": 39.2,
   "lianban": 19
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.823,
-  "small_big_ratio_5d": 0.669,
-  "vol_shift": "资金流向中小盘"
+  "small_big_ratio_now": 0.763,
+  "small_big_ratio_5d": 0.716
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "影视院线",
-    "zdf": "6.80",
-    "main_net5d": 2.7,
-    "retail_net": -14.7,
+    "name": "通信设备",
+    "zdf": "9.99",
+    "main_net5d": 41.3,
+    "retail_net": -130.2,
     "tag": "机构型"
    },
    {
-    "name": "半导体",
-    "zdf": "1.58",
-    "main_net5d": 89.8,
-    "retail_net": -41.0,
-    "tag": "机构型"
-   },
-   {
-    "name": "传媒",
-    "zdf": "3.47",
-    "main_net5d": 7.3,
-    "retail_net": -47.7,
-    "tag": "机构型"
-   },
-   {
-    "name": "昨日涨停",
-    "zdf": "4.86",
-    "main_net5d": -43.2,
-    "retail_net": 14.4,
+    "name": "元件",
+    "zdf": "7.40",
+    "main_net5d": -21.3,
+    "retail_net": -81.3,
     "tag": "游资型"
    },
    {
-    "name": "光伏设备",
-    "zdf": "1.07",
-    "main_net5d": 39.7,
-    "retail_net": -3.4,
+    "name": "半导体",
+    "zdf": "3.60",
+    "main_net5d": 264.7,
+    "retail_net": -76.8,
+    "tag": "机构型"
+   },
+   {
+    "name": "白酒Ⅱ",
+    "zdf": "-2.78",
+    "main_net5d": -28.9,
+    "retail_net": 10.6,
+    "tag": "游资型"
+   },
+   {
+    "name": "光伏概念",
+    "zdf": "1.30",
+    "main_net5d": 67.1,
+    "retail_net": -36.0,
     "tag": "机构型"
    }
   ]
@@ -78,17 +78,17 @@
  "mode_cross": {
   "dominant": "堆量模式",
   "all": {
-   "堆量模式": 14,
-   "欧马模式": 1
+   "堆量模式": 15
   },
   "leaders": {
-   "堆量模式": 11,
-   "欧马模式": 1
+   "堆量模式": 12
   },
   "pullbacks": {
-   "堆量模式": 2
+   "堆量模式": 3
   },
-  "gpoints": {},
+  "gpoints": {
+   "堆量模式": 1
+  },
   "verdict": "✅ 强共振（风格轴与猛兽双模式一致）",
   "total_scored": 15
  },
