@@ -1,5 +1,5 @@
 {
- "date": "2026-11-11",
+ "date": "2026-11-12",
  "writes": {
   "板块共振_latest.json": [
    ".github/workflows/quant_scan.yml",
@@ -1023,8 +1023,8 @@
  "dup_freshness": [
   {
    "name": "sector_component_em.json",
-   "root": "2026-11-10",
-   "outputs": "2026-11-10",
+   "root": "2026-11-11",
+   "outputs": "2026-11-11",
    "status": "同步"
   },
   {
