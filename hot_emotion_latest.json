@@ -1,36 +1,35 @@
 {
- "date": "2026-11-11",
- "total": 76,
- "lianban_cnt": 19,
- "max_lb": 4,
- "shouban": 57,
+ "date": "2026-11-12",
+ "total": 37,
+ "lianban_cnt": 11,
+ "max_lb": 5,
+ "shouban": 26,
  "by_lb": {
+  "5": 2,
   "4": 2,
-  "3": 5,
-  "2": 12,
-  "1": 57
+  "3": 2,
+  "2": 5,
+  "1": 26
  },
  "score": {
-  "score": 65,
+  "score": 68,
   "level": "活跃",
   "parts": {
-   "涨停家数": 12,
-   "连板高度": 18,
+   "涨停家数": 5,
+   "连板高度": 28,
    "连板占比": 35
   }
  },
  "persistence": [],
- "alerts": [
-  "⚠️ 高度退潮：最高板从7板降至4板（昨2026-11-10）"
- ],
+ "alerts": [],
  "lianban_rows": [
   {
    "code": "sh600327",
    "name": "大东方",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -46,8 +45,8 @@
    "name": "日出东方",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -60,31 +59,12 @@
    ]
   },
   {
-   "code": "sz002708",
-   "name": "光洋股份",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "汽车零部件",
-    "汽车",
-    "底盘与发动机系统",
-    "飞行汽车(eVTOL)"
-   ]
-  },
-  {
    "code": "sz002623",
    "name": "亚玛顿",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -98,49 +78,12 @@
    ]
   },
   {
-   "code": "sz002931",
-   "name": "锋龙股份",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "金属制品",
-    "QFII新进"
-   ]
-  },
-  {
-   "code": "sh600715",
-   "name": "文投控股",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "信托重仓",
-    "连续亏损",
-    "游戏概念"
-   ]
-  },
-  {
    "code": "sh603706",
    "name": "东方环宇",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -151,170 +94,12 @@
    ]
   },
   {
-   "code": "sz000678",
-   "name": "襄阳轴承",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "汽车零部件",
-    "汽车",
-    "底盘与发动机系统",
-    "连续亏损"
-   ]
-  },
-  {
-   "code": "sz002160",
-   "name": "常铝股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "基金减仓"
-   ]
-  },
-  {
-   "code": "sz001339",
-   "name": "智微智能",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "计算机设备",
-    "网络安全",
-    "私募新进",
-    "保险新进"
-   ]
-  },
-  {
-   "code": "sz002209",
-   "name": "达意隆",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "印刷包装机械",
-    "机械设备",
-    "专用设备",
-    "私募新进"
-   ]
-  },
-  {
-   "code": "sz002313",
-   "name": "日海智能",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通信终端及配件"
-   ]
-  },
-  {
-   "code": "sz002425",
-   "name": "凯撒文化",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "QFII新进",
-    "连续亏损",
-    "游戏概念"
-   ]
-  },
-  {
-   "code": "sz002861",
-   "name": "瀛通通讯",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "电子",
-    "消费电子零部件及组装",
-    "消费电子",
-    "智能音箱"
-   ]
-  },
-  {
-   "code": "sh601595",
-   "name": "上海电影",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": []
-  },
-  {
-   "code": "sh603466",
-   "name": "风语筑",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "首发经济",
-    "QFII新进",
-    "游戏概念"
-   ]
-  },
-  {
    "code": "sh603536",
    "name": "惠发食品",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -327,31 +112,12 @@
    ]
   },
   {
-   "code": "sh605488",
-   "name": "福莱新材",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "膜材料",
-    "塑料",
-    "基础化工",
-    "基金减仓"
-   ]
-  },
-  {
    "code": "sh605255",
    "name": "天普股份",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -361,6 +127,98 @@
     "汽车零部件",
     "汽车",
     "底盘与发动机系统"
+   ]
+  },
+  {
+   "code": "sz002148",
+   "name": "北纬科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "基金增仓",
+    "高市盈率",
+    "游戏概念",
+    "芯片概念"
+   ]
+  },
+  {
+   "code": "sz002593",
+   "name": "日上集团",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "钢结构",
+    "建筑装饰",
+    "专业工程"
+   ]
+  },
+  {
+   "code": "sh603135",
+   "name": "中重科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "机械设备",
+    "专用设备",
+    "基金减仓",
+    "高端装备"
+   ]
+  },
+  {
+   "code": "sh603396",
+   "name": "金辰股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "光伏加工设备",
+    "光伏设备",
+    "电力设备",
+    "QFII新进"
+   ]
+  },
+  {
+   "code": "sh603725",
+   "name": "天安新材",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "瓷砖地板",
+    "轻工制造"
    ]
   }
  ],
