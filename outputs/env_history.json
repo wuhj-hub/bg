@@ -442,7 +442,7 @@
   "degraded": false
  },
  "2026-11-12": {
-  "temp": 42.2,
+  "temp": 42.0,
   "level": "偏冷",
   "position_cap": 30,
   "subs": {
@@ -451,12 +451,12 @@
    "width": 42.0,
    "breadth": 18.6,
    "structure": 11.5,
-   "inbull": 22.4
+   "inbull": 19.6
   },
   "divergence": {
    "index_vs_emotion": -14.3,
    "breadth_vs_width": -23.4,
-   "structure_vs_inbull": -10.9
+   "structure_vs_inbull": -8.1
   },
   "degraded": false
  }
