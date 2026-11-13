@@ -16,19 +16,6 @@
       "note": "日线建仓2026-11-13+周线+60m"
     },
     {
-      "code": "sz000060",
-      "name": "中金岭南",
-      "entry": "2026-11-13",
-      "guaili": false,
-      "in_now": true,
-      "week": "2026-10-08",
-      "m60": true,
-      "stars": 5,
-      "reversal": null,
-      "strength": null,
-      "note": "日线建仓2026-11-13+周线+60m"
-    },
-    {
       "code": "sz000069",
       "name": "华侨城Ａ",
       "entry": "2026-11-13",
@@ -113,19 +100,6 @@
       "guaili": false,
       "in_now": true,
       "week": "2026-09-21",
-      "m60": true,
-      "stars": 5,
-      "reversal": null,
-      "strength": null,
-      "note": "日线建仓2026-11-13+周线+60m"
-    },
-    {
-      "code": "sz000553",
-      "name": "安道麦A",
-      "entry": "2026-11-13",
-      "guaili": false,
-      "in_now": true,
-      "week": "2026-10-26",
       "m60": true,
       "stars": 5,
       "reversal": null,
@@ -1641,6 +1615,19 @@
       "note": "日线建仓2026-11-10+周线+60m"
     },
     {
+      "code": "sz000060",
+      "name": "中金岭南",
+      "entry": "2026-11-13",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-10-08",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-11-13+周线"
+    },
+    {
       "code": "sz000070",
       "name": "特发信息",
       "entry": "2026-11-09",
@@ -1678,6 +1665,19 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-11-09+周线"
+    },
+    {
+      "code": "sz000553",
+      "name": "安道麦A",
+      "entry": "2026-11-13",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-10-26",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-11-13+周线"
     },
     {
       "code": "sz000567",
