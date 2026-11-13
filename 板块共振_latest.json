@@ -1,34 +1,26 @@
 {
- "date": "2026-11-12",
+ "date": "2026-11-13",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 50,
+ "pool_size": 49,
  "resonance_boards": [
   {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "zdf": 0.82,
-   "strength": 5,
+   "name": "影视院线",
+   "code": "pt01801766",
+   "zdf": 3.5,
+   "strength": 7,
    "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
   },
   {
-   "name": "国有大型银行Ⅱ",
-   "code": "pt01801782",
-   "zdf": 0.81,
-   "strength": 5,
+   "name": "白色家电",
+   "code": "pt01801111",
+   "zdf": 2.68,
+   "strength": 7,
    "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "半导体",
-   "code": "pt01801081",
-   "zdf": 0.55,
-   "strength": 5,
-   "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -36,7 +28,29 @@
   {
    "name": "银行",
    "code": "pt01801780",
-   "zdf": 0.36,
+   "zdf": 1.46,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "国有大型银行Ⅱ",
+   "code": "pt01801782",
+   "zdf": 1.56,
+   "strength": 7,
+   "factors": [
+    "抢筹",
+    "进场",
+    "吸筹"
+   ]
+  },
+  {
+   "name": "饮料乳品",
+   "code": "pt01801127",
+   "zdf": 1.0,
    "strength": 5,
    "factors": [
     "进场",
@@ -44,70 +58,91 @@
    ]
   }
  ],
- "grab_top": [],
- "entry_top": [
+ "grab_top": [
   {
-   "name": "半导体",
-   "code": "pt01801081",
-   "value": 112.7
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 7
+  },
+  {
+   "name": "白色家电",
+   "code": "pt01801111",
+   "value": 7
   },
   {
    "name": "银行",
    "code": "pt01801780",
-   "value": 21.6
-  },
-  {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "value": 18.7
+   "value": 7
   },
   {
    "name": "国有大型银行Ⅱ",
    "code": "pt01801782",
-   "value": 12.6
+   "value": 7
+  }
+ ],
+ "entry_top": [
+  {
+   "name": "银行",
+   "code": "pt01801780",
+   "value": 20.6
   },
   {
-   "name": "服装家纺",
-   "code": "pt01801132",
-   "value": 0.5
+   "name": "国有大型银行Ⅱ",
+   "code": "pt01801782",
+   "value": 12.8
+  },
+  {
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 9.3
+  },
+  {
+   "name": "白色家电",
+   "code": "pt01801111",
+   "value": 2.6
+  },
+  {
+   "name": "饮料乳品",
+   "code": "pt01801127",
+   "value": 1.2
   }
  ],
  "absorption_top": [
   {
    "name": "国有大型银行Ⅱ",
    "code": "pt01801782",
-   "value": 1.85
-  },
-  {
-   "name": "广告营销",
-   "code": "pt01801765",
-   "value": 1.41
+   "value": 1.95
   },
   {
    "name": "银行",
    "code": "pt01801780",
-   "value": 1.17
+   "value": 1.12
   },
   {
-   "name": "半导体",
-   "code": "pt01801081",
-   "value": 0.81
+   "name": "白色家电",
+   "code": "pt01801111",
+   "value": 0.89
   },
   {
-   "name": "服装家纺",
-   "code": "pt01801132",
-   "value": 0.13
+   "name": "影视院线",
+   "code": "pt01801766",
+   "value": 0.88
+  },
+  {
+   "name": "饮料乳品",
+   "code": "pt01801127",
+   "value": 0.35
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "国有大型银行Ⅱ",
-   "stock": "工商银行",
-   "code": "sh601398",
-   "zdf": "1.88",
-   "main1": 1.69,
-   "main5": 2.32
+   "board": "白色家电",
+   "stock": "美的集团",
+   "code": "sz000333",
+   "zdf": "2.91",
+   "main1": 2.82,
+   "main5": 1.98
   }
  ]
 }
