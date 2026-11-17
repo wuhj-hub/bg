@@ -1719,19 +1719,6 @@
       "note": "日线建仓2026-11-16+周线+60m"
     },
     {
-      "code": "sz002851",
-      "name": "麦格米特",
-      "entry": "2026-11-16",
-      "guaili": true,
-      "in_now": true,
-      "week": "2026-10-26",
-      "m60": true,
-      "stars": 5,
-      "reversal": null,
-      "strength": null,
-      "note": "日线建仓2026-11-16+周线+60m"
-    },
-    {
       "code": "sz002868",
       "name": "绿康生化",
       "entry": "2026-11-16",
@@ -2187,19 +2174,6 @@
       "note": "日线建仓2026-11-16+周线+60m"
     },
     {
-      "code": "sh600330",
-      "name": "天通股份",
-      "entry": "2026-11-16",
-      "guaili": true,
-      "in_now": true,
-      "week": "2026-11-16",
-      "m60": true,
-      "stars": 5,
-      "reversal": null,
-      "strength": null,
-      "note": "日线建仓2026-11-16+周线+60m"
-    },
-    {
       "code": "sh600339",
       "name": "中油工程",
       "entry": "2026-11-11",
@@ -2497,19 +2471,6 @@
       "reversal": null,
       "strength": null,
       "note": "日线建仓2026-11-13+周线+60m"
-    },
-    {
-      "code": "sh600645",
-      "name": "中源协和",
-      "entry": "2026-11-17",
-      "guaili": false,
-      "in_now": true,
-      "week": "2026-10-26",
-      "m60": true,
-      "stars": 5,
-      "reversal": null,
-      "strength": null,
-      "note": "日线建仓2026-11-17+周线+60m"
     },
     {
       "code": "sh600668",
@@ -5528,6 +5489,19 @@
       "note": "日线建仓2026-11-17+周线"
     },
     {
+      "code": "sz002851",
+      "name": "麦格米特",
+      "entry": "2026-11-16",
+      "guaili": true,
+      "in_now": true,
+      "week": "2026-10-26",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-11-16+周线"
+    },
+    {
       "code": "sz002852",
       "name": "道道全",
       "entry": "2026-11-17",
@@ -5996,6 +5970,19 @@
       "note": "日线建仓2026-11-16+周线"
     },
     {
+      "code": "sh600330",
+      "name": "天通股份",
+      "entry": "2026-11-16",
+      "guaili": true,
+      "in_now": true,
+      "week": "2026-11-16",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-11-16+周线"
+    },
+    {
       "code": "sh600360",
       "name": "华微电子",
       "entry": "2026-11-16",
@@ -6271,6 +6258,19 @@
     {
       "code": "sh600620",
       "name": "天宸股份",
+      "entry": "2026-11-17",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-10-26",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-11-17+周线"
+    },
+    {
+      "code": "sh600645",
+      "name": "中源协和",
       "entry": "2026-11-17",
       "guaili": false,
       "in_now": true,
