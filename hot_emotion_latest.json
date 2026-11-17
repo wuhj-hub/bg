@@ -1,159 +1,35 @@
 {
- "date": "2026-11-16",
- "total": 21,
- "lianban_cnt": 8,
- "max_lb": 4,
- "shouban": 13,
+ "date": "2026-11-17",
+ "total": 31,
+ "lianban_cnt": 6,
+ "max_lb": 3,
+ "shouban": 25,
  "by_lb": {
-  "4": 1,
-  "3": 2,
+  "3": 1,
   "2": 5,
-  "1": 13
+  "1": 25
  },
  "score": {
-  "score": 58,
-  "level": "活跃",
+  "score": 39,
+  "level": "低迷",
   "parts": {
    "涨停家数": 5,
-   "连板高度": 18,
-   "连板占比": 35
+   "连板高度": 10,
+   "连板占比": 24
   }
  },
  "persistence": [],
- "alerts": [],
+ "alerts": [
+  "⚠️ 高度退潮：最高板从4板降至3板（昨2026-11-16）"
+ ],
  "lianban_rows": [
-  {
-   "code": "sz002148",
-   "name": "北纬科技",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "基金增仓",
-    "高市盈率",
-    "游戏概念",
-    "芯片概念"
-   ]
-  },
-  {
-   "code": "sz002187",
-   "name": "广百股份",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "首发经济",
-    "私募重仓",
-    "连续亏损"
-   ]
-  },
-  {
-   "code": "sz002205",
-   "name": "国统股份",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "水泥",
-    "水泥制品",
-    "建筑材料",
-    "水利建设"
-   ]
-  },
-  {
-   "code": "sz000595",
-   "name": "新能股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "增持计划",
-    "高市盈率"
-   ]
-  },
-  {
-   "code": "sz000819",
-   "name": "岳阳兴长",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "私募新进",
-    "增持计划",
-    "高市盈率"
-   ]
-  },
-  {
-   "code": "sz002425",
-   "name": "凯撒文化",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "QFII新进",
-    "连续亏损",
-    "游戏概念"
-   ]
-  },
-  {
-   "code": "sz002548",
-   "name": "金新农",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "连续亏损"
-   ]
-  },
   {
    "code": "sz002685",
    "name": "华东重机",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -165,6 +41,91 @@
     "工程机械",
     "芯片概念"
    ]
+  },
+  {
+   "code": "sz000521",
+   "name": "长虹美菱",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "家用电器",
+    "白色家电",
+    "冰洗",
+    "基金增仓"
+   ]
+  },
+  {
+   "code": "sz000533",
+   "name": "顺钠股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "电力设备",
+    "智算中心（AIDC）"
+   ]
+  },
+  {
+   "code": "sz002861",
+   "name": "瀛通通讯",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "电子",
+    "消费电子零部件及组装",
+    "消费电子",
+    "智能音箱"
+   ]
+  },
+  {
+   "code": "sz002959",
+   "name": "小熊电器",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "家用电器"
+   ]
+  },
+  {
+   "code": "sh600936",
+   "name": "北投科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
   }
  ],
  "leaders": {}
