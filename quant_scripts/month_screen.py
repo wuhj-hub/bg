@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""衔接 · 月线扫描（指标1 XG / 指标2 A5）
+"""衔接 · 月线扫描（弱启 = 原指标1 XG / 强启 = 原指标2 A5）
 
 范围：沪深主板非 ST（剔除创业板 300/301、科创板 688/689、北交所、ST/*ST）
 数据：腾讯前复权月线（newfqkline，单只最长 302 根 / 2001 至今，含成交量）
@@ -309,34 +309,34 @@ def tbl2(lst):
 
 
 def render(res, scanned, skipped, bar_date, cur_month_open=True, stale=0, label=None):
-    s1, s2 = res[0]['指标1'], res[0]['指标2']
+    s1, s2 = res[0]['弱启'], res[0]['强启']
     ym = bar_date[:7]
     stat = ("月线已走完" if not cur_month_open else "月线未走完")
     if label:
         info = f"**数据截止**：{label} 月线（完整）"
-        title = f"# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）· {label} 完整版\n"
+        title = f"# 衔接 · 月线扫描（弱启 / 强启，沪深主板非ST）· {label} 完整版\n"
     else:
         info = f"**最新月线**：{ym}（{stat}，末根 {bar_date}）"
-        title = "# 衔接 · 月线扫描（指标1 / 指标2，沪深主板非ST）\n"
+        title = "# 衔接 · 月线扫描（弱启 / 强启，沪深主板非ST）\n"
     md = [title,
           f"{info}　**有效标的**：{scanned} 只"
           f"（剔除 {skipped} 只数据不足/非主板/ST，另剔除 {stale} 只退市或长期停牌）\n",
           "**数据口径**：腾讯前复权月线（含成交量，单只最长 302 根）；名称与 ST 状态取实时行情快照\n"]
     if cur_month_open:
         md.append("\n> ⚠️ 当月月线尚未走完，下列「本月信号」为月内成立状态，需月末收盘确认。\n")
-    md.append(f"\n---\n\n## 一、指标1（XG）· {len(s1)} 只\n")
+    md.append(f"\n---\n\n## 一、弱启（XG）· {len(s1)} 只\n")
     md.append("C上穿MA10 → 其后仅1根阴线的回调且当月收阴、相对K1时MA10涨幅<50% → 自回调月起首次突破该阴线最高价且MA4>MA5>MA10 → K1以来无死叉、近3月有过起爆量能、K1附近有MA5上穿MA10。\n\n")
     md.append(tbl1(s1))
-    md.append(f"\n## 二、指标2（A5）· {len(s2)} 只\n")
+    md.append(f"\n## 二、强启（A5）· {len(s2)} 只\n")
     md.append("MA5上穿MA10 → 其后仅1根阴线的回调且当月收阴、相对金叉时MA10涨幅<50%且MA4>MA5>MA10 → 自回调月起首次上穿该阴线最高价 → 仅此一次突破、EMA12>EMA60、收盘<15元。\n\n")
     md.append(tbl2(s2))
     for k, lbl in ((1, '上月'), (2, '前月')):
         if k not in res:
             continue
-        md.append(f"\n## 三、{lbl}信号（已收盘，对照）\n\n### 指标1 · {len(res[k]['指标1'])} 只\n")
-        md.append(tbl1(res[k]['指标1']))
-        md.append(f"\n### 指标2 · {len(res[k]['指标2'])} 只\n")
-        md.append(tbl2(res[k]['指标2']))
+        md.append(f"\n## 三、{lbl}信号（已收盘，对照）\n\n### 弱启 · {len(res[k]['弱启'])} 只\n")
+        md.append(tbl1(res[k]['弱启']))
+        md.append(f"\n### 强启 · {len(res[k]['强启'])} 只\n")
+        md.append(tbl2(res[k]['强启']))
     md.append("""
 ---
 
@@ -386,7 +386,7 @@ def main():
     print(f'[pool] 剔除 ST 后 {len(codes)} 只', flush=True)
 
     cache = fetch_klines(codes, a.cache)
-    res = {k: {'指标1': [], '指标2': []} for k in range(a.months)}
+    res = {k: {'弱启': [], '强启': []} for k in range(a.months)}
     scanned = 0; skipped = 0; bar_dates = {}
     stale = 0
     for code in codes:
@@ -411,9 +411,9 @@ def main():
             r = eval_at(x, t)
             r['code'] = code; r['name'] = nm
             if r['XG1']:
-                res[k]['指标1'].append(r)
+                res[k]['弱启'].append(r)
             if r['A5']:
-                res[k]['指标2'].append(r)
+                res[k]['强启'].append(r)
 
     if scanned < len(codes) * 0.5:
         print(f'[error] 有效标的仅 {scanned}/{len(codes)}，数据源异常，终止'); return 1
@@ -428,7 +428,7 @@ def main():
     if cur_open:
         prev_ym = (time.strftime('%Y-%m', time.localtime(
             time.mktime(time.strptime(bar_date[:10], '%Y-%m-%d')) - 86400 * 28)))
-        res_prev = {0: {'指标1': [], '指标2': []}}
+        res_prev = {0: {'弱启': [], '强启': []}}
         extra = {}
         cur_m = bar_date[:7]
         for code in codes:
@@ -456,11 +456,11 @@ def main():
                 r = eval_at(xp, t2)
                 r['code'] = code
                 r['name'] = nm
-                tgt = res_prev[0] if k == 0 else extra.setdefault(k, {'指标1': [], '指标2': []})
+                tgt = res_prev[0] if k == 0 else extra.setdefault(k, {'弱启': [], '强启': []})
                 if r['XG1']:
-                    tgt['指标1'].append(r)
+                    tgt['弱启'].append(r)
                 if r['A5']:
-                    tgt['指标2'].append(r)
+                    tgt['强启'].append(r)
         # 对照区（上月/前月）一律用干净数据，与独立完整版一致
         for k, v in extra.items():
             res[k] = v
@@ -474,18 +474,18 @@ def main():
         md_prev = render(res_prev, scanned, skipped, bar_date, False, stale=stale, label=prev_ym)
         p_prev = os.path.join(a.outdir, f'衔接_{prev_ym}.md')
         open(p_prev, 'w').write(md_prev)
-        print(f"[out] {p_prev}（{prev_ym} 完整版：指标1={len(res_prev[0]['指标1'])} 指标2={len(res_prev[0]['指标2'])}）")
+        print(f"[out] {p_prev}（{prev_ym} 完整版：弱启={len(res_prev[0]['弱启'])} 强启={len(res_prev[0]['强启'])}）")
 
     payload = {'bar_date': bar_date, 'scanned': scanned, 'skipped': skipped,
-               '指标1': {str(k): res[k]['指标1'] for k in res},
-               '指标2': {str(k): res[k]['指标2'] for k in res}}
+               '弱启': {str(k): res[k]['弱启'] for k in res},
+               '强启': {str(k): res[k]['强启'] for k in res}}
     json.dump(payload, open(os.path.join(a.outdir, 'month_screen_latest.json'), 'w'), ensure_ascii=False, indent=1, default=str)
-    print(f'[out] {p_md}  指标1={len(res[0]["指标1"])} 指标2={len(res[0]["指标2"])}')
+    print(f'[out] {p_md}  弱启={len(res[0]["弱启"])} 强启={len(res[0]["强启"])}')
 
     if a.push and not a.no_push:
-        lines = [f"- **指标1（XG）** {len(res[0]['指标1'])} 只：" + ('、'.join(f"{r['name']}({r['close']:.2f})" for r in sorted(res[0]['指标1'], key=lambda z: -z['close'])) or '无'),
-                 f"- **指标2（A5）** {len(res[0]['指标2'])} 只：" + ('、'.join(f"{r['name']}({r['close']:.2f})" for r in sorted(res[0]['指标2'], key=lambda z: -z['close'])) or '无')]
-        push(f"📐 衔接月线 {ym} ｜ 指标1 {len(res[0]['指标1'])} · 指标2 {len(res[0]['指标2'])}",
+        lines = [f"- **弱启（XG）** {len(res[0]['弱启'])} 只：" + ('、'.join(f"{r['name']}({r['close']:.2f})" for r in sorted(res[0]['弱启'], key=lambda z: -z['close'])) or '无'),
+                 f"- **强启（A5）** {len(res[0]['强启'])} 只：" + ('、'.join(f"{r['name']}({r['close']:.2f})" for r in sorted(res[0]['强启'], key=lambda z: -z['close'])) or '无')]
+        push(f"📐 衔接月线 {ym} ｜ 弱启 {len(res[0]['弱启'])} · 强启 {len(res[0]['强启'])}",
              f"**沪深主板非ST · 数据截至 {bar_date}**\n\n" + '\n'.join(lines) + "\n\n> 详见知识库「报告/全盘量化」")
     return 0
 
