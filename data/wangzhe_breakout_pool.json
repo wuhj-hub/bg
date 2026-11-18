@@ -1615,9 +1615,7 @@
    "exit_date": "2026-10-20",
    "exit_price": 18.09,
    "exit_reason": "跌破实底",
-   "ret": -10.49,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -10.49
   },
   {
    "code": "603329",
@@ -1644,9 +1642,7 @@
    "exit_date": "2026-10-20",
    "exit_price": 10.73,
    "exit_reason": "跌破实底",
-   "ret": -8.45,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -8.45
   },
   {
    "code": "002767",
@@ -1673,9 +1669,7 @@
    "exit_date": "2026-10-20",
    "exit_price": 16.36,
    "exit_reason": "跌破实底",
-   "ret": -9.31,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -9.31
   },
   {
    "code": "603605",
@@ -1702,9 +1696,7 @@
    "exit_date": "2026-10-21",
    "exit_price": 55.59,
    "exit_reason": "跌破实底",
-   "ret": -3.81,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -3.81
   },
   {
    "code": "000090",
@@ -1756,9 +1748,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 13.0,
    "exit_reason": "跌破实底",
-   "ret": -11.86,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -11.86
   },
   {
    "code": "002278",
@@ -1812,9 +1802,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 30.13,
    "exit_reason": "跌破实底",
-   "ret": -6.14,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.14
   },
   {
    "code": "600742",
@@ -1922,9 +1910,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 14.2,
    "exit_reason": "跌破实底",
-   "ret": -10.52,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -10.52
   },
   {
    "code": "002389",
@@ -1951,9 +1937,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 18.05,
    "exit_reason": "跌破实底",
-   "ret": -4.55,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -4.55
   },
   {
    "code": "002258",
@@ -1980,9 +1964,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 13.88,
    "exit_reason": "跌破实底",
-   "ret": -6.91,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.91
   },
   {
    "code": "603337",
@@ -2009,9 +1991,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 35.69,
    "exit_reason": "跌破实底",
-   "ret": -1.68,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -1.68
   },
   {
    "code": "603351",
@@ -2038,9 +2018,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 26.27,
    "exit_reason": "跌破实底",
-   "ret": -6.18,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.18
   },
   {
    "code": "002355",
@@ -2121,9 +2099,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 37.8,
    "exit_reason": "跌破实底",
-   "ret": -4.18,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -4.18
   },
   {
    "code": "603918",
@@ -2150,9 +2126,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 10.35,
    "exit_reason": "跌破实底",
-   "ret": -4.08,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -4.08
   },
   {
    "code": "603703",
@@ -2179,9 +2153,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 9.93,
    "exit_reason": "跌破实底",
-   "ret": -3.59,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -3.59
   },
   {
    "code": "002792",
@@ -2208,9 +2180,7 @@
    "exit_date": "2026-10-22",
    "exit_price": 29.89,
    "exit_reason": "跌破实底",
-   "ret": -6.86,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.86
   },
   {
    "code": "603861",
@@ -2237,9 +2207,7 @@
    "exit_date": "2026-10-23",
    "exit_price": 11.12,
    "exit_reason": "跌破实底",
-   "ret": -5.76,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -5.76
   },
   {
    "code": "603790",
@@ -2266,9 +2234,7 @@
    "exit_date": "2026-10-23",
    "exit_price": 22.95,
    "exit_reason": "跌破实底",
-   "ret": -9.11,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -9.11
   },
   {
    "code": "002201",
@@ -2322,9 +2288,7 @@
    "exit_date": "2026-10-26",
    "exit_price": 20.75,
    "exit_reason": "跌破实底",
-   "ret": -5.64,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -5.64
   },
   {
    "code": "600148",
@@ -2351,9 +2315,7 @@
    "exit_date": "2026-10-26",
    "exit_price": 14.88,
    "exit_reason": "跌破实底",
-   "ret": -8.6,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -8.6
   },
   {
    "code": "600261",
@@ -2434,9 +2396,7 @@
    "exit_date": "2026-10-26",
    "exit_price": 42.65,
    "exit_reason": "跌破实底",
-   "ret": -4.11,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -4.11
   },
   {
    "code": "000519",
@@ -2462,9 +2422,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 13.8,
    "exit_reason": "跌破实底",
-   "ret": -4.7,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -4.7
   },
   {
    "code": "600038",
@@ -2491,9 +2449,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 26.33,
    "exit_reason": "跌破实底",
-   "ret": -4.18,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -4.18
   },
   {
    "code": "603015",
@@ -2520,9 +2476,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 10.01,
    "exit_reason": "跌破实底",
-   "ret": -7.31,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.31
   },
   {
    "code": "600391",
@@ -2549,9 +2503,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 38.15,
    "exit_reason": "跌破实底",
-   "ret": -10.49,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -10.49
   },
   {
    "code": "002265",
@@ -2578,9 +2530,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 19.02,
    "exit_reason": "跌破实底",
-   "ret": -5.33,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -5.33
   },
   {
    "code": "601778",
@@ -2661,9 +2611,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 13.4,
    "exit_reason": "跌破实底",
-   "ret": -4.96,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -4.96
   },
   {
    "code": "003007",
@@ -2690,9 +2638,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 35.91,
    "exit_reason": "跌破实底",
-   "ret": -9.13,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -9.13
   },
   {
    "code": "003025",
@@ -2719,9 +2665,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 11.57,
    "exit_reason": "跌破实底",
-   "ret": -5.55,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -5.55
   },
   {
    "code": "002988",
@@ -2748,9 +2692,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 27.66,
    "exit_reason": "跌破实底",
-   "ret": -11.46,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -11.46
   },
   {
    "code": "002876",
@@ -2777,9 +2719,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 27.64,
    "exit_reason": "跌破实底",
-   "ret": -11.47,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -11.47
   },
   {
    "code": "002967",
@@ -2806,9 +2746,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 17.0,
    "exit_reason": "跌破实底",
-   "ret": -3.41,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -3.41
   },
   {
    "code": "003009",
@@ -2835,9 +2773,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 41.89,
    "exit_reason": "跌破实底",
-   "ret": -6.06,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.06
   },
   {
    "code": "603051",
@@ -2864,9 +2800,7 @@
    "exit_date": "2026-10-27",
    "exit_price": 22.81,
    "exit_reason": "跌破实底",
-   "ret": -3.59,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -3.59
   },
   {
    "code": "002037",
@@ -2974,9 +2908,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 9.01,
    "exit_reason": "跌破实底",
-   "ret": -12.1,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -12.1
   },
   {
    "code": "002791",
@@ -3003,9 +2935,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 14.47,
    "exit_reason": "跌破实底",
-   "ret": -9.56,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -9.56
   },
   {
    "code": "603776",
@@ -3032,9 +2962,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 19.97,
    "exit_reason": "跌破实底",
-   "ret": -3.81,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -3.81
   },
   {
    "code": "603236",
@@ -3061,9 +2989,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 67.0,
    "exit_reason": "跌破实底",
-   "ret": -11.97,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -11.97
   },
   {
    "code": "002045",
@@ -3117,9 +3043,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 13.7,
    "exit_reason": "跌破实底",
-   "ret": -6.74,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.74
   },
   {
    "code": "002097",
@@ -3227,9 +3151,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 13.82,
    "exit_reason": "跌破实底",
-   "ret": -9.02,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -9.02
   },
   {
    "code": "001298",
@@ -3256,9 +3178,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 15.16,
    "exit_reason": "跌破实底",
-   "ret": -12.67,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -12.67
   },
   {
    "code": "002153",
@@ -3312,9 +3232,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 12.68,
    "exit_reason": "跌破实底",
-   "ret": -7.38,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.38
   },
   {
    "code": "600446",
@@ -3341,9 +3259,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 9.86,
    "exit_reason": "跌破实底",
-   "ret": -6.98,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.98
   },
   {
    "code": "000411",
@@ -3370,9 +3286,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 9.76,
    "exit_reason": "跌破实底",
-   "ret": -7.22,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.22
   },
   {
    "code": "603331",
@@ -3399,9 +3313,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 10.86,
    "exit_reason": "跌破实底",
-   "ret": -15.88,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -15.88
   },
   {
    "code": "600288",
@@ -3428,9 +3340,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 10.15,
    "exit_reason": "跌破实底",
-   "ret": -3.15,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -3.15
   },
   {
    "code": "600626",
@@ -3484,9 +3394,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 26.63,
    "exit_reason": "跌破实底",
-   "ret": -10.94,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -10.94
   },
   {
    "code": "603390",
@@ -3513,9 +3421,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 9.98,
    "exit_reason": "跌破实底",
-   "ret": -6.47,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.47
   },
   {
    "code": "002284",
@@ -3623,9 +3529,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 35.48,
    "exit_reason": "跌破实底",
-   "ret": -7.89,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.89
   },
   {
    "code": "002394",
@@ -3652,9 +3556,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 9.82,
    "exit_reason": "跌破实底",
-   "ret": -6.83,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.83
   },
   {
    "code": "603633",
@@ -3708,9 +3610,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 15.57,
    "exit_reason": "跌破实底",
-   "ret": -6.32,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.32
   },
   {
    "code": "002906",
@@ -3737,9 +3637,7 @@
    "exit_date": "2026-10-29",
    "exit_price": 24.3,
    "exit_reason": "跌破实底",
-   "ret": -7.36,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.36
   },
   {
    "code": "000030",
@@ -3819,9 +3717,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 11.03,
    "exit_reason": "跌破实底",
-   "ret": -7.23,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.23
   },
   {
    "code": "603755",
@@ -3848,9 +3744,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 25.25,
    "exit_reason": "跌破实底",
-   "ret": -6.31,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.31
   },
   {
    "code": "002933",
@@ -3877,9 +3771,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 24.15,
    "exit_reason": "跌破实底",
-   "ret": -12.97,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -12.97
   },
   {
    "code": "600698",
@@ -3933,9 +3825,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 12.21,
    "exit_reason": "跌破实底",
-   "ret": -8.47,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -8.47
   },
   {
    "code": "002940",
@@ -3962,9 +3852,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 21.29,
    "exit_reason": "跌破实底",
-   "ret": -9.9,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -9.9
   },
   {
    "code": "002112",
@@ -3991,9 +3879,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 12.28,
    "exit_reason": "跌破实底",
-   "ret": -14.9,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -14.9
   },
   {
    "code": "603696",
@@ -4020,9 +3906,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 12.76,
    "exit_reason": "跌破实底",
-   "ret": -14.71,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -14.71
   },
   {
    "code": "603685",
@@ -4049,9 +3933,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 24.91,
    "exit_reason": "跌破实底",
-   "ret": -8.08,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -8.08
   },
   {
    "code": "002363",
@@ -4132,9 +4014,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 12.93,
    "exit_reason": "跌破实底",
-   "ret": -7.25,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.25
   },
   {
    "code": "002983",
@@ -4161,9 +4041,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 20.2,
    "exit_reason": "跌破实底",
-   "ret": -13.79,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -13.79
   },
   {
    "code": "002196",
@@ -4190,9 +4068,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 9.52,
    "exit_reason": "跌破实底",
-   "ret": -6.3,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.3
   },
   {
    "code": "603933",
@@ -4219,9 +4095,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 17.02,
    "exit_reason": "跌破实底",
-   "ret": -10.61,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -10.61
   },
   {
    "code": "002010",
@@ -4275,9 +4149,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 42.58,
    "exit_reason": "跌破实底",
-   "ret": -9.54,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -9.54
   },
   {
    "code": "603219",
@@ -4304,9 +4176,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 11.95,
    "exit_reason": "跌破实底",
-   "ret": -6.71,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.71
   },
   {
    "code": "002801",
@@ -4333,9 +4203,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 25.04,
    "exit_reason": "跌破实底",
-   "ret": -5.37,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -5.37
   },
   {
    "code": "002698",
@@ -4362,9 +4230,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 10.52,
    "exit_reason": "跌破实底",
-   "ret": -7.39,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.39
   },
   {
    "code": "603275",
@@ -4391,9 +4257,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 33.94,
    "exit_reason": "跌破实底",
-   "ret": -7.42,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.42
   },
   {
    "code": "002765",
@@ -4447,9 +4311,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 12.82,
    "exit_reason": "跌破实底",
-   "ret": -8.82,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -8.82
   },
   {
    "code": "002420",
@@ -4503,9 +4365,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 14.11,
    "exit_reason": "跌破实底",
-   "ret": -3.88,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -3.88
   },
   {
    "code": "002823",
@@ -4532,9 +4392,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 11.74,
    "exit_reason": "跌破实底",
-   "ret": -12.97,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -12.97
   },
   {
    "code": "002703",
@@ -4561,9 +4419,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 13.69,
    "exit_reason": "跌破实底",
-   "ret": -10.64,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -10.64
   },
   {
    "code": "603376",
@@ -4590,9 +4446,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 23.51,
    "exit_reason": "跌破实底",
-   "ret": -10.61,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -10.61
   },
   {
    "code": "603121",
@@ -4619,9 +4473,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 10.99,
    "exit_reason": "跌破实底",
-   "ret": -11.23,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -11.23
   },
   {
    "code": "600523",
@@ -4648,9 +4500,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 11.61,
    "exit_reason": "跌破实底",
-   "ret": -3.65,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -3.65
   },
   {
    "code": "600395",
@@ -4704,9 +4554,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 14.99,
    "exit_reason": "跌破实底",
-   "ret": -16.4,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -16.4
   },
   {
    "code": "603926",
@@ -4733,9 +4581,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 15.07,
    "exit_reason": "跌破实底",
-   "ret": -11.66,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -11.66
   },
   {
    "code": "601799",
@@ -4762,9 +4608,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 66.0,
    "exit_reason": "跌破实底",
-   "ret": -6.77,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -6.77
   },
   {
    "code": "603579",
@@ -4791,9 +4635,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 14.75,
    "exit_reason": "跌破实底",
-   "ret": -14.54,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -14.54
   },
   {
    "code": "600114",
@@ -4820,9 +4662,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 21.34,
    "exit_reason": "跌破实底",
-   "ret": -9.77,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -9.77
   },
   {
    "code": "601698",
@@ -4849,9 +4689,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 21.96,
    "exit_reason": "跌破实底",
-   "ret": -4.94,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -4.94
   },
   {
    "code": "600862",
@@ -4878,9 +4716,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 17.82,
    "exit_reason": "跌破实底",
-   "ret": -2.46,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -2.46
   },
   {
    "code": "600611",
@@ -4961,9 +4797,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 33.14,
    "exit_reason": "跌破实底",
-   "ret": -1.22,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -1.22
   },
   {
    "code": "001379",
@@ -4990,9 +4824,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 14.52,
    "exit_reason": "跌破实底",
-   "ret": -8.28,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -8.28
   },
   {
    "code": "600879",
@@ -5019,9 +4851,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 12.64,
    "exit_reason": "跌破实底",
-   "ret": -7.87,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.87
   },
   {
    "code": "603536",
@@ -5048,9 +4878,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 9.46,
    "exit_reason": "跌破实底",
-   "ret": -9.39,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -9.39
   },
   {
    "code": "603225",
@@ -5077,9 +4905,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 16.22,
    "exit_reason": "跌破实底",
-   "ret": -1.99,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -1.99
   },
   {
    "code": "002943",
@@ -5106,9 +4932,7 @@
    "exit_date": "2026-10-30",
    "exit_price": 25.66,
    "exit_reason": "跌破实底",
-   "ret": -7.1,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.1
   },
   {
    "code": "603089",
@@ -5162,9 +4986,7 @@
    "exit_date": "2026-11-02",
    "exit_price": 25.79,
    "exit_reason": "跌破实底",
-   "ret": -10.17,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -10.17
   },
   {
    "code": "603072",
@@ -5191,9 +5013,7 @@
    "exit_date": "2026-11-02",
    "exit_price": 27.73,
    "exit_reason": "跌破实底",
-   "ret": -4.77,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -4.77
   },
   {
    "code": "603027",
@@ -5247,9 +5067,7 @@
    "exit_date": "2026-11-04",
    "exit_price": 10.67,
    "exit_reason": "跌破实底",
-   "ret": -7.7,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -7.7
   },
   {
    "code": "603303",
@@ -5276,9 +5094,7 @@
    "exit_date": "2026-11-04",
    "exit_price": 26.26,
    "exit_reason": "跌破实底",
-   "ret": -11.76,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -11.76
   },
   {
    "code": "600585",
@@ -5305,9 +5121,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 18.48,
    "exit_reason": "超出价格上限",
-   "ret": -0.86,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -0.86
   },
   {
    "code": "603348",
@@ -5334,9 +5148,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 15.08,
    "exit_reason": "超出价格上限",
-   "ret": -1.5,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -1.5
   },
   {
    "code": "603013",
@@ -5363,9 +5175,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 15.18,
    "exit_reason": "超出价格上限",
-   "ret": 1.2,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.2
   },
   {
    "code": "002626",
@@ -5392,9 +5202,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 17.56,
    "exit_reason": "超出价格上限",
-   "ret": 5.09,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 5.09
   },
   {
    "code": "600732",
@@ -5421,9 +5229,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 13.8,
    "exit_reason": "超出价格上限",
-   "ret": 23.21,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 23.21
   },
   {
    "code": "600501",
@@ -5450,9 +5256,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 16.76,
    "exit_reason": "超出价格上限",
-   "ret": 9.33,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 9.33
   },
   {
    "code": "002299",
@@ -5479,9 +5283,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 17.36,
    "exit_reason": "超出价格上限",
-   "ret": 8.03,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 8.03
   },
   {
    "code": "601155",
@@ -5508,9 +5310,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 12.68,
    "exit_reason": "超出价格上限",
-   "ret": 1.12,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.12
   },
   {
    "code": "603273",
@@ -5537,9 +5337,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 15.61,
    "exit_reason": "超出价格上限",
-   "ret": 7.43,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 7.43
   },
   {
    "code": "002472",
@@ -5566,9 +5364,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 44.49,
    "exit_reason": "超出价格上限",
-   "ret": 14.16,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 14.16
   },
   {
    "code": "003021",
@@ -5595,9 +5391,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 98.78,
    "exit_reason": "超出价格上限",
-   "ret": 36.12,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 36.12
   },
   {
    "code": "603341",
@@ -5624,9 +5418,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 39.19,
    "exit_reason": "超出价格上限",
-   "ret": 2.43,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 2.43
   },
   {
    "code": "001282",
@@ -5653,9 +5445,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 16.88,
    "exit_reason": "超出价格上限",
-   "ret": 3.18,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 3.18
   },
   {
    "code": "603286",
@@ -5682,9 +5472,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 53.86,
    "exit_reason": "超出价格上限",
-   "ret": 18.37,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 18.37
   },
   {
    "code": "001388",
@@ -5711,9 +5499,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 21.97,
    "exit_reason": "超出价格上限",
-   "ret": 7.85,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 7.85
   },
   {
    "code": "002929",
@@ -5740,9 +5526,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 57.37,
    "exit_reason": "超出价格上限",
-   "ret": 12.4,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 12.4
   },
   {
    "code": "001306",
@@ -5769,9 +5553,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 57.76,
    "exit_reason": "超出价格上限",
-   "ret": 1.07,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.07
   },
   {
    "code": "603009",
@@ -5798,9 +5580,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 52.13,
    "exit_reason": "超出价格上限",
-   "ret": 10.23,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 10.23
   },
   {
    "code": "600838",
@@ -5854,9 +5634,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 17.62,
    "exit_reason": "超出价格上限",
-   "ret": 10.54,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 10.54
   },
   {
    "code": "603838",
@@ -5883,9 +5661,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 13.06,
    "exit_reason": "超出价格上限",
-   "ret": -0.23,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -0.23
   },
   {
    "code": "603350",
@@ -5912,9 +5688,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 27.99,
    "exit_reason": "超出价格上限",
-   "ret": -5.05,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -5.05
   },
   {
    "code": "002439",
@@ -5941,9 +5715,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 14.62,
    "exit_reason": "超出价格上限",
-   "ret": -2.86,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -2.86
   },
   {
    "code": "603901",
@@ -5997,9 +5769,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 16.11,
    "exit_reason": "超出价格上限",
-   "ret": 2.94,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 2.94
   },
   {
    "code": "002380",
@@ -6026,9 +5796,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 27.95,
    "exit_reason": "超出价格上限",
-   "ret": 1.01,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.01
   },
   {
    "code": "000810",
@@ -6055,9 +5823,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 11.11,
    "exit_reason": "超出价格上限",
-   "ret": 10.88,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 10.88
   },
   {
    "code": "001308",
@@ -6084,9 +5850,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 19.04,
    "exit_reason": "超出价格上限",
-   "ret": 2.86,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 2.86
   },
   {
    "code": "002606",
@@ -6113,9 +5877,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 12.26,
    "exit_reason": "超出价格上限",
-   "ret": 1.41,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.41
   },
   {
    "code": "002223",
@@ -6142,9 +5904,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 29.02,
    "exit_reason": "超出价格上限",
-   "ret": 6.26,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 6.26
   },
   {
    "code": "603713",
@@ -6171,9 +5931,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 72.23,
    "exit_reason": "超出价格上限",
-   "ret": 8.36,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 8.36
   },
   {
    "code": "002026",
@@ -6200,9 +5958,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 10.68,
    "exit_reason": "超出价格上限",
-   "ret": -3.26,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -3.26
   },
   {
    "code": "600415",
@@ -6229,9 +5985,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 12.15,
    "exit_reason": "超出价格上限",
-   "ret": 7.52,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 7.52
   },
   {
    "code": "002230",
@@ -6258,9 +6012,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 39.15,
    "exit_reason": "超出价格上限",
-   "ret": 2.49,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 2.49
   },
   {
    "code": "605333",
@@ -6287,9 +6039,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 19.9,
    "exit_reason": "超出价格上限",
-   "ret": 20.97,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 20.97
   },
   {
    "code": "603160",
@@ -6316,9 +6066,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 62.88,
    "exit_reason": "超出价格上限",
-   "ret": 11.31,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 11.31
   },
   {
    "code": "001219",
@@ -6345,9 +6093,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 23.23,
    "exit_reason": "超出价格上限",
-   "ret": 70.56,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 70.56
   },
   {
    "code": "603886",
@@ -6374,9 +6120,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 13.44,
    "exit_reason": "超出价格上限",
-   "ret": 3.94,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 3.94
   },
   {
    "code": "002901",
@@ -6403,9 +6147,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 42.38,
    "exit_reason": "超出价格上限",
-   "ret": 0.55,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 0.55
   },
   {
    "code": "603719",
@@ -6459,9 +6201,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 23.25,
    "exit_reason": "超出价格上限",
-   "ret": 1.44,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.44
   },
   {
    "code": "605339",
@@ -6488,9 +6228,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 14.36,
    "exit_reason": "超出价格上限",
-   "ret": 8.54,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 8.54
   },
   {
    "code": "603716",
@@ -6517,9 +6255,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 15.65,
    "exit_reason": "超出价格上限",
-   "ret": -2.55,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -2.55
   },
   {
    "code": "002034",
@@ -6546,9 +6282,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 14.78,
    "exit_reason": "超出价格上限",
-   "ret": 3.65,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 3.65
   },
   {
    "code": "600309",
@@ -6575,9 +6309,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 73.58,
    "exit_reason": "超出价格上限",
-   "ret": 4.62,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 4.62
   },
   {
    "code": "002532",
@@ -6604,9 +6336,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 12.19,
    "exit_reason": "超出价格上限",
-   "ret": 2.27,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 2.27
   },
   {
    "code": "001296",
@@ -6633,9 +6363,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 19.78,
    "exit_reason": "超出价格上限",
-   "ret": -2.22,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -2.22
   },
   {
    "code": "603612",
@@ -6662,9 +6390,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 17.2,
    "exit_reason": "超出价格上限",
-   "ret": 8.31,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 8.31
   },
   {
    "code": "603199",
@@ -6691,9 +6417,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 34.37,
    "exit_reason": "超出价格上限",
-   "ret": 6.44,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 6.44
   },
   {
    "code": "603317",
@@ -6720,9 +6444,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 14.02,
    "exit_reason": "超出价格上限",
-   "ret": 10.74,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 10.74
   },
   {
    "code": "000983",
@@ -6776,9 +6498,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 42.9,
    "exit_reason": "超出价格上限",
-   "ret": 10.57,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 10.57
   },
   {
    "code": "605338",
@@ -6805,9 +6525,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 20.84,
    "exit_reason": "超出价格上限",
-   "ret": 9.8,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 9.8
   },
   {
    "code": "002078",
@@ -6834,9 +6552,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 13.99,
    "exit_reason": "超出价格上限",
-   "ret": 2.64,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 2.64
   },
   {
    "code": "603382",
@@ -6863,9 +6579,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 18.85,
    "exit_reason": "超出价格上限",
-   "ret": -5.13,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -5.13
   },
   {
    "code": "603389",
@@ -6892,9 +6606,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 47.71,
    "exit_reason": "超出价格上限",
-   "ret": 6.97,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 6.97
   },
   {
    "code": "600118",
@@ -6921,9 +6633,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 56.89,
    "exit_reason": "超出价格上限",
-   "ret": 1.77,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.77
   },
   {
    "code": "000893",
@@ -6950,9 +6660,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 37.75,
    "exit_reason": "超出价格上限",
-   "ret": 5.15,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 5.15
   },
   {
    "code": "002149",
@@ -6979,9 +6687,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 36.45,
    "exit_reason": "超出价格上限",
-   "ret": 12.81,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 12.81
   },
   {
    "code": "601083",
@@ -7008,9 +6714,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 14.46,
    "exit_reason": "超出价格上限",
-   "ret": 3.8,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 3.8
   },
   {
    "code": "603587",
@@ -7037,9 +6741,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 14.14,
    "exit_reason": "超出价格上限",
-   "ret": 9.61,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 9.61
   },
   {
    "code": "603899",
@@ -7066,9 +6768,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 23.68,
    "exit_reason": "超出价格上限",
-   "ret": 4.09,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 4.09
   },
   {
    "code": "002582",
@@ -7122,9 +6822,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 81.1,
    "exit_reason": "超出价格上限",
-   "ret": 5.23,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 5.23
   },
   {
    "code": "600262",
@@ -7151,9 +6849,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 14.48,
    "exit_reason": "超出价格上限",
-   "ret": 0.28,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 0.28
   },
   {
    "code": "603589",
@@ -7180,9 +6876,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 18.91,
    "exit_reason": "超出价格上限",
-   "ret": 4.36,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 4.36
   },
   {
    "code": "600702",
@@ -7209,9 +6903,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 34.65,
    "exit_reason": "超出价格上限",
-   "ret": 5.42,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 5.42
   },
   {
    "code": "000596",
@@ -7238,9 +6930,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 105.2,
    "exit_reason": "超出价格上限",
-   "ret": 9.93,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 9.93
   },
   {
    "code": "600690",
@@ -7267,9 +6957,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 21.42,
    "exit_reason": "超出价格上限",
-   "ret": 3.28,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 3.28
   },
   {
    "code": "600885",
@@ -7296,9 +6984,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 33.45,
    "exit_reason": "超出价格上限",
-   "ret": 7.25,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 7.25
   },
   {
    "code": "601038",
@@ -7325,9 +7011,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 14.27,
    "exit_reason": "超出价格上限",
-   "ret": 7.78,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 7.78
   },
   {
    "code": "600177",
@@ -7381,9 +7065,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 28.95,
    "exit_reason": "超出价格上限",
-   "ret": 2.95,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 2.95
   },
   {
    "code": "603103",
@@ -7410,9 +7092,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 17.38,
    "exit_reason": "超出价格上限",
-   "ret": 5.46,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 5.46
   },
   {
    "code": "605108",
@@ -7439,9 +7119,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 12.32,
    "exit_reason": "超出价格上限",
-   "ret": 1.07,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.07
   },
   {
    "code": "600633",
@@ -7468,9 +7146,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 11.35,
    "exit_reason": "超出价格上限",
-   "ret": 5.98,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 5.98
   },
   {
    "code": "603536",
@@ -7524,9 +7200,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 11.91,
    "exit_reason": "超出价格上限",
-   "ret": 1.28,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.28
   },
   {
    "code": "002159",
@@ -7553,9 +7227,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 13.51,
    "exit_reason": "超出价格上限",
-   "ret": 1.66,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.66
   },
   {
    "code": "000776",
@@ -7582,9 +7254,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 19.38,
    "exit_reason": "超出价格上限",
-   "ret": 0.41,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 0.41
   },
   {
    "code": "601788",
@@ -7611,9 +7281,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 13.9,
    "exit_reason": "超出价格上限",
-   "ret": 1.39,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.39
   },
   {
    "code": "605117",
@@ -7640,9 +7308,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 81.96,
    "exit_reason": "超出价格上限",
-   "ret": 13.06,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 13.06
   },
   {
    "code": "603091",
@@ -7669,9 +7335,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 46.67,
    "exit_reason": "超出价格上限",
-   "ret": 1.9,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.9
   },
   {
    "code": "000819",
@@ -7698,9 +7362,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 11.48,
    "exit_reason": "超出价格上限",
-   "ret": -2.38,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -2.38
   },
   {
    "code": "603477",
@@ -7727,9 +7389,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 15.13,
    "exit_reason": "超出价格上限",
-   "ret": 3.84,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 3.84
   },
   {
    "code": "603628",
@@ -7756,9 +7416,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 10.93,
    "exit_reason": "超出价格上限",
-   "ret": 6.43,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 6.43
   },
   {
    "code": "603486",
@@ -7785,9 +7443,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 49.12,
    "exit_reason": "超出价格上限",
-   "ret": 4.33,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 4.33
   },
   {
    "code": "002558",
@@ -7814,9 +7470,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 21.74,
    "exit_reason": "超出价格上限",
-   "ret": 1.16,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 1.16
   },
   {
    "code": "603402",
@@ -7843,9 +7497,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 56.86,
    "exit_reason": "超出价格上限",
-   "ret": 0.91,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 0.91
   },
   {
    "code": "002992",
@@ -7872,9 +7524,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 31.5,
    "exit_reason": "超出价格上限",
-   "ret": 3.75,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 3.75
   },
   {
    "code": "603777",
@@ -7901,9 +7551,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 14.62,
    "exit_reason": "超出价格上限",
-   "ret": 0.83,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 0.83
   },
   {
    "code": "600697",
@@ -7930,9 +7578,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 11.53,
    "exit_reason": "超出价格上限",
-   "ret": 4.16,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 4.16
   },
   {
    "code": "603456",
@@ -7959,9 +7605,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 16.64,
    "exit_reason": "超出价格上限",
-   "ret": 2.65,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 2.65
   },
   {
    "code": "600563",
@@ -7988,9 +7632,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 109.44,
    "exit_reason": "超出价格上限",
-   "ret": -0.4,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -0.4
   },
   {
    "code": "002773",
@@ -8017,9 +7659,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 22.28,
    "exit_reason": "超出价格上限",
-   "ret": 10.02,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 10.02
   },
   {
    "code": "600605",
@@ -8046,9 +7686,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 28.58,
    "exit_reason": "超出价格上限",
-   "ret": 3.74,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 3.74
   },
   {
    "code": "001312",
@@ -8075,9 +7713,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 16.86,
    "exit_reason": "超出价格上限",
-   "ret": -1.52,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -1.52
   },
   {
    "code": "603989",
@@ -8104,9 +7740,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 23.73,
    "exit_reason": "超出价格上限",
-   "ret": -2.47,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": -2.47
   },
   {
    "code": "603092",
@@ -8133,9 +7767,7 @@
    "exit_date": "2026-11-05",
    "exit_price": 41.5,
    "exit_reason": "超出价格上限",
-   "ret": 0.39,
-   "invalid": true,
-   "invalid_note": "历史脏数据：信号日收盘≥入池门槛10元（旧参数遗留，已剔除统计）"
+   "ret": 0.39
   },
   {
    "code": "000679",
@@ -10056,7 +9688,7 @@
   }
  ],
  "meta": {
-  "cleaned": "2026-11-18",
-  "note": "取消涨破10元移出，改为止盈跟踪；历史 sig_close>=10 记录标 invalid"
+  "updated": "2026-11-19",
+  "note": "取消价格限制（--max-price 0 全价位纳入）；历史记录全部有效，旧口径\"涨破上限\"项保留并可追溯"
  }
 }

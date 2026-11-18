@@ -25,8 +25,9 @@
   --scan            扫描最新交易日信号 + 更新跟踪池 + 出报告（默认）
   --pool-file F     股票池（默认 all_mainboard.csv）
   --limit N         K线根数（默认 80，足够 MA15+5日量+20日振幅）
-  --max-price P     入池价格门槛：只把「信号日收盘价 < P 元」（默认 10；0=不限）的标的纳入跟踪。
-                    涨过 P 元**不再移出**，继续按止盈规则跟踪（标 🎓 出圈）；--cap-mode exit 可回退旧口径
+  --max-price P     入池价格上限（**默认 0 = 不限价**，全价位纳入）。若设为正数，则只有信号日
+                    收盘价 < P 的标的入池，且涨过 P 后不再移出（🎓 出圈）；--cap-mode exit 可回退旧口径
+  --min-price P     入池价格下限（默认 0 = 不限）
   --cap-mode M      hold（默认）=涨过上限继续跟踪；exit=涨过即移出（旧口径）
   --take-profit     启用止盈（默认开）：浮盈破 MA10 / 峰值回撤 8% / 持有满 60 交易日
   --no-take-profit  只保留「跌破实底」止损
@@ -432,6 +433,8 @@ def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit
     L.append("> 防守：信号K **实顶=收盘**（强支撑）、**实底=开盘**（破则出局）。跟踪池每日更新，**跌破实底即删除**。")
     if max_price:
         L.append(f"> 入池：**信号日收盘价 < {max_price:g} 元**；涨过上限**不再移出**，继续按止盈规则跟踪（🎓 出圈）")
+    else:
+        L.append("> 入池：**不设价格限制（全价位纳入）**，止盈/止损规则一视同仁")
     L.append("> 止盈：①已浮盈且收盘跌破 **MA10** ②自最高收盘回撤 **8%**（浮盈≥5% 起启用）③持有满 **60** 个交易日；止损：收盘**跌破实底**")
     if temp is not None:
         tag = "🟢" if temp >= 55 else ("🟡" if temp >= 40 else "🔴")
@@ -572,8 +575,10 @@ def main():
     ap.add_argument("--date", default="")
     ap.add_argument("--comp-th", type=float, default=0.03)
     ap.add_argument("--max-new", type=int, default=40)
-    ap.add_argument("--max-price", type=float, default=10.0,
-                    help="入池价格门槛：仅信号日收盘价低于该值才入池（默认 10 元；0=不限）；涨过不再移出")
+    ap.add_argument("--max-price", type=float, default=0.0,
+                    help="入池价格上限（默认 0=不限价，全价位纳入）；设为正数时涨过不再移出，仅标出圈")
+    ap.add_argument("--min-price", type=float, default=0.0,
+                    help="入池价格下限（默认 0=不限）")
     ap.add_argument("--cap-mode", choices=["hold", "exit"], default="hold",
                     help="hold=涨过门槛继续跟踪（默认）；exit=涨过即移出（旧口径）")
     ap.add_argument("--take-profit", dest="take_profit", action="store_true", default=True)
@@ -603,15 +608,21 @@ def main():
         log("预筛不可用 → 全市场取数")
     else:
         # 池内标的必须参与更新（即使今日涨幅不足3%）
-        if a.max_price and qmap:
+        if (a.max_price or a.min_price) and qmap:
             n0 = len(cand)
             keep = []
             for c in cand:
                 px = (qmap.get(norm(c)) or {}).get("price")
-                if px is None or px <= 0 or px < a.max_price:
+                if px is None or px <= 0:
                     keep.append(c)
+                    continue
+                if a.max_price and px >= a.max_price:
+                    continue
+                if a.min_price and px < a.min_price:
+                    continue
+                keep.append(c)
             cand = keep
-            log(f"价格预筛：涨幅≥3% {n0} 只 → 现价<{a.max_price:g} 元 {len(cand)} 只")
+            log(f"价格预筛：涨幅≥3% {n0} 只 → 区间筛后 {len(cand)} 只")
         targets = sorted(set(cand) | {c for c in sig if c in set(all_codes)})
         log(f"预筛：涨幅≥3% 的 {len(cand)} 只 + 池内 {len(sig)} 只 → 取数 {len(targets)} 只")
 
@@ -637,7 +648,7 @@ def main():
         if not s:
             continue
         s["code"], s["name"] = code, (name_map.get(code) or "").strip()
-        if s["close"] < 3:
+        if a.min_price and s["close"] < a.min_price:
             continue
         if a.max_price and s["close"] >= a.max_price:
             continue

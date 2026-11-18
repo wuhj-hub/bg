@@ -756,7 +756,7 @@ jobs:
           FETCH_CACHE: "1"
           FETCH_CACHE_TTL: "18000"
         run: |
-          python3 quant_scripts/wangzhe_breakout.py --pool-file all_mainboard.csv --push || echo "王者突破扫描失败(非致命)"
+          python3 quant_scripts/wangzhe_breakout.py --pool-file all_mainboard.csv --max-price 0 --min-price 0 --push || echo "王者突破扫描失败(非致命)"
           # 池/报告生成后立即提交（不可放进前面「提交报告产物」步——那一步在本步之前，文件尚未生成）
           RP=$(ls -t outputs/王者突破_*.md 2>/dev/null | head -1)
           if [ -n "$RP" ]; then
