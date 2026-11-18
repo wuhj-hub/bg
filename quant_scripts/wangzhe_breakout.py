@@ -25,8 +25,15 @@
   --scan            扫描最新交易日信号 + 更新跟踪池 + 出报告（默认）
   --pool-file F     股票池（默认 all_mainboard.csv）
   --limit N         K线根数（默认 80，足够 MA15+5日量+20日振幅）
-  --max-price P     价格上限：只统计收盘价 < P 元（默认 10；0=不限）。新信号、单条件观察、
-                    在池跟踪统一适用；在池标的长到 P 元以上 → 移出（记「超出价格上限」，不计入胜率）
+  --max-price P     入池价格门槛：只把「信号日收盘价 < P 元」（默认 10；0=不限）的标的纳入跟踪。
+                    涨过 P 元**不再移出**，继续按止盈规则跟踪（标 🎓 出圈）；--cap-mode exit 可回退旧口径
+  --cap-mode M      hold（默认）=涨过上限继续跟踪；exit=涨过即移出（旧口径）
+  --take-profit     启用止盈（默认开）：浮盈破 MA10 / 峰值回撤 8% / 持有满 60 交易日
+  --no-take-profit  只保留「跌破实底」止损
+  --tp-ma N         止盈均线周期（默认 10 日）
+  --tp-dd X         移动止盈回撤阈值（默认 0.08＝8%）
+  --tp-min-gain G   移动止盈启动的浮盈门槛（默认 5%）
+  --max-hold N      最长持有交易日（默认 60）
   --date YYYY-MM-DD 指定信号日（默认各股最新K线日）
   --push            推送摘要（PushPlus，env PUSH_TOKEN）
   --no-fetch        只用缓存/池文件，不取数（调试）
@@ -276,7 +283,7 @@ def load_pool():
 
 def save_pool(sig, removed):
     os.makedirs(DATA, exist_ok=True)
-    removed = removed[-300:]
+    removed = removed[-2000:]      # 2026-11-18：300→2000（原截断会丢历史，累计了结数倒退）
     json.dump({"updated": datetime.now(BJT).strftime("%Y-%m-%d %H:%M"),
                "signals": sig, "removed": removed},
               open(POOL_F, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -297,8 +304,31 @@ def read_env():
     return None
 
 
-def update_pool(sig, bars_map, target_date, max_price=0.0):
-    """更新池内状态；跌破实底 → 移除；现价≥价格上限 → 移出（不计入「跌破实底」了结统计）。
+def _calc_ma(vals, n):
+    out, sm = [None] * len(vals), 0.0
+    for i, v in enumerate(vals):
+        sm += v
+        if i >= n:
+            sm -= vals[i - n]
+        if i >= n - 1:
+            out[i] = sm / n
+    return out
+
+
+def update_pool(sig, bars_map, target_date, max_price=0.0, cap_mode="hold",
+                take_profit=True, tp_ma=10, tp_dd=0.08, tp_min_gain=5.0, max_hold=60):
+    """更新池内状态（逐日、以**收盘价**判定）。出场规则优先级：
+
+      1) 跌破实底（收盘 < 信号日开盘）              -> 跌破实底（止损）
+      2) 止盈·破均线：已浮盈 且 收盘跌破 MA{tp_ma}    -> 浮盈破MA{n}止盈
+      3) 止盈·移动：一度浮盈>=tp_min_gain% 且 自最高收盘回撤>=tp_dd -> 峰值回撤止盈
+      4) 持有满 max_hold 个交易日                   -> 持有到期
+
+    价格上限 --max-price **只做入池筛选**：起始价<上限的标的涨过上限后**继续跟踪**
+    （cap_mode="exit" 才回退「涨破即移出」的旧口径）。
+
+    注：信号日必为涨幅>=3% 的阳线（收盘>开盘），故「跌破实底」的收益在数学上恒为负、
+    胜率恒为 0%，它只代表止损单的损伤，不能当作策略胜率。
 
     返回 (still, removed_today)
     """
@@ -313,30 +343,85 @@ def update_pool(sig, bars_map, target_date, max_price=0.0):
         close = last["close"]
         it["last_date"] = last["date"]
         it["last_close"] = round(close, 2)
-        # 持有天数 / 不破顶天数：按信号日之后的K线逐根重算（断档补跑也能自愈）
         since = [b for b in bars if b["date"] > it.get("signal_date", "")]
-        it["days"] = max(int(it.get("days") or 0), len(since))   # 只前进不倒退（K线窗口有限）
+        it["days"] = max(int(it.get("days") or 0), len(since))   # 只前进不倒退
         it["last_date_prev"] = last["date"]
         it["peak"] = max(it.get("peak") or 0, round(close, 2))
         it["max_gain"] = round((it["peak"] / it["sig_close"] - 1) * 100, 2) if it.get("sig_close") else 0
         it["dist_bottom"] = round((close / it["sig_open"] - 1) * 100, 2) if it.get("sig_open") else 0
-        if max_price and close >= max_price:
+        gain = (close / it["sig_close"] - 1) * 100 if it.get("sig_close") else 0.0
+
+        # 出圈：涨过入池门槛后继续跟踪（只打标，不退出）
+        if max_price and close >= max_price and not it.get("graduate"):
+            it["graduate"] = True
+            it["graduate_date"] = last["date"]
+            it["graduate_price"] = round(close, 2)
+
+        # 旧口径（可选）：涨破上限即移出
+        if cap_mode == "exit" and max_price and close >= max_price:
             it.update(exit_date=last["date"], exit_price=round(close, 2),
-                      exit_reason="超出价格上限",
-                      ret=round((close / it["sig_close"] - 1) * 100, 2))
+                      exit_reason="超出价格上限", ret=round(gain, 2))
             removed_today.append(it)
             continue
+
+        # 1) 止损：跌破实底
         if close < it["sig_open"]:
             it.update(exit_date=last["date"], exit_price=round(close, 2),
-                      exit_reason="跌破实底",
-                      ret=round((close / it["sig_close"] - 1) * 100, 2))
+                      exit_reason="跌破实底", ret=round(gain, 2))
             removed_today.append(it)
             continue
+
+        # 2) 止盈
+        reason = None
+        if take_profit:
+            m = _calc_ma([b["close"] for b in bars], tp_ma)[-1] if len(bars) >= tp_ma else None
+            if gain > 0 and m and close < m:
+                reason = "浮盈破MA%d止盈" % tp_ma
+            elif it["max_gain"] >= tp_min_gain and close <= it["peak"] * (1 - tp_dd):
+                reason = "峰值回撤%d%%止盈" % round(tp_dd * 100)
+        if reason:
+            it.update(exit_date=last["date"], exit_price=round(close, 2),
+                      exit_reason=reason, ret=round(gain, 2))
+            removed_today.append(it)
+            continue
+
+        # 3) 持有到期
+        if max_hold and it["days"] >= max_hold:
+            it.update(exit_date=last["date"], exit_price=round(close, 2),
+                      exit_reason="持有到期", ret=round(gain, 2))
+            removed_today.append(it)
+            continue
+
         it["status"] = "强" if close >= it["sig_close"] else "观察"
         it["hold_top_days"] = max(int(it.get("hold_top_days") or 0),
                                   sum(1 for b in since if b["close"] >= it["sig_close"]))
         still[code] = it
     return still, removed_today
+
+
+def backfill_exit_after(removed_all, bars_map):
+    """回填「出场后 5/10/20 交易日」涨跌（正=出场过早）。只用本次已取到的K线，不额外取数。"""
+    n = 0
+    for x in removed_all:
+        if x.get("exit_date") is None or x.get("after20") is not None:
+            continue
+        bars = bars_map.get(x.get("code")) or []
+        dates = [b["date"] for b in bars]
+        if x["exit_date"] not in dates:
+            continue
+        k = dates.index(x["exit_date"])
+        px = x.get("exit_price") or bars[k]["close"]
+        if not px:
+            continue
+        got = False
+        for h in (5, 10, 20):
+            key = "after%d" % h
+            if x.get(key) is None and k + h < len(bars):
+                x[key] = round((bars[k + h]["close"] / px - 1) * 100, 2)
+                got = True
+        if got:
+            n += 1
+    return n
 
 
 def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit, max_price=0.0):
@@ -346,7 +431,8 @@ def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit
     L.append("> 口径：**神龙摆尾尾部突破K**（涨幅≥3% + 收盘上穿 HHV(MA15,5) + CG≠FS）× **王者倍量柱**（量≥2×前5日均量 + 阳线）")
     L.append("> 防守：信号K **实顶=收盘**（强支撑）、**实底=开盘**（破则出局）。跟踪池每日更新，**跌破实底即删除**。")
     if max_price:
-        L.append(f"> 范围：**只统计收盘价 < {max_price:g} 元**的标的（新信号、单条件观察、跟踪池统一适用；涨到上限以上即移出）")
+        L.append(f"> 入池：**信号日收盘价 < {max_price:g} 元**；涨过上限**不再移出**，继续按止盈规则跟踪（🎓 出圈）")
+    L.append("> 止盈：①已浮盈且收盘跌破 **MA10** ②自最高收盘回撤 **8%**（浮盈≥5% 起启用）③持有满 **60** 个交易日；止损：收盘**跌破实底**")
     if temp is not None:
         tag = "🟢" if temp >= 55 else ("🟡" if temp >= 40 else "🔴")
         L.append(f"> 环境：鱼身温度 **{temp:.0f}** {tag}" + ("（低温，信号弱化，仅观察）" if temp < 40 else ""))
@@ -389,11 +475,15 @@ def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit
                      f"{x.get('dist_bottom', 0):+.2f} | {x.get('max_gain', 0):+.2f} | {x.get('score', 0):.1f} |")
         L.append("")
         L.append("> 🔥 = 不破实顶 ≥5 个交易日（文章「长期横盘不破突破K顶」形态）")
+        grad = [x for x in sig.values() if x.get("graduate")]
+        if grad:
+            L.append(f"> 🎓 其中 **{len(grad)}** 只已涨过入池门槛仍在跟踪（不再移出）：" +
+                     "、".join(f"{x['code']} {x['name']}({x.get('last_close', '-')})" for x in grad[:12]))
     else:
         L.append("")
         L.append("（池内为空）")
     L.append("")
-    L.append(f"## 三、今日删除（跌破实底，{len(removed_today)} 只）")
+    L.append(f"## 三、今日移出（{len(removed_today)} 只，含止损/止盈/到期）")
     if removed_today:
         L.append("")
         L.append("| 代码 | 名称 | 信号日 | 移出日 | 出场价 | 相对信号收盘% | 原因 |")
@@ -407,15 +497,44 @@ def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit
     L.append("")
     L.append("## 四、池内已了结统计")
     if removed_all:
-        rets = [x.get("ret", 0) for x in removed_all
-                if x.get("ret") is not None and x.get("exit_reason") != "超出价格上限"]
-        win = sum(1 for r in rets if r > 0)
+        # 全口径：所有真实了结（含历史「涨破上限」项），只剔除历史脏数据（invalid）
+        valid = [x for x in removed_all
+                 if x.get("ret") is not None and not x.get("invalid")]
+        dirty = [x for x in removed_all if x.get("invalid")]
+        legacy = [x for x in removed_all if x.get("exit_reason") == "超出价格上限"]
         L.append("")
-        L.append(f"- 累计了结 **{len(rets)}** 只，胜率 **{100*win/len(rets):.1f}%**，平均 **{sum(rets)/len(rets):+.2f}%**（跌破实底出场）")
-        brk = sum(1 for x in removed_all if x.get("exit_reason") == "跌破实底")
-        over = sum(1 for x in removed_all if x.get("exit_reason") == "超出价格上限")
-        L.append(f"- 其中跌破实底 {brk} 只、涨破价格上限移出 {over} 只（不计入以上胜率）；"
-                 f"最长持有 {max([x.get('days',0) for x in removed_all] or [0])} 个交易日")
+        if valid:
+            rs = [x["ret"] for x in valid]
+            win = sum(1 for r in rs if r > 0)
+            med = sorted(rs)[len(rs) // 2]
+            L.append(f"- **全口径了结 {len(rs)} 只**：胜率 **{100*win/len(rs):.1f}%**，"
+                     f"平均 **{sum(rs)/len(rs):+.2f}%**，中位 **{med:+.2f}%**（含止盈/止损/到期）")
+            L.append(f"- 最长持有 {max([x.get('days', 0) for x in valid] or [0])} 个交易日")
+            L.append("")
+            L.append("| 出场原因 | 只数 | 胜率 | 均值 | 中位 |")
+            L.append("|---|---|---|---|---|")
+            groups = {}
+            for x in valid:
+                groups.setdefault(x.get("exit_reason") or "未标注", []).append(x["ret"])
+            for why, arr in sorted(groups.items(), key=lambda kv: -len(kv[1])):
+                w2 = sum(1 for r in arr if r > 0)
+                a2 = sorted(arr)[len(arr) // 2]
+                L.append(f"| {why} | {len(arr)} | {100*w2/len(arr):.1f}% | {sum(arr)/len(arr):+.2f}% | {a2:+.2f}% |")
+            L.append("")
+            L.append("> ⚠️ 「跌破实底」胜率恒为 0.0% 是定义决定的：信号日必为涨幅≥3% 的阳线（收盘>开盘），"
+                     "而跌破实底=收盘<开盘 → 相对信号收盘必然为负。它只衡量止损单的损伤，**不是策略胜率**。")
+            aft = [x for x in valid if x.get("after5") is not None]
+            if aft:
+                seg = " / ".join(
+                    f"{k}日 {sum(x[k] for x in aft if x.get(k) is not None)/max(1,len([x for x in aft if x.get(k) is not None])):+.2f}%"
+                    for k in ("5", "10", "20") if any(x.get("after" + k) is not None for x in aft))
+                L.append(f"- 出场后表现（已回填 {len(aft)} 只，正=出场过早）：{seg}")
+        if legacy:
+            _lr = [x["ret"] for x in legacy]
+            L.append(f"- 其中旧口径「涨破价格上限」移出 {len(legacy)} 只："
+                     f"均值 {sum(_lr)/len(_lr):+.2f}%（已停用，现改为出圈继续跟踪）")
+        if dirty:
+            L.append(f"- 🧹 历史脏数据 {len(dirty)} 条（信号日收盘 ≥ 入池门槛，旧参数遗留）已剔除统计")
     else:
         L.append("")
         L.append("（暂无）")
@@ -454,7 +573,15 @@ def main():
     ap.add_argument("--comp-th", type=float, default=0.03)
     ap.add_argument("--max-new", type=int, default=40)
     ap.add_argument("--max-price", type=float, default=10.0,
-                    help="价格上限：只统计收盘价低于该值（默认 10 元；0=不限）")
+                    help="入池价格门槛：仅信号日收盘价低于该值才入池（默认 10 元；0=不限）；涨过不再移出")
+    ap.add_argument("--cap-mode", choices=["hold", "exit"], default="hold",
+                    help="hold=涨过门槛继续跟踪（默认）；exit=涨过即移出（旧口径）")
+    ap.add_argument("--take-profit", dest="take_profit", action="store_true", default=True)
+    ap.add_argument("--no-take-profit", dest="take_profit", action="store_false")
+    ap.add_argument("--tp-ma", type=int, default=10, help="止盈均线周期（默认 10）")
+    ap.add_argument("--tp-dd", type=float, default=0.08, help="移动止盈回撤阈值（默认 0.08）")
+    ap.add_argument("--tp-min-gain", type=float, default=5.0, help="移动止盈启动浮盈门槛（默认 5%%）")
+    ap.add_argument("--max-hold", type=int, default=60, help="最长持有交易日（默认 60）")
     ap.add_argument("--push", action="store_true")
     ap.add_argument("--no-fetch", action="store_true")
     ap.add_argument("--with-month", action="store_true", default=True)
@@ -529,7 +656,10 @@ def main():
         log(f"月线完成 {len(mb_map)} 只")
 
     # 先更新旧池（用今日数据）
-    sig, removed_today = update_pool(sig, bars_map, target, a.max_price)
+    sig, removed_today = update_pool(sig, bars_map, target, a.max_price,
+                                     cap_mode=a.cap_mode, take_profit=a.take_profit,
+                                     tp_ma=a.tp_ma, tp_dd=a.tp_dd,
+                                     tp_min_gain=a.tp_min_gain, max_hold=a.max_hold)
     removed_all.extend(removed_today)
 
     # 新信号入池：只收「王者突破」双确认（单条件仅列观察，不入池）
@@ -546,6 +676,9 @@ def main():
                               max_gain=0.0, dist_bottom=0.0, last_date_prev=s["date"])
         added += 1
 
+    n_aft = backfill_exit_after(removed_all, bars_map)
+    if n_aft:
+        log(f"出场后表现回填 {n_aft} 条")
     save_pool(sig, removed_all)
     temp = read_env()
     md = build_report(target, news, sig, removed_today, removed_all, temp,
@@ -553,20 +686,34 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     rp = os.path.join(OUT, f"王者突破_{target}.md")
     open(rp, "w", encoding="utf-8").write(md)
+    _valid = [x for x in removed_all if x.get("ret") is not None and not x.get("invalid")]
+    _why = {}
+    for _x in _valid:
+        _why[_x.get("exit_reason") or "未标注"] = _why.get(_x.get("exit_reason") or "未标注", 0) + 1
     json.dump({"date": target, "new": news, "pool": list(sig.values()), "temp": temp,
                "removed_today": removed_today,
-               "stats": dict(scanned=len(codes_names), covered=len(bars_map), pool=len(sig))},
+               "stats": dict(scanned=len(codes_names), covered=len(bars_map), pool=len(sig),
+                             graduate=sum(1 for x in sig.values() if x.get("graduate")),
+                             closed=len(_valid),
+                             winrate=round(100 * sum(1 for x in _valid if x["ret"] > 0) / len(_valid), 1) if _valid else None,
+                             avg_ret=round(sum(x["ret"] for x in _valid) / len(_valid), 2) if _valid else None,
+                             by_reason=_why)},
               open(SNAP, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     log(f"报告 {rp}；新信号 {len(news)}，池 {len(sig)}，删除 {len(removed_today)}")
 
     if a.push:
-        lines = [f"### 👑 王者突破 {target}", f"- 新信号 **{len(news)}** / 池内 **{len(sig)}** / 删除 **{len(removed_today)}**"]
+        lines = [f"### 👑 王者突破 {target}", f"- 新信号 **{len(news)}** / 池内 **{len(sig)}** / 移出 **{len(removed_today)}**"]
         if temp is not None:
             lines.append(f"- 鱼身温度 {temp:.0f}" + ("（低温仅观察）" if temp < 40 else ""))
         for s in sorted(news, key=lambda z: -z["score"])[:10]:
             lines.append(f"- {s['code']} {s['name']} 收{s['close']} 量{s['volx']:.1f}× 守{s['top']}/损{s['bottom']} 分{s['score']:.0f}")
         if removed_today:
-            lines.append("- 删除：" + "、".join(f"{x['name']}({x['ret']:+.1f}%)" for x in removed_today[:8]))
+            lines.append("- 移出：" + "、".join(f"{x['name']}({x['ret']:+.1f}%·{x.get('exit_reason','')})"
+                                                for x in removed_today[:8]))
+        _g = [x for x in sig.values() if x.get("graduate")]
+        if _g:
+            lines.append(f"- 🎓 已涨过入池门槛仍在跟踪 {len(_g)} 只：" +
+                         "、".join(f"{x['name']}({x.get('last_close','-')})" for x in _g[:8]))
         push_md(f"👑王者突破 {target}", "\n".join(lines))
 
 
