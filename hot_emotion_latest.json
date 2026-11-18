@@ -1,35 +1,33 @@
 {
- "date": "2026-11-17",
- "total": 31,
- "lianban_cnt": 6,
- "max_lb": 3,
- "shouban": 25,
+ "date": "2026-11-18",
+ "total": 34,
+ "lianban_cnt": 7,
+ "max_lb": 4,
+ "shouban": 27,
  "by_lb": {
-  "3": 1,
-  "2": 5,
-  "1": 25
+  "4": 1,
+  "2": 6,
+  "1": 27
  },
  "score": {
-  "score": 39,
-  "level": "低迷",
+  "score": 53,
+  "level": "中性",
   "parts": {
    "涨停家数": 5,
-   "连板高度": 10,
-   "连板占比": 24
+   "连板高度": 18,
+   "连板占比": 30
   }
  },
  "persistence": [],
- "alerts": [
-  "⚠️ 高度退潮：最高板从4板降至3板（昨2026-11-16）"
- ],
+ "alerts": [],
  "lianban_rows": [
   {
    "code": "sz002685",
    "name": "华东重机",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -43,8 +41,8 @@
    ]
   },
   {
-   "code": "sz000521",
-   "name": "长虹美菱",
+   "code": "sz000707",
+   "name": "双环科技",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -55,15 +53,14 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "家用电器",
-    "白色家电",
-    "冰洗",
-    "基金增仓"
+    "基础化工",
+    "基金减仓",
+    "连续亏损"
    ]
   },
   {
-   "code": "sz000533",
-   "name": "顺钠股份",
+   "code": "sz002771",
+   "name": "真视通",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -74,13 +71,15 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "电力设备",
-    "智算中心（AIDC）"
+    "网络安全",
+    "连续亏损",
+    "智算中心（AIDC）",
+    "算力租赁"
    ]
   },
   {
-   "code": "sz002861",
-   "name": "瀛通通讯",
+   "code": "sz002843",
+   "name": "泰嘉股份",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -91,15 +90,14 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "电子",
-    "消费电子零部件及组装",
-    "消费电子",
-    "智能音箱"
+    "通用设备",
+    "机械设备",
+    "金属制品"
    ]
   },
   {
-   "code": "sz002959",
-   "name": "小熊电器",
+   "code": "sh600410",
+   "name": "华胜天成",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -110,12 +108,13 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "家用电器"
+    "芯片概念",
+    "华为鲲鹏"
    ]
   },
   {
-   "code": "sh600936",
-   "name": "北投科技",
+   "code": "sh603030",
+   "name": "全筑股份",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -125,7 +124,28 @@
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
-   "sectors": []
+   "sectors": [
+    "装修装饰Ⅲ",
+    "装修装饰Ⅱ",
+    "建筑装饰",
+    "私募重仓"
+   ]
+  },
+  {
+   "code": "sh603324",
+   "name": "盛剑科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "连续亏损"
+   ]
   }
  ],
  "leaders": {}
