@@ -330,10 +330,10 @@ def render(res, scanned, skipped, bar_date, cur_month_open=True, stale=0, label=
     md.append(f"\n## 二、强启（A5）· {len(s2)} 只\n")
     md.append("MA5上穿MA10 → 其后仅1根阴线的回调且当月收阴、相对金叉时MA10涨幅<50%且MA4>MA5>MA10 → 自回调月起首次上穿该阴线最高价 → 仅此一次突破、EMA12>EMA60、收盘<15元。\n\n")
     md.append(tbl2(s2))
-    for k, lbl in ((1, '上月'), (2, '前月')):
+    for idx, (k, lbl) in enumerate(((1, '上月'), (2, '前月')), start=3):
         if k not in res:
             continue
-        md.append(f"\n## 三、{lbl}信号（已收盘，对照）\n\n### 弱启 · {len(res[k]['弱启'])} 只\n")
+        md.append(f"\n## {'三' if idx == 3 else '四'}、{lbl}信号（已收盘，对照）\n\n### 弱启 · {len(res[k]['弱启'])} 只\n")
         md.append(tbl1(res[k]['弱启']))
         md.append(f"\n### 强启 · {len(res[k]['强启'])} 只\n")
         md.append(tbl2(res[k]['强启']))
