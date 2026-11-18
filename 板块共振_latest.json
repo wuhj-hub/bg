@@ -1,46 +1,15 @@
 {
- "date": "2026-11-17",
+ "date": "2026-11-18",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 50,
+ "pool_size": 49,
  "resonance_boards": [
   {
-   "name": "渔业",
-   "code": "pt01801015",
-   "zdf": 1.14,
+   "name": "航运港口",
+   "code": "pt01801992",
+   "zdf": 2.01,
    "strength": 7,
    "factors": [
     "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "光刻机",
-   "code": "pt02101316",
-   "zdf": 2.7,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "白色家电",
-   "code": "pt01801111",
-   "zdf": 1.08,
-   "strength": 6,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "zdf": 0.24,
-   "strength": 5,
-   "factors": [
     "进场",
     "吸筹"
    ]
@@ -48,69 +17,34 @@
  ],
  "grab_top": [
   {
-   "name": "渔业",
-   "code": "pt01801015",
-   "value": 7
-  },
-  {
-   "name": "光刻机",
-   "code": "pt02101316",
+   "name": "航运港口",
+   "code": "pt01801992",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "白色家电",
-   "code": "pt01801111",
-   "value": 11.3
-  },
-  {
-   "name": "光刻机",
-   "code": "pt02101316",
-   "value": 4.7
-  },
-  {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "value": 1.1
-  },
-  {
-   "name": "渔业",
-   "code": "pt01801015",
-   "value": 0.3
+   "name": "航运港口",
+   "code": "pt01801992",
+   "value": 0.8
   }
  ],
  "absorption_top": [
   {
-   "name": "白色家电",
-   "code": "pt01801111",
-   "value": 3.15
-  },
-  {
-   "name": "渔业",
-   "code": "pt01801015",
-   "value": 0.57
-  },
-  {
-   "name": "光刻机",
-   "code": "pt02101316",
-   "value": 0.25
-  },
-  {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "value": 0.13
+   "name": "航运港口",
+   "code": "pt01801992",
+   "value": 0.19
   }
  ],
  "control_top": [],
  "zhongjun_candidates": [
   {
-   "board": "渔业",
-   "stock": "好当家",
-   "code": "sh600467",
-   "zdf": "10.00",
-   "main1": 1.39,
-   "main5": 0.42
+   "board": "航运港口",
+   "stock": "招商轮船",
+   "code": "sh601872",
+   "zdf": "5.94",
+   "main1": 2.52,
+   "main5": -1.52
   }
  ]
 }
