@@ -189,7 +189,12 @@ def compute(rows):
     yin = c < o
     gold = cross_up(ma5, ma10)
     dead = cross_up(ma10, ma5)
-    K1 = cross_up(c, ma10)
+    # K1 严格按通达信公式：CROSS(C,MA(C,10)) AND REF(C<MA(C,10),1) AND REF(C<MA(C,10),2)
+    # 即「当月收盘上穿 MA10，且前两根月线收盘都在 MA10 下方」
+    K1 = np.zeros(n, bool)
+    _ok10 = ~np.isnan(ma10)
+    K1[2:] = (_ok10[2:] & _ok10[1:-1] & _ok10[:-2]
+              & (c[2:] > ma10[2:]) & (c[1:-1] < ma10[1:-1]) & (c[:-2] < ma10[:-2]))
 
     def ratio_ok(base, x):
         return base is not None and not np.isnan(base) and base > 0 and (x / base * 100 - 100) < 50
