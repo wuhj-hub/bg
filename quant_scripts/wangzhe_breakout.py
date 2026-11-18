@@ -501,7 +501,7 @@ def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit
         valid = [x for x in removed_all
                  if x.get("ret") is not None and not x.get("invalid")]
         dirty = [x for x in removed_all if x.get("invalid")]
-        legacy = [x for x in removed_all if x.get("exit_reason") == "超出价格上限"]
+        legacy = [x for x in valid if x.get("exit_reason") == "超出价格上限"]
         L.append("")
         if valid:
             rs = [x["ret"] for x in valid]
@@ -542,7 +542,7 @@ def build_report(date, news, sig, removed_today, removed_all, temp, stats, limit
     L.append("## 五、使用说明（重要）")
     L.append("")
     L.append("- **回测结论**（400只主板×800根）：双条件信号 T+20 +0.65% vs 基准 +1.01%，胜率 45% vs 47.9% → **本形态无独立方向性 alpha**，不可信号日追买。")
-    L.append("- 定位：**候选观察池 + 防守线纪律**。真正的用法是「入池 → 等回踩实顶附近/缩量横盘 → 结合双弦·猛兽·鱼身共振再做」；跌破实底无条件删除。")
+    L.append("- 定位：**候选观察池 + 纪律跟踪**。真正的用法是「入池 → 等回踩实顶附近/缩量横盘 → 结合双弦·猛兽·鱼身共振再做」；止损=收盘跌破实底，止盈=浮盈破MA10 / 峰值回撤8%。")
     L.append("- 环境闸门：鱼身温度 <40（🔴）时全部信号降级为观察，不介入。")
     L.append("")
     L.append(f"> 生成：wangzhe_breakout.py · 扫描 {stats.get('scanned', 0)} 只 / 覆盖 {stats.get('covered', 0)} / 池 {len(sig)} / 新增 {len(news)} / 删除 {len(removed_today)}")
@@ -699,7 +699,7 @@ def main():
                              avg_ret=round(sum(x["ret"] for x in _valid) / len(_valid), 2) if _valid else None,
                              by_reason=_why)},
               open(SNAP, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    log(f"报告 {rp}；新信号 {len(news)}，池 {len(sig)}，删除 {len(removed_today)}")
+    log(f"报告 {rp}；新信号 {len(news)}，池 {len(sig)}，移出 {len(removed_today)}")
 
     if a.push:
         lines = [f"### 👑 王者突破 {target}", f"- 新信号 **{len(news)}** / 池内 **{len(sig)}** / 移出 **{len(removed_today)}**"]
