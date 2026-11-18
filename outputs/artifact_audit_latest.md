@@ -1,4 +1,4 @@
-# 🔍 产物入库审计 · 2026-11-18
+# 🔍 产物入库审计 · 2026-11-19
 
 > 扫描 97 个产出路径 / 116 个提交路径 / 31 个消费读取路径
 > 🔴 高危（被读取且未提交）**0** ｜ 🟡 未提交 **14** ｜ ✅ 已提交 **83** ｜ ❔ 提交但未见生成 46 ｜ 🧬 陈旧副本 **0**
@@ -20,7 +20,7 @@
 | `拥挤度监控_{var}.json` | quant_scripts/crowding_watch.py |
 | `拥挤度监控_{var}.md` | quant_scripts/crowding_watch.py |
 | `权重提案_{var}.json` | quant_scripts/learn_weights.py |
-| `衔接_{var}.md` | quant_scripts/month_screen.py |
+| `衔接_{var}.md` | quant_scripts/month_screen.py, quant_scripts/month_screen_period.py |
 
 ## ✅ 已提交
 
@@ -81,5 +81,5 @@
 
 | 产物 | 根日期 | outputs日期 | 判定 |
 |---|---|---|---|
-| `sector_component_em.json` | 2026-11-17 | 2026-11-17 | 同步 |
+| `sector_component_em.json` | 2026-11-18 | 2026-11-18 | 同步 |
 | `xihu_breadth_history.json` | 2024-06-11 | 2024-06-11 | 同步 |
