@@ -518,7 +518,7 @@
   "degraded": false
  },
  "2026-11-18": {
-  "temp": 27.1,
+  "temp": 27.0,
   "level": "冰点",
   "position_cap": 20,
   "subs": {
@@ -527,12 +527,12 @@
    "width": 50.3,
    "breadth": 17.1,
    "structure": 8.8,
-   "inbull": 18.3
+   "inbull": 17.6
   },
   "divergence": {
    "index_vs_emotion": -45.0,
    "breadth_vs_width": -33.2,
-   "structure_vs_inbull": -9.5
+   "structure_vs_inbull": -8.8
   },
   "degraded": false
  }
