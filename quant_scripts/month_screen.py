@@ -247,20 +247,25 @@ def compute(rows):
                 qibao=qibao, e12=e12, e60=e60)
 
 
-def eval_at(x, t):
+def eval_at(x, t, mp=15.0, scope='all'):
+    """mp=价格上限（<=0 表示不限），scope=作用范围 all/weak/strong/none"""
     c, h, v = x['c'], x['h'], x['v']
+    _lim = bool(mp and mp > 0)
+    _p_ok = (not _lim) or (float(c[t]) < float(mp))
+    _weak_ok = _p_ok if scope in ('all', 'weak') else True
+    _strong_ok = _p_ok if scope in ('all', 'strong') else True
     K2 = hv_true(x['K1'], 10, t)
     A3 = hv_true(x['A2'], 10, t)
     cntA4 = cnt(x['A4s'], A3 or 0, t)
     XG1 = bool(cntA4 == 1 and x['A4s'][t] and K2 and K2 > 0
                and cnt(x['dead'], K2, t) == 0 and anyx(v > x['qibao'], 3, t)
-               and anyx(x['gold'], K2 + 2, t))
+               and anyx(x['gold'], K2 + 2, t) and _weak_ok)
     A1 = hv_true(x['gold'], 10, t)
     A3b = hv_true(x['A2b'], 10, t)
     cntA4b = cnt(x['A4b'], A3b or 0, t)
     ea, eb = x['e12'][t], x['e60'][t]
     A5 = bool(cntA4b == 1 and x['A4b'][t] and A1 and A1 > 0
-              and not np.isnan(ea) and not np.isnan(eb) and ea > eb and c[t] < 15)
+              and not np.isnan(ea) and not np.isnan(eb) and ea > eb and _strong_ok)
     g = lambda z: (None if (z is None or (isinstance(z, float) and np.isnan(z))) else float(z))
     return dict(
         date=x['d'][t], close=float(c[t]), ma4=g(x['ma4'][t]), ma5=g(x['ma5'][t]), ma10=g(x['ma10'][t]),
@@ -273,6 +278,7 @@ def eval_at(x, t):
         A1=A1, A2b_date=(x['d'][t - A3b] if (A3b and A3b > 0) else None), A3b=A3b,
         A4b=bool(x['A4b'][t]), A4b_refh=(float(h[t - A3b]) if (A3b and A3b > 0) else None),
         cntA4b=cntA4b, ema12=g(ea), ema60=g(eb), A5=A5, bars=x['n'], first=x['d'][0],
+        price_ok=_p_ok,
     )
 
 
@@ -308,7 +314,14 @@ def tbl2(lst):
     return h + '\n'.join(rows) + '\n'
 
 
-def render(res, scanned, skipped, bar_date, cur_month_open=True, stale=0, label=None):
+def render(res, scanned, skipped, bar_date, cur_month_open=True, stale=0, label=None,
+           mp=15.0, scope='all'):
+    _note = ''
+    if mp and mp > 0:
+        _where = {'all': '弱启+强启', 'weak': '仅弱启', 'strong': '仅强启'}.get(scope, '弱启+强启')
+        _note = f'、收盘<{mp:g}元（{_where}）'
+    else:
+        _note = '、不限价'
     s1, s2 = res[0]['弱启'], res[0]['强启']
     ym = bar_date[:7]
     stat = ("月线已走完" if not cur_month_open else "月线未走完")
@@ -321,14 +334,17 @@ def render(res, scanned, skipped, bar_date, cur_month_open=True, stale=0, label=
     md = [title,
           f"{info}　**有效标的**：{scanned} 只"
           f"（剔除 {skipped} 只数据不足/非主板/ST，另剔除 {stale} 只退市或长期停牌）\n",
-          "**数据口径**：腾讯前复权月线（含成交量，单只最长 302 根）；名称与 ST 状态取实时行情快照\n"]
+          "**数据口径**：腾讯前复权月线（含成交量，单只最长 302 根）；名称与 ST 状态取实时行情快照\n",
+          (f"**价格限制**：收盘 < {mp:g} 元（作用范围：{ {'all':'弱启+强启','weak':'仅弱启','strong':'仅强启','none':'无'}.get(scope,scope) }；可用 --max-price 0 关闭）\n" if (mp and mp > 0) else "**价格限制**：不限价\n")]
     if cur_month_open:
         md.append("\n> ⚠️ 当月月线尚未走完，下列「本月信号」为月内成立状态，需月末收盘确认。\n")
     md.append(f"\n---\n\n## 一、弱启（XG）· {len(s1)} 只\n")
-    md.append("C上穿MA10 → 其后仅1根阴线的回调且当月收阴、相对K1时MA10涨幅<50% → 自回调月起首次突破该阴线最高价且MA4>MA5>MA10 → K1以来无死叉、近3月有过起爆量能、K1附近有MA5上穿MA10。\n\n")
+    md.append("C上穿MA10 → 其后仅1根阴线的回调且当月收阴、相对K1时MA10涨幅<50% → 自回调月起首次突破该阴线最高价且MA4>MA5>MA10 → K1以来无死叉、近3月有过起爆量能、K1附近有MA5上穿MA10"
+              + (f"、收盘<{mp:g}元。" if (mp and mp > 0 and scope in ('all', 'weak')) else "。") + "\n\n")
     md.append(tbl1(s1))
     md.append(f"\n## 二、强启（A5）· {len(s2)} 只\n")
-    md.append("MA5上穿MA10 → 其后仅1根阴线的回调且当月收阴、相对金叉时MA10涨幅<50%且MA4>MA5>MA10 → 自回调月起首次上穿该阴线最高价 → 仅此一次突破、EMA12>EMA60、收盘<15元。\n\n")
+    md.append("MA5上穿MA10 → 其后仅1根阴线的回调且当月收阴、相对金叉时MA10涨幅<50%且MA4>MA5>MA10 → 自回调月起首次上穿该阴线最高价 → 仅此一次突破、EMA12>EMA60"
+              + (f"、收盘<{mp:g}元。" if (mp and mp > 0 and scope in ('all', 'strong')) else "。") + "\n\n")
     md.append(tbl2(s2))
     for idx, (k, lbl) in enumerate(((1, '上月'), (2, '前月')), start=3):
         if k not in res:
@@ -374,6 +390,10 @@ def main():
     ap.add_argument('--force', action='store_true')
     ap.add_argument('--push', action='store_true')
     ap.add_argument('--no-push', action='store_true')
+    ap.add_argument('--max-price', type=float, default=15.0,
+                    help='价格上限（收盘价严格小于），默认 15；传 0 表示不限价')
+    ap.add_argument('--price-scope', default='all', choices=['all', 'weak', 'strong', 'none'],
+                    help='价格上限作用范围：all=弱启+强启（默认）/weak/strong/none')
     a = ap.parse_args()
 
     codes = load_pool()
@@ -408,7 +428,7 @@ def main():
             t = x['n'] - 1 - k
             if t < 20:
                 continue
-            r = eval_at(x, t)
+            r = eval_at(x, t, a.max_price, a.price_scope)
             r['code'] = code; r['name'] = nm
             if r['XG1']:
                 res[k]['弱启'].append(r)
@@ -453,7 +473,7 @@ def main():
                 t2 = t - max(0, k - 1)
                 if t2 < 20:
                     continue
-                r = eval_at(xp, t2)
+                r = eval_at(xp, t2, a.max_price, a.price_scope)
                 r['code'] = code
                 r['name'] = nm
                 tgt = res_prev[0] if k == 0 else extra.setdefault(k, {'弱启': [], '强启': []})
@@ -465,13 +485,15 @@ def main():
         for k, v in extra.items():
             res[k] = v
 
-    md = render(res, scanned, skipped, bar_date, cur_open, stale=stale)
+    md = render(res, scanned, skipped, bar_date, cur_open, stale=stale,
+                mp=a.max_price, scope=a.price_scope)
 
     os.makedirs(a.outdir, exist_ok=True)
     p_md = os.path.join(a.outdir, f'衔接_{ym}.md')
     open(p_md, 'w').write(md)
     if res_prev is not None:
-        md_prev = render(res_prev, scanned, skipped, bar_date, False, stale=stale, label=prev_ym)
+        md_prev = render(res_prev, scanned, skipped, bar_date, False, stale=stale, label=prev_ym,
+                         mp=a.max_price, scope=a.price_scope)
         p_prev = os.path.join(a.outdir, f'衔接_{prev_ym}.md')
         open(p_prev, 'w').write(md_prev)
         print(f"[out] {p_prev}（{prev_ym} 完整版：弱启={len(res_prev[0]['弱启'])} 强启={len(res_prev[0]['强启'])}）")
