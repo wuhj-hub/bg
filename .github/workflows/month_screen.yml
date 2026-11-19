@@ -84,7 +84,7 @@ jobs:
           IMA_FOLDER_ID: folder_7485264708529742
           IMA_OVERWRITE: '1'
         run: |
-          python3 quant_scripts/month_screen.py --push --max-price 15 --price-scope all
+          python3 quant_scripts/month_screen.py --push --max-price 0
           CM=$(date +%Y-%m)
           PM=$(date -d "$(date +%Y-%m-01) -1 month" +%Y-%m 2>/dev/null || date -v-1m +%Y-%m)
           OK=""
