@@ -1,50 +1,11 @@
 {
- "date": "2026-11-18",
+ "date": "2026-11-19",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 49,
- "resonance_boards": [
-  {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "zdf": 2.01,
-   "strength": 7,
-   "factors": [
-    "抢筹",
-    "进场",
-    "吸筹"
-   ]
-  }
- ],
- "grab_top": [
-  {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "value": 7
-  }
- ],
- "entry_top": [
-  {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "value": 0.8
-  }
- ],
- "absorption_top": [
-  {
-   "name": "航运港口",
-   "code": "pt01801992",
-   "value": 0.19
-  }
- ],
+ "pool_size": 46,
+ "resonance_boards": [],
+ "grab_top": [],
+ "entry_top": [],
+ "absorption_top": [],
  "control_top": [],
- "zhongjun_candidates": [
-  {
-   "board": "航运港口",
-   "stock": "招商轮船",
-   "code": "sh601872",
-   "zdf": "5.94",
-   "main1": 2.52,
-   "main5": -1.52
-  }
- ]
+ "zhongjun_candidates": []
 }
