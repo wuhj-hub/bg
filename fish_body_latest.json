@@ -1,6 +1,6 @@
 {
   "market_temp": {
-    "temp": 50,
+    "temp": 45,
     "level": "中性",
     "idx": "3577.62"
   },
@@ -35,38 +35,6 @@
       "month_gate": "PASS",
       "month_reversal": "均线金叉(MA6上穿MA12)",
       "rsg_dev": 386.2,
-      "rsg_strong": true
-    },
-    {
-      "code": "sh601728",
-      "name": "中国电信",
-      "pattern": "MACD空中加油",
-      "raw_score": 95,
-      "final_score": 74,
-      "multi_score": 72,
-      "resonance": "共振向下",
-      "price": 7.15,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.10)>=DEA(0.09)金叉",
-        "MACD柱0.020刚翻红加油成功",
-        "收盘7.15>MA56.96",
-        "MA20>MA60多头排列"
-      ],
-      "stop_loss": "6.61",
-      "target": "8.22",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股强势",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": 497.4,
       "rsg_strong": true
     },
     {
@@ -176,7 +144,7 @@
       "price": 7.65,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(0.13)>=DEA(0.12)金叉",
+        "DIF(0.13)>=DEA(0.11)金叉",
         "MACD柱0.030刚翻红加油成功",
         "收盘7.65>MA57.57",
         "MA20>MA60多头排列"
@@ -208,7 +176,7 @@
       "price": 49.44,
       "reasons": [
         "DIF/DEA在0轴上方",
-        "DIF(1.48)>=DEA(1.18)金叉",
+        "DIF(1.47)>=DEA(1.18)金叉",
         "MACD柱0.59>0但已走高",
         "收盘49.44>MA549.22",
         "MA20>MA60多头排列",
@@ -229,38 +197,6 @@
       "month_reversal": null,
       "rsg_dev": null,
       "rsg_strong": false
-    },
-    {
-      "code": "sh601818",
-      "name": "光大银行",
-      "pattern": "MACD空中加油",
-      "raw_score": 90,
-      "final_score": 67,
-      "multi_score": 53,
-      "resonance": "共振向下",
-      "price": 3.23,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.05)>=DEA(0.04)金叉",
-        "MACD柱0.020刚翻红加油成功",
-        "MA20>MA60多头排列",
-        "KDJ_J=73未超买"
-      ],
-      "stop_loss": "3.09",
-      "target": "3.71",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "纠缠",
-      "month_gate": "WARN",
-      "month_reversal": null,
-      "rsg_dev": 310.1,
-      "rsg_strong": true
     },
     {
       "code": "sz002242",
@@ -506,38 +442,6 @@
       "rsg_strong": false
     },
     {
-      "code": "sh601009",
-      "name": "南京银行",
-      "pattern": "MACD空中加油",
-      "raw_score": 80,
-      "final_score": 59,
-      "multi_score": 51,
-      "resonance": "共振向下",
-      "price": 13.25,
-      "reasons": [
-        "DIF/DEA在0轴上方",
-        "DIF(0.33)>=DEA(0.23)金叉",
-        "MACD柱0.20>0但已走高",
-        "收盘13.25>MA513.13",
-        "MA20>MA60多头排列"
-      ],
-      "stop_loss": "12.47",
-      "target": "15.24",
-      "mode": 1,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "平台突破(12月新高)",
-      "rsg_dev": 490.0,
-      "rsg_strong": true
-    },
-    {
       "code": "sh600919",
       "name": "江苏银行",
       "pattern": "MACD空中加油",
@@ -570,35 +474,35 @@
       "rsg_strong": true
     },
     {
-      "code": "sh601728",
-      "name": "中国电信",
-      "pattern": "均线回踩支撑",
+      "code": "sh601188",
+      "name": "龙江交通",
+      "pattern": "MACD空中加油",
       "raw_score": 75,
-      "final_score": 58,
-      "multi_score": 72,
+      "final_score": 57,
+      "multi_score": 60,
       "resonance": "共振向下",
-      "price": 7.15,
+      "price": 4.57,
       "reasons": [
-        "MA20(6.90)>MA60(6.53)多头",
-        "MACD在0轴上方",
-        "在MA10附近(偏离4.4%)",
-        "收盘7.15>MA56.96",
-        "站在布林中轨上方"
+        "DIF/DEA在0轴上方",
+        "DIF(0.44)>=DEA(0.36)金叉",
+        "MACD柱0.16>0但已走高",
+        "MA20>MA60多头排列",
+        "KDJ_J=59未超买"
       ],
-      "stop_loss": "6.55",
-      "target": "8.01",
-      "mode": 2,
+      "stop_loss": "4.45",
+      "target": "5.26",
+      "mode": 1,
       "tag": "",
       "resonance_detail": {
         "index": "大盘向下",
-        "stock": "个股强势",
+        "stock": "个股中性",
         "resonance": "共振向下",
         "score": 20
       },
-      "month_trend": "多头",
+      "month_trend": "纠缠",
       "month_gate": "PASS",
-      "month_reversal": "趋势确立(MA6上行)",
-      "rsg_dev": 497.4,
+      "month_reversal": "平台突破(12月新高)",
+      "rsg_dev": 781.5,
       "rsg_strong": true
     },
     {
@@ -727,38 +631,6 @@
       "month_gate": "PASS",
       "month_reversal": "平台突破(12月新高)",
       "rsg_dev": 543.6,
-      "rsg_strong": true
-    },
-    {
-      "code": "sh601009",
-      "name": "南京银行",
-      "pattern": "均线回踩支撑",
-      "raw_score": 75,
-      "final_score": 55,
-      "multi_score": 51,
-      "resonance": "共振向下",
-      "price": 13.25,
-      "reasons": [
-        "MA20(12.42)>MA60(12.06)多头",
-        "MACD在0轴上方",
-        "在MA10附近(偏离3.5%)",
-        "收盘13.25>MA513.13",
-        "站在布林中轨上方"
-      ],
-      "stop_loss": "11.80",
-      "target": "14.84",
-      "mode": 2,
-      "tag": "",
-      "resonance_detail": {
-        "index": "大盘向下",
-        "stock": "个股中性",
-        "resonance": "共振向下",
-        "score": 20
-      },
-      "month_trend": "多头",
-      "month_gate": "PASS",
-      "month_reversal": "平台突破(12月新高)",
-      "rsg_dev": 490.0,
       "rsg_strong": true
     }
   ]
