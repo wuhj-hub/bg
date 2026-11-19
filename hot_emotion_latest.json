@@ -1,70 +1,35 @@
 {
- "date": "2026-11-18",
- "total": 34,
- "lianban_cnt": 7,
- "max_lb": 4,
- "shouban": 27,
+ "date": "2026-11-19",
+ "total": 22,
+ "lianban_cnt": 5,
+ "max_lb": 3,
+ "shouban": 17,
  "by_lb": {
-  "4": 1,
-  "2": 6,
-  "1": 27
+  "3": 3,
+  "2": 2,
+  "1": 17
  },
  "score": {
-  "score": 53,
+  "score": 45,
   "level": "中性",
   "parts": {
    "涨停家数": 5,
-   "连板高度": 18,
+   "连板高度": 10,
    "连板占比": 30
   }
  },
  "persistence": [],
- "alerts": [],
+ "alerts": [
+  "⚠️ 高度退潮：最高板从4板降至3板（昨2026-11-18）"
+ ],
  "lianban_rows": [
-  {
-   "code": "sz002685",
-   "name": "华东重机",
-   "price": "",
-   "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "机械设备",
-    "工程机械整机",
-    "工程机械",
-    "芯片概念"
-   ]
-  },
-  {
-   "code": "sz000707",
-   "name": "双环科技",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "基础化工",
-    "基金减仓",
-    "连续亏损"
-   ]
-  },
   {
    "code": "sz002771",
    "name": "真视通",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -78,47 +43,12 @@
    ]
   },
   {
-   "code": "sz002843",
-   "name": "泰嘉股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "金属制品"
-   ]
-  },
-  {
-   "code": "sh600410",
-   "name": "华胜天成",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "芯片概念",
-    "华为鲲鹏"
-   ]
-  },
-  {
    "code": "sh603030",
    "name": "全筑股份",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -136,6 +66,22 @@
    "name": "盛剑科技",
    "price": "",
    "chg": "",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "连续亏损"
+   ]
+  },
+  {
+   "code": "sz000711",
+   "name": "京蓝科技",
+   "price": "",
+   "chg": "",
    "lianban": 2,
    "ji_ji_ban": "2天2板",
    "reason": "",
@@ -144,7 +90,26 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "连续亏损"
+    "金属回收",
+    "黑龙江自贸区",
+    "金属锌"
+   ]
+  },
+  {
+   "code": "sh600156",
+   "name": "华升股份",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "连续亏损",
+    "算力租赁"
    ]
   }
  ],
