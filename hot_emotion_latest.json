@@ -1,35 +1,33 @@
 {
- "date": "2026-11-19",
- "total": 22,
- "lianban_cnt": 5,
- "max_lb": 3,
- "shouban": 17,
+ "date": "2026-11-20",
+ "total": 23,
+ "lianban_cnt": 3,
+ "max_lb": 4,
+ "shouban": 20,
  "by_lb": {
-  "3": 3,
-  "2": 2,
-  "1": 17
+  "4": 2,
+  "2": 1,
+  "1": 20
  },
  "score": {
-  "score": 45,
-  "level": "中性",
+  "score": 39,
+  "level": "低迷",
   "parts": {
    "涨停家数": 5,
-   "连板高度": 10,
-   "连板占比": 30
+   "连板高度": 18,
+   "连板占比": 16
   }
  },
  "persistence": [],
- "alerts": [
-  "⚠️ 高度退潮：最高板从4板降至3板（昨2026-11-18）"
- ],
+ "alerts": [],
  "lianban_rows": [
   {
    "code": "sz002771",
    "name": "真视通",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -43,31 +41,12 @@
    ]
   },
   {
-   "code": "sh603030",
-   "name": "全筑股份",
-   "price": "",
-   "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "装修装饰Ⅲ",
-    "装修装饰Ⅱ",
-    "建筑装饰",
-    "私募重仓"
-   ]
-  },
-  {
    "code": "sh603324",
    "name": "盛剑科技",
    "price": "",
    "chg": "",
-   "lianban": 3,
-   "ji_ji_ban": "3天3板",
+   "lianban": 4,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -78,8 +57,8 @@
    ]
   },
   {
-   "code": "sz000711",
-   "name": "京蓝科技",
+   "code": "sz002579",
+   "name": "中京电子",
    "price": "",
    "chg": "",
    "lianban": 2,
@@ -90,26 +69,10 @@
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "金属回收",
-    "黑龙江自贸区",
-    "金属锌"
-   ]
-  },
-  {
-   "code": "sh600156",
-   "name": "华升股份",
-   "price": "",
-   "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "连续亏损",
-    "算力租赁"
+    "印制电路板",
+    "元件",
+    "电子",
+    "私募新进"
    ]
   }
  ],
