@@ -476,6 +476,8 @@ def render_limitup_panel():
     head = f"- 情绪刻度：首板晋级率 {fj}%（{mkt.get('mood', '—')}）" if fj is not None else "- 情绪刻度：—"
     L.append(head + f" · 涨停{d.get('limitup_total', '—')} · 连板{d.get('lianban_total', '—')}")
     rows = [c for c in cr if c.get("grade") in ("主线", "支线")][:8] or cr[:6]
+    _pm = fetch_prices([(lead.get(c.get("concept")) or {}).get("code") for c in rows]
+                       + [(zj.get(c.get("concept")) or {}).get("code") for c in rows])
     if rows:
         icon = {"主线": "🔴", "支线": "🟡", "一日游": "⚪"}
         L += ["", "| 级别 | 板块 | 涨停 | 晋级率 | 龙头(分) | 中军 |", "|---|---|---|---|---|---|"]
@@ -484,10 +486,17 @@ def render_limitup_panel():
             jjs = f"{jj:.0f}%" if isinstance(jj, (int, float)) else "—"
             l = lead.get(c.get("concept"))
             ls = f"{l['leader']}({l['score']})" if l else "—"
+            if l and l.get("code"):
+                ls += f" {price_txt(l.get('code'), _pm)}"
             z = zj.get(c.get("concept"))
+            zs = "—"
+            if z:
+                zs = z["name"]
+                if z.get("code"):
+                    zs += f" {price_txt(z.get('code'), _pm)}"
             L.append(f"| {icon.get(c.get('grade'), '')}{c.get('grade')} | {c.get('concept')} | "
-                     f"{c.get('n')} | {jjs} | {ls} | {z['name'] if z else '—'} |")
-    L.append(f"\n> 数据 {d.get('date', '?')}｜概念口径（一票可属多概念，家数会放大）；龙头=五步法打分；中军以成交额近似市值")
+                     f"{c.get('n')} | {jjs} | {ls} | {zs} |")
+    L.append(f"\n> 数据 {d.get('date', '?')}｜概念口径（一票可属多概念，家数会放大）；龙头=五步法打分；中军以成交额近似市值；价格=最新行情价（**<15 元标红**）")
     return "\n".join(L)
 
 
@@ -1055,17 +1064,18 @@ def render_ai_chokepoint():
     if not w or not w.get("rows"):
         return None
     rows = w["rows"]
+    _pm = fetch_prices([r.get("code") for r in rows])
     L = []
     L.append("\n### ③.4 🔗 宁静卡位链观察（题材质地 · 盘后产出）")
     L.append("")
     # ① 卡位≥80
     top = [r for r in rows if (r.get("chokepoint") or 0) >= 80]
     if top:
-        L.append("- ⭐ **题材确认候选**（卡位≥80）：" + " / ".join(r["name"] + "(" + str(r["chokepoint"]) + ")" for r in top))
+        L.append("- ⭐ **题材确认候选**（卡位≥80）：" + " / ".join(r["name"] + "(" + str(r["chokepoint"]) + ") " + price_txt(r.get("code"), _pm) for r in top))
     # ② 有信号×卡位≥70 交集（资金共振+题材质地背书）
     hit = [r for r in rows if (r.get("four_dim_total") or 0) >= 4 and (r.get("chokepoint") or 0) >= 70]
     if hit:
-        L.append("- 🎯 **卡位×信号交集**（四维≥4+卡位≥70）：" + " / ".join(r["name"] + "(卡位" + str(r["chokepoint"]) + "·四维" + str(r["four_dim_total"]) + ")" for r in hit))
+        L.append("- 🎯 **卡位×信号交集**（四维≥4+卡位≥70）：" + " / ".join(r["name"] + "(卡位" + str(r["chokepoint"]) + "·四维" + str(r["four_dim_total"]) + ") " + price_txt(r.get("code"), _pm) for r in hit))
     # ③ relabel 警告（bearish前期：120日涨幅大=定价过半；阈值≥80%）
     rel = []
     for r in rows:
@@ -1078,12 +1088,12 @@ def render_ai_chokepoint():
             if v >= 80 and (r.get("chokepoint") or 0) < 78:
                 rel.append(r)
     if rel:
-        L.append("- ⚠️ **relabel过半·追高警惕**（120日涨幅≥80%+卡位被摊薄）：" + " / ".join(r["name"] + "(" + str(r["chg120"]) + "·卡位" + str(r["chokepoint"]) + ")" for r in rel[:6]))
+        L.append("- ⚠️ **relabel过半·追高警惕**（120日涨幅≥80%+卡位被摊薄）：" + " / ".join(r["name"] + "(" + str(r["chg120"]) + "·卡位" + str(r["chokepoint"]) + ") " + price_txt(r.get("code"), _pm) for r in rel[:6]))
     # ④ 证据弱标的（证据铁律提示）
     wk = [r for r in rows if r.get("evidence") in ("weak", "none")]
     if wk:
-        L.append("- 🔻 **证据待核验**（无强/中证据·若进信号将降级）：" + " / ".join(r["name"] + "(" + str(r["evidence"]) + ")" for r in wk))
-    L.append(f"\n> 数据源：ai_chokepoint_watch_{w.get('date', '?')}（池内{len(rows)}只主板卡位链标的(多池)·卡位分=基础分+relabel自动衰减）")
+        L.append("- 🔻 **证据待核验**（无强/中证据·若进信号将降级）：" + " / ".join(r["name"] + "(" + str(r["evidence"]) + ") " + price_txt(r.get("code"), _pm) for r in wk))
+    L.append(f"\n> 数据源：ai_chokepoint_watch_{w.get('date', '?')}（池内{len(rows)}只主板卡位链标的(多池)·卡位分=基础分+relabel自动衰减）；价格=最新行情价（**<15 元标红**）")
     return "\n".join(L)
 
 
@@ -1111,15 +1121,16 @@ def render_yitong_rsv50():
         return None
     L = ["\n### ③.5 🏆 一统天下·RSV50三线强度（建仓区×相对强度·回测20日超额+5.87pct）"]
     L.append("")
+    _pm = fetch_prices([r.get("code") for r in (dual + stg)])
     if dual:
         L.append("- 🔥 **月线反转 + RSV50 双共振**：" + " / ".join(
-            f"{r['name']}({r['code'][2:]})" for r in dual))
+            f"{r['name']}({r['code'][2:]}) {price_txt(r.get('code'), _pm, r.get('close'))}" for r in dual))
     if stg:
         top = sorted(stg, key=lambda r: -r.get("stars", 0))[:8]
         L.append("- 📊 **建仓区 + RSV50三线强度**（个股50日>行业50日>大盘50日）：" + " / ".join(
-            f"{r['name']}({r['code'][2:]})" for r in top))
+            f"{r['name']}({r['code'][2:]}) {price_txt(r.get('code'), _pm, r.get('close'))}" for r in top))
     L.append(f"- 统计：建仓区{len(rs)}只 | RSV50强度{len(stg)}只 | 双共振{len(dual)}只")
-    L.append("\n> 数据源：一统天下建仓区股池（yitong_screener·盘后产出）")
+    L.append("\n> 数据源：一统天下建仓区股池（yitong_screener·盘后产出）；价格=最新行情价（**<15 元标红**）")
     return "\n".join(L)
 
 
@@ -1142,13 +1153,13 @@ def render_xihu_rsv():
     L.append("")
     if res:
         L.append("- 🔥 **三周期共振**（RSV50/144/250 均≥85）：" + " / ".join(
-            f"{r['name']}({r['code'][2:]})" for r in res[:12]))
+            f"{r['name']}({r['code'][2:]}) {price_txt(r.get('code'), None, r.get('close'))}" for r in res[:12]))
     show = strong[:15] if strong else top[:10]
     if show:
         L.append("- 📊 **较强标的**：" + " / ".join(
-            f"{r['name']}(Score{r['score']}·{r.get('resonance', '')})" for r in show))
+            f"{r['name']}(Score{r['score']}·{r.get('resonance', '')}) {price_txt(r.get('code'), None, r.get('close'))}" for r in show))
     L.append(f"- 统计：评分{d.get('total', 0)}只 | TOP榜{len(top)}只 | 三周期共振{len(res)}只")
-    L.append(f"\n> 数据源：xihu_rsv_latest.json（{d.get('date', '?')} 盘后 xihu_rsv 全市场扫描）")
+    L.append(f"\n> 数据源：xihu_rsv_latest.json（{d.get('date', '?')} 盘后 xihu_rsv 全市场扫描）；价格=数据日收盘价（**<15 元标红**）")
     return "\n".join(L)
 
 
@@ -1506,18 +1517,21 @@ def render_hot_concepts():
          f"首板 {j.get('first_total', '?')} ｜ 情绪：{mk.get('mood', '—')}"
          f"（连板晋级 {mk.get('lianban_jinji_rate', '?')}% / 首板晋级 {mk.get('first_jinji_rate', '?')}%）"
          " ｜ 源自盘后《涨停概念排行》。\n",
-         "| 级别 | 热点概念 | 涨停 | 连板 | 晋级率 | 龙头 | 板数 | 龙头分 | 主力净流入(万) |",
-         "|---|---|---|---|---|---|---|---|---|"]
-    for c in j["concept_rank"][:8]:
+         "| 级别 | 热点概念 | 涨停 | 连板 | 晋级率 | 龙头 | 龙头现价 | 板数 | 龙头分 | 主力净流入(万) |",
+         "|---|---|---|---|---|---|---|---|---|---|"]
+    _rows = j["concept_rank"][:8]
+    _pm = fetch_prices([(lmap.get(c.get("concept")) or {}).get("code") for c in _rows])
+    for c in _rows:
         l = lmap.get(c.get("concept"), {})
         fund = l.get("fund_net")
         fund_s = f"{fund / 10000:+.0f}" if isinstance(fund, (int, float)) else "—"
         jj = c.get("jinji_rate")
         jj_s = f"{jj:.0f}%" if isinstance(jj, (int, float)) else "—"
+        _lt = price_txt(l.get("code"), _pm) if l.get("code") else "—"
         L.append(f"| {c.get('grade', '')} | {c.get('concept', '')} | {c.get('n', '')} | {c.get('lb', '')} | {jj_s} | "
-                 f"{l.get('leader', '—')} | {l.get('lianban', '')} | {l.get('score', '')} | {fund_s} |")
+                 f"{l.get('leader', '—')} | {_lt} | {l.get('lianban', '')} | {l.get('score', '')} | {fund_s} |")
     L.append("")
-    L.append("- 说明：熊市用「题材炒作」打法，本表给出当日**热点概念及其龙头**（六维打分：启动/弹性/封单/带动/辨识/资金）；"
+    L.append("- 说明：龙头现价=最新行情价，**<15 元标红加粗**。熊市用「题材炒作」打法，本表给出当日**热点概念及其龙头**（六维打分：启动/弹性/封单/带动/辨识/资金）；"
              "执行需结合**退潮判断与止损**。完整名单见盘后《涨停概念排行》。\n")
     return "\n".join(L)
 
@@ -1539,8 +1553,8 @@ def render_guaili():
          f"> {d.get('date', '')} 盘后扫描 ｜ 命中 **{len(hs)}** 只 ｜ 中位超额 +2.56%/20日 · 胜率 59%（全环境 t>6）\n"]
     top = hs[:10]
     L.append("- **乖离最深 10 只**：" + " ｜ ".join(
-        f"{h['name']}({h['code'][2:]}) {h['bias']}%" for h in top))
-    L.append(f"- 说明：急跌乖离低吸信号，须配合 **2×ATR 止损**；完整名单见盘后《乖离低买》报告。")
+        f"{h['name']}({h['code'][2:]}) {price_txt(h.get('code'), None, h.get('close'))} {h['bias']}%" for h in top))
+    L.append(f"- 说明：急跌乖离低吸信号，须配合 **2×ATR 止损**；价格=数据日收盘价（**<15 元标红**）；完整名单见盘后《乖离低买》报告。")
     return "\n".join(L)
 
 
@@ -1574,6 +1588,82 @@ def hl_price_in_text(s):
     return _PRICE_BRACKET.sub(lambda m: "(" + hl_price(m.group(1)) + ")", str(s))
 
 
+def _to_qt(code):
+    """任意代码写法 → 腾讯行情代码（sh600519 / sz000725 / bj430047）"""
+    s = str(code or "").strip().lower()
+    if s[:2] in ("sh", "sz", "bj"):
+        return s
+    d = re.sub(r"\D", "", s)
+    if not d:
+        return ""
+    d = d[-6:]
+    if d[0] in "569":
+        return "sh" + d
+    if d[0] in "48":
+        return "bj" + d
+    return "sz" + d
+
+
+def _c6(code):
+    return re.sub(r"\D", "", str(code or ""))[-6:]
+
+
+_PRICE_CACHE = {}
+
+
+def fetch_prices(codes, chunk=60):
+    """腾讯 qt.gtimg.cn 批量现价 → {6位代码: 价格}；失败静默返回 {}（不阻断报告）"""
+    want = []
+    for c in codes or []:
+        q = _to_qt(c)
+        if q and q not in want:
+            want.append(q)
+    out = {}
+    for i in range(0, len(want), chunk):
+        part = want[i:i + chunk]
+        need = [q for q in part if _c6(q) not in _PRICE_CACHE]
+        if not need:
+            continue
+        try:
+            req = urllib.request.Request(
+                "https://qt.gtimg.cn/q=" + ",".join(need),
+                headers={"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"})
+            raw = urllib.request.urlopen(req, timeout=15).read().decode("gbk", "ignore")
+        except Exception:
+            continue
+        for ln in raw.split(";"):
+            if "=" not in ln or '"' not in ln:
+                continue
+            key = ln.split("=", 1)[0].strip()
+            if key.startswith("v_"):
+                key = key[2:]
+            f = ln.split('"')[1].split("~")
+            if len(f) > 3:
+                try:
+                    p = float(f[3])
+                except ValueError:
+                    continue
+                if p > 0:
+                    _PRICE_CACHE[_c6(key)] = p
+    for q in want:
+        p = _PRICE_CACHE.get(_c6(q))
+        if p is not None:
+            out[_c6(q)] = p
+    return out
+
+
+def price_txt(code, pmap=None, fallback=None):
+    """价格文本：实时快照优先，其次数据源自带 close；<15 元标红，缺失显示 —"""
+    p = (pmap or {}).get(_c6(code))
+    if p is None:
+        p = _PRICE_CACHE.get(_c6(code))
+    if p is None and fallback not in (None, "", 0):
+        p = fallback
+    if p in (None, "", 0):
+        return "—"
+    return hl_price(p)
+
+
 def render_execution_cards():
     """④.1 个股执行卡紧凑渲染 v1.1
     改动：① 🆕 新上卡标记 ② summary 内联进卡片行（修复"孤立半截行"） ③ 持仓/新增候选/延续候选 分组
@@ -1587,7 +1677,7 @@ def render_execution_cards():
          f"> {d.get('date', '')} 盘后 execution_card 输出 · 基准{total/10000:.0f}万："
          "①月/周上级门禁 ②2×ATR止损·盈亏比≥2·单票≤30% ③5:3:2分批。"
          "🆕 = 首次上卡（含当日信号仲裁 ★ 及以上候选）。"
-         "💰 现价/止损/目标/触发价 **<15 元标红加粗**。\n"]
+         "💰 全报告所有个股价格 **<15 元标红加粗**（本卡含现价/止损/目标/触发价）。\n"]
 
     def line(c):
         tag = "🆕 " if c.get("is_new") else ""
