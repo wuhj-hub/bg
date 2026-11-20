@@ -1544,16 +1544,34 @@ def render_guaili():
     return "\n".join(L)
 
 
-def hl_price(v, digits=2):
-    """低价高亮：现价 <10 元 → 红色加粗（Markdown 内联 HTML）"""
+LOW_PRICE_TH = 15.0   # 低价标红阈值（2026-11-20 由 10 元提到 15 元，覆盖报告内全部价位）
+
+
+def hl_price(v, digits=None):
+    """低价高亮：价格 <15 元 → 红色加粗（Markdown 内联 HTML）
+    2026-11-20：阈值 10 → 15；digits=None 时保留原文本小数位（避免 9.5 被写成 9.50）
+    """
+    raw = str(v).strip()
     try:
-        p = float(v)
+        p = float(raw)
     except (TypeError, ValueError):
         return str(v)
+    if digits is None:
+        digits = len(raw.split(".")[1]) if "." in raw else 2
     s = f"{p:.{digits}f}"
-    if p < 10:
+    if p < LOW_PRICE_TH:
         return f'<span style="color:#e60012"><b>{s}</b></span>'
     return s
+
+
+_PRICE_BRACKET = re.compile(r"\((\d+(?:\.\d+)?)\)")
+
+
+def hl_price_in_text(s):
+    """把文本中括号内的价格按 <15 元高亮（如 回踩MA10(4.38)不破 / 放量突破前高(9.50)）"""
+    if s is None:
+        return ""
+    return _PRICE_BRACKET.sub(lambda m: "(" + hl_price(m.group(1)) + ")", str(s))
 
 
 def render_execution_cards():
@@ -1568,7 +1586,8 @@ def render_execution_cards():
     L = ["\n### ④.1 个股执行卡（卷钱机器·周期级联）\n",
          f"> {d.get('date', '')} 盘后 execution_card 输出 · 基准{total/10000:.0f}万："
          "①月/周上级门禁 ②2×ATR止损·盈亏比≥2·单票≤30% ③5:3:2分批。"
-         "🆕 = 首次上卡（含当日信号仲裁 ★ 及以上候选）。\n"]
+         "🆕 = 首次上卡（含当日信号仲裁 ★ 及以上候选）。"
+         "💰 现价/止损/目标/触发价 **<15 元标红加粗**。\n"]
 
     def line(c):
         tag = "🆕 " if c.get("is_new") else ""
@@ -1577,7 +1596,7 @@ def render_execution_cards():
             nm += f"·{c['signal']}"
         v = c.get("verdict", "?")
         if c.get("action"):
-            return [f"- {tag}{v} **{nm}**：{c['action']}"]
+            return [f"- {tag}{v} **{nm}**：{hl_price_in_text(c['action'])}"]
         up = c.get("upper", {})
         b = c.get("budget", {})
         parts = []
@@ -1585,12 +1604,16 @@ def render_execution_cards():
             tr = x.get("trigger", "")
             if tr.startswith("信号确认位附近(≈"):
                 tr = "≈" + tr.split("(≈")[1].rstrip(")")
-            if tr.startswith("≈"):          # 现价（B1 参考价）<10 元 → 红色加粗
+            if tr.startswith("≈"):          # 现价（B1 参考价）<15 元 → 红色加粗
                 tr = "≈" + hl_price(tr[1:])
+            else:                            # B2/B3 触发价（括号内价格）<15 元 → 红色加粗
+                tr = hl_price_in_text(tr)
             parts.append(f"{x['batch']} {x.get('pct')}%@{tr}")
+        _stop = hl_price(b.get("stop")) if b.get("stop") not in (None, "") else "—"
+        _tgt = hl_price(b.get("target")) if b.get("target") not in (None, "") else "—"
         out = [f"- {tag}{v} **{nm}**：月{up.get('month_trend')}({up.get('month_gate')})/"
-               f"周{up.get('week_trend')}({up.get('week_gate')}) | 止损{b.get('stop')} "
-               f"目标{b.get('target')} 盈亏比{b.get('rr')} | " + " → ".join(parts)]
+               f"周{up.get('week_trend')}({up.get('week_gate')}) | 止损{_stop} "
+               f"目标{_tgt} 盈亏比{b.get('rr')} | " + " → ".join(parts)]
         if c.get("summary"):
             out.append(f"  ↳ {c['summary']}")
         return out
