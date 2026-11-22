@@ -1,5 +1,5 @@
 {
- "date": "2026-11-20",
+ "date": "2026-11-23",
  "writes": {
   "market_width_latest.json": [
    "market_width.py",
@@ -1024,8 +1024,8 @@
  "dup_freshness": [
   {
    "name": "sector_component_em.json",
-   "root": "2026-11-19",
-   "outputs": "2026-11-19",
+   "root": "2026-11-20",
+   "outputs": "2026-11-20",
    "status": "同步"
   },
   {
