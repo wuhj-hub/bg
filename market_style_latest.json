@@ -1,93 +1,76 @@
 {
- "date": "2026-11-20",
- "data_date": "2026-11-20",
+ "date": "2026-11-23",
+ "data_date": "2026-11-23",
  "style": "均衡市",
  "icon": "⚖️",
- "score": -12,
+ "score": 17,
  "score_detail": {
   "size_style": -25,
-  "limitup_structure": 12,
-  "volume_structure": -8,
+  "limitup_structure": 33,
+  "volume_structure": 0,
   "sector_fund": 9
  },
  "size_style": {
-  "hs300_5d": -1.54,
-  "hs300_10d": -2.46,
-  "zz1000_5d": -11.15,
-  "zz1000_10d": -13.17,
-  "rel_5d": -9.61,
-  "rel_10d": -10.71,
-  "rel_20d": -12.45,
-  "zz500_5d": -7.11
+  "hs300_5d": -0.54,
+  "hs300_10d": -2.41,
+  "zz1000_5d": -5.71,
+  "zz1000_10d": -10.58,
+  "rel_5d": -5.17,
+  "rel_10d": -8.16,
+  "rel_20d": -8.8,
+  "zz500_5d": -2.67
  },
  "limitup_structure": {
-  "limitup": 25,
-  "strong": 32,
-  "width_score": 36.6,
-  "level": "偏弱（跌多涨少）",
+  "limitup": 117,
+  "strong": 393,
+  "width_score": 100,
+  "level": "🔥 强势（普涨格局）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 1.0,
-  "zhaban_rate": 37.5,
-  "lianban": 3
+  "strong_ratio": 12.9,
+  "zhaban_rate": 35.0,
+  "lianban": 15
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.583,
-  "small_big_ratio_5d": 0.663,
-  "vol_shift": "资金回流大盘"
+  "small_big_ratio_now": 0.634,
+  "small_big_ratio_5d": 0.637
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "国有大型银行Ⅱ",
-    "zdf": "2.52",
-    "main_net5d": -2.3,
-    "retail_net": -2.6,
+    "name": "元件",
+    "zdf": "4.46",
+    "main_net5d": -17.1,
+    "retail_net": -54.0,
     "tag": "游资型"
    },
    {
-    "name": "银行",
-    "zdf": "1.29",
-    "main_net5d": -43.2,
-    "retail_net": 6.4,
+    "name": "通信设备",
+    "zdf": "5.67",
+    "main_net5d": -96.5,
+    "retail_net": -67.5,
     "tag": "游资型"
    },
    {
     "name": "半导体",
-    "zdf": "-4.91",
-    "main_net5d": -101.9,
-    "retail_net": 109.2,
+    "zdf": "0.98",
+    "main_net5d": -134.6,
+    "retail_net": 1.6,
     "tag": "游资型"
-   },
-   {
-    "name": "元件",
-    "zdf": "-2.94",
-    "main_net5d": -138.2,
-    "retail_net": -18.3,
-    "tag": "游资型"
-   },
-   {
-    "name": "白酒Ⅱ",
-    "zdf": "0.41",
-    "main_net5d": 8.1,
-    "retail_net": -4.9,
-    "tag": "机构型"
    }
   ]
  },
  "mode_cross": {
-  "dominant": "欧马模式",
+  "dominant": "堆量模式",
   "all": {
-   "堆量模式": 9,
-   "欧马模式": 6
+   "堆量模式": 13,
+   "欧马模式": 2
   },
   "leaders": {
-   "堆量模式": 4,
-   "欧马模式": 6
+   "堆量模式": 3
   },
   "pullbacks": {},
   "gpoints": {
-   "欧马模式": 2,
    "堆量模式": 1
   },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
