@@ -1,12 +1,12 @@
 {
- "date": "2026-11-20",
+ "date": "2026-11-23",
  "source": "local(westock独立口径·无外部依赖)",
- "pool_size": 49,
+ "pool_size": 50,
  "resonance_boards": [
   {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
-   "zdf": 1.23,
+   "name": "通信设备",
+   "code": "pt01801102",
+   "zdf": 5.67,
    "strength": 7,
    "factors": [
     "抢筹",
@@ -15,31 +15,12 @@
    ]
   },
   {
-   "name": "渔业",
-   "code": "pt01801015",
-   "zdf": 0.79,
-   "strength": 5,
+   "name": "元件",
+   "code": "pt01801083",
+   "zdf": 4.46,
+   "strength": 7,
    "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "证金持股",
-   "code": "pt02003718",
-   "zdf": 1.09,
-   "strength": 5,
-   "factors": [
-    "进场",
-    "吸筹"
-   ]
-  },
-  {
-   "name": "白酒Ⅱ",
-   "code": "pt01801125",
-   "zdf": 0.41,
-   "strength": 5,
-   "factors": [
+    "抢筹",
     "进场",
     "吸筹"
    ]
@@ -47,16 +28,26 @@
  ],
  "grab_top": [
   {
-   "name": "保险Ⅱ",
-   "code": "pt01801194",
+   "name": "通信设备",
+   "code": "pt01801102",
+   "value": 7
+  },
+  {
+   "name": "元件",
+   "code": "pt01801083",
    "value": 7
   }
  ],
  "entry_top": [
   {
-   "name": "证金持股",
-   "code": "pt02003718",
-   "value": 6.3
+   "name": "元件",
+   "code": "pt01801083",
+   "value": 101.4
+  },
+  {
+   "name": "通信设备",
+   "code": "pt01801102",
+   "value": 40.7
   },
   {
    "name": "白酒Ⅱ",
@@ -66,61 +57,31 @@
   {
    "name": "保险Ⅱ",
    "code": "pt01801194",
-   "value": 3.1
-  },
-  {
-   "name": "渔业",
-   "code": "pt01801015",
-   "value": 0.1
+   "value": 2.2
   }
  ],
  "absorption_top": [
   {
+   "name": "元件",
+   "code": "pt01801083",
+   "value": 2.43
+  },
+  {
+   "name": "通信设备",
+   "code": "pt01801102",
+   "value": 0.78
+  },
+  {
    "name": "保险Ⅱ",
    "code": "pt01801194",
-   "value": 0.85
+   "value": 0.55
   },
   {
    "name": "白酒Ⅱ",
    "code": "pt01801125",
-   "value": 0.52
-  },
-  {
-   "name": "证金持股",
-   "code": "pt02003718",
-   "value": 0.32
-  },
-  {
-   "name": "渔业",
-   "code": "pt01801015",
-   "value": 0.08
+   "value": 0.53
   }
  ],
  "control_top": [],
- "zhongjun_candidates": [
-  {
-   "board": "证金持股",
-   "stock": "中国石油",
-   "code": "sh601857",
-   "zdf": "4.67",
-   "main1": 1.96,
-   "main5": 0.98
-  },
-  {
-   "board": "保险Ⅱ",
-   "stock": "中国太保",
-   "code": "sh601601",
-   "zdf": "1.60",
-   "main1": -1.21,
-   "main5": 0.39
-  },
-  {
-   "board": "渔业",
-   "stock": "好当家",
-   "code": "sh600467",
-   "zdf": "10.00",
-   "main1": 1.78,
-   "main5": 0.26
-  }
- ]
+ "zhongjun_candidates": []
 }
