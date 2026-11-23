@@ -1,20 +1,21 @@
 {
- "date": "2026-11-20",
- "total": 23,
- "lianban_cnt": 3,
- "max_lb": 4,
- "shouban": 20,
+ "date": "2026-11-23",
+ "total": 114,
+ "lianban_cnt": 14,
+ "max_lb": 5,
+ "shouban": 100,
  "by_lb": {
-  "4": 2,
-  "2": 1,
-  "1": 20
+  "5": 2,
+  "3": 1,
+  "2": 11,
+  "1": 100
  },
  "score": {
-  "score": 39,
-  "level": "低迷",
+  "score": 64,
+  "level": "活跃",
   "parts": {
-   "涨停家数": 5,
-   "连板高度": 18,
+   "涨停家数": 20,
+   "连板高度": 28,
    "连板占比": 16
   }
  },
@@ -26,8 +27,8 @@
    "name": "真视通",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -45,8 +46,8 @@
    "name": "盛剑科技",
    "price": "",
    "chg": "",
-   "lianban": 4,
-   "ji_ji_ban": "4天4板",
+   "lianban": 5,
+   "ji_ji_ban": "5天5板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -61,8 +62,8 @@
    "name": "中京电子",
    "price": "",
    "chg": "",
-   "lianban": 2,
-   "ji_ji_ban": "2天2板",
+   "lianban": 3,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -73,6 +74,201 @@
     "元件",
     "电子",
     "私募新进"
+   ]
+  },
+  {
+   "code": "sz000530",
+   "name": "冰山冷热",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "通用设备",
+    "机械设备",
+    "制冷空调设备",
+    "核能核电"
+   ]
+  },
+  {
+   "code": "sz002199",
+   "name": "东晶电子",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "元件",
+    "电子",
+    "被动元件",
+    "QFII新进"
+   ]
+  },
+  {
+   "code": "sz002086",
+   "name": "东方海洋",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他农产品加工",
+    "农产品加工",
+    "连续亏损"
+   ]
+  },
+  {
+   "code": "sz002548",
+   "name": "金新农",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "连续亏损"
+   ]
+  },
+  {
+   "code": "sz002642",
+   "name": "荣联科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "华为鲲鹏"
+   ]
+  },
+  {
+   "code": "sh600467",
+   "name": "好当家",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "中韩自贸区"
+   ]
+  },
+  {
+   "code": "sh600327",
+   "name": "大东方",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "社区团购",
+    "私募新进",
+    "民营医院"
+   ]
+  },
+  {
+   "code": "sh603004",
+   "name": "鼎龙科技",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他化学制品",
+    "化学制品",
+    "基础化工",
+    "基金减仓"
+   ]
+  },
+  {
+   "code": "sh605577",
+   "name": "龙版传媒",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "黑龙江自贸区"
+   ]
+  },
+  {
+   "code": "sh603960",
+   "name": "克来机电",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "汽车零部件",
+    "汽车",
+    "底盘与发动机系统",
+    "高端装备"
+   ]
+  },
+  {
+   "code": "sh605018",
+   "name": "长华集团",
+   "price": "",
+   "chg": "",
+   "lianban": 2,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "汽车零部件",
+    "汽车",
+    "其他汽车零部件",
+    "飞行汽车(eVTOL)"
    ]
   }
  ],
