@@ -1004,19 +1004,6 @@
       "note": "日线建仓2026-11-19+周线+60m"
     },
     {
-      "code": "sh603619",
-      "name": "中曼石油",
-      "entry": "2026-11-17",
-      "guaili": false,
-      "in_now": true,
-      "week": "2026-10-19",
-      "m60": true,
-      "stars": 5,
-      "reversal": null,
-      "strength": null,
-      "note": "日线建仓2026-11-17+周线+60m"
-    },
-    {
       "code": "sh603682",
       "name": "锦和商管",
       "entry": "2026-11-19",
@@ -14179,6 +14166,19 @@
       "guaili": false,
       "in_now": true,
       "week": "2026-11-09",
+      "m60": false,
+      "stars": 4,
+      "reversal": null,
+      "strength": null,
+      "note": "日线建仓2026-11-17+周线"
+    },
+    {
+      "code": "sh603619",
+      "name": "中曼石油",
+      "entry": "2026-11-17",
+      "guaili": false,
+      "in_now": true,
+      "week": "2026-10-19",
       "m60": false,
       "stars": 4,
       "reversal": null,
