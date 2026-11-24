@@ -729,8 +729,17 @@ def pool_overview_section(today):
     else:
         A("| 👑 乾坤 | A级金股 | 0 | 当日无A级（分级严格，属正常） |")
 
-    # 武威（月度频率）
-    A("| 📐 武威 | 月线精选池 | 月度 | 每月1日自动扫描（最近2026-07：飞亚达重仓）；8月池 9/1 更新 |")
+    # 武威（月度频率）——动态读取最近一次产出（2026-11-25 修复：原为硬编码，停在8月）
+    try:
+        import glob as _glob
+        _ww = sorted(_glob.glob("outputs/ww_period_*_v21.md") + _glob.glob("ww_period_*_v21.md"))
+        if _ww:
+            _ym = os.path.basename(_ww[-1]).split("ww_period_")[-1].split("_")[0]
+            A(f"| 📐 武威 | 月线精选池 | 月度 | 已更新至 {_ym[:4]}-{_ym[4:6]}（{os.path.basename(_ww[-1])}） |")
+        else:
+            A("| 📐 武威 | 月线精选池 | 月度 | ⏳ 未找到 ww_period_*_v21.md |")
+    except Exception:
+        A("| 📐 武威 | 月线精选池 | 月度 | ⚠️ 读取失败 |")
 
     L.append("")
     return "\n".join(L)
