@@ -1085,6 +1085,32 @@ def read_bull_zone(today):
     return None
 
 
+_MG_CACHE = {}
+
+
+def month_gain_of(code):
+    """当月涨幅%（最新月线收盘 / 上月收盘 - 1）。用于「牛市后期大涨即减」提示。
+    失败返回 None，不阻断报告。2026-11-24 接入。
+    """
+    c = str(code or "").strip()
+    if not c:
+        return None
+    if c in _MG_CACHE:
+        return _MG_CACHE[c]
+    val = None
+    try:
+        rows = fetch_kline_table([c], "month", 3)
+        if len(rows) >= 2:
+            cur = float(rows[-1].get("last") or 0)
+            prev = float(rows[-2].get("last") or 0)
+            if prev > 0 and cur > 0:
+                val = (cur / prev - 1) * 100
+    except Exception:
+        val = None
+    _MG_CACHE[c] = val
+    return val
+
+
 def read_env():
     """读环境唯一化引擎（env_latest.json，第1层：5子分→温度→仓位总闸），失败返回None"""
     return _ri_load(("env_latest.json", "outputs/env_latest.json", "../outputs/env_latest.json",
@@ -1743,6 +1769,13 @@ def render_execution_cards():
                f"目标{_tgt} 盈亏比{b.get('rr')} | " + " → ".join(parts)]
         if c.get("summary"):
             out.append(f"  ↳ {c['summary']}")
+        if (c.get("signal") or "").startswith("持仓"):
+            _mg = month_gain_of(c.get("code"))
+            if _mg is not None and _mg >= 25:
+                _bz = read_bull_zone(d.get("date") or "")
+                _tail = bool(_bz and not _bz.get("none") and _bz.get("tail"))
+                _tip = "牛市末段·优先减仓" if _tail else "快速上涨·注意兑现"
+                out.append(f"  ↳ ⚠️ 本月已涨 {_mg:+.0f}%（{_tip}：可减 1/3）")
         return out
 
     holds = [c for c in cards if (c.get("signal") or "").startswith("持仓")]
