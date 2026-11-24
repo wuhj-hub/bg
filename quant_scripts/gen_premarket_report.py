@@ -574,8 +574,15 @@ def gen_report(today_str):
     # 2026-10-27 修复：双弦脚本 run_shuangxian.py 从不产出 air_count（sx_air 恒 None），
     # 报告中“空头 x/8”的唯一真实来源＝calc_zengxingzhi 的 8 大指数月线口径，故提前计算并复用缓存。
     zx_table, zx_qual, zx_bear, zx_bull, zx_nvalid = calc_zengxingzhi()
+    _bz = read_bull_zone(today_str)
     lines.append("| 系统 | 信号 |")
     lines.append("|:----|:----|")
+    if _bz:
+        if _bz.get("none"):
+            lines.append(f"| 📅 周期位置 | 非牛市区间（上一轮牛市结束 {_bz.get('last_end', '—')}） |")
+        else:
+            _tail = " ⚠️ **牛市末段·分批减仓**" if _bz.get("tail") else ""
+            lines.append(f"| 📅 周期位置 | 第{_bz['seq']}次牛市（{_bz['start']}~{_bz['end']}）第 {_bz['months_in']} 个月{_tail} |")
     lines.append(f"| 🌡️ 鱼身温度 | {ft_v}/100" if ft_v is not None else "| 🌡️ 鱼身温度 | ⏳ 待量化运行 |")
     lines.append(f"| 🛡️ 猛兽安全评分 | {bs}/100" if bs is not None else "| 🛡️ 猛兽安全评分 | ⏳ 待量化运行 |")
     # 有效指数不足 6 个时不展示空头数（避免“空头0/8”式误导），退回 sx_air 或“待量化”
@@ -1046,6 +1053,36 @@ def render_reversal_quality():
     except Exception as e:
         L.append("> 生成失败(%s)" % e)
     return "\n".join(L) + "\n"
+
+
+def read_bull_zone(today):
+    """读 data/bull_markets.csv（曾星智六段牛市真值标签，2026-11-24 接入）
+    返回 {'seq','start','end','months_in','tail','note'} / {'none':True,'last_end'} / None
+    用途：报告「周期位置」一行；tail=True 表示处在牛市区间最后 3 个月，提示分批减仓。
+    """
+    for p in ("data/bull_markets.csv", "../data/bull_markets.csv"):
+        try:
+            txt = open(p, encoding="utf-8-sig").read().strip().splitlines()
+        except Exception:
+            continue
+        if len(txt) < 2:
+            continue
+        rows = [l.split(",") for l in txt[1:] if l.count(",") >= 3]
+        d = str(today)[:7]
+        try:
+            y, m = int(str(today)[:4]), int(str(today)[5:7])
+        except Exception:
+            return None
+        for r in rows:
+            if r[1] <= d <= r[2]:
+                sy, sm = int(r[1][:4]), int(r[1][5:7])
+                ey, em = int(r[2][:4]), int(r[2][5:7])
+                return {"seq": r[0], "start": r[1], "end": r[2],
+                        "months_in": (y - sy) * 12 + (m - sm) + 1,
+                        "tail": (y * 12 + m) >= (ey * 12 + em - 2),
+                        "note": r[6] if len(r) > 6 else ""}
+        return {"none": True, "last_end": rows[-1][2] if rows else "—"}
+    return None
 
 
 def read_env():
