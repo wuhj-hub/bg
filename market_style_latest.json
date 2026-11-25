@@ -1,84 +1,95 @@
 {
- "date": "2026-11-24",
- "data_date": "2026-11-24",
+ "date": "2026-11-25",
+ "data_date": "2026-11-25",
  "style": "均衡市",
  "icon": "⚖️",
- "score": -3,
+ "score": -7,
  "score_detail": {
   "size_style": -25,
-  "limitup_structure": 16,
+  "limitup_structure": 9,
   "volume_structure": 0,
-  "sector_fund": 6
+  "sector_fund": 9
  },
  "size_style": {
-  "hs300_5d": -0.32,
-  "hs300_10d": -2.35,
-  "zz1000_5d": -4.82,
-  "zz1000_10d": -11.86,
-  "rel_5d": -4.5,
-  "rel_10d": -9.51,
-  "rel_20d": -7.66,
-  "zz500_5d": -2.71
+  "hs300_5d": -2.15,
+  "hs300_10d": -4.35,
+  "zz1000_5d": -8.45,
+  "zz1000_10d": -16.91,
+  "rel_5d": -6.3,
+  "rel_10d": -12.56,
+  "rel_20d": -11.21,
+  "zz500_5d": -6.24
  },
  "limitup_structure": {
-  "limitup": 47,
-  "strong": 115,
-  "width_score": 59.2,
-  "level": "结构性偏强（涨停潮·涨少跌多分化）",
+  "limitup": 46,
+  "strong": 66,
+  "width_score": 42.6,
+  "level": "结构分化（涨少跌多·资金抱团）",
   "zhongjun_cnt": 0,
   "zhongjun": [],
-  "strong_ratio": 3.8,
-  "zhaban_rate": 69.5,
-  "lianban": 26
+  "strong_ratio": 2.2,
+  "zhaban_rate": 47.1,
+  "lianban": 13
  },
  "volume_structure": {
-  "small_big_ratio_now": 0.593,
-  "small_big_ratio_5d": 0.634
+  "small_big_ratio_now": 0.596,
+  "small_big_ratio_5d": 0.614
  },
  "sector_fund": {
   "sectors": [
    {
-    "name": "元件",
-    "zdf": "1.14",
-    "main_net5d": 101.4,
-    "retail_net": -31.1,
-    "tag": "机构型"
-   },
-   {
-    "name": "昨日涨停",
-    "zdf": "4.14",
-    "main_net5d": -67.1,
-    "retail_net": 16.7,
+    "name": "半导体",
+    "zdf": "-7.02",
+    "main_net5d": -24.3,
+    "retail_net": 125.0,
     "tag": "游资型"
    },
    {
-    "name": "半导体",
-    "zdf": "1.53",
-    "main_net5d": -8.2,
-    "retail_net": -13.1,
+    "name": "渔业",
+    "zdf": "4.65",
+    "main_net5d": 0.0,
+    "retail_net": -3.7,
+    "tag": "机构型"
+   },
+   {
+    "name": "白酒Ⅱ",
+    "zdf": "0.89",
+    "main_net5d": -5.4,
+    "retail_net": -5.8,
+    "tag": "游资型"
+   },
+   {
+    "name": "一般零售",
+    "zdf": "0.27",
+    "main_net5d": -3.7,
+    "retail_net": -5.2,
     "tag": "游资型"
    },
    {
     "name": "昨日连板",
-    "zdf": "4.13",
-    "main_net5d": -19.1,
-    "retail_net": 8.9,
+    "zdf": "0.10",
+    "main_net5d": -20.8,
+    "retail_net": 17.6,
     "tag": "游资型"
    }
   ]
  },
  "mode_cross": {
-  "dominant": "堆量模式",
+  "dominant": "欧马模式",
   "all": {
-   "堆量模式": 11,
-   "欧马模式": 4
-  },
-  "leaders": {
-   "堆量模式": 3,
+   "堆量模式": 13,
    "欧马模式": 2
   },
-  "pullbacks": {},
-  "gpoints": {},
+  "leaders": {
+   "堆量模式": 10,
+   "欧马模式": 2
+  },
+  "pullbacks": {
+   "堆量模式": 1
+  },
+  "gpoints": {
+   "堆量模式": 2
+  },
   "verdict": "ℹ️ 均衡市（风格轴中性，以猛兽信号为准）",
   "total_scored": 15
  },
