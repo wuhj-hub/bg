@@ -500,6 +500,94 @@ def render_limitup_panel():
     return "\n".join(L)
 
 
+# ══════════ 🎯 交易层（2026-11-25 报告分层改造）══════════
+# 目的：解决「每天平铺 20 个信号 = 每天 20 个判断」的决策过载（期顺赢《如何构建交易系统》四层框架）。
+# 只把【回测证实正超额】的模块放进交易层；其余一律降为观察层（看结构可以，不给买点）。
+#
+# 入层依据（均为我方实测超额，非文献口径）：
+#   乖离低买     20日超额 +2.56% / 胜率 59%（全环境 t>6，6/6 环境显著正）
+#   极品底超跌   T+20 超额 +6.57pp / 胜率 62.6%（与乖离低买同族的超跌类，一统天下副图已验证）
+#   RSV50双共振  20日超额 +5.87pct（建仓区×相对强度）
+# 不入层依据（回测为负或无效，故只做观察）：
+#   王者倍量柱月线突破 -4.71pp（t=-2.34）｜薛斯通道周线 -1.84pp（t=-5.69）
+#   峰峦叠翠 -5.4pp ｜ 百日前高放量板 -1.79pp ｜ 简而素周进素 -16.52%
+#   开盘八法 / 主升浪四信号 / 曾星智短线公式 → 有效但为负或无效
+# 改动原则：不删任何原有小节，只加「交易层」置顶 + 给 ③ 打上观察层标记。
+
+def render_trade_layer():
+    """🎯 交易层置顶区块：门禁（能不能做）+ 可做清单（最多 6 只，带止损与依据）。"""
+    env = read_env() or {}
+    reg = read_market_regime() or {}
+    temp = env.get("temp")
+    cap = env.get("position_cap")
+    rlabel = reg.get("regime_label") or reg.get("regime") or ""
+    L = ["\n## 🎯 交易层（今天只做这些 ｜ 其余一律观察层）\n"]
+    gate = []
+    if cap is not None:
+        gate.append(f"总仓上限 **{cap}%**（env温度 {temp if temp is not None else '—'}）")
+    if rlabel:
+        gate.append(f"行情类型 **{rlabel}**")
+    bearish = (isinstance(temp, (int, float)) and temp < 40) or ("熊" in str(rlabel))
+    gate.append("🔒 **只做超跌低吸，不做任何突破/追高**" if bearish
+                else "可做低吸；突破类模块仍视为观察")
+    if env.get("degraded"):
+        gate.append("⚠️env降级")
+    L.append("> 门禁：" + " ｜ ".join(gate) + "\n")
+
+    cands = []
+    gl = read_guaili() or {}
+    for h in (gl.get("hits") or [])[:5]:
+        cands.append({"code": h.get("code"), "name": h.get("name"), "px": h.get("close"),
+                      "why": f"乖离 {h.get('bias')}% 急跌低吸",
+                      "stat": "20日超额+2.56%/胜59%"})
+    yt = read_yitong_pool() or {}
+    for r in (yt.get("results") or []):
+        if r.get("reversal") and r.get("strength"):
+            cands.append({"code": r.get("code"), "name": r.get("name"), "px": r.get("close"),
+                          "why": "月线反转 + RSV50双共振",
+                          "stat": "20日超额+5.87pct"})
+    seen, uniq = set(), []
+    for c in cands:
+        k = c.get("code")
+        if not k or k in seen:
+            continue
+        seen.add(k)
+        uniq.append(c)
+    uniq = uniq[:6]
+
+    if uniq:
+        _per = max(5, min(10, (int(cap) if cap else 30) // 3))
+        pm = fetch_prices([c["code"] for c in uniq])
+        L.append(f"**✅ 今日可做 {len(uniq)} 只**（单票≤{_per}%，其余留现金；止损固定 −7%，以收盘价为基准）\n")
+        L.append("| 标的 | 收盘 | 现价 | 为什么做 | 止损(−7%) |")
+        L.append("|---|---|---|---|---|")
+        for c in uniq:
+            px = c.get("px")
+            try:
+                pxv = float(px) if px not in (None, "") else None
+            except (TypeError, ValueError):
+                pxv = None
+            sl = f"{pxv * 0.93:.2f}" if pxv else "—"
+            nm = f"{c['name']}({str(c['code'])[2:]})" if c.get("name") else str(c.get("code"))
+            # 现价与信号价偏离过大 → 提示"别追"，避免盘前高开直接买
+            _t = price_txt(c.get("code"), pm, px)
+            try:
+                _live = pm.get(_c6(c.get("code")))   # fetch_prices 返回 {6位代码: 价格}
+                if pxv and _live and abs(float(_live) / pxv - 1) >= 0.05:
+                    _t += f" ⚠️Δ{(float(_live) / pxv - 1) * 100:+.0f}%"
+            except (TypeError, ValueError):
+                pass
+            L.append(f"| {nm} | {hl_price(px)} | {_t} | {c['why']} | {hl_price(sl)} |")
+        L.append("")
+        L.append("> 依据：乖离低买 20日超额+2.56%/胜59%（全环境 t>6）；RSV50双共振 20日超额+5.87pct。"
+                 "现价偏离信号价 ≥5% 标 ⚠️＝开盘已走掉，不追。")
+    else:
+        L.append("**✅ 今日无交易层信号 → 空仓等待**（不为凑单降标准）\n")
+    L.append("\n**⛔ 明确不做**：本表以外的一切信号（含 ③ 观察层全部内容）。"
+             "它们未经正超额验证——看结构可以，不能据此下单。\n")
+    return "\n".join(L)
+
+
 def gen_report(today_str):
     """生成完整盘前报告"""
     today = today_str
@@ -521,6 +609,11 @@ def gen_report(today_str):
                  "unknown": "盘后量化数据日期未知"}[quant_fresh]
         lines.append(f"⚠️ 数据截止：A股 {yesterday} 收盘；美股 {yesterday} 收盘。【{_warn}，三系统/资金/板块等盘后数据可能不完整，仅供参考】")
     lines.append("⚠️ 基于公开数据整理，不构成投资建议。\n")
+    # 🎯 交易层置顶（2026-11-25）：先给"今天做不做、做哪几只"，再讲理由
+    try:
+        lines.append(render_trade_layer())
+    except Exception as _e:
+        lines.append(f"\n## 🎯 交易层\n\n> 生成失败({_e})\n")
     
     # ① 外围环境
     lines.append("## ① 外围环境\n")
@@ -755,7 +848,9 @@ def gen_report(today_str):
     except Exception as _e:
         lines.append("\n### ②.10 反弹质量检查\n\n> 生成失败(%s)\n" % _e)
 
-    lines.append("\n## ③ 板块排行\n")
+    lines.append("\n## ③ 板块与信号（📎 观察层 · 不给买点）\n")
+    lines.append("> 本节多为**观察/记分**用途：其中除 ③.5 RSV50 与 ③.6 乖离低买（已在交易层聚合）外，"
+                 "其余模块未通过正超额回测，只用于理解资金与题材结构。\n")
     board = get_board_data()
     if board:
         lines.append("| 排名 | 板块 | 涨跌幅 |")
