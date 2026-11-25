@@ -104,11 +104,25 @@ def parse_tdx_json(data):
     return rows
 
 
-def parse_westock_kline(csv_text, end_date=None):
+def _count_lb(bars, end):
+    """从 bars[end] 往前数连续涨停根数（终点=end）。"""
+    lb = 0
+    for i in range(end, 0, -1):
+        if bars[i - 1][1] > 0 and bars[i][1] / bars[i - 1][1] - 1 >= 0.095:
+            lb += 1
+        else:
+            break
+    return lb
+
+
+def parse_westock_kline(csv_text, end_date=None, with_broken=False):
     """westock 批量 kline 自算涨停/连板（--westock 模式）。
     输入: kline 批量输出文本（列序: symbol,date,open,last,high,low,...）
     end_date: 若指定(YYYY-MM-DD)，丢弃该日之后的K线，用于回溯补历史数据（连板终点=end_date）
     输出: list[dict]（无题材/板型字段，lianban 通过连续涨停日推算）
+          with_broken=True 时返回 (rows, broken, prev_rows)：
+            broken = 昨日连板≥2、今日未封（断板层）
+            prev_rows = 昨日涨停全集（逐层晋级率分母，含今日未涨的）
     """
     rows = []
     by_code = defaultdict(list)
@@ -137,31 +151,47 @@ def parse_westock_kline(csv_text, end_date=None):
             by_code[sym].append((date, close))
         except ValueError:
             continue
+    # 基准日=各票最后一根K线日期的众数（多数票一致）；停牌/取数缺失的票最后一根更早 → 跳过，
+    # 否则会被误判成「昨日连板今日未封」进入断板层。
+    # 注意：批量输出为日期降序，未排序时 v[-1] 是「最旧」那天 → 必须取 max
+    _last = Counter(max(x[0] for x in v) for v in by_code.values() if v)
+    ref_date = _last.most_common(1)[0][0] if _last else None
+    broken, prev_rows = [], []
     for sym, bars in by_code.items():
         bars.sort(key=lambda x: x[0])
-        # 从最近一天往前数连续涨停天数
-        lb = 0
-        for i in range(len(bars) - 1, 0, -1):
-            d, c = bars[i]
-            pd, pc = bars[i - 1]
-            if pc > 0 and c / pc - 1 >= 0.095:
-                lb += 1
-            else:
-                break
+        n = len(bars)
+        if ref_date and bars[-1][0] != ref_date:
+            continue   # 停牌/数据缺失，不参与今日统计
+        # 今日连板（终点=最后一根）+ 昨日连板（终点=倒数第二根）
+        lb = _count_lb(bars, n - 1)
+        lb_prev = _count_lb(bars, n - 2) if n >= 3 else 0
+        chg_today = ((bars[-1][1] / bars[-2][1] - 1) * 100) if (n >= 2 and bars[-2][1] > 0) else 0.0
+        rec = {
+            "code": sym, "name": "", "price": bars[-1][1], "chg": round(chg_today, 2),
+            "lianban": lb, "lb_prev": lb_prev,
+            "ji_ji_ban": f"{lb}天{lb}板" if lb else "",
+            "reason": "", "banxing": "", "first_time": "",
+            "open_cnt": "", "fengdan": "",
+        }
+        if lb_prev >= 1:
+            prev_rows.append(rec)   # 昨日涨停全集（逐层晋级率分母）
         if lb >= 1:
-            rows.append({
-                "code": sym, "name": "", "price": "", "chg": "",
-                "lianban": lb, "ji_ji_ban": f"{lb}天{lb}板",
-                "reason": "", "banxing": "", "first_time": "",
-                "open_cnt": "", "fengdan": "",
-            })
+            rows.append(rec)
+        elif lb_prev >= 2:
+            broken.append(rec)   # 昨日连板今日未封 → 断板层
+    if with_broken:
+        return rows, broken, prev_rows
     return rows
 
 
 # ---------- 统计与情绪温度 ----------
 
-def build_stats(rows, total_hint=None):
-    """从涨停记录构建统计。"""
+def build_stats(rows, total_hint=None, broken=None, prev_rows=None):
+    """从涨停记录构建统计。
+    broken=断板层（昨日连板今日未封）；prev_rows=昨日涨停全集（晋级率分母）。
+    """
+    broken = broken or []
+    prev_rows = prev_rows or []
     total = total_hint or len(rows)
     by_lb = Counter(r["lianban"] for r in rows)
     lianban_rows = sorted([r for r in rows if r["lianban"] >= 2],
@@ -212,6 +242,30 @@ def build_stats(rows, total_hint=None):
                     seen_tags.add(t)
                     if t not in tag_leaders or leader_key(r) < leader_key(tag_leaders[t]):
                         tag_leaders[t] = r
+    # 逐层晋级率：昨日 N 板 → 今日 N+1 板（仅 westock 模式有 lb_prev）
+    prev_cnt, up_cnt = Counter(), Counter()
+    if prev_rows:   # 分母=昨日全部涨停股（含今日完全没涨的，避免晋级率虚高）
+        for r in prev_rows:
+            p = r.get("lb_prev")
+            if p and p >= 1:
+                prev_cnt[p] += 1
+    else:           # 兜底：只有今日涨停+断板（分母偏小，晋级率偏高）
+        for r in list(rows) + list(broken):
+            p = r.get("lb_prev")
+            if p and p >= 1:
+                prev_cnt[p] += 1
+    for r in rows:
+        p = r.get("lb_prev")
+        if p and p >= 1 and r["lianban"] == p + 1:
+            up_cnt[p] += 1
+    jj_rows = []
+    for p in sorted(prev_cnt, reverse=True):
+        if prev_cnt[p] <= 0:
+            continue
+        jj_rows.append({"from": p, "to": p + 1, "prev": prev_cnt[p], "up": up_cnt[p],
+                        "rate": 100.0 * up_cnt[p] / prev_cnt[p]})
+    # 梯队断层：最高板与 2 板之间为 0 的层
+    gaps = [x for x in range(2, max_lb) if by_lb.get(x, 0) == 0] if max_lb >= 3 else []
     return {
         "total": total,
         "shouban": shouban,
@@ -222,6 +276,9 @@ def build_stats(rows, total_hint=None):
         "tags": tag_counter.most_common(15),
         "lianban_tags": lianban_tags.most_common(10),
         "tag_leaders": tag_leaders,
+        "broken": broken,
+        "jj": jj_rows,
+        "gaps": gaps,
     }
 
 
@@ -410,6 +467,32 @@ def render_md(date, stats, score, persistence, alerts, sample_note=""):
     if stats["shouban"] > 0:
         L.append(f"- 首板 {stats['shouban']} 只")
         L.append("")
+    # ⚡ 梯队断层（2026-11-25 新增）
+    if stats.get("gaps"):
+        gl = "、".join(f"{x}板" for x in stats["gaps"])
+        L.append(f"> ⚡ **梯队断层**：{gl}空档（最高 {stats['max_lb']} 板 → 下方承接断，接力不连续）")
+        L.append("")
+    # 🔻 断板层（昨日连板≥2、今日未封）
+    if stats.get("broken"):
+        bks = sorted(stats["broken"], key=lambda x: (-(x.get("lb_prev") or 0), -(x.get("chg") or 0)))
+        L.append(f"**🔻 断板层**（昨日连板≥2、今日未封 {len(bks)} 只）：")
+        for b in bks[:20]:
+            nm = b.get("name") or b["code"]
+            sec = f"[{'/'.join((b.get('sectors') or [])[:1])}]" if b.get("sectors") else ""
+            c = b.get("chg")
+            cs = f"{c:+.1f}%" if isinstance(c, (int, float)) else "—"
+            L.append(f"- {b.get('lb_prev')}板→断：{nm}（今日 {cs}）{sec}")
+        if len(bks) > 20:
+            L.append(f"- ……另 {len(bks) - 20} 只")
+        L.append("")
+    # 📈 逐层晋级率
+    if stats.get("jj"):
+        _p = []
+        for j in stats["jj"]:
+            a = "首板" if j["from"] == 1 else f"{j['from']}板"
+            _p.append(f"{a}→{j['to']}板 {j['up']}/{j['prev']}={j['rate']:.0f}%")
+        L.append("**📈 逐层晋级率**：" + " ｜ ".join(_p))
+        L.append("")
     # 主线判定（板块持续性）
     L.append("**主线判定**（涨停多+连板多=强主线；连续上榜=持续主线；涨停多+连板少=一日游）：")
     if persistence:
@@ -459,7 +542,7 @@ def main():
             print("错误：--westock 模式需要 --kline-file（westock kline 批量输出）", file=sys.stderr)
             sys.exit(1)
         with open(args.kline_file, "r", encoding="utf-8") as f:
-            rows = parse_westock_kline(f.read(), end_date=args.end_date)
+            rows, broken, prev_rows = parse_westock_kline(f.read(), end_date=args.end_date, with_broken=True)
         total_hint = len(rows)
         # 名称填充（A：all_mainboard.csv 100%覆盖主板）+ 板块归属（B：sector_component.json）
         name_map, sector_map = {}, {}
@@ -501,7 +584,7 @@ def main():
                     name_map = sdata.get("code_name", {})
             except (OSError, json.JSONDecodeError):
                 pass
-        for r in rows:
+        for r in rows + broken:
             code = r["code"][2:] if r["code"].startswith(("sh", "sz")) else r["code"]
             if not r["name"] and code in name_map:
                 r["name"] = name_map[code]
@@ -531,13 +614,14 @@ def main():
         rows = all_rows
         sample_note = "" if total_hint and total_hint == len(rows) else \
             f"样本 {len(rows)}/{total_hint or '?'} 只涨停（tdx导出截断）"
+        broken, prev_rows = [], []   # tdx 模式无 lb_prev → 断板层/逐层晋级率自动跳过
 
     if not rows:
         print("错误：未解析到任何涨停记录", file=sys.stderr)
         sys.exit(1)
 
     # 2. 统计 + 情绪温度
-    stats = build_stats(rows, total_hint=total_hint)
+    stats = build_stats(rows, total_hint=total_hint, broken=broken, prev_rows=prev_rows)
     score = emotion_score(stats)
 
     # 3. 历史累积 + 板块持续性 + 退潮预警
@@ -554,6 +638,10 @@ def main():
         "score": score["score"],
         "level": score["level"],
         "themes": {p["tag"]: {"heat": p["heat"], "zt": p["zt"]} for p in persistence_now},
+        # 2026-11-25：断板/断层/逐层晋级，供后续回测「断板与断层是否有预测力」
+        "broken_cnt": len(stats.get("broken") or []),
+        "gaps": stats.get("gaps") or [],
+        "jj": {f"{j['from']}->{j['to']}": round(j["rate"], 1) for j in (stats.get("jj") or [])},
     }
     with open(history_file, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=1)
@@ -567,6 +655,9 @@ def main():
         "by_lb": stats["by_lb"],
         "score": score, "persistence": persistence_now, "alerts": alerts,
         "lianban_rows": stats["lianban_rows"],
+        "broken": stats.get("broken") or [],
+        "jj": stats.get("jj") or [],
+        "gaps": stats.get("gaps") or [],
         "leaders": {t: {"code": r["code"], "name": r["name"], "lianban": r["lianban"],
                         "ji_ji_ban": r["ji_ji_ban"], "banxing": r["banxing"],
                         "first_time": r["first_time"], "fengdan": r["fengdan"]}
