@@ -1,5 +1,5 @@
 {
- "date": "2026-11-26",
+ "date": "2026-11-27",
  "writes": {
   "market_width_latest.json": [
    "market_width.py",
@@ -8,6 +8,9 @@
   "板块共振_latest.json": [
    ".github/workflows/quant_scan.yml",
    "sector_resonance_local.py"
+  ],
+  "changelog.md": [
+   "update_changelog.py"
   ],
   "{var}_latest.json": [
    "quad_resonance.py"
@@ -184,6 +187,9 @@
    ".github/workflows/quant_scan.yml",
    "quant_scripts/yearline_breadth.py"
   ],
+  "yearline_breadth_history.json": [
+   "quant_scripts/yearline_breadth.py"
+  ],
   "yao_pool.txt": [
    "quant_scripts/yao_gu_pool.py"
   ],
@@ -295,6 +301,14 @@
    ".github/workflows/quant_scan.yml",
    "quant_scripts/limitup_concept_rank.py"
   ],
+  "pool_entries.csv": [
+   "quant_scripts/perf_schema.py"
+  ],
+  "wangzhe_signals.csv": [
+   "quant_scripts/perf_schema.py",
+   "quant_scripts/wangzhe_funnel.py",
+   "quant_scripts/wangzhe_track.py"
+  ],
   "board_top_latest.json": [
    ".github/workflows/quant_scan.yml",
    "quant_scripts/top_signal.py"
@@ -314,10 +328,6 @@
   ],
   "market_regime_latest.md": [
    "quant_scripts/market_regime.py"
-  ],
-  "wangzhe_signals.csv": [
-   "quant_scripts/wangzhe_funnel.py",
-   "quant_scripts/wangzhe_track.py"
   ],
   "wangzhe_stats.json": [
    "quant_scripts/wangzhe_track.py"
@@ -457,6 +467,9 @@
    "quant_scan.yml"
   ],
   "xihu_breadth_history.json": [
+   "quant_scan.yml"
+  ],
+  "yearline_breadth_history.json": [
    "quant_scan.yml"
   ],
   "123_2b_latest.json": [
@@ -875,6 +888,7 @@
  "missing": [
   "_latest.json",
   "_latest.md",
+  "changelog.md",
   "em_industry.json",
   "kline_{var}_{var}_{var}.json",
   "sw_l1_industry.json",
@@ -922,6 +936,7 @@
   "panhou_lianghua.csv",
   "param_contract_latest.json",
   "pipeline_audit.json",
+  "pool_entries.csv",
   "pool_{var}.json",
   "premarket_judgment_.json",
   "premarket_judgment_latest.json",
@@ -945,6 +960,7 @@
   "xihu_rsv_latest.json",
   "xihu_turns_latest.json",
   "yao_pool.txt",
+  "yearline_breadth_history.json",
   "yearline_breadth_latest.json",
   "yitong_pool.txt",
   "{var}.json",
@@ -993,7 +1009,6 @@
   "paper_portfolio.json",
   "param_contract_latest.md",
   "pipeline_audit_latest.json",
-  "pool_entries.csv",
   "pool_quality.json",
   "regime_history.csv",
   "reversal_perf_day.csv",
@@ -1024,8 +1039,8 @@
  "dup_freshness": [
   {
    "name": "sector_component_em.json",
-   "root": "2026-11-25",
-   "outputs": "2026-11-25",
+   "root": "2026-11-26",
+   "outputs": "2026-11-26",
    "status": "同步"
   },
   {
