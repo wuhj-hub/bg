@@ -66,9 +66,20 @@ jobs:
       - name: 安装依赖
         run: pip install pandas numpy -q
 
+      # ─── 时段判断（北京）：>=14 点算「收盘后」，走完整统计 ───
+      # 2026-11-26：原实现用 github.event.schedule 字符串匹配，遇 GitHub schedule
+      # 严重延迟（15:05 常延到次日 02~03 点）时会判错；改为按北京小时判断，
+      # 任何触发源（含外部 cron-job.org 的 dispatch）在 14 点后都走完整统计。
+      - name: 判断时段（北京）
+        id: slot
+        run: |
+          H=$(TZ=Asia/Shanghai date +%H)
+          if [ "$H" -ge 14 ]; then echo "full=1" >> $GITHUB_OUTPUT; echo "时段: 收盘后(H=$H) → 完整统计"
+          else echo "full=0" >> $GITHUB_OUTPUT; echo "时段: 盘前(H=$H) → 竞价快报"; fi
+
       # ─── 盘前 09:27：竞价快报（轻量，只读行情快照，目标 <2min）───
       - name: 竞价快报（盘前·金额/高开/低开榜）
-        if: github.event_name == 'repository_dispatch' || github.event.schedule == '27 1 * * 1-5'
+        if: steps.slot.outputs.full == '0'
         run: |
           python3 quant_scripts/jingjia_track.py --universe all_mainboard.csv --brief
 
@@ -79,7 +90,7 @@ jobs:
       # ③ 更新历史信号 T+1~T+5 收益 → 生成 outputs/竞价统计_{date}.md
       # 说明：--backfill 2 顺手补齐近 2 个交易日缺口（如上次运行失败），保证连续
       - name: 完整统计（采集竞价 + 逐日跟踪 + 收益回填 + 报告）
-        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '5 7 * * 1-5'
+        if: steps.slot.outputs.full == '1' || github.event_name == 'workflow_dispatch'
         run: |
           python3 quant_scripts/jingjia_track.py \
             --universe all_mainboard.csv --fetch --backfill 2 --report
