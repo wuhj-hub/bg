@@ -146,9 +146,103 @@ def save_signals(sig):
 
 
 # ---------------- 报告：紫霞牛 / 一进二 明细（2026-09-30 新增） ----------------
+# ---------------- 当日竞价回顾（2026-11-26 新增） ----------------
+def review_section(sig, store, daily, date):
+    """当日竞价回顾：今日信号当场表现 / 昨日信号今日承接 / 今日竞价情绪 / 最差案例。"""
+    def wc(c):
+        return ("sh" if c[:1] in ("6", "9", "5") else "sz") + c
+
+    rows = list(sig.values())
+    md = ["", "## 三、当日竞价回顾", ""]
+
+    # 1) 今日信号当场表现
+    today = [r for r in rows if r.get("date") == date and r.get("R0") not in (None, "")]
+    md += ["### 1. 今日信号 · 当场表现（R0 = 竞价开盘买 → 当日收盘）", ""]
+    if not today:
+        md += ["（今日无信号）", ""]
+    else:
+        md += ["| 策略 | 数量 | 胜率 | 均值 | 中位 | 最好 | 最差 |", "|---|---|---|---|---|---|---|"]
+        for st in ["紫霞牛", "一进二", "超级竞价"]:
+            rs = [r for r in today if r.get("strategy") == st]
+            if not rs:
+                continue
+            a = np.array([float(r["R0"]) for r in rs])
+            b = max(rs, key=lambda r: float(r["R0"]))
+            w = min(rs, key=lambda r: float(r["R0"]))
+            md.append(f"| {st} | {len(a)} | {(a > 0).mean():.0%} | {a.mean():+.2%} | {np.median(a):+.2%} | "
+                      f"{b['code']} {b.get('name', '')} {float(b['R0']):+.2%} | "
+                      f"{w['code']} {w.get('name', '')} {float(w['R0']):+.2%} |")
+        md.append("")
+
+    # 2) 昨日信号今日承接
+    try:
+        alld = sorted({r["date"] for d in daily.values() for r in d})
+        prev = next((x for x in reversed(alld) if x < date), None)
+    except Exception:
+        prev = None
+    md += [f"### 2. 昨日信号 · 今日承接（{prev or '-'} 信号 → R1）", ""]
+    y = [r for r in rows if r.get("date") == prev and r.get("R1") not in (None, "")]
+    if not prev or not y:
+        md += ["（昨日无信号或未满 T+1）", ""]
+    else:
+        md += ["| 策略 | 数量 | 胜率 | 均值 | 最弱 |", "|---|---|---|---|---|"]
+        for st in ["紫霞牛", "一进二", "超级竞价"]:
+            rs = [r for r in y if r.get("strategy") == st]
+            if not rs:
+                continue
+            a = np.array([float(r["R1"]) for r in rs])
+            w = min(rs, key=lambda r: float(r["R1"]))
+            md.append(f"| {st} | {len(a)} | {(a > 0).mean():.0%} | {a.mean():+.2%} | "
+                      f"{w['code']} {w.get('name', '')} {float(w['R1']):+.2%} |")
+        md.append("")
+
+    # 3) 今日竞价情绪
+    md += ["### 3. 今日竞价情绪（全 universe）", ""]
+    au = store.get(date) or {}
+    stat = []
+    for c, v in au.items():
+        bars = daily.get(wc(c))
+        if not bars:
+            continue
+        idx = {r["date"]: i for i, r in enumerate(bars)}
+        i = idx.get(date)
+        if i is None or i == 0:
+            continue
+        pc = bars[i - 1]["close"]
+        o = v.get("o") or 0
+        if pc > 0 and o > 0:
+            stat.append((c, (o / pc - 1) * 100, (v.get("amt") or 0) / 1e8, o))
+    if not stat:
+        md += ["（今日竞价库无数据，需先 --fetch / --ingest）", ""]
+    else:
+        hi = [x for x in stat if x[1] > 0]
+        up3 = [x for x in stat if x[1] >= 3]
+        dn3 = [x for x in stat if x[1] <= -3]
+        md += [f"- 覆盖 {len(stat)} 只；**高开 {len(hi)} 只（{len(hi) / len(stat):.0%}）**，"
+               f"其中高开≥3% {len(up3)} 只；低开≤−3% {len(dn3)} 只",
+               f"- 竞价金额合计 {sum(x[2] for x in stat):.1f} 亿；平均高开 {np.mean([x[1] for x in stat]):+.2f}%", ""]
+        top = sorted(stat, key=lambda x: -x[2])[:10]
+        md += ["| 代码 | 竞价金额(亿) | 高开% | 竞价开盘 |", "|---|---|---|---|"]
+        for c, g, amt, o in top:
+            md.append(f"| {c} | {amt:.2f} | {g:+.2f}% | {o:.2f} |")
+        md.append("")
+
+    # 4) 最差案例
+    md += ["### 4. 今日最差案例（R0 后 5）", ""]
+    worst = sorted(today, key=lambda r: float(r["R0"]))[:5]
+    if worst:
+        md += ["| 代码 | 名称 | 策略 | 竞价开盘 | R0 |", "|---|---|---|---|---|"]
+        for r in worst:
+            md.append(f"| {r['code']} | {r.get('name', '')} | {r['strategy']} | {r.get('buy_open', '-')} | {float(r['R0']):+.2%} |")
+    md.append("")
+    md += ["> 口径提醒：紫霞牛 / 一进二 用 9:25 竞价数据即可判定，R0 可执行；超级竞价为**日线公式**，"
+           "须收盘才算，其 R0 只是事后统计，真实执行应按 **T+1 开盘**。", ""]
+    return md
+
+
 def special_section(by_strat):
     """紫霞牛 / 一进二 明细（信号稀少，单列便于跟踪）。返回 markdown 行列表。"""
-    md = ["", "## 四、紫霞牛 / 一进二 明细", "",
+    md = ["", "## 五、紫霞牛 / 一进二 明细", "",
           "> 这两个策略信号稀少（累计样本小），单列便于跟踪；收益=信号日 9:30 竞价开盘价买入。", ""]
     for st in ["紫霞牛", "一进二"]:
         rows = sorted(by_strat.get(st, []), key=lambda r: r.get("date", ""), reverse=True)
@@ -420,8 +514,9 @@ def main():
                     r0 = f"{float(r['R0']):+.2%}" if r.get("R0") else "-"
                     md.append(f"| {r['code']} | {r['name']} | {r['buy_open']} | {r0} |")
                 md.append("")
+        md += review_section(sig, store, daily, args.date)
         # 全部信号清单
-        md += ["", "## 三、信号全清单", "", "| 日期 | 代码 | 名称 | 策略 | 当天 | 次日 |", "|---|---|---|---|---|---|"]
+        md += ["", "## 四、信号全清单", "", "| 日期 | 代码 | 名称 | 策略 | 当天 | 次日 |", "|---|---|---|---|---|---|"]
         for key in sorted(sig.keys(), reverse=True)[:120]:
             r = sig[key]
             r0 = f"{float(r['R0']):+.2%}" if r.get("R0") else "-"
