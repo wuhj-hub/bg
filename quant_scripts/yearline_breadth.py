@@ -296,6 +296,33 @@ def main():
 
     print(f"[OK] 站上年线 {stats['above']}/{stats['total']} = {stats['ratio']:.1f}%")
     print(f"[OK] {md_path}")
+    # ── 每日 append 历史（同日覆盖；供分位/趋势判断）2026-11-26 ──
+    try:
+        hist_path = os.path.join(args.outdir, "yearline_breadth_history.json")
+        hist = {}
+        for _p in (hist_path, os.path.join("outputs", "yearline_breadth_history.json"),
+                   "yearline_breadth_history.json"):
+            if os.path.exists(_p):
+                try:
+                    with open(_p, encoding="utf-8") as _f:
+                        _h = json.load(_f)
+                    if isinstance(_h, dict) and _h:
+                        hist = _h
+                        break
+                except Exception:
+                    continue
+        if stats["mode"] == "full":
+            hist[date_str] = {"total": stats["total"], "above": stats["above"],
+                              "ratio_pct": round(stats["ratio"], 1), "level": json_out["level"]}
+            if len(hist) > 2000:
+                for _k in sorted(hist)[:-2000]:
+                    hist.pop(_k, None)
+            with open(hist_path, "w", encoding="utf-8") as _f:
+                json.dump(hist, _f, ensure_ascii=False, sort_keys=True)
+            print(f"[OK] {hist_path}（{len(hist)} 个交易日）")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[WARN] 年线历史 append 失败: {_e}", file=sys.stderr)
+
     print(f"[OK] {jpath}")
 
 
