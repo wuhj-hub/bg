@@ -169,10 +169,12 @@ def review_section(sig, store, daily, date):
             a = np.array([float(r["R0"]) for r in rs])
             b = max(rs, key=lambda r: float(r["R0"]))
             w = min(rs, key=lambda r: float(r["R0"]))
-            md.append(f"| {st} | {len(a)} | {(a > 0).mean():.0%} | {a.mean():+.2%} | {np.median(a):+.2%} | "
+            lbl = st + (" ⚠️" if st == "超级竞价" else "")
+            md.append(f"| {lbl} | {len(a)} | {(a > 0).mean():.0%} | {a.mean():+.2%} | {np.median(a):+.2%} | "
                       f"{b['code']} {b.get('name', '')} {float(b['R0']):+.2%} | "
                       f"{w['code']} {w.get('name', '')} {float(w['R0']):+.2%} |")
-        md.append("")
+        md += ["", "> ⚠️ = 超级竞价是**日线公式**，当天 9:25 无法判定，其 R0 是「事后用当日开盘价回算」，"
+               "**不可执行**（今日 14 只 93%/+8.62% 即由此虚高）；可执行口径看第 2 节的 T+1 承接。", ""]
 
     # 2) 昨日信号今日承接
     try:
