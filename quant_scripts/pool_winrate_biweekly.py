@@ -33,6 +33,14 @@ NEW_POOLS = {"四维共振", "信号仲裁", "乖离低买", "RSV强度", "123AB
 WESTOCK = ([shutil.which("westock-data-skillhub")] if shutil.which("westock-data-skillhub")
            else ["npx", "-y", "westock-data-skillhub@1.0.3"])
 
+# 2026-11-26 战绩层统一（第4层蒸馏）：记录归一 + 收益口径复用 perf_schema
+try:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import perf_schema as _perf
+except Exception as _e:  # noqa: BLE001
+    _perf = None
+    print(f"[WARN] perf_schema 不可用: {_e}", flush=True)
+
 
 def run(args, timeout=300):
     # 2026-10-16 阶段3·批次4：插入式迁移——优先统一取数层 fetch.raw，失败回退本地 npx
@@ -107,6 +115,11 @@ def trading_ret(bars, entry_date, h):
     return (c1 / c0 - 1) * 100 if c0 > 0 else None
 
 
+# 收益口径复用 perf_schema（避免两套实现漂移；不可用时回退上面本地版本）
+if _perf is not None:
+    trading_ret = _perf.trading_ret
+
+
 def agg(vals):
     if not vals:
         return None
@@ -150,7 +163,9 @@ def main():
     lx = [(r.get("date"), norm(r.get("code"))) for r in read_csv(LIANGXUE) if r.get("date") and r.get("code")]
     jj = [(r.get("date"), norm(r.get("code")), r.get("strategy")) for r in read_csv(JINGJIA) if r.get("date") and r.get("code")]
 
-    codes = [c for _, c, _ in p_rows] + [c for _, c in lx] + [c for _, c, _ in jj]
+    recs = _perf.load_all(with_pools=False) if _perf else []
+    codes = ([c for _, c, _ in p_rows] + [c for _, c in lx] + [c for _, c, _ in jj]
+             + [r["code"] for r in recs])
     kline = fetch_klines(codes)
     print(f"[INFO] 标的 {len(set(c for c in codes if c))} 只，取到 K 线 {len(kline)} 只", flush=True)
 
@@ -163,36 +178,13 @@ def main():
                 agg_pool.setdefault(pool, {}).setdefault(h, []).append(v)
     base = {h: [v for _, c, ed in p_rows if (v := trading_ret(kline.get(c), ed, h)) is not None] for h in HOLDS}
 
-    # ── 二、信号源 OOS ──
+    # ── 二、信号源 OOS（统一走 perf_schema；2026-11-26 起）──
+    wz = read_csv(WANGZHE)          # 仅用于章四判断是否展示王者行
     src = {}
-    # 涨停王者：用自带 r5/r10/r20 列（不重取）
-    wz = read_csv(WANGZHE)
-    if wz:
-        for h, col in ((5, "r5"), (10, "r10"), (20, "r20")):
-            vals = []
-            for r in wz:
-                try:
-                    if r.get(col):
-                        vals.append(float(r[col]))
-                except ValueError:
-                    pass
-            if vals:
-                src.setdefault("涨停王者（自带回测列）", {})[h] = vals
-    # 量学：现算
-    lx_agg = {}
-    for d, c in lx:
-        for h in (5, 10, 20):
-            v = trading_ret(kline.get(c), d, h)
-            if v is not None:
-                lx_agg.setdefault(h, []).append(v)
-    if lx_agg:
-        src["量学（月线闸门 PASS）"] = lx_agg
-    # 竞价：按策略现算
-    for d, c, st in jj:
-        for h in (5, 10, 20):
-            v = trading_ret(kline.get(c), d, h)
-            if v is not None:
-                src.setdefault(f"竞价·{st}", {}).setdefault(h, []).append(v)
+    if recs:
+        _perf.fill_returns(recs, kline, holds=(5, 10, 20))
+        src = _perf.summary(recs, holds=(5, 10, 20))
+    print(f"[INFO] 统一战绩记录 {len(recs)} 条 / 来源 {len(src)} 个", flush=True)
 
     # ── 组装报告 ──
     date_str = now.strftime("%Y-%m-%d")
@@ -203,9 +195,13 @@ def main():
     def row(name, d):
         return f"| {name} | " + " | ".join(cell(agg(d.get(h, []))) for h in HOLDS) + " |"
 
+    def row_src(name, d):
+        # perf_schema.summary 已返回 (胜率, 均值, n) 元组
+        return f"| {name} | " + " | ".join(cell(d.get(h)) for h in (5, 10, 20)) + " | — |"
+
     L = [f"# 📊 股池胜率总览 · {date_str}", "",
          "> **统一口径（OOS）**：entry = 信号/入池日（或其后的首个交易日）收盘价，收益 = 收盘(+N)/entry−1，N∈{5,10,20,60} 交易日",
-         f"> 生成 {now.strftime('%Y-%m-%d %H:%M')} 北京 · 双周（ISO 第 {wk} 周）· 样本：pool_entries {len(p_rows)} 条",
+         f"> 生成 {now.strftime('%Y-%m-%d %H:%M')} 北京 · 双周（ISO 第 {wk} 周）· 样本：pool_entries {len(p_rows)} 条 ｜ 统一战绩 {len(recs)} 条 / {len(src)} 源",
          "> 本报告已统一取代《股池信号胜率跟踪报告》《纸面组合跟踪报告》", ""]
 
     L += ["## 一、各池 OOS 表现（按 20日样本量排序）", "", HDR, SEP]
@@ -223,13 +219,15 @@ def main():
         L.append("| （样本积累中） | — | — | — | — |")
     L += ["", "> 新池自 2026-10-10 盘后起累积 entry_date；20/60 日列需持有满相应交易日才有值。", ""]
 
-    L += ["## 三、体系信号源 OOS", "", HDR, SEP]
+    L += ["## 三、体系信号源 OOS（统一 schema）", "", HDR, SEP]
     if src:
-        for s in sorted(src):
-            L.append(row(s, src[s]))
+        for s in sorted(src, key=lambda k: -(src[k].get(5) or (0, 0, 0))[2]):
+            L.append(row_src(s, src[s]))
     else:
         L.append("| （无信号源数据） | — | — | — | — |")
-    L += ["", "> 王者=其自带 r5/r10/r20 回测列；量学/竞价=按上表统一口径现算（竞价原为开盘口径，此处统一为收盘口径）。", ""]
+    L += ["", "> 口径：涨停王者=自带 r5/r10/r20 列；反转数值/双弦月度池/量学/竞价=按统一口径由 K 线现算。",
+          "> ⚠️ 竞价 CSV 的 R0~R5 列按「信号日开盘」计价、含未来函数（R5 均值虚高至 +7%），已弃用，一律现算。",
+          "> 反转数值（日/周/月）与双弦月度池为 2026-11-26 新增纳入。", ""]
 
     # ── 四、按行情类型分层（曾星智《悟道01》三类短线行情 · 指数口径）──
     reg_map = {}
