@@ -1,4 +1,4 @@
-# 🔍 体系自检元审计 · 2026-11-26
+# 🔍 体系自检元审计 · 2026-11-27
 
 > 扫描 26 个 workflow ｜ 风险项 **94** ｜ 🔴高危 **0** ｜ 🟢受控捕获 **50**（已有告警通道，不计入风险项）
 
@@ -22,7 +22,7 @@
 - guard_selfcheck.yml :: 上传自检报告到盘后量化文件夹（供查阅） (L62) — 命中 continue-on-error: true, || echo（吞错误）
 - inbull_scan.yml :: 入牛时点扫描 + 上传知识库 + 推送 + 提交 (L47) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）, || true
 - inbull_threshold_monitor.yml :: 季度复算 + 漂移对比 + 上传知识库 + 推送 + 提交 (L35) — 命中 2>/dev/null（屏蔽 stderr）, continue-on-error: true, || echo（吞错误）
-- jingjia_track.yml :: 上传竞价报告/快报到知识库「报告/竞价」 (L97) — 命中 continue-on-error: true, || echo（吞错误）
+- jingjia_track.yml :: 上传竞价报告/快报到知识库「报告/竞价」 (L115) — 命中 continue-on-error: true, || echo（吞错误）
 - pool_winrate_biweekly.yml :: 提交总览到仓库 (L79) — 命中 continue-on-error: true, || echo（吞错误）
 - pool_winrate_biweekly.yml :: 上传知识库「报告 / 全盘量化」 (L94) — 命中 continue-on-error: true, || echo（吞错误）
 - probe_em.yml :: 东财板块接口参数探测（找可用 fs/ 端点） (L21) — 命中 continue-on-error: true
