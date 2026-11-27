@@ -1249,6 +1249,35 @@ def main():
               open(os.path.join(outdir, "涨停概念排行_latest.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
 
+    # ── 每日 append 涨停名单历史（2026-11-28）：供「涨停梯队 → 次日竞价」跟踪 ──
+    # 多路径合并读 + 双写，避免每次全新 checkout 从空重建（同 情绪指标跟踪.json 的教训）
+    try:
+        hp = os.path.join(outdir, "limitup_history.json")
+        hp_root = os.path.join(BASE, "limitup_history.json")
+        hh = {}
+        for _p in (hp, hp_root):
+            if not os.path.exists(_p):
+                continue
+            try:
+                _d = json.load(open(_p, encoding="utf-8"))
+            except Exception:
+                continue
+            if isinstance(_d, dict):
+                for _k, _v in _d.items():
+                    hh.setdefault(_k, _v)
+        hh[today] = [{"code": x.get("code"), "c6": x.get("c6"), "name": x.get("name"),
+                      "lianban": x.get("lianban"), "hybk": x.get("hybk"),
+                      "chg": x.get("chg"), "fund": x.get("fund")} for x in ups]
+        if len(hh) > 120:
+            for _k in sorted(hh)[:-120]:
+                hh.pop(_k, None)
+        for _p in (hp, hp_root):
+            with open(_p, "w", encoding="utf-8") as _f:
+                json.dump(hh, _f, ensure_ascii=False, sort_keys=True)
+        print(f"[OK] 涨停名单历史 {len(hh)} 个交易日 → limitup_history.json")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[WARN] 涨停名单历史 append 失败: {_e}")
+
     # 跨月跟踪：把当日情绪指标并入 情绪指标跟踪.json（按日期累积去重）
     # 跨月跟踪：把当日情绪指标并入 情绪指标跟踪.json（按日期累积去重）
     # 2026-10-20 修复：原只读写 outdir 一份，而 CI 提交的是**仓库根**那份（workflow 用 cp 覆盖）
