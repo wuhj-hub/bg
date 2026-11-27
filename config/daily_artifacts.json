@@ -42,6 +42,12 @@
    "producer": "yearline_breadth.py"
   },
   {
+   "path": "outputs/limitup_history.json",
+   "min_bytes": 50,
+   "producer": "limitup_concept_rank.py",
+   "optional": true
+  },
+  {
    "path": "一统天下建仓区股池_latest.json",
    "min_bytes": 100,
    "producer": "yitong_screener.py"
