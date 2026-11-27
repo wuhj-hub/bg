@@ -242,9 +242,164 @@ def review_section(sig, store, daily, date):
     return md
 
 
+# ---------------- 涨停梯队 × 次日竞价（2026-11-28 新增） ----------------
+def _wc(c6):
+    return ("sh" if c6[:1] in ("6", "9", "5") else "sz") + c6
+
+
+def _load_limitup_hist():
+    for p in ("outputs/limitup_history.json", "limitup_history.json"):
+        if os.path.exists(p):
+            try:
+                with open(p, encoding="utf-8") as f:
+                    d = json.load(f)
+                if isinstance(d, dict) and d:
+                    return d
+            except Exception:
+                continue
+    return {}
+
+
+def _load_industry():
+    for p in ("quant_scripts/em_industry.json", "em_industry.json"):
+        if os.path.exists(p):
+            try:
+                with open(p, encoding="utf-8") as f:
+                    d = json.load(f)
+                st = d.get("stocks") if isinstance(d, dict) else None
+                if isinstance(st, dict):
+                    return {k: (v.get("ind") or "未分类") for k, v in st.items()}
+            except Exception:
+                continue
+    return {}
+
+
+def limitup_section(store, daily, date):
+    """涨停梯队 / 板块热点 → 今日竞价承接。回答三个问题：
+    1) 昨日各连板梯队，今天竞价给多少溢价、多少晋级；
+    2) 昨日哪些板块涨停最多，今天承接最强（=方向）；
+    3) 今天竞价最强的一批票，集中在哪些板块。
+    """
+    md = ["", "## 四、涨停梯队 × 次日竞价", ""]
+    hh = _load_limitup_hist()
+    if not hh:
+        md += ["（`limitup_history.json` 尚未积累，次一交易日起生效）", ""]
+        return md
+    days = sorted(hh)
+    prev = next((k for k in reversed(days) if k < date), None)
+    if not prev:
+        md += ["（无上一交易日涨停名单）", ""]
+        return md
+
+    au = store.get(date) or {}
+    rows = hh.get(prev) or []
+
+    def q_metrics(code6):
+        v = au.get(code6)
+        bars = daily.get(_wc(code6))
+        if not v or not bars:
+            return None
+        idx = {r["date"]: i for i, r in enumerate(bars)}
+        i = idx.get(date)
+        if i is None or i == 0:
+            return None
+        pc = bars[i - 1]["close"]
+        o = v.get("o") or 0
+        if pc <= 0 or o <= 0:
+            return None
+        return {"gap": (o / pc - 1) * 100,
+                "chg": (bars[i]["close"] / pc - 1) * 100,
+                "amt": (v.get("amt") or 0) / 1e8}
+
+    recs = []
+    for r in rows:
+        c6 = (r.get("c6") or "").strip()
+        if not c6:
+            continue
+        m = q_metrics(c6)
+        if not m:
+            continue
+        recs.append(dict(c6=c6, name=r.get("name", ""), lb=int(r.get("lianban") or 1),
+                         hybk=r.get("hybk") or "未分类", **m))
+
+    md += [f"### 1. 昨日（{prev}）涨停梯队 → 今日竞价", ""]
+    if not recs:
+        md += ["（昨日涨停股今日竞价数据缺失）", ""]
+    else:
+        md += ["| 梯队 | 数量 | 竞价高开率 | 平均高开 | 竞价金额(亿) | 当日晋级率 |",
+               "|---|---|---|---|---|---|"]
+        def tier(lb):
+            return "4板+" if lb >= 4 else f"{lb}板"
+        for t in ["1板", "2板", "3板", "4板+"]:
+            sub = [x for x in recs if tier(x["lb"]) == t]
+            if not sub:
+                continue
+            up = sum(1 for x in sub if x["gap"] > 0)
+            adv = sum(1 for x in sub if x["chg"] >= 9.5)
+            md.append(f"| {t} | {len(sub)} | {up / len(sub):.0%} | "
+                      f"{np.mean([x['gap'] for x in sub]):+.2f}% | "
+                      f"{sum(x['amt'] for x in sub):.1f} | {adv / len(sub):.0%} |")
+        tot = len(recs)
+        md.append(f"| **合计** | {tot} | {sum(1 for x in recs if x['gap'] > 0) / tot:.0%} | "
+                  f"{np.mean([x['gap'] for x in recs]):+.2f}% | "
+                  f"{sum(x['amt'] for x in recs):.1f} | "
+                  f"{sum(1 for x in recs if x['chg'] >= 9.5) / tot:.0%} |")
+        md.append("")
+
+        # 2) 板块承接
+        md += [f"### 2. 昨日板块热点 → 今日承接（按昨日涨停家数排序）", ""]
+        byb = defaultdict(list)
+        for x in recs:
+            byb[x["hybk"]].append(x)
+        md += ["| 板块 | 昨日涨停 | 今日竞价高开率 | 平均高开 | 晋级率 |", "|---|---|---|---|---|"]
+        for b, sub in sorted(byb.items(), key=lambda kv: -len(kv[1]))[:12]:
+            up = sum(1 for x in sub if x["gap"] > 0)
+            adv = sum(1 for x in sub if x["chg"] >= 9.5)
+            md.append(f"| {b} | {len(sub)} | {up / len(sub):.0%} | "
+                      f"{np.mean([x['gap'] for x in sub]):+.2f}% | {adv / len(sub):.0%} |")
+        md.append("")
+        md += ["> 判读：**高开率高 + 晋级率高** = 该板块资金还在；**高开率低但晋级率高** = 低吸承接强；"
+               "**普遍低开低走** = 昨日情绪已退潮。", ""]
+
+    # 3) 今日竞价强势板块
+    md += ["### 3. 今日竞价强势股 → 板块分布（高开≥3%）", ""]
+    ind = _load_industry()
+    cnt = defaultdict(int)
+    amt_sum = defaultdict(float)
+    n_all = 0
+    for c6, v in au.items():
+        bars = daily.get(_wc(c6))
+        if not bars:
+            continue
+        idx = {r["date"]: i for i, r in enumerate(bars)}
+        i = idx.get(date)
+        if i is None or i == 0:
+            continue
+        pc = bars[i - 1]["close"]
+        o = v.get("o") or 0
+        if pc <= 0 or o <= 0:
+            continue
+        n_all += 1
+        if (o / pc - 1) * 100 >= 3:
+            k = ind.get(c6) or "未分类"
+            cnt[k] += 1
+            amt_sum[k] += (v.get("amt") or 0) / 1e8
+    if not cnt:
+        md += ["（今日无高开≥3% 的竞价标的）", ""]
+    else:
+        md += [f"- 全市场竞价覆盖 {n_all} 只，高开≥3% 共 {sum(cnt.values())} 只", ""]
+        md += ["| 板块 | 高开≥3% 只数 | 竞价金额(亿) |", "|---|---|---|"]
+        for k, n in sorted(cnt.items(), key=lambda kv: -kv[1])[:12]:
+            md.append(f"| {k} | {n} | {amt_sum[k]:.2f} |")
+        md.append("")
+    md += ["> 说明：第 1、2 节的板块口径来自涨停池 `hybk`（与复盘报告涨停梯队一致）；"
+           "第 3 节用 `em_industry.json` 行业口径（全市场覆盖）。", ""]
+    return md
+
+
 def special_section(by_strat):
     """紫霞牛 / 一进二 明细（信号稀少，单列便于跟踪）。返回 markdown 行列表。"""
-    md = ["", "## 五、紫霞牛 / 一进二 明细", "",
+    md = ["", "## 六、紫霞牛 / 一进二 明细", "",
           "> 这两个策略信号稀少（累计样本小），单列便于跟踪；收益=信号日 9:30 竞价开盘价买入。", ""]
     for st in ["紫霞牛", "一进二"]:
         rows = sorted(by_strat.get(st, []), key=lambda r: r.get("date", ""), reverse=True)
@@ -517,8 +672,9 @@ def main():
                     md.append(f"| {r['code']} | {r['name']} | {r['buy_open']} | {r0} |")
                 md.append("")
         md += review_section(sig, store, daily, args.date)
+        md += limitup_section(store, daily, args.date)
         # 全部信号清单
-        md += ["", "## 四、信号全清单", "", "| 日期 | 代码 | 名称 | 策略 | 当天 | 次日 |", "|---|---|---|---|---|---|"]
+        md += ["", "## 五、信号全清单", "", "| 日期 | 代码 | 名称 | 策略 | 当天 | 次日 |", "|---|---|---|---|---|---|"]
         for key in sorted(sig.keys(), reverse=True)[:120]:
             r = sig[key]
             r0 = f"{float(r['R0']):+.2%}" if r.get("R0") else "-"
