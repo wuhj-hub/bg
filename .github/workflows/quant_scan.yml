@@ -510,6 +510,7 @@ jobs:
               pools/pool_$(date +%Y-%m).json \
               一统天下建仓区股池_latest.json 一统天下建仓区股池_latest.md yitong_pool.txt \
               sector_component_em.json 涨停概念排行_latest.json 情绪指标跟踪.json \
+              outputs/limitup_history.json limitup_history.json \
               outputs/env_latest.json outputs/env_history.json \
               outputs/四维共振_latest.json outputs/silent_failures_$(date +%Y-%m-%d).log
             RC=$?
