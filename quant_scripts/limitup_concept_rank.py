@@ -1265,9 +1265,10 @@ def main():
             if isinstance(_d, dict):
                 for _k, _v in _d.items():
                     hh.setdefault(_k, _v)
-        hh[today] = [{"code": x.get("code"), "c6": x.get("c6"), "name": x.get("name"),
-                      "lianban": x.get("lianban"), "hybk": x.get("hybk"),
-                      "chg": x.get("chg"), "fund": x.get("fund")} for x in ups]
+        if ups:      # 空名单（--fast 或取数失败）不覆盖已有历史
+            hh[today] = [{"code": x.get("code"), "c6": x.get("c6"), "name": x.get("name"),
+                          "lianban": x.get("lianban"), "hybk": x.get("hybk"),
+                          "chg": x.get("chg"), "fund": x.get("fund")} for x in ups]
         if len(hh) > 120:
             for _k in sorted(hh)[:-120]:
                 hh.pop(_k, None)
