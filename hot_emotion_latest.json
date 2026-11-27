@@ -1,23 +1,23 @@
 {
- "date": "2026-11-26",
- "total": 66,
- "lianban_cnt": 17,
- "max_lb": 5,
- "shouban": 49,
+ "date": "2026-11-27",
+ "total": 380,
+ "lianban_cnt": 29,
+ "max_lb": 6,
+ "shouban": 351,
  "by_lb": {
-  "5": 1,
-  "4": 1,
-  "3": 4,
-  "2": 11,
-  "1": 49
+  "6": 1,
+  "4": 3,
+  "3": 3,
+  "2": 22,
+  "1": 351
  },
  "score": {
-  "score": 75,
-  "level": "亢奋",
+  "score": 64,
+  "level": "活跃",
   "parts": {
-   "涨停家数": 12,
-   "连板高度": 28,
-   "连板占比": 35
+   "涨停家数": 20,
+   "连板高度": 36,
+   "连板占比": 8
   }
  },
  "persistence": [],
@@ -26,11 +26,11 @@
   {
    "code": "sh603960",
    "name": "克来机电",
-   "price": 20.46,
-   "chg": 10.0,
-   "lianban": 5,
-   "lb_prev": 4,
-   "ji_ji_ban": "5天5板",
+   "price": 22.51,
+   "chg": 10.02,
+   "lianban": 6,
+   "lb_prev": 5,
+   "ji_ji_ban": "6天6板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -44,30 +44,13 @@
    ]
   },
   {
-   "code": "sh600814",
-   "name": "杭州解百",
-   "price": 9.19,
-   "chg": 10.06,
+   "code": "sz002651",
+   "name": "利君股份",
+   "price": 9.56,
+   "chg": 10.01,
    "lianban": 4,
    "lb_prev": 3,
    "ji_ji_ban": "4天4板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "社保新进"
-   ]
-  },
-  {
-   "code": "sz002651",
-   "name": "利君股份",
-   "price": 8.69,
-   "chg": 10.0,
-   "lianban": 3,
-   "lb_prev": 2,
-   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -82,11 +65,11 @@
   {
    "code": "sz002872",
    "name": "天圣制药",
-   "price": 7.81,
-   "chg": 10.0,
-   "lianban": 3,
-   "lb_prev": 2,
-   "ji_ji_ban": "3天3板",
+   "price": 8.59,
+   "chg": 9.99,
+   "lianban": 4,
+   "lb_prev": 3,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -98,30 +81,13 @@
    ]
   },
   {
-   "code": "sh600722",
-   "name": "金牛化工",
-   "price": 14.47,
-   "chg": 10.04,
-   "lianban": 3,
-   "lb_prev": 2,
-   "ji_ji_ban": "3天3板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "基础化工"
-   ]
-  },
-  {
    "code": "sh603030",
    "name": "全筑股份",
-   "price": 2.87,
-   "chg": 9.96,
-   "lianban": 3,
-   "lb_prev": 2,
-   "ji_ji_ban": "3天3板",
+   "price": 3.16,
+   "chg": 10.1,
+   "lianban": 4,
+   "lb_prev": 3,
+   "ji_ji_ban": "4天4板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -135,33 +101,13 @@
    ]
   },
   {
-   "code": "sz000530",
-   "name": "冰山冷热",
-   "price": 16.17,
-   "chg": 10.0,
-   "lianban": 2,
-   "lb_prev": 1,
-   "ji_ji_ban": "2天2板",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "制冷空调设备",
-    "核能核电"
-   ]
-  },
-  {
    "code": "sz002144",
    "name": "宏达高科",
-   "price": 9.99,
-   "chg": 10.02,
-   "lianban": 2,
-   "lb_prev": 1,
-   "ji_ji_ban": "2天2板",
+   "price": 10.99,
+   "chg": 10.01,
+   "lianban": 3,
+   "lb_prev": 2,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -174,11 +120,11 @@
   {
    "code": "sz002197",
    "name": "证通电子",
-   "price": 7.05,
-   "chg": 9.98,
-   "lianban": 2,
-   "lb_prev": 1,
-   "ji_ji_ban": "2天2板",
+   "price": 7.76,
+   "chg": 10.07,
+   "lianban": 3,
+   "lb_prev": 2,
+   "ji_ji_ban": "3天3板",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -192,10 +138,202 @@
    ]
   },
   {
-   "code": "sh600103",
-   "name": "青山纸业",
-   "price": 4.16,
+   "code": "sh600280",
+   "name": "中央商场",
+   "price": 3.41,
+   "chg": 10.0,
+   "lianban": 3,
+   "lb_prev": 2,
+   "ji_ji_ban": "3天3板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "连续亏损"
+   ]
+  },
+  {
+   "code": "sz000158",
+   "name": "常山北明",
+   "price": 15.27,
+   "chg": 10.01,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "高市盈率",
+    "腾讯概念",
+    "华为鲲鹏",
+    "智算中心（AIDC）"
+   ]
+  },
+  {
+   "code": "sz000603",
+   "name": "盛达资源",
+   "price": 26.25,
+   "chg": 10.02,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "白银",
+    "基金增仓",
+    "金属铜",
+    "金属镍"
+   ]
+  },
+  {
+   "code": "sz000889",
+   "name": "中嘉博创",
+   "price": 4.3,
+   "chg": 9.97,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": []
+  },
+  {
+   "code": "sz002077",
+   "name": "大港股份",
+   "price": 14.07,
+   "chg": 10.01,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "半导体",
+    "电子",
+    "集成电路封测",
+    "芯片概念"
+   ]
+  },
+  {
+   "code": "sz002081",
+   "name": "金螳螂",
+   "price": 4.82,
    "chg": 10.05,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "装修装饰Ⅲ",
+    "装修装饰Ⅱ",
+    "建筑装饰",
+    "QFII新进"
+   ]
+  },
+  {
+   "code": "sz002199",
+   "name": "东晶电子",
+   "price": 12.42,
+   "chg": 10.01,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "元件",
+    "电子",
+    "被动元件",
+    "QFII新进"
+   ]
+  },
+  {
+   "code": "sz002261",
+   "name": "拓维信息",
+   "price": 23.06,
+   "chg": 10.02,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "基金减仓",
+    "高市盈率",
+    "游戏概念",
+    "华为鲲鹏"
+   ]
+  },
+  {
+   "code": "sz002298",
+   "name": "中电鑫龙",
+   "price": 7.76,
+   "chg": 10.07,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "电力设备",
+    "基金减仓",
+    "高铁",
+    "智算中心（AIDC）"
+   ]
+  },
+  {
+   "code": "sz002453",
+   "name": "华软科技",
+   "price": 4.91,
+   "chg": 10.09,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他化学制品",
+    "化学制品",
+    "基础化工",
+    "连续亏损"
+   ]
+  },
+  {
+   "code": "sz002565",
+   "name": "顺灏股份",
+   "price": 9.27,
+   "chg": 9.96,
    "lianban": 2,
    "lb_prev": 1,
    "ji_ji_ban": "2天2板",
@@ -209,13 +347,302 @@
    ]
   },
   {
-   "code": "sh600227",
-   "name": "赤天化",
-   "price": 3.55,
-   "chg": 9.91,
+   "code": "sz002713",
+   "name": "东易日盛",
+   "price": 8.36,
+   "chg": 10.0,
    "lianban": 2,
    "lb_prev": 1,
    "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "装修装饰Ⅲ",
+    "装修装饰Ⅱ",
+    "建筑装饰",
+    "智算中心（AIDC）"
+   ]
+  },
+  {
+   "code": "sz003040",
+   "name": "楚天龙",
+   "price": 12.18,
+   "chg": 10.03,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "通信终端及配件"
+   ]
+  },
+  {
+   "code": "sz002815",
+   "name": "崇达技术",
+   "price": 16.79,
+   "chg": 10.03,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "印制电路板",
+    "元件",
+    "电子",
+    "汽车电子"
+   ]
+  },
+  {
+   "code": "sz002843",
+   "name": "泰嘉股份",
+   "price": 15.57,
+   "chg": 10.04,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "通用设备",
+    "机械设备",
+    "金属制品"
+   ]
+  },
+  {
+   "code": "sz002913",
+   "name": "奥士康",
+   "price": 69.27,
+   "chg": 10.0,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "印制电路板",
+    "元件",
+    "电子",
+    "智算中心（AIDC）"
+   ]
+  },
+  {
+   "code": "sh600520",
+   "name": "三佳科技",
+   "price": 22.07,
+   "chg": 10.02,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "半导体设备",
+    "半导体",
+    "电子",
+    "私募新进"
+   ]
+  },
+  {
+   "code": "sh600567",
+   "name": "山鹰国际",
+   "price": 1.11,
+   "chg": 9.9,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "轻工制造",
+    "私募新进",
+    "连续亏损"
+   ]
+  },
+  {
+   "code": "sh603051",
+   "name": "鹿山新材",
+   "price": 23.96,
+   "chg": 10.01,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "胶黏剂及胶带",
+    "化学制品",
+    "基础化工",
+    "私募新进"
+   ]
+  },
+  {
+   "code": "sh603203",
+   "name": "快克智能",
+   "price": 34.05,
+   "chg": 10.02,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "机械设备",
+    "自动化设备",
+    "工控设备",
+    "基金减仓"
+   ]
+  },
+  {
+   "code": "sh603373",
+   "name": "安邦护卫",
+   "price": 36.07,
+   "chg": 10.0,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "其他专业服务",
+    "专业服务",
+    "社会服务",
+    "QFII新进"
+   ]
+  },
+  {
+   "code": "sh603386",
+   "name": "骏亚科技",
+   "price": 15.97,
+   "chg": 9.99,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "印制电路板",
+    "元件",
+    "电子",
+    "汽车电子"
+   ]
+  },
+  {
+   "code": "sh603687",
+   "name": "大胜达",
+   "price": 13.66,
+   "chg": 9.98,
+   "lianban": 2,
+   "lb_prev": 1,
+   "ji_ji_ban": "2天2板",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "轻工制造",
+    "芯片概念"
+   ]
+  }
+ ],
+ "broken": [
+  {
+   "code": "sz000530",
+   "name": "冰山冷热",
+   "price": 15.45,
+   "chg": -4.45,
+   "lianban": 0,
+   "lb_prev": 2,
+   "ji_ji_ban": "",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "通用设备",
+    "机械设备",
+    "制冷空调设备",
+    "核能核电"
+   ]
+  },
+  {
+   "code": "sh600103",
+   "name": "XD青山纸",
+   "price": 4.06,
+   "chg": -2.17,
+   "lianban": 0,
+   "lb_prev": 2,
+   "ji_ji_ban": "",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "QFII新进"
+   ]
+  },
+  {
+   "code": "sh600467",
+   "name": "好当家",
+   "price": 3.8,
+   "chg": -4.04,
+   "lianban": 0,
+   "lb_prev": 2,
+   "ji_ji_ban": "",
+   "reason": "",
+   "banxing": "",
+   "first_time": "",
+   "open_cnt": "",
+   "fengdan": "",
+   "sectors": [
+    "中韩自贸区"
+   ]
+  },
+  {
+   "code": "sh600227",
+   "name": "赤天化",
+   "price": 3.5,
+   "chg": -1.41,
+   "lianban": 0,
+   "lb_prev": 2,
+   "ji_ji_ban": "",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -230,11 +657,11 @@
   {
    "code": "sh600229",
    "name": "城市传媒",
-   "price": 5.95,
-   "chg": 9.98,
-   "lianban": 2,
-   "lb_prev": 1,
-   "ji_ji_ban": "2天2板",
+   "price": 6.04,
+   "chg": 1.51,
+   "lianban": 0,
+   "lb_prev": 2,
+   "ji_ji_ban": "",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -245,47 +672,47 @@
    ]
   },
   {
-   "code": "sh600280",
-   "name": "中央商场",
-   "price": 3.1,
-   "chg": 9.93,
-   "lianban": 2,
-   "lb_prev": 1,
-   "ji_ji_ban": "2天2板",
+   "code": "sh600722",
+   "name": "金牛化工",
+   "price": 15.16,
+   "chg": 4.77,
+   "lianban": 0,
+   "lb_prev": 3,
+   "ji_ji_ban": "",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "连续亏损"
+    "基础化工"
    ]
   },
   {
-   "code": "sh600467",
-   "name": "好当家",
-   "price": 3.96,
-   "chg": 10.0,
-   "lianban": 2,
-   "lb_prev": 1,
-   "ji_ji_ban": "2天2板",
+   "code": "sh600814",
+   "name": "杭州解百",
+   "price": 9.53,
+   "chg": 3.7,
+   "lianban": 0,
+   "lb_prev": 4,
+   "ji_ji_ban": "",
    "reason": "",
    "banxing": "",
    "first_time": "",
    "open_cnt": "",
    "fengdan": "",
    "sectors": [
-    "中韩自贸区"
+    "社保新进"
    ]
   },
   {
    "code": "sh601086",
    "name": "国芳集团",
-   "price": 11.79,
-   "chg": 9.67,
-   "lianban": 2,
-   "lb_prev": 1,
-   "ji_ji_ban": "2天2板",
+   "price": 11.31,
+   "chg": -4.07,
+   "lianban": 0,
+   "lb_prev": 2,
+   "ji_ji_ban": "",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -296,11 +723,11 @@
   {
    "code": "sh603324",
    "name": "盛剑科技",
-   "price": 35.5,
-   "chg": 10.01,
-   "lianban": 2,
-   "lb_prev": 1,
-   "ji_ji_ban": "2天2板",
+   "price": 37.4,
+   "chg": 5.35,
+   "lianban": 0,
+   "lb_prev": 2,
+   "ji_ji_ban": "",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -313,11 +740,11 @@
   {
    "code": "sh603708",
    "name": "家家悦",
-   "price": 10.65,
-   "chg": 10.02,
-   "lianban": 2,
-   "lb_prev": 1,
-   "ji_ji_ban": "2天2板",
+   "price": 10.27,
+   "chg": -3.57,
+   "lianban": 0,
+   "lb_prev": 2,
+   "ji_ji_ban": "",
    "reason": "",
    "banxing": "",
    "first_time": "",
@@ -328,176 +755,45 @@
    ]
   }
  ],
- "broken": [
-  {
-   "code": "sz002122",
-   "name": "汇洲智能",
-   "price": 3.8,
-   "chg": 5.85,
-   "lianban": 0,
-   "lb_prev": 3,
-   "ji_ji_ban": "",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "机床工具",
-    "高端装备"
-   ]
-  },
-  {
-   "code": "sz002164",
-   "name": "宁波东力",
-   "price": 21.06,
-   "chg": -2.95,
-   "lianban": 0,
-   "lb_prev": 3,
-   "ji_ji_ban": "",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "通用设备",
-    "机械设备",
-    "金属制品",
-    "增持计划"
-   ]
-  },
-  {
-   "code": "sz002242",
-   "name": "九阳股份",
-   "price": 41.9,
-   "chg": 8.66,
-   "lianban": 0,
-   "lb_prev": 3,
-   "ji_ji_ban": "",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "家用电器"
-   ]
-  },
-  {
-   "code": "sz002548",
-   "name": "金新农",
-   "price": 5.33,
-   "chg": 6.39,
-   "lianban": 0,
-   "lb_prev": 4,
-   "ji_ji_ban": "",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "连续亏损"
-   ]
-  },
-  {
-   "code": "sz002579",
-   "name": "中京电子",
-   "price": 19.23,
-   "chg": 7.91,
-   "lianban": 0,
-   "lb_prev": 5,
-   "ji_ji_ban": "",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "印制电路板",
-    "元件",
-    "电子",
-    "私募新进"
-   ]
-  },
-  {
-   "code": "sh603360",
-   "name": "百傲化学",
-   "price": 11.25,
-   "chg": 6.53,
-   "lianban": 0,
-   "lb_prev": 2,
-   "ji_ji_ban": "",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "基础化工"
-   ]
-  },
-  {
-   "code": "sh603926",
-   "name": "铁流股份",
-   "price": 18.45,
-   "chg": 2.67,
-   "lianban": 0,
-   "lb_prev": 3,
-   "ji_ji_ban": "",
-   "reason": "",
-   "banxing": "",
-   "first_time": "",
-   "open_cnt": "",
-   "fengdan": "",
-   "sectors": [
-    "汽车零部件",
-    "汽车",
-    "底盘与发动机系统",
-    "QFII新进"
-   ]
-  }
- ],
  "jj": [
   {
    "from": 5,
    "to": 6,
    "prev": 1,
-   "up": 0,
-   "rate": 0.0
+   "up": 1,
+   "rate": 100.0
   },
   {
    "from": 4,
    "to": 5,
-   "prev": 2,
-   "up": 1,
-   "rate": 50.0
+   "prev": 1,
+   "up": 0,
+   "rate": 0.0
   },
   {
    "from": 3,
    "to": 4,
-   "prev": 5,
-   "up": 1,
-   "rate": 20.0
+   "prev": 4,
+   "up": 3,
+   "rate": 75.0
   },
   {
    "from": 2,
    "to": 3,
-   "prev": 5,
-   "up": 4,
-   "rate": 80.0
+   "prev": 11,
+   "up": 3,
+   "rate": 27.272727272727273
   },
   {
    "from": 1,
    "to": 2,
-   "prev": 34,
-   "up": 11,
-   "rate": 32.35294117647059
+   "prev": 49,
+   "up": 22,
+   "rate": 44.89795918367347
   }
  ],
- "gaps": [],
+ "gaps": [
+  5
+ ],
  "leaders": {}
 }
