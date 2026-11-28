@@ -741,6 +741,23 @@ jobs:
           #   python3 upload_ima.py --file "outputs/反转数值月线跟踪_$(date +%Y-%m-%d).md" --name "反转数值月线跟踪_$(date +%Y-%m-%d).md" || true
           # fi
 
+      # ─── 第五.8b步：涨停复盘上传（2026-11-28 · A 报告 / C JSON 已由 limitup_concept_rank 产出）───
+      - name: 涨停复盘上传
+        if: always()
+        continue-on-error: true
+        env:
+          IMA_OPENAPI_CLIENTID: ${{ secrets.IMA_OPENAPI_CLIENTID }}
+          IMA_OPENAPI_APIKEY: ${{ secrets.IMA_OPENAPI_APIKEY }}
+          IMA_KB_ID: ${{ secrets.IMA_KB_ID }}
+          IMA_FOLDER_ID: folder_7485264708529742
+        run: |
+          D=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          if [ -f "outputs/涨停复盘_${D}.md" ]; then
+            python3 upload_ima.py --file "outputs/涨停复盘_${D}.md" --name "涨停复盘_${D}.md" || echo "⚠️ 涨停复盘上传失败(非致命)"
+          else
+            echo "未找到 outputs/涨停复盘_${D}.md（上游 limitup 未产或涨停池为空）"
+          fi
+
       # ─── 第五.9步：王者突破（神龙摆尾尾部突破K × 王者倍量柱）选股 + 跟踪池 + 入库 + 上传（2026-10-17）───
       #   文章来源：林中独步《神龙摆尾（三线合一）指标的一个小妙用》
       #   纪律：信号K 实顶(收盘)=强支撑、实底(开盘)=止损位；跟踪池每日更新，跌破实底即删除
