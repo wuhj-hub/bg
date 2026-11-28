@@ -475,6 +475,31 @@ def render_limitup_panel():
     L = ["\n### ③.7 🔥 热板作战面板（板块分级 · 龙头 · 中军）", ""]
     head = f"- 情绪刻度：首板晋级率 {fj}%（{mkt.get('mood', '—')}）" if fj is not None else "- 情绪刻度：—"
     L.append(head + f" · 涨停{d.get('limitup_total', '—')} · 连板{d.get('lianban_total', '—')}")
+
+    # ── 2026-11-28：梯队结构 + 赚钱效应 + 方向（来自 涨停复盘 的 ladder / money_effect）──
+    lad = d.get("ladder") or []
+    me = d.get("money_effect") or {}
+    td = me.get("tier_dist") or {}
+    if td:
+        _line = "- 梯队：" + " / ".join(f"{k} {v}" for k, v in td.items() if v)
+        if me.get("explode_rate") is not None:
+            _line += f"｜盘中开板率 {me.get('explode_rate')}%"
+        L.append(_line)
+    if me.get("promote_rate") is not None:
+        L.append(f"- 昨日涨停 {me.get('prev_zt')} 只 → 今日晋级 {me.get('promote')} 只（{me.get('promote_rate')}%）")
+    hi_sec = {}
+    for x in lad:
+        if x.get("tier") in ("3板", "4板+"):
+            for sec in (x.get("top_sectors") or []):
+                hi_sec[sec["name"]] = hi_sec.get(sec["name"], 0) + sec["n"]
+    if hi_sec:
+        _top = sorted(hi_sec.items(), key=lambda kv: -kv[1])[:3]
+        L.append("- 高位（3板+）集中：" + "，".join(f"{n} {c}" for n, c in _top))
+    _main = next((c for c in cr if c.get("grade") == "主线"), None)
+    if _main:
+        L.append(f"- **方向提示**：主线 {_main.get('concept')}（{_main.get('n')} 只涨停，"
+                 f"最高 {_main.get('maxlb', '—')} 板）→ 今日竞价重点看该板块首板承接与高位股溢价")
+
     rows = [c for c in cr if c.get("grade") in ("主线", "支线")][:8] or cr[:6]
     _pm = fetch_prices([(lead.get(c.get("concept")) or {}).get("code") for c in rows]
                        + [(zj.get(c.get("concept")) or {}).get("code") for c in rows])
