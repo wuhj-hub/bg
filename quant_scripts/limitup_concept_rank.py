@@ -858,10 +858,18 @@ def _tier(lb):
     return "4板+" if lb >= 4 else f"{lb}板"
 
 
-def _reason(u, code_sector):
-    """涨停原因 = 板块 + 概念（只写事实标签，不做猜测性归因）。"""
+def _reason(u, cmap, code_sector):
+    """涨停原因 = 板块 + 概念（只写事实标签，不做猜测性归因）。
+
+    概念优先用 fetch_concepts（东财 F10 精准概念 IS_PRECISE=1，已过滤泛概念）；
+    取不到时退回涨停池的板块成分。
+    """
     hy = (u.get("hybk") or "").strip()
-    cons = [c for c in (code_sector.get(u.get("c6")) or []) if c and c != hy]
+    c6 = str(u.get("c6") or "").zfill(6)
+    rec = cmap.get(c6) or {}
+    cons = [c for c in (rec.get("concept") or []) if c and c != hy]
+    if not cons:
+        cons = [c for c in (code_sector.get(u.get("c6")) or []) if c and c != hy]
     parts = [hy] if hy else []
     if cons:
         parts.append("/".join(cons[:2]))
@@ -871,6 +879,16 @@ def _reason(u, code_sector):
 
 def build_review(ups, code_sector, today, mkt_lb_jj=None, mkt_first_jj=None, mood=None):
     """生成《涨停复盘》md 行 + 结构化片段（A：报告 / C：JSON）。"""
+    # 精准概念（行业为主、概念为辅）：只对涨停股取，失败则降级为板块成分
+    cmap = {}
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import fetch_concepts as _FC
+        c6s = [str(u.get("c6")).zfill(6) for u in ups[:400] if u.get("c6")]
+        cmap = _FC.ensure(c6s, sleep=0.12)
+    except Exception as _e:  # noqa: BLE001
+        print(f"[WARN] 概念标签不可用，降级为板块成分: {_e}", file=sys.stderr)
+
     tiers = {"1板": [], "2板": [], "3板": [], "4板+": []}
     for u in ups:
         tiers[_tier(u.get("lianban"))].append(u)
@@ -933,7 +951,7 @@ def build_review(ups, code_sector, today, mkt_lb_jj=None, mkt_first_jj=None, moo
           "|---|---|---|---|---|---|---|"]
     reasons_json = []
     for u in sorted(ups, key=lambda x: (-int(x.get("lianban") or 1), -float(x.get("fund") or 0))):
-        rs = _reason(u, code_sector)
+        rs = _reason(u, cmap, code_sector)
         fd = f"{u['fund'] / 1e4:.0f}" if u.get("fund") else "—"
         L.append(f"| {u.get('code')} | {u.get('name')} | {_tier(u.get('lianban'))} | "
                  f"{u.get('hybk') or '未分类'} | {rs} | {fd} | {fmt_t(u.get('fbt'))} |")
