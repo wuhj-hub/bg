@@ -835,6 +835,138 @@ def render_regime(reg):
     return L
 
 
+# ══════════════════════ 涨停复盘（2026-11-28 · A+C） ══════════════════════
+def _load_limitup_hist():
+    for p in (os.path.join(BASE, "outputs/limitup_history.json"),
+              os.path.join(BASE, "limitup_history.json")):
+        if os.path.exists(p):
+            try:
+                with open(p, encoding="utf-8") as f:
+                    d = json.load(f)
+                if isinstance(d, dict) and d:
+                    return d
+            except Exception:
+                continue
+    return {}
+
+
+def _tier(lb):
+    try:
+        lb = int(lb or 1)
+    except (TypeError, ValueError):
+        lb = 1
+    return "4板+" if lb >= 4 else f"{lb}板"
+
+
+def _reason(u, code_sector):
+    """涨停原因 = 板块 + 概念（只写事实标签，不做猜测性归因）。"""
+    hy = (u.get("hybk") or "").strip()
+    cons = [c for c in (code_sector.get(u.get("c6")) or []) if c and c != hy]
+    parts = [hy] if hy else []
+    if cons:
+        parts.append("/".join(cons[:2]))
+    txt = "｜".join(parts) if parts else "—"
+    return f"{txt}｜{_tier(u.get('lianban'))}"
+
+
+def build_review(ups, code_sector, today, mkt_lb_jj=None, mkt_first_jj=None, mood=None):
+    """生成《涨停复盘》md 行 + 结构化片段（A：报告 / C：JSON）。"""
+    tiers = {"1板": [], "2板": [], "3板": [], "4板+": []}
+    for u in ups:
+        tiers[_tier(u.get("lianban"))].append(u)
+
+    # 板块统计（按涨停家数）
+    byb = defaultdict(list)
+    for u in ups:
+        byb[(u.get("hybk") or "未分类")].append(u)
+    sec_rank = sorted(byb.items(), key=lambda kv: -len(kv[1]))
+
+    # 昨日涨停 → 今日表现（晋级率/炸板）
+    hist = _load_limitup_hist()
+    prev = next((k for k in sorted(hist) if k < today), None) if hist else None
+    prev_list = hist.get(prev) or []
+    prev_c6 = {(x.get("c6") or "").strip() for x in prev_list if x.get("c6")}
+    today_c6 = {(u.get("c6") or "").strip() for u in ups}
+    promote = len(prev_c6 & today_c6)
+    promote_rate = round(promote / len(prev_c6) * 100, 1) if prev_c6 else None
+    explode = sum(1 for u in ups if (u.get("zbc") or 0) > 0)
+    explode_rate = round(explode / len(ups) * 100, 1) if ups else None
+
+    L = [f"# 涨停复盘 · {today}", "",
+         "> 口径：涨停池来自东财（含 20% 涨跌幅板块）；「原因」只写**板块+概念**标签，不做猜测性归因；"
+         "晋级率=昨日涨停今日仍在涨停池比例。", ""]
+
+    L += ["## 一、情绪刻度", ""]
+    L.append(f"- 涨停 **{len(ups)}**（连板 {len(ups) - len(tiers['1板'])} / 首板 {len(tiers['1板'])}）"
+             + (f"｜情绪 {mood}" if mood else ""))
+    if mkt_lb_jj is not None or mkt_first_jj is not None:
+        L.append(f"- 连板晋级率 {mkt_lb_jj if mkt_lb_jj is not None else '—'}%"
+                 f"｜首板晋级率 {mkt_first_jj if mkt_first_jj is not None else '—'}%")
+    if prev_c6:
+        L.append(f"- 昨日涨停 {len(prev_c6)} 只 → 今日晋级 **{promote}** 只（{promote_rate}%）")
+    L.append(f"- 盘中开板 {explode} 只（开板率 {explode_rate}%，zbc>0 即盘中炸过板）")
+    L.append("- 梯队分布：" + "｜".join(f"{k} {len(v)}" for k, v in tiers.items()))
+    L.append("")
+
+    L += ["## 二、连板梯队 × 板块", "", "| 梯队 | 数量 | 主要板块（家数） |", "|---|---|---|"]
+    ladder_json = []
+    for k, v in tiers.items():
+        if not v:
+            continue
+        b = defaultdict(int)
+        for u in v:
+            b[(u.get("hybk") or "未分类")] += 1
+        top = sorted(b.items(), key=lambda kv: -kv[1])[:5]
+        L.append(f"| {k} | {len(v)} | " + "，".join(f"{n} {c}" for n, c in top) + " |")
+        ladder_json.append({"tier": k, "n": len(v),
+                            "top_sectors": [{"name": n, "n": c} for n, c in top]})
+    L.append("")
+
+    L += ["## 三、板块排行", "", "| 板块 | 涨停 | 最高板 | 占涨停比 |", "|---|---|---|---|"]
+    for name, v in sec_rank[:12]:
+        mx = max((int(u.get("lianban") or 1) for u in v), default=1)
+        L.append(f"| {name} | {len(v)} | {mx} | {len(v) / len(ups) * 100:.1f}% |")
+    L.append("")
+
+    L += ["## 四、逐票清单（含原因）", "",
+          "| 代码 | 名称 | 板 | 板块 | 原因 | 封单(万) | 首封 |",
+          "|---|---|---|---|---|---|---|"]
+    reasons_json = []
+    for u in sorted(ups, key=lambda x: (-int(x.get("lianban") or 1), -float(x.get("fund") or 0))):
+        rs = _reason(u, code_sector)
+        fd = f"{u['fund'] / 1e4:.0f}" if u.get("fund") else "—"
+        L.append(f"| {u.get('code')} | {u.get('name')} | {_tier(u.get('lianban'))} | "
+                 f"{u.get('hybk') or '未分类'} | {rs} | {fd} | {fmt_t(u.get('fbt'))} |")
+        reasons_json.append({"code": u.get("code"), "name": u.get("name"),
+                             "lianban": int(u.get("lianban") or 1),
+                             "sector": u.get("hybk") or "未分类", "reason": rs})
+    L.append("")
+
+    L += ["## 五、判读", ""]
+    hi = [u for u in ups if int(u.get("lianban") or 1) >= 3]
+    if hi:
+        hb = defaultdict(int)
+        for u in hi:
+            hb[u.get("hybk") or "未分类"] += 1
+        top_hb = sorted(hb.items(), key=lambda kv: -kv[1])[:3]
+        L.append(f"- 高位（3板+）{len(hi)} 只，集中：" + "，".join(f"{n} {c}" for n, c in top_hb))
+    if sec_rank:
+        L.append(f"- 主线：**{sec_rank[0][0]}**（{len(sec_rank[0][1])} 只，占 {len(sec_rank[0][1]) / len(ups) * 100:.0f}%）")
+    if explode_rate is not None:
+        L.append(f"- 盘中开板率 {explode_rate}%：" + ("分歧较大，次日溢价需打折" if explode_rate >= 25 else "封板质量尚可"))
+    if promote_rate is not None:
+        L.append(f"- 昨日涨停今日晋级 {promote_rate}%：" + ("接力有效" if promote_rate >= 40 else "接力转弱"))
+    L.append("")
+
+    rv = {"ladder": ladder_json,
+          "money_effect": {"prev_zt": len(prev_c6), "promote": promote,
+                           "promote_rate": promote_rate, "explode": explode,
+                           "explode_rate": explode_rate,
+                           "tier_dist": {k: len(v) for k, v in tiers.items()}},
+          "reasons": reasons_json}
+    return L, rv
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=20)
@@ -1231,6 +1363,16 @@ def main():
     mp = os.path.join(outdir, f"涨停概念排行_{today}.md")
     open(mp, "w", encoding="utf-8").write(md)
 
+    # ── 涨停复盘（2026-11-28 · 独立报告 + JSON 片段）──
+    rv_json = {}
+    try:
+        rv_md, rv_json = build_review(ups, code_sector, today, mkt_lb_jj, mkt_first_jj, mood)
+        rp = os.path.join(outdir, f"涨停复盘_{today}.md")
+        open(rp, "w", encoding="utf-8").write("\n".join(rv_md))
+        print(f"[OK] {rp}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[WARN] 涨停复盘生成失败: {_e}", file=sys.stderr)
+
     json.dump({"date": today,
                "limitup_total": len(ups), "lianban_total": n_lb, "first_total": n_first,
                "prev_limitup_total": prev_zt_n,
@@ -1245,7 +1387,8 @@ def main():
                                  "stocks": [x["name"] for x in v["stocks"]]} for k, v in rank],
                "leaders": leaders_json,
                "zhongjun": zj_json,
-               "stocks": ups},
+               "stocks": ups,
+               **rv_json},
               open(os.path.join(outdir, "涨停概念排行_latest.json"), "w", encoding="utf-8"),
               ensure_ascii=False, indent=1)
 
